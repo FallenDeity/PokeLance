@@ -20,7 +20,7 @@ asyncio.run(main())
 
 
 # case 1
-async def main():
+async def main() -> None:
     client = pokelance.PokeLance()
     print(await client._client.ping())
     return None

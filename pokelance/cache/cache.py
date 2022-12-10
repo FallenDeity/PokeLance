@@ -9,9 +9,11 @@ if t.TYPE_CHECKING:
 
 
 __all__: t.Tuple[str, ...] = ("PokemonCache", "BaseCache")
+_KT = t.TypeVar("_KT")
+_VT = t.TypeVar("_VT")
 
 
-class BaseCache(MutableMapping):
+class BaseCache(MutableMapping[t.Any, t.Any]):
     def __init__(self, max_size: int = 100) -> None:
         self._max_size = max_size
         self._cache: t.Dict[str, t.Any] = {}

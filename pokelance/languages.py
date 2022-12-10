@@ -21,4 +21,4 @@ class Language:
 
     @classmethod
     def from_name(cls, name: str) -> str:
-        return getattr(cls, name.upper())
+        return str(getattr(cls, name.upper()))

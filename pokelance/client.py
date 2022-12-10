@@ -9,6 +9,7 @@ if t.TYPE_CHECKING:
     from types import TracebackType
 
     import aiohttp
+    import logging
 
     from .ext import BaseExtension, Pokemon
 
@@ -29,7 +30,7 @@ class PokeLance:
     ) -> None:
         self._session = session
         self._logger = create_logging_setup("Client")
-        self._language = language if isinstance(language, str) else Language.from_name(language)
+        self._language = language if language == Language.default() else Language.from_name(language)
         self._client = HttpClient(client=self, session=self._session, cache_size=cache_size)
 
     async def _async_setup_hook(self) -> None:
@@ -66,17 +67,17 @@ class PokeLance:
         return await self._client.ping()
 
     @property
-    def session(self):
-        return self._session
+    def session(self) -> "aiohttp.ClientSession":
+        return self._client._session
 
     @property
-    def logger(self):
+    def logger(self) -> "logging.Logger":
         return self._logger
 
     @property
-    def language(self):
+    def language(self) -> str:
         return self._language
 
     @property
-    def http(self):
+    def http(self) -> HttpClient:
         return self._client
