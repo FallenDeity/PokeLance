@@ -1,0 +1,53 @@
+[tool.poetry]
+name = "pokelance"
+version = "0.0.1a"
+description = "A flexible and easy to use pokemon library."
+authors = ["FallenDeity <61227305+FallenDeity@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+attrs = "^22.1.0"
+aiohttp = "^3.8.3"
+aiofiles = "^22.1.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.12.0"
+isort = "^5.10.1"
+mkdocs = "^1.4.2"
+ruff = "^0.0.171"
+mkdocstrings = "^0.19.0"
+mkdocs-material = "^8.5.11"
+Pygments = "^2.13.0"
+pre-commit = "^2.20.0"
+mypy = "^0.991"
+pyright = "^1.1.283"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 120
+
+[tool.pyright]
+include = ["pokelance"]
+pythonVersion = "3.8"
+typeCheckingMode = "strict"
+reportPrivateUsage = false
+reportImportCycles = false
+
+[tool.black]
+line-length = 120
+target-version = ['py38']
+
+[tool.isort]
+line_length = 120
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+src_paths = ["pokelance"]
