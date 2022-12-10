@@ -1,6 +1,6 @@
 # PokeLance
 
-<p style="text-align:center;">
+<p align="center">
 <img src="https://raw.githubusercontent.com/sarthhh/wyvern/master/docs/assets/wyvern.png" height=150 width=150 alt="logo"><br><br>
 <img src="https://img.shields.io/github/license/FallenDeity/PokeLance?style=flat-square" alt="license">
 <img src="https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square" alt="black">
