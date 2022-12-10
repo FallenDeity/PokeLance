@@ -22,19 +22,31 @@ __all__: t.Tuple[str, ...] = (
 @t.final
 class HttpClient:
 
-    __slots__: t.Tuple[str, ...] = ("_client", "_session", "_cache")
+    __slots__: t.Tuple[str, ...] = (
+        "_client",
+        "session",
+        "_cache",
+        "_is_ready",
+    )
 
     def __init__(
         self, *, cache_size: int, client: "PokeLance", session: t.Optional[aiohttp.ClientSession] = None
     ) -> None:
         self._client = client
-        self._session = session or aiohttp.ClientSession()
+        self.session = session
+        self._is_ready = False
         self._cache = Cache(max_size=cache_size)
-        if self._client.session is None:
-            self._client._session = self._session
+
+    async def connect(self) -> None:
+        if not self._is_ready:
+            if self.session is None:
+                self.session = aiohttp.ClientSession()
+                await self._client.setup_hook()
+            self._is_ready = True
 
     async def request(self, route: Route) -> t.Any:
-        async with self._session.request(route.method, route.url, params=route.payload) as response:
+        await self.connect()
+        async with self.session.request(route.method, route.url, params=route.payload) as response:
             if 300 > response.status >= 200:
                 return await response.json()
             else:

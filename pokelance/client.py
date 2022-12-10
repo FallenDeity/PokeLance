@@ -6,12 +6,12 @@ from .languages import Language
 from .logger import create_logging_setup
 
 if t.TYPE_CHECKING:
+    import logging
     from types import TracebackType
 
     import aiohttp
-    import logging
 
-    from .ext import BaseExtension, Pokemon
+    from .ext import BaseExtension, Berry
 
 __all__: t.Tuple[str, ...] = ("PokeLance",)
 
@@ -19,7 +19,7 @@ __all__: t.Tuple[str, ...] = ("PokeLance",)
 class PokeLance:
 
     EXTENSIONS: Path = Path(__file__).parent / "ext"
-    pokemon: "Pokemon"
+    berry: "Berry"
 
     def __init__(
         self,
@@ -28,16 +28,9 @@ class PokeLance:
         language: str = Language.default(),
         session: t.Optional["aiohttp.ClientSession"] = None,
     ) -> None:
-        self._session = session
         self._logger = create_logging_setup("Client")
         self._language = language if language == Language.default() else Language.from_name(language)
-        self._client = HttpClient(client=self, session=self._session, cache_size=cache_size)
-
-    async def _async_setup_hook(self) -> None:
-        await self.setup_hook()
-        self._logger.info("Setup complete")
-        self._logger.info(f"Using language: {self._language}")
-        self._logger.info(f"Using cache size: {self._client.cache.max_size}")
+        self._http = HttpClient(client=self, session=session, cache_size=cache_size)
 
     async def __aenter__(self) -> "PokeLance":
         return self
@@ -48,15 +41,17 @@ class PokeLance:
         exc_val: t.Optional[BaseException],
         exc_tb: t.Optional["TracebackType"],
     ) -> None:
-        if self._session is not None:
-            await self._session.close()
+        await self._http.session.close()
 
     async def setup_hook(self) -> None:
+        self._logger.info(f"Using language: {self._language}")
+        self._logger.info(f"Using cache size: {self._http.cache.max_size}")
         for extension in self.EXTENSIONS.iterdir():
             if extension.is_file() and extension.suffix == ".py":
                 if "_" not in extension.stem:
                     module = __import__(f"pokelance.ext.{extension.stem}", fromlist=["setup"])
                     await module.setup(self)
+        self._logger.info("Setup complete")
 
     async def add_extension(self, name: str, extension: "BaseExtension") -> None:
         self._logger.info(f"Adding extension: {name}")
@@ -64,11 +59,11 @@ class PokeLance:
         setattr(self, name, extension)
 
     async def ping(self) -> float:
-        return await self._client.ping()
+        return await self._http.ping()
 
-    @property
-    def session(self) -> "aiohttp.ClientSession":
-        return self._client._session
+    async def close(self) -> None:
+        self._logger.info("Closing session")
+        await self._http.session.close()
 
     @property
     def logger(self) -> "logging.Logger":
@@ -80,4 +75,4 @@ class PokeLance:
 
     @property
     def http(self) -> HttpClient:
-        return self._client
+        return self._http

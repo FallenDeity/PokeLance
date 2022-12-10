@@ -11,7 +11,6 @@ python = "^3.8"
 attrs = "^22.1.0"
 aiohttp = "^3.8.3"
 aiofiles = "^22.1.0"
-types-aiofiles = "^22.1.0.4"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -23,8 +22,6 @@ mkdocstrings = "^0.19.0"
 mkdocs-material = "^8.5.11"
 Pygments = "^2.13.0"
 pre-commit = "^2.20.0"
-mypy = "^0.991"
-pyright = "^1.1.283"
 
 [build-system]
 requires = ["poetry-core"]
@@ -32,13 +29,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
 line-length = 120
-
-[tool.pyright]
-include = ["pokelance"]
-pythonVersion = "3.8"
-typeCheckingMode = "strict"
-reportPrivateUsage = false
-reportImportCycles = false
+target-version = "py38"
 
 [tool.black]
 line-length = 120

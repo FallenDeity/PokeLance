@@ -18,13 +18,13 @@ class BaseExtension:
         self._client = client
         self._cache = self._client.cache
 
-    def validate_resource(self, cache: "BaseCache", resource: t.Union[str, int], route: "Route") -> None:
-        data: t.List[str] = list(map(str, cache.endpoints.values())) + list(cache.endpoints.keys())
+    def _validate_resource(self, cache: "BaseCache", resource: t.Union[str, int], route: "Route") -> None:
+        data: t.Set[str] = set(list(map(str, cache.endpoints.values())) + list(cache.endpoints.keys()))
         if resource not in data:
             raise ResourceNotFound(self.get_message(str(resource), data), route)
 
     @staticmethod
-    def get_message(case: str, data: t.List[str]) -> str:
+    def get_message(case: str, data: t.Set[str]) -> str:
         matches = get_close_matches(case, data, n=10, cutoff=0.5)
         if matches:
             return f"Resource not found. Did you mean {', '.join(matches)}?"

@@ -6,14 +6,14 @@ import aiofiles
 
 if t.TYPE_CHECKING:
     from pokelance.http import Route
+    from pokelance.models import Berry as BerryModel
+    from pokelance.models import BerryFirmness, BerryFlavor
 
 
-__all__: t.Tuple[str, ...] = ("PokemonCache", "BaseCache")
-_KT = t.TypeVar("_KT")
-_VT = t.TypeVar("_VT")
+__all__: t.Tuple[str, ...] = ("PokemonCache", "BaseCache", "BerryCache", "BerryFlavorCache", "BerryFirmnessCache")
 
 
-class BaseCache(MutableMapping[t.Any, t.Any]):
+class BaseCache(MutableMapping):
     def __init__(self, max_size: int = 100) -> None:
         self._max_size = max_size
         self._cache: t.Dict[str, t.Any] = {}
@@ -60,5 +60,199 @@ class BaseCache(MutableMapping[t.Any, t.Any]):
         return self._cache
 
 
+class SecondaryTypeCache(BaseCache):
+    def load_documents(self, data: t.List[t.Dict[str, str]]) -> None:
+        for document in data:
+            self._endpoints[document["url"].split("/")[-2]] = int(document["url"].split("/")[-2])
+
+
+class BerryCache(BaseCache):
+    _cache: t.Dict[str, "BerryModel"]
+
+
+class BerryFirmnessCache(BaseCache):
+    _cache: t.Dict[str, "BerryFirmness"]
+
+
+class BerryFlavorCache(BaseCache):
+    _cache: t.Dict[str, "BerryFlavor"]
+
+
+class ContestTypeCache(BaseCache):
+    ...
+
+
 class PokemonCache(BaseCache):
-    pass
+    ...
+
+
+class AbilityCache(BaseCache):
+    ...
+
+
+class EggGroupCache(BaseCache):
+    ...
+
+
+class GenderCache(BaseCache):
+    ...
+
+
+class GrowthRateCache(BaseCache):
+    ...
+
+
+class NatureCache(BaseCache):
+    ...
+
+
+class PokeathlonStatCache(BaseCache):
+    ...
+
+
+class PokemonColorCache(BaseCache):
+    ...
+
+
+class PokemonFormCache(BaseCache):
+    ...
+
+
+class PokemonLocationAreaCache(BaseCache):
+    ...
+
+
+class PokemonHabitatCache(BaseCache):
+    ...
+
+
+class PokemonShapeCache(BaseCache):
+    ...
+
+
+class PokemonSpeciesCache(BaseCache):
+    ...
+
+
+class StatCache(BaseCache):
+    ...
+
+
+class TypeCache(BaseCache):
+    ...
+
+
+class EncounterMethodCache(BaseCache):
+    ...
+
+
+class EncounterConditionCache(BaseCache):
+    ...
+
+
+class EncounterConditionValueCache(BaseCache):
+    ...
+
+
+class EvolutionTriggerCache(BaseCache):
+    ...
+
+
+class GamesGenerationCache(BaseCache):
+    ...
+
+
+class GamesPokedexCache(BaseCache):
+    ...
+
+
+class GamesVersionCache(BaseCache):
+    ...
+
+
+class GamesVersionGroupCache(BaseCache):
+    ...
+
+
+class ItemCache(BaseCache):
+    ...
+
+
+class ItemAttributeCache(BaseCache):
+    ...
+
+
+class ItemCategoryCache(BaseCache):
+    ...
+
+
+class ItemFlingEffectCache(BaseCache):
+    ...
+
+
+class ItemPocketCache(BaseCache):
+    ...
+
+
+class LocationCache(BaseCache):
+    ...
+
+
+class LocationAreaCache(BaseCache):
+    ...
+
+
+class PalParkAreaCache(BaseCache):
+    ...
+
+
+class RegionCache(BaseCache):
+    ...
+
+
+class MoveCache(BaseCache):
+    ...
+
+
+class MoveAilmentCache(BaseCache):
+    ...
+
+
+class MoveBattleStyleCache(BaseCache):
+    ...
+
+
+class MoveCategoryCache(BaseCache):
+    ...
+
+
+class MoveDamageClassCache(BaseCache):
+    ...
+
+
+class MoveLearnMethodCache(BaseCache):
+    ...
+
+
+class MoveTargetCache(BaseCache):
+    ...
+
+
+class MachineCache(SecondaryTypeCache):
+    ...
+
+
+class EvolutionChainCache(SecondaryTypeCache):
+    ...
+
+
+class CharacteristicCache(SecondaryTypeCache):
+    ...
+
+
+class ContestEffectCache(SecondaryTypeCache):
+    ...
+
+
+class SuperContestEffectCache(SecondaryTypeCache):
+    ...
