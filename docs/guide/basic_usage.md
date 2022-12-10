@@ -1,27 +1,13 @@
+# Basic Use and taking advantage of cache
+
+```python
 import asyncio
 
-import pokelance
+from pokelance import PokeLance
 
-"""
-# case 2
-client = pokelance.PokeLance()
-async def main():
-    print(await client._client.ping())
-    return None
-asyncio.run(main())
-
-# case 3
-async def main():
-    async with pokelance.PokeLance() as client:
-        print(await client._client.ping())
-        return None
-asyncio.run(main())
-"""
-
-client = pokelance.PokeLance()
+client = PokeLance()
 
 
-# case 1
 async def main():
     print(await client.ping())
     print(await client.berry.fetch_berry("cheri"))
@@ -34,3 +20,4 @@ async def main():
 
 
 asyncio.run(main())
+```

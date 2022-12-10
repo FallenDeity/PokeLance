@@ -1,0 +1,74 @@
+site_name: PokeLance
+repo_url: https://github.com/FallenDeity/PokeLance
+site_description: Documentation for the PokeApi wrapper, PokeLance.
+site_author: FallenDeity
+copyright: Copyright FallenDeity ( 2022 - present )
+site_url: https://FallenDeity.github.io/PokeLance
+
+theme:
+  name: "material"
+  logo: assets/pokelance.png
+  favicon: assets/pokelance.png
+
+  font:
+    text: Ubuntu
+
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.top
+    - content.code.annotate
+  palette:
+    - scheme: light
+      toggle:
+        icon: material/weather-sunny
+        name: Light Mode
+    - scheme: slate
+      toggle:
+        icon: material/weather-night
+        name: Dark Mode
+
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: numpy
+            merge_init_into_class: false
+            inherited_members: true
+          import:
+            - https://docs.python.org/3.9/objects.inv
+  - search
+  - social:
+      cards_color:
+        fill: "#3761A3"
+        text: "#FFFFFF"
+
+
+
+nav:
+  - Getting Started: index.md
+  - Guide:
+      - Usage: guide/basic_usage.md
+
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.superfences
+
+extra:
+  version: 0.0.4a
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/FallenDeity/PokeLance
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/FyEE54u9GF
