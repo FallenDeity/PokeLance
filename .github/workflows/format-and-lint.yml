@@ -32,3 +32,6 @@ jobs:
       - name: Linting with ruff
         run: |
           poetry run ruff .
+      - name: Build docs
+        run: |
+          poetry run mkdocs gh-deploy --force

@@ -149,3 +149,7 @@ cython_debug/
 
 # Poetry
 poetry.lock
+
+# Mkdocs
+
+site/
