@@ -4,7 +4,8 @@
 
 ![](https://img.shields.io/github/license/FallenDeity/PokeLance?style=flat-square)
 ![](https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square)
-![](https://img.shields.io/badge/%20type_checker-ruff-%231674b1?style=flat-square)
+![](https://img.shields.io/badge/%20type_checker-mypy-%231674b1?style=flat-square)
+![](https://img.shields.io/badge/%20linter-ruff-%231674b1?style=flat-square)
 ![](https://img.shields.io/github/stars/FallenDeity/PokeLance?style=flat-square)
 ![](https://img.shields.io/github/last-commit/FallenDeity/PokeLance?style=flat-square)
 ![](https://img.shields.io/pypi/pyversions/PokeLance?style=flat-square)
