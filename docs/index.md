@@ -43,7 +43,6 @@ from pokelance import PokeLance
 client = PokeLance()
 
 
-# case 1
 async def main():
     print(await client.ping())
     print(await client.berry.fetch_berry("cheri"))

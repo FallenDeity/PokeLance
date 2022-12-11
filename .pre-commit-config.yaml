@@ -45,3 +45,13 @@ repos:
         language: python
         stages:
           - commit
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        pass_filenames: false
+        entry: poetry run mypy .
+        language: python
+        stages:
+          - commit

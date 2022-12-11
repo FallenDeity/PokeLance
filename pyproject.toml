@@ -11,6 +11,7 @@ python = "^3.8"
 attrs = "^22.1.0"
 aiohttp = "^3.8.3"
 aiofiles = "^22.1.0"
+types-aiofiles = "^22.1.0.4"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -25,6 +26,7 @@ typing-extensions = "^4.4.0"
 pre-commit = "^2.20.0"
 Pillow = "^9.3.0"
 CairoSVG = "^2.5.2"
+mypy = "^0.991"
 
 [build-system]
 requires = ["poetry-core"]

@@ -49,6 +49,53 @@ plugins:
 
 nav:
   - Getting Started: index.md
+  - API Reference:
+      - PokeLance: api_reference/pokelance.md
+      - Logging: api_reference/logger.md
+      - Exceptions: api_reference/exceptions.md
+      - Cache:
+          - Cache: api_reference/cache/cache.md
+          - CacheManager: api_reference/cache/cache_manager.md
+      - Http:
+          - Client: api_reference/http/httpclient.md
+          - Routes: api_reference/http/routes.md
+      - Extensions:
+          - base: api_reference/ext/_base.md
+          - berry: api_reference/ext/berry.md
+          - contest: api_reference/ext/contest.md
+          - encounter: api_reference/ext/encounter.md
+          - evolution: api_reference/ext/evolution.md
+          - game: api_reference/ext/game.md
+          - item: api_reference/ext/item.md
+          - location: api_reference/ext/location.md
+          - machine: api_reference/ext/machine.md
+          - move: api_reference/ext/move.md
+          - pokemon: api_reference/ext/pokemon.md
+      - Models:
+          - Base: api_reference/models/base.md
+          - Common:
+              - Resources: api_reference/models/common/resources.md
+              - Models: api_reference/models/common/models.md
+          - Abstract:
+              - Utility:
+                  - Berries: api_reference/models/abstract/utils/berries.md
+                  - Contests: api_reference/models/abstract/utils/contests.md
+                  - Evolutions: api_reference/models/abstract/utils/evolutions.md
+                  - Games: api_reference/models/abstract/utils/games.md
+                  - Items: api_reference/models/abstract/utils/items.md
+                  - Locations: api_reference/models/abstract/utils/locations.md
+                  - Moves: api_reference/models/abstract/utils/moves.md
+                  - Pokemons: api_reference/models/abstract/utils/pokemons.md
+              - Berry: api_reference/models/abstract/berry.md
+              - Contest: api_reference/models/abstract/contest.md
+              - Encounter: api_reference/models/abstract/encounter.md
+              - Evolution: api_reference/models/abstract/evolution.md
+              - Game: api_reference/models/abstract/game.md
+              - Item: api_reference/models/abstract/item.md
+              - Location: api_reference/models/abstract/location.md
+              - Machine: api_reference/models/abstract/machine.md
+              - Move: api_reference/models/abstract/move.md
+              - Pokemon: api_reference/models/abstract/pokemon.md
   - Guide:
       - Usage: guide/basic_usage.md
 

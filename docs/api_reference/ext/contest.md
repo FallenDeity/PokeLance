@@ -1,0 +1,1 @@
+::: pokelance.ext.contest

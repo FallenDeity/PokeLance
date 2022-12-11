@@ -1,0 +1,1 @@
+::: pokelance.models.abstract.contest

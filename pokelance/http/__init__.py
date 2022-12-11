@@ -21,6 +21,28 @@ __all__: t.Tuple[str, ...] = (
 
 @t.final
 class HttpClient:
+    """The HTTP client for PokeLance.
+
+    Parameters
+    ----------
+    client: pokelance.PokeLance
+        The client that this HTTP client is for.
+    cache_size: int
+        The size of the cache.
+    session: aiohttp.ClientSession
+        The session to use for the HTTP client.
+
+    Attributes
+    ----------
+    session: aiohttp.ClientSession
+        The session to use for the HTTP client.
+    _is_ready: bool
+        Whether the HTTP client is ready.
+    _cache: pokelance.cache.Cache
+        The cache to use for the HTTP client.
+    _client: pokelance.PokeLance
+        The client that this HTTP client is for.
+    """
 
     __slots__: t.Tuple[str, ...] = (
         "_client",
@@ -32,12 +54,29 @@ class HttpClient:
     def __init__(
         self, *, cache_size: int, client: "PokeLance", session: t.Optional[aiohttp.ClientSession] = None
     ) -> None:
+        """Initializes the HTTP client.
+
+        Parameters
+        ----------
+        cache_size: int
+            The size of the cache.
+        client: pokelance.PokeLance
+            The client that this HTTP client is for.
+        session: aiohttp.ClientSession
+            The session to use for the HTTP client.
+
+        Returns
+        -------
+        pokelance.http.HttpClient
+            The HTTP client.
+        """
         self._client = client
         self.session = session
         self._is_ready = False
         self._cache = Cache(max_size=cache_size)
 
     async def connect(self) -> None:
+        """Connects the HTTP client."""
         if not self._is_ready:
             if self.session is None:
                 self.session = aiohttp.ClientSession()
@@ -45,18 +84,51 @@ class HttpClient:
             self._is_ready = True
 
     async def request(self, route: Route) -> t.Any:
-        await self.connect()
-        async with self.session.request(route.method, route.url, params=route.payload) as response:
-            if 300 > response.status >= 200:
-                return await response.json()
-            else:
-                raise HTTPException(str(response.reason), route, response.status).create()
+        """Makes a request to the PokeAPI.
+
+        Parameters
+        ----------
+        route: pokelance.http.Route
+            The route to use for the request.
+
+        Returns
+        -------
+        t.Any
+            The response from the PokeAPI.
+
+        Raises
+        ------
+        pokelance.exceptions.HTTPException
+            An error occurred while making the request.
+        """
+        if self.session is not None:
+            async with self.session.request(route.method, route.url, params=route.payload) as response:
+                if 300 > response.status >= 200:
+                    return await response.json()
+                else:
+                    raise HTTPException(str(response.reason), route, response.status).create()
+        else:
+            await self.connect()
 
     async def ping(self) -> float:
+        """Pings the PokeAPI and returns the latency.
+
+        Returns
+        -------
+        float
+            The latency of the PokeAPI.
+        """
         start = time.perf_counter()
         await self.request(Route())
         return time.perf_counter() - start
 
     @property
     def cache(self) -> Cache:
+        """The cache to use for the HTTP client.
+
+        Returns
+        -------
+        pokelance.cache.Cache
+            The cache.
+        """
         return self._cache

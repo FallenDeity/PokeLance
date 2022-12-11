@@ -1,0 +1,1 @@
+::: pokelance.models.common.resources

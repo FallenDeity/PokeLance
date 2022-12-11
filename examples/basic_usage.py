@@ -5,7 +5,7 @@ from pokelance import PokeLance
 client = PokeLance()
 
 
-async def main():
+async def main() -> None:
     print(await client.ping())
     print(await client.berry.fetch_berry("cheri"))
     print(await client.berry.fetch_berry_flavor("spicy"))

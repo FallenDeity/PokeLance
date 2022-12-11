@@ -32,6 +32,9 @@ jobs:
       - name: Linting with ruff
         run: |
           poetry run ruff .
+      - name: Type checking with mypy
+        run: |
+          poetry run mypy .
       - name: Build docs
         run: |
           poetry run mkdocs gh-deploy --force

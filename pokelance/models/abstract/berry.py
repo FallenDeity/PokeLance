@@ -16,6 +16,38 @@ __all__: t.Tuple[str, ...] = (
 
 @attrs.define(slots=True, kw_only=True)
 class Berry(BaseModel):
+    """A berry resource.
+
+    Attributes
+    ----------
+    id: int
+        The identifier for this berry resource.
+    name: str
+        The name for this berry resource.
+    growth_time: int
+        Time it takes the tree to grow one stage, in hours. Berry trees go through
+        four of these growth stages before they can be picked.
+    max_harvest: int
+        The maximum number of these berries that can grow on one tree in Generation
+        IV.
+    natural_gift_power: int
+        The power of the move "Natural Gift" when used with this Berry.
+    size: int
+        Berries are actually items. This is the number of those items.
+    smoothness: int
+        The speed at which this Berry dries out the soil as it grows. A higher
+        rate means the soil dries more quickly.
+    soil_dryness: int
+        The firmness of this berry, used in making Pokéblocks or Poffins.
+    flavors: typing.List[BerryFlavorMap]
+        A list of references to each flavor a berry can have and the potency of
+        each of those flavors in regard to this berry.
+    item: pokelance.models.common.NamedResource
+        The item that corresponds to this berry.
+    natural_gift_type: pokelance.models.common.NamedResource
+        The type inherited by "Natural Gift" when used with this Berry.
+    """
+
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
     growth_time: int = attrs.field(factory=int)
@@ -49,6 +81,20 @@ class Berry(BaseModel):
 
 @attrs.define(slots=True, kw_only=True)
 class BerryFirmness(BaseModel):
+    """A berry firmness resource.
+
+    Attributes
+    ----------
+    id: int
+        The identifier for this berry firmness resource.
+    name: str
+        The name for this berry firmness resource.
+    berries: typing.List[pokelance.models.common.NamedResource]
+        A list of the berries with this firmness.
+    names: typing.List[pokelance.models.common.Name]
+        A list of the name of this berry firmness listed in different languages.
+    """
+
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
     berries: t.List[NamedResource] = attrs.field(factory=list)
@@ -66,6 +112,22 @@ class BerryFirmness(BaseModel):
 
 @attrs.define(slots=True, kw_only=True)
 class BerryFlavor(BaseModel):
+    """A berry flavor resource.
+
+    Attributes
+    ----------
+    id: int
+        The identifier for this berry flavor resource.
+    name: str
+        The name for this berry flavor resource.
+    berries: typing.List[FlavorBerryMap]
+        A list of the berries with this flavor.
+    contest_type: pokelance.models.common.NamedResource
+        The contest type that correlates with this berry flavor.
+    names: typing.List[pokelance.models.common.Name]
+        The name of this berry flavor listed in different languages.
+    """
+
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
     berries: t.List[FlavorBerryMap] = attrs.field(factory=list)
