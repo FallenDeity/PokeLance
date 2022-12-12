@@ -40,7 +40,7 @@ class Description(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Description":
         return cls(
             description=payload.get("description", ""),
-            language=NamedResource.from_payload(payload.get("language", {})),
+            language=NamedResource.from_payload(payload.get("language", {}) or {}),
         )
 
 
@@ -63,7 +63,7 @@ class Effect(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Effect":
         return cls(
             effect=payload.get("effect", ""),
-            language=NamedResource.from_payload(payload.get("language", {})),
+            language=NamedResource.from_payload(payload.get("language", {}) or {}),
         )
 
 
@@ -98,7 +98,7 @@ class Encounter(BaseModel):
             max_level=payload.get("max_level", 0),
             condition_values=[Resource.from_payload(i) for i in payload.get("condition_values", [])],
             chance=payload.get("chance", 0),
-            method=NamedResource.from_payload(payload.get("method", {})),
+            method=NamedResource.from_payload(payload.get("method", {}) or {}),
         )
 
 
@@ -124,8 +124,8 @@ class FlavorText(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "FlavorText":
         return cls(
             flavor_text=payload.get("flavor_text", ""),
-            language=NamedResource.from_payload(payload.get("language", {})),
-            version=NamedResource.from_payload(payload.get("version", {})),
+            language=NamedResource.from_payload(payload.get("language", {}) or {}),
+            version=NamedResource.from_payload(payload.get("version", {}) or {}),
         )
 
 
@@ -148,7 +148,7 @@ class GenerationGameIndex(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationGameIndex":
         return cls(
             game_index=payload.get("game_index", 0),
-            generation=NamedResource.from_payload(payload.get("generation", {})),
+            generation=NamedResource.from_payload(payload.get("generation", {}) or {}),
         )
 
 
@@ -170,8 +170,8 @@ class MachineVersionDetail(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MachineVersionDetail":
         return cls(
-            machine=Resource.from_payload(payload.get("machine", {})),
-            version_group=NamedResource.from_payload(payload.get("version_group", {})),
+            machine=Resource.from_payload(payload.get("machine", {}) or {}),
+            version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
         )
 
 
@@ -192,7 +192,7 @@ class Name(BaseModel):
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Name":
-        return cls(name=payload.get("name", ""), language=NamedResource.from_payload(payload.get("language", {})))
+        return cls(name=payload.get("name", ""), language=NamedResource.from_payload(payload.get("language", {}) or {}))
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -218,7 +218,7 @@ class VerboseEffect(BaseModel):
         return cls(
             effect=payload.get("effect", ""),
             short_effect=payload.get("short_effect", ""),
-            language=NamedResource.from_payload(payload.get("language", {})),
+            language=NamedResource.from_payload(payload.get("language", {} or {})),
         )
 
 
@@ -243,7 +243,7 @@ class VersionEncounterDetail(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "VersionEncounterDetail":
         return cls(
-            version=NamedResource.from_payload(payload.get("version", {})),
+            version=NamedResource.from_payload(payload.get("version", {}) or {}),
             max_chance=payload.get("max_chance", 0),
             encounter_details=[Encounter.from_payload(i) for i in payload.get("encounter_details", [])],
         )
@@ -268,7 +268,7 @@ class VersionGameIndex(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "VersionGameIndex":
         return cls(
             game_index=payload.get("game_index", 0),
-            version=NamedResource.from_payload(payload.get("version", {})),
+            version=NamedResource.from_payload(payload.get("version", {}) or {}),
         )
 
 
@@ -294,6 +294,6 @@ class VersionGroupFlavorText(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "VersionGroupFlavorText":
         return cls(
             text=payload.get("text", ""),
-            language=NamedResource.from_payload(payload.get("language", {})),
-            version_group=NamedResource.from_payload(payload.get("version_group", {})),
+            language=NamedResource.from_payload(payload.get("language", {}) or {}),
+            version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
         )

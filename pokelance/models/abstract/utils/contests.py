@@ -31,5 +31,5 @@ class ContestName(BaseModel):
         return cls(
             name=payload.get("name", ""),
             color=payload.get("color", ""),
-            language=NamedResource.from_payload(payload.get("language", {})),
+            language=NamedResource.from_payload(payload.get("language", {}) or {}),
         )

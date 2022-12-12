@@ -177,6 +177,6 @@ class Evolution(BaseExtension):
         return self.cache.evolution_trigger.setdefault(route, EvolutionTrigger.from_payload(data))
 
 
-async def setup(lance: "PokeLance") -> None:
+def setup(lance: "PokeLance") -> None:
     """Sets up the evolution cog."""
-    await lance.add_extension("evolution", Evolution(lance.http))
+    lance.add_extension("evolution", Evolution(lance.http))

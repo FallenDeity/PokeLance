@@ -108,6 +108,6 @@ class Machine(BaseExtension):
         return self.cache.machine.setdefault(route, MachineModel.from_payload(data))
 
 
-async def setup(lance: "PokeLance") -> None:
+def setup(lance: "PokeLance") -> None:
     """Sets up the machine cog."""
-    await lance.add_extension("machine", Machine(lance.http))
+    lance.add_extension("machine", Machine(lance.http))

@@ -385,6 +385,6 @@ class Item(BaseExtension):
         return self.cache.item_pocket.setdefault(route, ItemPocket.from_payload(data))
 
 
-async def setup(lance: "PokeLance") -> None:
+def setup(lance: "PokeLance") -> None:
     """Sets up the item cog."""
-    await lance.add_extension("item", Item(lance.http))
+    lance.add_extension("item", Item(lance.http))

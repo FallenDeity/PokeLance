@@ -523,6 +523,6 @@ class Move(BaseExtension):
         return self.cache.move_target.setdefault(route, MoveTarget.from_payload(data))
 
 
-async def setup(lance: "PokeLance") -> None:
+def setup(lance: "PokeLance") -> None:
     """Sets up the move cog."""
-    await lance.add_extension("move", Move(lance.http))
+    lance.add_extension("move", Move(lance.http))

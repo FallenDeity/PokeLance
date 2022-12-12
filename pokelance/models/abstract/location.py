@@ -48,7 +48,7 @@ class Location(BaseModel):
         return cls(
             id=payload.get("id", 0),
             name=payload.get("name", ""),
-            region=NamedResource.from_payload(payload.get("region", {})),
+            region=NamedResource.from_payload(payload.get("region", {}) or {}),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
             game_indices=[GenerationGameIndex.from_payload(i) for i in payload.get("game_indices", [])],
             areas=[NamedResource.from_payload(i) for i in payload.get("areas", [])],
@@ -95,7 +95,7 @@ class LocationArea(BaseModel):
             name=payload.get("name", ""),
             game_index=payload.get("game_index", 0),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
-            location=NamedResource.from_payload(payload.get("location", {})),
+            location=NamedResource.from_payload(payload.get("location", {}) or {}),
             encounter_method_rates=[
                 EncounterMethodRate.from_payload(i) for i in payload.get("encounter_method_rates", [])
             ],
@@ -171,7 +171,7 @@ class Region(BaseModel):
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             locations=[NamedResource.from_payload(i) for i in payload.get("locations", [])],
-            main_generation=NamedResource.from_payload(payload.get("main_generation", {})),
+            main_generation=NamedResource.from_payload(payload.get("main_generation", {}) or {}),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
             pokedexes=[NamedResource.from_payload(i) for i in payload.get("pokedexes", [])],
             version_groups=[NamedResource.from_payload(i) for i in payload.get("version_groups", [])],

@@ -1,4 +1,3 @@
-import asyncio
 import typing as t
 from pathlib import Path
 
@@ -27,9 +26,7 @@ class PokeLance:
         The HTTP client used to make requests to the PokeAPI.
     _logger : logging.Logger
         The logger used to log information about the client.
-    _auto_load : bool
-        Whether or not to automatically load extension data on setup.
-    _loaders : typing.List[typing.Coroutine[t.Any, t.Any, None]]
+    _loaders : t.List[t.Tuple[t.Coroutine[t.Any, t.Any, None], str]]
         A list of coroutines to load extension data.
     EXTENSIONS : Path
         The path to the extensions directory.
@@ -83,7 +80,6 @@ class PokeLance:
         *,
         cache_size: int = 100,
         session: t.Optional["aiohttp.ClientSession"] = None,
-        load: bool = True,
     ) -> None:
         """
         Parameters
@@ -92,8 +88,6 @@ class PokeLance:
             The size of the cache to use for the HTTP client.
         session : typing.Optional[aiohttp.ClientSession]
             The session to use for the HTTP client. It is recommended to use the default.
-        load : bool
-            Whether or not to automatically load extension data on setup.
 
         Returns
         -------
@@ -102,8 +96,8 @@ class PokeLance:
         """
         self._logger = create_logging_setup("Client")
         self._http = HttpClient(client=self, session=session, cache_size=cache_size)
-        self._auto_load = load
-        self._loaders: t.List[t.Coroutine[t.Any, t.Any, None]] = []
+        self._loaders: t.List[t.Tuple[t.Coroutine[t.Any, t.Any, None], str]] = []
+        self.setup_hook()
 
     async def __aenter__(self) -> "PokeLance":
         return self
@@ -117,7 +111,7 @@ class PokeLance:
         if self._http.session is not None:
             await self._http.session.close()
 
-    async def setup_hook(self) -> None:
+    def setup_hook(self) -> None:
         """
         The setup hook to be called after the client is created.
         This is called automatically when the client is created.
@@ -128,15 +122,10 @@ class PokeLance:
             if extension.is_file() and extension.suffix == ".py":
                 if "_" not in extension.stem:
                     module = __import__(f"pokelance.ext.{extension.stem}", fromlist=["setup"])
-                    await module.setup(self)
-        if not self._auto_load:
-            [asyncio.create_task(loader) for loader in self._loaders]
-            self._logger.info("Lazy loading extension data.")
-        else:
-            self._logger.info("Loading extension data complete.")
+                    module.setup(self)
         self._logger.info("Setup complete")
 
-    async def add_extension(self, name: str, extension: "BaseExtension") -> None:
+    def add_extension(self, name: str, extension: "BaseExtension") -> None:
         """
         Adds an extension to the client. This is called automatically when an extension is loaded.
 
@@ -147,11 +136,7 @@ class PokeLance:
         extension : BaseExtension
             The extension to add.
         """
-        self._logger.info(f"Adding extension: {name}")
-        if not self._auto_load:
-            self._loaders.append(extension.setup())
-        else:
-            await extension.setup()
+        self._loaders.append((extension.setup(), name))
         setattr(self, name, extension)
 
     async def ping(self) -> float:
@@ -173,6 +158,18 @@ class PokeLance:
         self._logger.info("Closing session")
         if self._http.session is not None:
             await self._http.session.close()
+
+    @property
+    def loaders(self) -> t.List[t.Tuple[t.Coroutine[t.Any, t.Any, None], str]]:
+        """
+        The list of loaders for the extensions.
+
+        Returns
+        -------
+        typing.List[typing.Tuple[typing.Coroutine[typing.Any, typing.Any, None], str]]
+            The list of loaders.
+        """
+        return self._loaders
 
     @property
     def logger(self) -> "logging.Logger":

@@ -6,7 +6,7 @@ copyright: Copyright FallenDeity ( 2022 - present )
 site_url: https://FallenDeity.github.io/PokeLance
 
 theme:
-  name: "material"
+  name: "readthedocs"
   logo: assets/pokelance.png
   favicon: assets/pokelance.png
 
@@ -97,9 +97,7 @@ nav:
               - Move: api_reference/models/abstract/move.md
               - Pokemon: api_reference/models/abstract/pokemon.md
   - Guide:
-      - Basic Usage: guide/basic_usage.md
-      - Discord Bot: guide/discord_bot.md
-      - FastAPI: guide/fastapi.md
+      - Usage: guide/basic_usage.md
 
 
 markdown_extensions:

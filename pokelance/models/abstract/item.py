@@ -80,9 +80,9 @@ class Item(BaseModel):
             name=payload.get("name", ""),
             cost=payload.get("cost", 0),
             fling_power=payload.get("fling_power", 0),
-            fling_effect=NamedResource.from_payload(payload.get("fling_effect", {})),
+            fling_effect=NamedResource.from_payload(payload.get("fling_effect", {}) or {}),
             attributes=[NamedResource.from_payload(attribute) for attribute in payload.get("attributes", [])],
-            category=NamedResource.from_payload(payload.get("category", {})),
+            category=NamedResource.from_payload(payload.get("category", {}) or {}),
             effect_entries=[VerboseEffect.from_payload(effect) for effect in payload.get("effect_entries", [])],
             flavor_text_entries=[
                 VersionGroupFlavorText.from_payload(flavor_text)
@@ -97,7 +97,7 @@ class Item(BaseModel):
                 ItemHolderPokemon.from_payload(held_by_pokemon)
                 for held_by_pokemon in payload.get("held_by_pokemon", [])
             ],
-            baby_trigger_for=NamedResource.from_payload(payload.get("baby_trigger_for", {})),
+            baby_trigger_for=NamedResource.from_payload(payload.get("baby_trigger_for", {}) or {}),
             machines=[MachineVersionDetail.from_payload(machine) for machine in payload.get("machines", [])],
         )
 
@@ -164,7 +164,7 @@ class ItemCategory(BaseModel):
             name=payload.get("name", ""),
             items=[NamedResource.from_payload(item) for item in payload.get("items", [])],
             names=[Name.from_payload(name) for name in payload.get("names", [])],
-            pocket=NamedResource.from_payload(payload.get("pocket", {})),
+            pocket=NamedResource.from_payload(payload.get("pocket", {}) or {}),
         )
 
 

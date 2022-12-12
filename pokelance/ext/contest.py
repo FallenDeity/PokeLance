@@ -247,6 +247,6 @@ class Contest(BaseExtension):
         return self.cache.super_contest_effect.setdefault(route, SuperContestEffect.from_payload(data))
 
 
-async def setup(lance: "PokeLance") -> None:
+def setup(lance: "PokeLance") -> None:
     """Sets up the contest cog."""
-    await lance.add_extension("contest", Contest(lance.http))
+    lance.add_extension("contest", Contest(lance.http))

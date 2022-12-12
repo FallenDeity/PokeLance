@@ -40,7 +40,7 @@ class ContestType(BaseModel):
         return cls(
             id=payload.get("id", 0),
             name=payload.get("name", ""),
-            berry_flavor=NamedResource.from_payload(payload.get("berry_flavor", {})),
+            berry_flavor=NamedResource.from_payload(payload.get("berry_flavor", {}) or {}),
             names=[ContestName.from_payload(name) for name in payload.get("names", [])],
         )
 

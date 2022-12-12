@@ -1,4 +1,4 @@
-![](./assets/pokelance.png){align=left style="width: 300px;"}
+![](./assets/pokelance.png){align=left style="width: 450px;"}
 
 # Welcome to PokeLance's documentation.
 
@@ -11,14 +11,25 @@
 ![](https://img.shields.io/pypi/pyversions/PokeLance?style=flat-square)
 ![](https://img.shields.io/pypi/v/PokeLance?style=flat-square)
 
-A [WIP] flexible and easy to use pokeapi wrapper for python 🚀
+A flexible, statically typed and easy to use pokeapi wrapper for python 🚀
+
+Features:
+- Modern and pythonic API asynchronously built on top of aiohttp
+- Flexible and easy to use
+- Statically typed with mypy
+- Linted with ruff
+- Well documented
+- Optimized for speed and performance
+- Automatically caches data for faster access
+- Caches endpoints for user convenience
+
 
 ---
 
 ## Installation
 
 ```bash
-python -m pip install pokelance
+$ python -m pip install pokelance
 ```
 
 ---
@@ -30,7 +41,7 @@ python -m pip install pokelance
 - [PokeLance Documentation](https://FallenDeity.github.io/PokeLance/)
 - [PokeLance GitHub](https://github.com/FallenDeity/PokeLance)
 - [PokeLance PyPI](https://pypi.org/project/PokeLance/)
-- [PokeLance Discord](https://discord.gg/FyEE54u9GF)
+- [PokeLance Discord](https://discord.gg/yeyEvT5V2J)
 
 ---
 
@@ -41,19 +52,45 @@ import asyncio
 
 from pokelance import PokeLance
 
-client = PokeLance()
+client = PokeLance()  # Create a client instance
 
 
-async def main():
-    print(await client.ping())
-    print(await client.berry.fetch_berry("cheri"))
+async def main() -> None:
+    print(await client.ping())  # Ping the pokeapi
+    print(await client.berry.fetch_berry("cheri"))  # Fetch a berry from the pokeapi
     print(await client.berry.fetch_berry_flavor("spicy"))
     print(await client.berry.fetch_berry_firmness("very-soft"))
-    print(client.berry.get_berry("cheri"))
+    print(client.berry.get_berry("cheri"))  # Get a cached berry it will return None if it doesn't exist
     print(client.berry.get_berry_flavor("spicy"))
     print(client.berry.get_berry_firmness("very-soft"))
+    await client.close()  # Close the client
     return None
 
+
+asyncio.run(main())
+```
+
+## With Async Context Manager
+
+```python
+import asyncio
+
+import aiohttp
+from pokelance import PokeLance
+
+
+async def main() -> None:
+    # Use an async context manager to create a client instance
+    async with aiohttp.ClientSession() as session, PokeLance(session=session) as client:
+        print(await client.ping())  # Ping the pokeapi
+        print(await client.berry.fetch_berry("cheri"))  # Fetch a berry from the pokeapi
+        print(await client.berry.fetch_berry_flavor("spicy"))
+        print(await client.berry.fetch_berry_firmness("very-soft"))
+        print(client.berry.get_berry("cheri"))  # Get a cached berry it will return None if it doesn't exist
+        print(client.berry.get_berry_flavor("spicy"))
+        print(client.berry.get_berry_firmness("very-soft"))
+        # The client will be closed automatically when the async context manager exits
+    return None
 
 asyncio.run(main())
 ```

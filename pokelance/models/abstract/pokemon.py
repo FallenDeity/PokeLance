@@ -718,9 +718,9 @@ class PokemonSpecies(BaseModel):
             egg_groups=[NamedResource.from_payload(i) for i in payload.get("egg_groups", [])],
             color=NamedResource.from_payload(payload.get("color", {})),
             shape=NamedResource.from_payload(payload.get("shape", {})),
-            evolves_from_species=NamedResource.from_payload(payload.get("evolves_from_species", {})),
-            evolution_chain=Resource.from_payload(payload.get("evolution_chain", {})),
-            habitat=NamedResource.from_payload(payload.get("habitat", {})),
+            evolves_from_species=NamedResource.from_payload(payload.get("evolves_from_species", {}) or {}),
+            evolution_chain=Resource.from_payload(payload.get("evolution_chain", {}) or {}),
+            habitat=NamedResource.from_payload(payload.get("habitat", {}) or {}),
             generation=NamedResource.from_payload(payload.get("generation", {})),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
             pal_park_encounters=[PalParkEncounterArea.from_payload(i) for i in payload.get("pal_park_encounters", [])],
@@ -778,7 +778,7 @@ class Stat(BaseModel):
             affecting_moves=MoveStatAffectSets.from_payload(payload.get("affecting_moves", {})),
             affecting_natures=NatureStatAffectSets.from_payload(payload.get("affecting_natures", {})),
             characteristics=[Resource.from_payload(i) for i in payload.get("characteristics", [])],
-            move_damage_class=NamedResource.from_payload(payload.get("move_damage_class", {})),
+            move_damage_class=NamedResource.from_payload(payload.get("move_damage_class", {}) or {}),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
         )
 

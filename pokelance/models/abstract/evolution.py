@@ -37,7 +37,7 @@ class EvolutionChain(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EvolutionChain":
         return cls(
             id=payload.get("id", 0),
-            baby_trigger_item=NamedResource.from_payload(payload.get("baby_trigger_item", {})),
+            baby_trigger_item=NamedResource.from_payload(payload.get("baby_trigger_item", {}) or {}),
             chain=ChainLink.from_payload(payload.get("chain", {})),
         )
 

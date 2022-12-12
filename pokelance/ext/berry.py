@@ -244,6 +244,6 @@ class Berry(BaseExtension):
         return self.cache.berry_firmness[route]
 
 
-async def setup(lance: "PokeLance") -> None:
+def setup(lance: "PokeLance") -> None:
     """Sets up the berry cog."""
-    await lance.add_extension("berry", Berry(lance.http))
+    lance.add_extension("berry", Berry(lance.http))

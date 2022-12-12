@@ -72,10 +72,10 @@ class Berry(BaseModel):
             size=data.get("size", 0),
             smoothness=data.get("smoothness", 0),
             soil_dryness=data.get("soil_dryness", 0),
-            firmness=NamedResource.from_payload(data.get("firmness", {})),
+            firmness=NamedResource.from_payload(data.get("firmness", {}) or {}),
             flavors=[BerryFlavorMap.from_payload(flavor) for flavor in data.get("flavors", [])],
-            item=NamedResource.from_payload(data.get("item", {})),
-            natural_gift_type=NamedResource.from_payload(data.get("natural_gift_type", {})),
+            item=NamedResource.from_payload(data.get("item", {}) or {}),
+            natural_gift_type=NamedResource.from_payload(data.get("natural_gift_type", {}) or {}),
         )
 
 
@@ -140,6 +140,6 @@ class BerryFlavor(BaseModel):
             id=data.get("id", 0),
             name=data.get("name", ""),
             berries=[FlavorBerryMap.from_payload(berry) for berry in data.get("berries", [])],
-            contest_type=NamedResource.from_payload(data.get("contest_type", {})),
+            contest_type=NamedResource.from_payload(data.get("contest_type", {}) or {}),
             names=[Name.from_payload(name) for name in data.get("names", [])],
         )

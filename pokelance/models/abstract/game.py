@@ -58,7 +58,7 @@ class Generation(BaseModel):
             name=payload.get("name", ""),
             abilities=[NamedResource.from_payload(i) for i in payload.get("abilities", [])],
             names=[Name.from_payload(i) for i in payload.get("names", [])],
-            main_region=NamedResource.from_payload(payload.get("main_region", {})),
+            main_region=NamedResource.from_payload(payload.get("main_region", {}) or {}),
             moves=[NamedResource.from_payload(i) for i in payload.get("moves", [])],
             pokemon_species=[NamedResource.from_payload(i) for i in payload.get("pokemon_species", [])],
             types=[NamedResource.from_payload(i) for i in payload.get("types", [])],
@@ -108,7 +108,7 @@ class Pokedex(BaseModel):
             descriptions=[Description.from_payload(i) for i in payload.get("descriptions", [])],
             names=[Name.from_payload(i) for i in payload.get("names", [])],
             pokemon_entries=[PokemonEntry.from_payload(i) for i in payload.get("pokemon_entries", [])],
-            region=NamedResource.from_payload(payload.get("region", {})),
+            region=NamedResource.from_payload(payload.get("region", {}) or {}),
             version_groups=[NamedResource.from_payload(i) for i in payload.get("version_groups", [])],
         )
 
@@ -140,7 +140,7 @@ class Version(BaseModel):
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
-            version_group=NamedResource.from_payload(payload.get("version_group", {})),
+            version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
         )
 
 
@@ -183,7 +183,7 @@ class VersionGroup(BaseModel):
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             order=payload.get("order", 0),
-            generation=NamedResource.from_payload(payload.get("generation", {})),
+            generation=NamedResource.from_payload(payload.get("generation", {}) or {}),
             move_learn_methods=[NamedResource.from_payload(i) for i in payload.get("move_learn_methods", [])],
             pokedexes=[NamedResource.from_payload(i) for i in payload.get("pokedexes", [])],
             regions=[NamedResource.from_payload(i) for i in payload.get("regions", [])],

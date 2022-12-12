@@ -100,6 +100,6 @@ class EncounterConditionValue(BaseModel):
         return cls(
             id=payload.get("id", 0),
             name=payload.get("name", ""),
-            condition=NamedResource.from_payload(payload.get("condition", {})),
+            condition=NamedResource.from_payload(payload.get("condition", {}) or {}),
             names=[Name.from_payload(name) for name in payload.get("names", [])],
         )

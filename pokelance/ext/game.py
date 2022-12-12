@@ -295,6 +295,6 @@ class Game(BaseExtension):
         return self.cache.version_group.setdefault(route, VersionGroup.from_payload(data))
 
 
-async def setup(lance: "PokeLance") -> None:
+def setup(lance: "PokeLance") -> None:
     """Sets up the game cog."""
-    await lance.add_extension("game", Game(lance.http))
+    lance.add_extension("game", Game(lance.http))

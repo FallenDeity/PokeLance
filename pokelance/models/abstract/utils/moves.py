@@ -33,8 +33,8 @@ class ContestComboDetail(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ContestComboDetail":
         return cls(
-            use_before=[NamedResource.from_payload(i) for i in payload.get("use_before", [])],
-            use_after=[NamedResource.from_payload(i) for i in payload.get("use_after", [])],
+            use_before=[NamedResource.from_payload(i or {}) for i in (payload.get("use_before", []) or [])],
+            use_after=[NamedResource.from_payload(i or {}) for i in (payload.get("use_after", []) or [])],
         )
 
 
@@ -83,8 +83,8 @@ class MoveFlavorText(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveFlavorText":
         return cls(
             flavor_text=payload.get("flavor_text", ""),
-            language=NamedResource.from_payload(payload.get("language", {})),
-            version_group=NamedResource.from_payload(payload.get("version_group", {})),
+            language=NamedResource.from_payload(payload.get("language", {}) or {}),
+            version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
         )
 
 
@@ -136,12 +136,12 @@ class MoveMetaData(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveMetaData":
         return cls(
-            ailment=NamedResource.from_payload(payload.get("ailment", {})),
-            category=NamedResource.from_payload(payload.get("category", {})),
-            min_hits=payload.get("min_hits", 0),
-            max_hits=payload.get("max_hits", 0),
-            min_turns=payload.get("min_turns", 0),
-            max_turns=payload.get("max_turns", 0),
+            ailment=NamedResource.from_payload(payload.get("ailment", {}) or {}),
+            category=NamedResource.from_payload(payload.get("category", {}) or {}),
+            min_hits=payload.get("min_hits", 0) or 1,
+            max_hits=payload.get("max_hits", 0) or 1,
+            min_turns=payload.get("min_turns", 0) or 1,
+            max_turns=payload.get("max_turns", 0) or 1,
             drain=payload.get("drain", 0),
             healing=payload.get("healing", 0),
             crit_rate=payload.get("crit_rate", 0),
@@ -160,7 +160,7 @@ class MoveStatChange(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveStatChange":
         return cls(
             change=payload.get("change", 0),
-            stat=NamedResource.from_payload(payload.get("stat", {})),
+            stat=NamedResource.from_payload(payload.get("stat", {}) or {}),
         )
 
 

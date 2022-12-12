@@ -65,7 +65,7 @@ class BaseExtension:
             The resource was not found in the cache.
         """
         data: t.Set[str] = set(list(map(str, cache.endpoints.values())) + list(cache.endpoints.keys()))
-        if data and resource not in data:
+        if data and str(resource) not in data:
             raise ResourceNotFound(self.get_message(str(resource), data), route)
 
     @staticmethod

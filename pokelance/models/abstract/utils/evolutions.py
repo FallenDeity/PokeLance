@@ -77,23 +77,23 @@ class EvolutionDetail(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EvolutionDetail":
         return cls(
-            item=NamedResource.from_payload(payload.get("item", {})),
-            trigger=NamedResource.from_payload(payload.get("trigger", {})),
+            item=NamedResource.from_payload(payload.get("item", {}) or {}),
+            trigger=NamedResource.from_payload(payload.get("trigger", {}) or {}),
             gender=payload.get("gender", 0),
-            held_item=NamedResource.from_payload(payload.get("held_item", {})),
-            known_move=NamedResource.from_payload(payload.get("known_move", {})),
-            known_move_type=NamedResource.from_payload(payload.get("known_move_type", {})),
-            location=NamedResource.from_payload(payload.get("location", {})),
+            held_item=NamedResource.from_payload(payload.get("held_item", {}) or {}),
+            known_move=NamedResource.from_payload(payload.get("known_move", {}) or {}),
+            known_move_type=NamedResource.from_payload(payload.get("known_move_type", {}) or {}),
+            location=NamedResource.from_payload(payload.get("location", {}) or {}),
             min_level=payload.get("min_level", 0),
             min_happiness=payload.get("min_happiness", 0),
             min_beauty=payload.get("min_beauty", 0),
             min_affection=payload.get("min_affection", 0),
             needs_overworld_rain=payload.get("needs_overworld_rain", False),
-            party_species=NamedResource.from_payload(payload.get("party_species", {})),
-            party_type=NamedResource.from_payload(payload.get("party_type", {})),
+            party_species=NamedResource.from_payload(payload.get("party_species", {}) or {}),
+            party_type=NamedResource.from_payload(payload.get("party_type", {}) or {}),
             relative_physical_stats=payload.get("relative_physical_stats", 0),
             time_of_day=payload.get("time_of_day", ""),
-            trade_species=NamedResource.from_payload(payload.get("trade_species", {})),
+            trade_species=NamedResource.from_payload(payload.get("trade_species", {}) or {}),
             turn_upside_down=payload.get("turn_upside_down", False),
         )
 
@@ -123,7 +123,7 @@ class ChainLink(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ChainLink":
         return cls(
             is_baby=payload.get("is_baby", False),
-            species=NamedResource.from_payload(payload.get("species", {})),
+            species=NamedResource.from_payload(payload.get("species", {}) or {}),
             evolution_details=[EvolutionDetail.from_payload(detail) for detail in payload.get("evolution_details", [])],
             evolves_to=[ChainLink.from_payload(link) for link in payload.get("evolves_to", [])],
         )

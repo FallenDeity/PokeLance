@@ -5,55 +5,8 @@ from collections.abc import MutableMapping
 import aiofiles
 
 if t.TYPE_CHECKING:
+    from pokelance import models  # noqa: F401
     from pokelance.http import Route  # noqa: F401
-    from pokelance.models import Ability  # noqa: F401
-    from pokelance.models import Berry  # noqa: F401
-    from pokelance.models import BerryFirmness  # noqa: F401
-    from pokelance.models import BerryFlavor  # noqa: F401
-    from pokelance.models import Characteristic  # noqa: F401
-    from pokelance.models import ContestEffect  # noqa: F401
-    from pokelance.models import ContestType  # noqa: F401
-    from pokelance.models import EggGroup  # noqa: F401
-    from pokelance.models import EncounterCondition  # noqa: F401
-    from pokelance.models import EncounterConditionValue  # noqa: F401
-    from pokelance.models import EncounterMethod  # noqa: F401
-    from pokelance.models import EvolutionChain  # noqa: F401
-    from pokelance.models import EvolutionTrigger  # noqa: F401
-    from pokelance.models import Gender  # noqa: F401
-    from pokelance.models import Generation  # noqa: F401
-    from pokelance.models import GrowthRate  # noqa: F401
-    from pokelance.models import Item  # noqa: F401
-    from pokelance.models import ItemAttribute  # noqa: F401
-    from pokelance.models import ItemCategory  # noqa: F401
-    from pokelance.models import ItemFlingEffect  # noqa: F401
-    from pokelance.models import ItemPocket  # noqa: F401
-    from pokelance.models import Location  # noqa: F401
-    from pokelance.models import LocationArea  # noqa: F401
-    from pokelance.models import LocationAreaEncounter  # noqa: F401
-    from pokelance.models import Machine  # noqa: F401
-    from pokelance.models import Move  # noqa: F401
-    from pokelance.models import MoveAilment  # noqa: F401
-    from pokelance.models import MoveBattleStyle  # noqa: F401
-    from pokelance.models import MoveCategory  # noqa: F401
-    from pokelance.models import MoveDamageClass  # noqa: F401
-    from pokelance.models import MoveLearnMethod  # noqa: F401
-    from pokelance.models import MoveTarget  # noqa: F401
-    from pokelance.models import Nature  # noqa: F401
-    from pokelance.models import PalParkArea  # noqa: F401
-    from pokelance.models import PokeathlonStat  # noqa: F401
-    from pokelance.models import Pokedex  # noqa: F401
-    from pokelance.models import Pokemon  # noqa: F401
-    from pokelance.models import PokemonColor  # noqa: F401
-    from pokelance.models import PokemonForm  # noqa: F401
-    from pokelance.models import PokemonHabitats  # noqa: F401
-    from pokelance.models import PokemonShape  # noqa: F401
-    from pokelance.models import PokemonSpecies  # noqa: F401
-    from pokelance.models import Region  # noqa: F401
-    from pokelance.models import Stat  # noqa: F401
-    from pokelance.models import SuperContestEffect  # noqa: F401
-    from pokelance.models import Type  # noqa: F401
-    from pokelance.models import Version  # noqa: F401
-    from pokelance.models import VersionGroup  # noqa: F401; noqa: F401
 
 
 __all__: t.Tuple[str, ...] = (
@@ -234,193 +187,193 @@ class SecondaryTypeCache(BaseCache[_KT, _VT]):
             self._endpoints[document["url"].split("/")[-2]] = int(document["url"].split("/")[-2])
 
 
-class BerryCache(BaseCache["Route", "Berry"]):
+class BerryCache(BaseCache["Route", "models.Berry"]):
     """A cache for berries."""
 
 
-class BerryFirmnessCache(BaseCache["Route", "BerryFirmness"]):
+class BerryFirmnessCache(BaseCache["Route", "models.BerryFirmness"]):
     """A cache for berry firmnesses."""
 
 
-class BerryFlavorCache(BaseCache["Route", "BerryFlavor"]):
+class BerryFlavorCache(BaseCache["Route", "models.BerryFlavor"]):
     """A cache for berry flavors."""
 
 
-class ContestTypeCache(BaseCache["Route", "ContestType"]):
+class ContestTypeCache(BaseCache["Route", "models.ContestType"]):
     """A cache for contest types."""
 
 
-class PokemonCache(BaseCache["Route", "Pokemon"]):
+class PokemonCache(BaseCache["Route", "models.Pokemon"]):
     """A cache for pokemon."""
 
 
-class AbilityCache(BaseCache["Route", "Ability"]):
+class AbilityCache(BaseCache["Route", "models.Ability"]):
     """A cache for abilities."""
 
 
-class EggGroupCache(BaseCache["Route", "EggGroup"]):
+class EggGroupCache(BaseCache["Route", "models.EggGroup"]):
     """A cache for egg groups."""
 
 
-class GenderCache(BaseCache["Route", "Gender"]):
+class GenderCache(BaseCache["Route", "models.Gender"]):
     """A cache for genders."""
 
 
-class GrowthRateCache(BaseCache["Route", "GrowthRate"]):
+class GrowthRateCache(BaseCache["Route", "models.GrowthRate"]):
     """A cache for growth rates."""
 
 
-class NatureCache(BaseCache["Route", "Nature"]):
+class NatureCache(BaseCache["Route", "models.Nature"]):
     """A cache for natures."""
 
 
-class PokeathlonStatCache(BaseCache["Route", "PokeathlonStat"]):
+class PokeathlonStatCache(BaseCache["Route", "models.PokeathlonStat"]):
     """A cache for pokeathlon stats."""
 
 
-class PokemonColorCache(BaseCache["Route", "PokemonColor"]):
+class PokemonColorCache(BaseCache["Route", "models.PokemonColor"]):
     """A cache for pokemon colors."""
 
 
-class PokemonFormCache(BaseCache["Route", "PokemonForm"]):
+class PokemonFormCache(BaseCache["Route", "models.PokemonForm"]):
     """A cache for pokemon forms."""
 
 
-class PokemonLocationAreaCache(BaseCache["Route", "LocationAreaEncounter"]):
+class PokemonLocationAreaCache(BaseCache["Route", "models.LocationAreaEncounter"]):
     """A cache for pokemon location areas."""
 
 
-class PokemonHabitatCache(BaseCache["Route", "PokemonHabitats"]):
+class PokemonHabitatCache(BaseCache["Route", "models.PokemonHabitats"]):
     """A cache for pokemon habitats."""
 
 
-class PokemonShapeCache(BaseCache["Route", "PokemonShape"]):
+class PokemonShapeCache(BaseCache["Route", "models.PokemonShape"]):
     """A cache for pokemon shapes."""
 
 
-class PokemonSpeciesCache(BaseCache["Route", "PokemonSpecies"]):
+class PokemonSpeciesCache(BaseCache["Route", "models.PokemonSpecies"]):
     """A cache for pokemon species."""
 
 
-class StatCache(BaseCache["Route", "Stat"]):
+class StatCache(BaseCache["Route", "models.Stat"]):
     """A cache for stats."""
 
 
-class TypeCache(BaseCache["Route", "Type"]):
+class TypeCache(BaseCache["Route", "models.Type"]):
     """A cache for types."""
 
 
-class EncounterMethodCache(BaseCache["Route", "EncounterMethod"]):
+class EncounterMethodCache(BaseCache["Route", "models.EncounterMethod"]):
     """A cache for encounter methods."""
 
 
-class EncounterConditionCache(BaseCache["Route", "EncounterCondition"]):
+class EncounterConditionCache(BaseCache["Route", "models.EncounterCondition"]):
     """A cache for encounter conditions."""
 
 
-class EncounterConditionValueCache(BaseCache["Route", "EncounterConditionValue"]):
+class EncounterConditionValueCache(BaseCache["Route", "models.EncounterConditionValue"]):
     """A cache for encounter condition values."""
 
 
-class EvolutionTriggerCache(BaseCache["Route", "EvolutionTrigger"]):
+class EvolutionTriggerCache(BaseCache["Route", "models.EvolutionTrigger"]):
     """A cache for evolution triggers."""
 
 
-class GamesGenerationCache(BaseCache["Route", "Generation"]):
+class GamesGenerationCache(BaseCache["Route", "models.Generation"]):
     """A cache for games generations."""
 
 
-class GamesPokedexCache(BaseCache["Route", "Pokedex"]):
+class GamesPokedexCache(BaseCache["Route", "models.Pokedex"]):
     """A cache for games pokedexes."""
 
 
-class GamesVersionCache(BaseCache["Route", "Version"]):
+class GamesVersionCache(BaseCache["Route", "models.Version"]):
     """A cache for games versions."""
 
 
-class GamesVersionGroupCache(BaseCache["Route", "VersionGroup"]):
+class GamesVersionGroupCache(BaseCache["Route", "models.VersionGroup"]):
     """A cache for games version groups."""
 
 
-class ItemCache(BaseCache["Route", "Item"]):
+class ItemCache(BaseCache["Route", "models.Item"]):
     """A cache for items."""
 
 
-class ItemAttributeCache(BaseCache["Route", "ItemAttribute"]):
+class ItemAttributeCache(BaseCache["Route", "models.ItemAttribute"]):
     """A cache for item attributes."""
 
 
-class ItemCategoryCache(BaseCache["Route", "ItemCategory"]):
+class ItemCategoryCache(BaseCache["Route", "models.ItemCategory"]):
     """A cache for item categories."""
 
 
-class ItemFlingEffectCache(BaseCache["Route", "ItemFlingEffect"]):
+class ItemFlingEffectCache(BaseCache["Route", "models.ItemFlingEffect"]):
     """A cache for item fling effects."""
 
 
-class ItemPocketCache(BaseCache["Route", "ItemPocket"]):
+class ItemPocketCache(BaseCache["Route", "models.ItemPocket"]):
     """A cache for item pockets."""
 
 
-class LocationCache(BaseCache["Route", "Location"]):
+class LocationCache(BaseCache["Route", "models.Location"]):
     """A cache for locations."""
 
 
-class LocationAreaCache(BaseCache["Route", "LocationArea"]):
+class LocationAreaCache(BaseCache["Route", "models.LocationArea"]):
     """A cache for location areas."""
 
 
-class PalParkAreaCache(BaseCache["Route", "PalParkArea"]):
+class PalParkAreaCache(BaseCache["Route", "models.PalParkArea"]):
     """A cache for pal park areas."""
 
 
-class RegionCache(BaseCache["Route", "Region"]):
+class RegionCache(BaseCache["Route", "models.Region"]):
     """A cache for regions."""
 
 
-class MoveCache(BaseCache["Route", "Move"]):
+class MoveCache(BaseCache["Route", "models.Move"]):
     """A cache for moves."""
 
 
-class MoveAilmentCache(BaseCache["Route", "MoveAilment"]):
+class MoveAilmentCache(BaseCache["Route", "models.MoveAilment"]):
     """A cache for move ailments."""
 
 
-class MoveBattleStyleCache(BaseCache["Route", "MoveBattleStyle"]):
+class MoveBattleStyleCache(BaseCache["Route", "models.MoveBattleStyle"]):
     """A cache for move battle styles."""
 
 
-class MoveCategoryCache(BaseCache["Route", "MoveCategory"]):
+class MoveCategoryCache(BaseCache["Route", "models.MoveCategory"]):
     """A cache for move categories."""
 
 
-class MoveDamageClassCache(BaseCache["Route", "MoveDamageClass"]):
+class MoveDamageClassCache(BaseCache["Route", "models.MoveDamageClass"]):
     """A cache for move damage classes."""
 
 
-class MoveLearnMethodCache(BaseCache["Route", "MoveLearnMethod"]):
+class MoveLearnMethodCache(BaseCache["Route", "models.MoveLearnMethod"]):
     """A cache for move learn methods."""
 
 
-class MoveTargetCache(BaseCache["Route", "MoveTarget"]):
+class MoveTargetCache(BaseCache["Route", "models.MoveTarget"]):
     """A cache for move targets."""
 
 
-class MachineCache(SecondaryTypeCache["Route", "Machine"]):
+class MachineCache(SecondaryTypeCache["Route", "models.Machine"]):
     """A cache for machines."""
 
 
-class EvolutionChainCache(SecondaryTypeCache["Route", "EvolutionChain"]):
+class EvolutionChainCache(SecondaryTypeCache["Route", "models.EvolutionChain"]):
     """A cache for evolution chains."""
 
 
-class CharacteristicCache(SecondaryTypeCache["Route", "Characteristic"]):
+class CharacteristicCache(SecondaryTypeCache["Route", "models.Characteristic"]):
     """A cache for characteristics."""
 
 
-class ContestEffectCache(SecondaryTypeCache["Route", "ContestEffect"]):
+class ContestEffectCache(SecondaryTypeCache["Route", "models.ContestEffect"]):
     """A cache for contest effects."""
 
 
-class SuperContestEffectCache(SecondaryTypeCache["Route", "SuperContestEffect"]):
+class SuperContestEffectCache(SecondaryTypeCache["Route", "models.SuperContestEffect"]):
     """A cache for super contest effects."""

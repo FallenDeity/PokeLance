@@ -317,6 +317,6 @@ class Location(BaseExtension):
         return self.cache.region.setdefault(route, Region.from_payload(data))
 
 
-async def setup(lance: "PokeLance") -> None:
+def setup(lance: "PokeLance") -> None:
     """Sets up the location cog."""
-    await lance.add_extension("location", Location(lance.http))
+    lance.add_extension("location", Location(lance.http))

@@ -1,3 +1,4 @@
+import asyncio
 import time
 import typing as t
 
@@ -75,13 +76,21 @@ class HttpClient:
         self._is_ready = False
         self._cache = Cache(max_size=cache_size)
 
+    def _load_endpoints(self) -> None:
+        """Loads the endpoints for the HTTP client."""
+        for num, (coro, name) in enumerate(self._client.loaders):
+            task = asyncio.create_task(coro)
+            task.add_done_callback(
+                lambda _: self._client.logger.info(f"Loaded {self._client.loaders.pop(0)[1]} endpoints.")
+            )
+        self._is_ready = True
+
     async def connect(self) -> None:
         """Connects the HTTP client."""
         if not self._is_ready:
             if self.session is None:
                 self.session = aiohttp.ClientSession()
-                await self._client.setup_hook()
-            self._is_ready = True
+                self._load_endpoints()
 
     async def request(self, route: Route) -> t.Any:
         """Makes a request to the PokeAPI.
@@ -101,6 +110,10 @@ class HttpClient:
         pokelance.exceptions.HTTPException
             An error occurred while making the request.
         """
+        if self.session is None:
+            await self.connect()
+        if not self._is_ready and self._client.loaders:
+            self._load_endpoints()
         if self.session is not None:
             async with self.session.request(route.method, route.url, params=route.payload) as response:
                 if 300 > response.status >= 200:
@@ -108,7 +121,7 @@ class HttpClient:
                 else:
                     raise HTTPException(str(response.reason), route, response.status).create()
         else:
-            await self.connect()
+            raise HTTPException("No session was provided.", route, 0).create()
 
     async def ping(self) -> float:
         """Pings the PokeAPI and returns the latency.

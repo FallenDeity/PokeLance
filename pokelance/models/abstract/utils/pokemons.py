@@ -59,7 +59,7 @@ class AbilityEffectChange(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "AbilityEffectChange":
         return cls(
             effect_entries=[Effect.from_payload(i) for i in payload.get("effect_entries", [])],
-            version_group=NamedResource.from_payload(payload.get("version_group", {})),
+            version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
         )
 
 
@@ -85,8 +85,8 @@ class AbilityFlavorText(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "AbilityFlavorText":
         return cls(
             flavor_text=payload.get("flavor_text", ""),
-            language=NamedResource.from_payload(payload.get("language", {})),
-            version_group=NamedResource.from_payload(payload.get("version_group", {})),
+            language=NamedResource.from_payload(payload.get("language", {}) or {}),
+            version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
         )
 
 
@@ -113,7 +113,7 @@ class AbilityPokemon(BaseModel):
         return cls(
             is_hidden=payload.get("is_hidden", False),
             slot=payload.get("slot", 0),
-            pokemon=NamedResource.from_payload(payload.get("pokemon", {})),
+            pokemon=NamedResource.from_payload(payload.get("pokemon", {}) or {}),
         )
 
 
@@ -136,7 +136,7 @@ class PokemonSpeciesGender(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonSpeciesGender":
         return cls(
             rate=payload.get("rate", 0),
-            pokemon_species=NamedResource.from_payload(payload.get("pokemon_species", {})),
+            pokemon_species=NamedResource.from_payload(payload.get("pokemon_species", {}) or {}),
         )
 
 
@@ -182,7 +182,7 @@ class NatureStatChange(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "NatureStatChange":
         return cls(
             max_change=payload.get("max_change", 0),
-            pokeathlon_stat=NamedResource.from_payload(payload.get("pokeathlon_stat", {})),
+            pokeathlon_stat=NamedResource.from_payload(payload.get("pokeathlon_stat", {}) or {}),
         )
 
 
@@ -209,7 +209,7 @@ class MoveBattleStylePreference(BaseModel):
         return cls(
             low_hp_preference=payload.get("low_hp_preference", 0),
             high_hp_preference=payload.get("high_hp_preference", 0),
-            move_battle_style=NamedResource.from_payload(payload.get("battle_style", {})),
+            move_battle_style=NamedResource.from_payload(payload.get("battle_style", {}) or {}),
         )
 
 

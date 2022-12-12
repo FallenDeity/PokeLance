@@ -231,6 +231,6 @@ class Encounter(BaseExtension):
         return self.cache.encounter_method.setdefault(route, EncounterMethod.from_payload(data))
 
 
-async def setup(lance: "PokeLance") -> None:
+def setup(lance: "PokeLance") -> None:
     """Sets up the encounter cog."""
-    await lance.add_extension("encounter", Encounter(lance.http))
+    lance.add_extension("encounter", Encounter(lance.http))

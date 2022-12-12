@@ -48,7 +48,7 @@ class ItemHolderPokemonVersionDetail(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemHolderPokemonVersionDetail":
         return cls(
             rarity=payload.get("rarity", 0),
-            version=NamedResource.from_payload(payload.get("version", {})),
+            version=NamedResource.from_payload(payload.get("version", {}) or {}),
         )
 
 
@@ -70,7 +70,7 @@ class ItemHolderPokemon(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemHolderPokemon":
         return cls(
-            pokemon=NamedResource.from_payload(payload.get("pokemon", {})),
+            pokemon=NamedResource.from_payload(payload.get("pokemon", {}) or {}),
             version_details=[
                 ItemHolderPokemonVersionDetail.from_payload(version_detail)
                 for version_detail in payload.get("version_details", [])
