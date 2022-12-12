@@ -13,6 +13,8 @@
 A flexible, statically typed and easy to use pokeapi wrapper for python 🚀
 </p>
 
+---
+
 
 Features:
 - Modern and pythonic API asynchronously built on top of aiohttp
@@ -23,3 +25,81 @@ Features:
 - Optimized for speed and performance
 - Automatically caches data for faster access
 - Caches endpoints for user convenience
+
+---
+
+## Installation
+
+```bash
+$ python -m pip install PokeLance
+```
+
+---
+
+## Usage
+
+```python
+import asyncio
+
+from pokelance import PokeLance
+
+client = PokeLance()  # Create a client instance
+
+
+async def main() -> None:
+    print(await client.ping())  # Ping the pokeapi
+    print(await client.berry.fetch_berry("cheri"))  # Fetch a berry from the pokeapi
+    print(await client.berry.fetch_berry_flavor("spicy"))
+    print(await client.berry.fetch_berry_firmness("very-soft"))
+    print(client.berry.get_berry("cheri"))  # Get a cached berry it will return None if it doesn't exist
+    print(client.berry.get_berry_flavor("spicy"))
+    print(client.berry.get_berry_firmness("very-soft"))
+    await client.close()  # Close the client
+    return None
+
+
+asyncio.run(main())
+```
+
+## With Async Context Manager
+
+```python
+import asyncio
+
+import aiohttp
+from pokelance import PokeLance
+
+
+async def main() -> None:
+    # Use an async context manager to create a client instance
+    async with aiohttp.ClientSession() as session, PokeLance(session=session) as client:
+        print(await client.ping())  # Ping the pokeapi
+        print(await client.berry.fetch_berry("cheri"))  # Fetch a berry from the pokeapi
+        print(await client.berry.fetch_berry_flavor("spicy"))
+        print(await client.berry.fetch_berry_firmness("very-soft"))
+        print(client.berry.get_berry("cheri"))  # Get a cached berry it will return None if it doesn't exist
+        print(client.berry.get_berry_flavor("spicy"))
+        print(client.berry.get_berry_firmness("very-soft"))
+        # The client will be closed automatically when the async context manager exits
+    return None
+
+asyncio.run(main())
+```
+
+## Important Links
+
+
+- [PokeAPI](https://pokeapi.co/)
+- [PokeAPI Documentation](https://pokeapi.co/docs/v2)
+- [PokeLance Documentation](https://FallenDeity.github.io/PokeLance/)
+- [PokeLance ReadTheDocs](https://pokelance.readthedocs.io/en/latest/)
+- [PokeLance GitHub](https://github.com/FallenDeity/PokeLance)
+- [PokeLance PyPI](https://pypi.org/project/PokeLance/)
+- [PokeLance Discord](https://discord.gg/yeyEvT5V2J)
+
+---
+
+!!! note "Note"
+    This is a work in progress. If you find any bugs or have any suggestions, please open an issue [here](https://github.com/FallenDeity/PokeLance/issues/new).
+
+---
