@@ -1,6 +1,6 @@
-![](./assets/pokelance.png){align=left style="width: 450px;"}
+![](./assets/pokelance.png){align=left style="width: 400px;"}
 
-# Welcome to PokeLance's documentation.
+# PokeLance Documentation
 
 ![](https://img.shields.io/github/license/FallenDeity/PokeLance?style=flat-square)
 ![](https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square)
@@ -13,7 +13,8 @@
 
 A flexible, statically typed and easy to use pokeapi wrapper for python 🚀
 
-Features:
+Features
+
 - Modern and pythonic API asynchronously built on top of aiohttp
 - Flexible and easy to use
 - Statically typed with mypy
