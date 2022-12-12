@@ -19,5 +19,5 @@ python:
     - requirements: docs/requirements.txt
 
 mkdocs:
-  configuration: mkdocs.yml
+  configuration: mkdocs_R.yml
   fail_on_warning: false
