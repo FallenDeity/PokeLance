@@ -97,7 +97,9 @@ nav:
               - Move: api_reference/models/abstract/move.md
               - Pokemon: api_reference/models/abstract/pokemon.md
   - Guide:
-      - Usage: guide/basic_usage.md
+      - Basic Usage: guide/basic_usage.md
+      - Discord Bot: guide/discord_bot.md
+      - FastAPI: guide/fastapi.md
 
 
 markdown_extensions:
