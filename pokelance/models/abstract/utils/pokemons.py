@@ -40,6 +40,443 @@ __all__: t.Tuple[str, ...] = (
 )
 
 
+@attrs.define(kw_only=True, slots=True)
+class BaseSprite(BaseModel):
+    """A pokemon sprite resource.
+
+    Attributes
+    ----------
+    front_default: str
+        The default depiction of this pokemon from the front in battle.
+    front_shiny: str
+        The shiny depiction of this pokemon from the front in battle.
+    front_female: str
+        The default depiction of female gender of this pokemon from the front in battle.
+    front_shiny_female: str
+        The shiny depiction of female gender of this pokemon from the front in battle.
+    back_default: str
+        The default depiction of this pokemon from the back in battle.
+    back_shiny: str
+        The shiny depiction of this pokemon from the back in battle.
+    back_female: str
+        The default depiction of female gender of this pokemon from the back in battle.
+    back_shiny_female: str
+        The shiny depiction of female gender of this pokemon from the back in battle.
+    """
+
+    back_default: str = attrs.field(factory=str)
+    back_shiny: str = attrs.field(factory=str)
+    back_female: str = attrs.field(factory=str)
+    back_shiny_female: str = attrs.field(factory=str)
+    front_default: str = attrs.field(factory=str)
+    front_shiny: str = attrs.field(factory=str)
+    front_female: str = attrs.field(factory=str)
+    front_shiny_female: str = attrs.field(factory=str)
+
+
+@attrs.define(kw_only=True, slots=True)
+class Generation(BaseModel):
+    """A generation resource."""
+
+    ...
+
+
+@attrs.define(kw_only=True, slots=True)
+class Animated(BaseSprite):
+    """A pokemon animated sprite resource."""
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Animated":
+        return cls(
+            back_default=payload.get("back_default", ""),
+            back_shiny=payload.get("back_shiny", ""),
+            back_female=payload.get("back_female", ""),
+            back_shiny_female=payload.get("back_shiny_female", ""),
+            front_default=payload.get("front_default", ""),
+            front_shiny=payload.get("front_shiny", ""),
+            front_female=payload.get("front_female", ""),
+            front_shiny_female=payload.get("front_shiny_female", ""),
+        )
+
+
+@attrs.define(kw_only=True, slots=True)
+class VersionSprite(BaseSprite):
+    """A pokemon version sprite resource.
+
+    Attributes
+    ----------
+    back_gray: str
+        The gray depiction of this pokemon from the back in battle.
+    front_gray: str
+        The gray depiction of this pokemon from the front in battle.
+    back_transperent: str
+        The transparent depiction of this pokemon from the back in battle.
+    front_transperent: str
+        The transparent depiction of this pokemon from the front in battle.
+    animated: Animated
+        The animated depiction of this pokemon.
+    """
+
+    back_gray: str = attrs.field(factory=str)
+    back_transperent: str = attrs.field(factory=str)
+    front_gray: str = attrs.field(factory=str)
+    front_transperent: str = attrs.field(factory=str)
+    animated: Animated = attrs.field(factory=Animated)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "VersionSprite":
+        return cls(
+            back_default=payload.get("back_default", ""),
+            back_gray=payload.get("back_gray", ""),
+            back_shiny=payload.get("back_shiny", ""),
+            back_transperent=payload.get("back_transperent", ""),
+            back_female=payload.get("back_female", ""),
+            back_shiny_female=payload.get("back_shiny_female", ""),
+            front_default=payload.get("front_default", ""),
+            front_shiny=payload.get("front_shiny", ""),
+            front_female=payload.get("front_female", ""),
+            front_shiny_female=payload.get("front_shiny_female", ""),
+            front_gray=payload.get("front_gray", ""),
+            front_transperent=payload.get("front_transperent", ""),
+            animated=Animated.from_payload(payload.get("animated", {})),
+        )
+
+
+@attrs.define(kw_only=True, slots=True)
+class GenerationI(Generation):
+    """A generation I resource.
+
+    Attributes
+    ----------
+    red_blue: VersionSprite
+        The red-blue depiction of this pokemon.
+    yellow: VersionSprite
+        The yellow depiction of this pokemon.
+    """
+
+    red_blue: VersionSprite = attrs.field(factory=VersionSprite)
+    yellow: VersionSprite = attrs.field(factory=VersionSprite)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationI":
+        return cls(
+            red_blue=VersionSprite.from_payload(payload.get("red-blue", {})),
+            yellow=VersionSprite.from_payload(payload.get("yellow", {})),
+        )
+
+
+@attrs.define(kw_only=True, slots=True)
+class GenerationII(Generation):
+    """A generation II resource.
+
+    Attributes
+    ----------
+    crystal: VersionSprite
+        The crystal depiction of this pokemon.
+    gold: VersionSprite
+        The gold depiction of this pokemon.
+    silver: VersionSprite
+        The silver depiction of this pokemon.
+    """
+
+    crystal: VersionSprite = attrs.field(factory=VersionSprite)
+    gold: VersionSprite = attrs.field(factory=VersionSprite)
+    silver: VersionSprite = attrs.field(factory=VersionSprite)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationII":
+        return cls(
+            crystal=VersionSprite.from_payload(payload.get("crystal", {})),
+            gold=VersionSprite.from_payload(payload.get("gold", {})),
+            silver=VersionSprite.from_payload(payload.get("silver", {})),
+        )
+
+
+@attrs.define(kw_only=True, slots=True)
+class GenerationIII(Generation):
+    """A generation III resource.
+
+    Attributes
+    ----------
+    emerald: VersionSprite
+        The emerald depiction of this pokemon.
+    firered_leafgreen: VersionSprite
+        The firered-leafgreen depiction of this pokemon.
+    ruby_sapphire: VersionSprite
+        The ruby-sapphire depiction of this pokemon.
+    """
+
+    emerald: VersionSprite = attrs.field(factory=VersionSprite)
+    firered_leafgreen: VersionSprite = attrs.field(factory=VersionSprite)
+    ruby_sapphire: VersionSprite = attrs.field(factory=VersionSprite)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationIII":
+        return cls(
+            emerald=VersionSprite.from_payload(payload.get("emerald", {})),
+            firered_leafgreen=VersionSprite.from_payload(payload.get("firered-leafgreen", {})),
+            ruby_sapphire=VersionSprite.from_payload(payload.get("ruby-sapphire", {})),
+        )
+
+
+@attrs.define(kw_only=True, slots=True)
+class GenerationIV(Generation):
+    """A generation IV resource.
+
+    Attributes
+    ----------
+    diamond_pearl: VersionSprite
+        The diamond-pearl depiction of this pokemon.
+    heartgold_soulsilver: VersionSprite
+        The heartgold-soulsilver depiction of this pokemon.
+    platinum: VersionSprite
+        The platinum depiction of this pokemon.
+    """
+
+    diamond_pearl: VersionSprite = attrs.field(factory=VersionSprite)
+    heartgold_soulsilver: VersionSprite = attrs.field(factory=VersionSprite)
+    platinum: VersionSprite = attrs.field(factory=VersionSprite)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationIV":
+        return cls(
+            diamond_pearl=VersionSprite.from_payload(payload.get("diamond-pearl", {})),
+            heartgold_soulsilver=VersionSprite.from_payload(payload.get("heartgold-soulsilver", {})),
+            platinum=VersionSprite.from_payload(payload.get("platinum", {})),
+        )
+
+
+@attrs.define(kw_only=True, slots=True)
+class GenerationV(Generation):
+    """A generation V resource.
+
+    Attributes
+    ----------
+    black_white: VersionSprite
+        The black-white depiction of this pokemon.
+    """
+
+    black_white: VersionSprite = attrs.field(factory=VersionSprite)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationV":
+        return cls(
+            black_white=VersionSprite.from_payload(payload.get("black-white", {})),
+        )
+
+
+@attrs.define(kw_only=True, slots=True)
+class GenerationVI(Generation):
+    """A generation VI resource.
+
+    Attributes
+    ----------
+    omegaruby_alphasapphire: VersionSprite
+        The omegaruby-alphasapphire depiction of this pokemon.
+    x_y: VersionSprite
+        The x-y depiction of this pokemon.
+    """
+
+    omegaruby_alphasapphire: VersionSprite = attrs.field(factory=VersionSprite)
+    x_y: VersionSprite = attrs.field(factory=VersionSprite)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationVI":
+        return cls(
+            omegaruby_alphasapphire=VersionSprite.from_payload(payload.get("omegaruby-alphasapphire", {})),
+            x_y=VersionSprite.from_payload(payload.get("x-y", {})),
+        )
+
+
+@attrs.define(kw_only=True, slots=True)
+class GenerationVII(Generation):
+    """A generation VII resource.
+
+    Attributes
+    ----------
+    icons: VersionSprite
+        The icons depiction of this pokemon.
+    ultra_sun_ultra_moon: VersionSprite
+        The ultra-sun-ultra-moon depiction of this pokemon.
+    """
+
+    icons: VersionSprite = attrs.field(factory=VersionSprite)
+    ultra_sun_ultra_moon: VersionSprite = attrs.field(factory=VersionSprite)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationVII":
+        return cls(
+            icons=VersionSprite.from_payload(payload.get("icons", {})),
+            ultra_sun_ultra_moon=VersionSprite.from_payload(payload.get("ultra-sun-ultra-moon", {})),
+        )
+
+
+@attrs.define(kw_only=True, slots=True)
+class GenerationVIII(Generation):
+    """A generation VIII resource.
+
+    Attributes
+    ----------
+    icons: VersionSprite
+        The icons depiction of this pokemon.
+    """
+
+    icons: VersionSprite = attrs.field(factory=VersionSprite)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationVIII":
+        return cls(
+            icons=VersionSprite.from_payload(payload.get("icons", {})),
+        )
+
+
+@attrs.define(kw_only=True, slots=True)
+class Versions(BaseModel):
+    """A sprite resource for all generations.
+
+    Attributes
+    ----------
+    generation_i: GenerationI
+        The generation I depiction of this pokemon.
+    generation_ii: GenerationII
+        The generation II depiction of this pokemon.
+    generation_iii: GenerationIII
+        The generation III depiction of this pokemon.
+    generation_iv: GenerationIV
+        The generation IV depiction of this pokemon.
+    generation_v: GenerationV
+        The generation V depiction of this pokemon.
+    generation_vi: GenerationVI
+        The generation VI depiction of this pokemon.
+    generation_vii: GenerationVII
+        The generation VII depiction of this pokemon.
+    generation_viii: GenerationVIII
+        The generation VIII depiction of this pokemon.
+    """
+
+    generation_i: GenerationI = attrs.field(factory=GenerationI)
+    generation_ii: GenerationII = attrs.field(factory=GenerationII)
+    generation_iii: GenerationIII = attrs.field(factory=GenerationIII)
+    generation_iv: GenerationIV = attrs.field(factory=GenerationIV)
+    generation_v: GenerationV = attrs.field(factory=GenerationV)
+    generation_vi: GenerationVI = attrs.field(factory=GenerationVI)
+    generation_vii: GenerationVII = attrs.field(factory=GenerationVII)
+    generation_viii: GenerationVIII = attrs.field(factory=GenerationVIII)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Versions":
+        return cls(
+            generation_i=GenerationI.from_payload(payload.get("generation-i", {})),
+            generation_ii=GenerationII.from_payload(payload.get("generation-ii", {})),
+            generation_iii=GenerationIII.from_payload(payload.get("generation-iii", {})),
+            generation_iv=GenerationIV.from_payload(payload.get("generation-iv", {})),
+            generation_v=GenerationV.from_payload(payload.get("generation-v", {})),
+            generation_vi=GenerationVI.from_payload(payload.get("generation-vi", {})),
+            generation_vii=GenerationVII.from_payload(payload.get("generation-vii", {})),
+            generation_viii=GenerationVIII.from_payload(payload.get("generation-viii", {})),
+        )
+
+
+@attrs.define(kw_only=True, slots=True)
+class DreamWorld(BaseModel):
+    """A dream world resource.
+
+    Attributes
+    ----------
+    front_default: str
+        The default depiction of this pokemon.
+    front_female: str
+        The female depiction of this pokemon.
+    """
+
+    front_default: str = attrs.field(factory=str)
+    front_female: str = attrs.field(factory=str)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "DreamWorld":
+        return cls(
+            front_default=payload.get("front_default", ""),
+            front_female=payload.get("front_female", ""),
+        )
+
+
+@attrs.define(kw_only=True, slots=True)
+class Home(BaseModel):
+    """A home resource.
+
+    Attributes
+    ----------
+    front_default: str
+        The default depiction of this pokemon.
+    front_female: str
+        The female depiction of this pokemon.
+    front_shiny: str
+        The shiny depiction of this pokemon.
+    front_shiny_female: str
+        The shiny female depiction of this pokemon.
+    """
+
+    front_default: str = attrs.field(factory=str)
+    front_female: str = attrs.field(factory=str)
+    front_shiny: str = attrs.field(factory=str)
+    front_shiny_female: str = attrs.field(factory=str)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Home":
+        return cls(
+            front_default=payload.get("front_default", ""),
+            front_female=payload.get("front_female", ""),
+            front_shiny=payload.get("front_shiny", ""),
+            front_shiny_female=payload.get("front_shiny_female", ""),
+        )
+
+
+@attrs.define(kw_only=True, slots=True)
+class OfficialArtwork(BaseModel):
+    """Official artwork for this Pokémon from Nintendo.
+
+    Attributes
+    ----------
+    front_default: str
+        The default depiction of this Pokémon from the official artwork.
+    """
+
+    front_default: str = attrs.field(factory=str)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "OfficialArtwork":
+        return cls(
+            front_default=payload.get("front_default", ""),
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class Other(BaseModel):
+    """Other sprites for this pokemon
+
+    Attributes
+    ----------
+    dream_world: DreamWorld
+        The dream world sprites for this pokemon
+    home: Home
+        The home sprites for this pokemon
+    official_artwork: OfficialArtwork
+        The official artwork sprites for this pokemon
+    """
+
+    dream_world: DreamWorld = attrs.field(factory=DreamWorld)
+    home: Home = attrs.field(factory=Home)
+    official_artwork: OfficialArtwork = attrs.field(factory=OfficialArtwork)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Other":
+        return cls(
+            dream_world=DreamWorld.from_payload(payload.get("dream_world", {})),
+            home=Home.from_payload(payload.get("home", {})),
+            official_artwork=OfficialArtwork.from_payload(payload.get("official-artwork", {})),
+        )
+
+
 @attrs.define(slots=True, kw_only=True)
 class AbilityEffectChange(BaseModel):
     """An ability effect change resource.
@@ -481,37 +918,19 @@ class PokemonStat(BaseModel):
 
 
 @attrs.define(slots=True, kw_only=True)
-class PokemonSprite(BaseModel):
+class PokemonSprite(BaseSprite):
     """A pokemon sprite resource.
 
     Attributes
     ----------
-    front_default: str
-        The default depiction of this pokemon from the front in battle.
-    front_shiny: str
-        The shiny depiction of this pokemon from the front in battle.
-    front_female: str
-        The default depiction of female gender of this pokemon from the front in battle.
-    front_shiny_female: str
-        The shiny depiction of female gender of this pokemon from the front in battle.
-    back_default: str
-        The default depiction of this pokemon from the back in battle.
-    back_shiny: str
-        The shiny depiction of this pokemon from the back in battle.
-    back_female: str
-        The default depiction of female gender of this pokemon from the back in battle.
-    back_shiny_female: str
-        The shiny depiction of female gender of this pokemon from the back in battle.
+    other: Other
+        A set of sprites used tin official artwork, home.
+    versions: Versions
+        A set of sprites used to depict this Pokémon in the game.
     """
 
-    front_default: str = attrs.field(factory=str)
-    front_shiny: str = attrs.field(factory=str)
-    front_female: str = attrs.field(factory=str)
-    front_shiny_female: str = attrs.field(factory=str)
-    back_default: str = attrs.field(factory=str)
-    back_shiny: str = attrs.field(factory=str)
-    back_female: str = attrs.field(factory=str)
-    back_shiny_female: str = attrs.field(factory=str)
+    other: Other = attrs.field(factory=Other)
+    versions: Versions = attrs.field(factory=Versions)
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonSprite":
@@ -524,6 +943,8 @@ class PokemonSprite(BaseModel):
             back_shiny=payload.get("back_shiny", ""),
             back_female=payload.get("back_female", ""),
             back_shiny_female=payload.get("back_shiny_female", ""),
+            other=Other.from_payload(payload.get("other", {})),
+            versions=Versions.from_payload(payload.get("versions", {})),
         )
 
 

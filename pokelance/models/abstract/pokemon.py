@@ -15,6 +15,7 @@ from pokelance.models.common import (
     VersionGameIndex,
 )
 
+from .showdown import ShowdownSprites
 from .utils import (
     AbilityEffectChange,
     AbilityFlavorText,
@@ -369,6 +370,8 @@ class Pokemon(BaseModel):
         A list of details showing all the stats this Pokémon has.
     types: t.List[PokemonType]
         A list of details showing types this Pokémon has.
+    showdown: ShowdownSprites
+        A set of sprites used to depict this Pokémon in the Showdown client.
     """
 
     id: int = attrs.field(factory=int)
@@ -389,6 +392,7 @@ class Pokemon(BaseModel):
     species: NamedResource = attrs.field(factory=NamedResource)
     stats: t.List[PokemonStat] = attrs.field(factory=list)
     types: t.List[PokemonType] = attrs.field(factory=list)
+    showdown: ShowdownSprites = attrs.field(factory=ShowdownSprites)
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Pokemon":
@@ -411,6 +415,7 @@ class Pokemon(BaseModel):
             species=NamedResource.from_payload(payload.get("species", {})),
             stats=[PokemonStat.from_payload(i) for i in payload.get("stats", [])],
             types=[PokemonType.from_payload(i) for i in payload.get("types", [])],
+            showdown=ShowdownSprites.from_name(payload.get("name", "")),
         )
 
 
