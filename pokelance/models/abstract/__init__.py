@@ -27,7 +27,6 @@ from .pokemon import (
     Stat,
     Type,
 )
-from .showdown import ShowdownSprites
 
 __all__: t.Tuple[str, ...] = (
     "Berry",
