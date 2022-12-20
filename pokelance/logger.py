@@ -1,80 +1,122 @@
+import datetime
+import enum
 import logging
+import pathlib
 import typing as t
 
-__all__: t.Tuple[str, ...] = ("create_logging_setup",)
+__all__: t.Tuple[str, ...] = (
+    "Logger",
+    "FileHandler",
+    "Formatter",
+)
+FLAIR: int = 95
 
 
-class Logger(logging.Formatter):
-    """
-    Logging formatter for Pokelance
+class LogLevelColors(enum.Enum):
+    """Colors for the log levels."""
+
+    DEBUG = "\033[96m"
+    INFO = "\033[92m"
+    WARNING = "\033[93m"
+    ERROR = "\033[33m"
+    CRITICAL = "\033[91m"
+    ENDC = "\033[0m"
+    FLAIR = "\033[95m"
 
 
-    Attributes
-    ----------
-    COLOR_CONFIGS : t.Dict[int, str]
-        A dictionary of logging levels and their respective color codes
+class Formatter(logging.Formatter):
+    """Format the log record."""
 
-    Examples
-    -----------
-
-    Color codes are used to color the log messages in the console.
-
-    >>> COLOR_CONFIGS: t.Dict[int, str] = {
-    ...     logging.DEBUG: "\x1b[36;49m",  # cyan
-    ...     logging.INFO: "\x1b[32;49m",  # green
-    ...     logging.WARNING: "\x1b[33;49m",  # yellow
-    ...     logging.ERROR: "\x1b[31;49m",  # red
-    ...     logging.CRITICAL: "\x1b[31;49m",  # red
-    ... }
-    """
-
-    COLOR_CONFIGS: t.Dict[int, str] = {
-        logging.DEBUG: "\x1b[33;49m",
-        logging.INFO: "\x1b[32;49m",
-        logging.WARNING: "\x1b[35;49m",
-        logging.ERROR: "\x1b[31;49m",
-        logging.CRITICAL: "\x1b[33;41;1m",
-    }
+    def __init__(self) -> None:
+        super().__init__(
+            "[%(asctime)s] | %(pathname)s:%(lineno)d | %(levelname)s | %(message)s",
+            style="%",
+        )
 
     def format(self, record: logging.LogRecord) -> str:
-        log_format = f"[%(asctime)s : {record.levelname.rjust(7)}] | %(message)s "
-
-        formatter = logging.Formatter(
-            "".join(
-                (
-                    self.COLOR_CONFIGS.get(record.levelno, "\x1b[32;49m"),
-                    log_format,
-                    "\x1b[0m",
-                )
-            )
-        )
-        return formatter.format(record)
+        """Format the log record."""
+        return f"{LogLevelColors[record.levelname].value}{super().format(record)}{LogLevelColors.ENDC.value}"
 
 
-def create_logging_setup(name: str) -> logging.Logger:
-    """
-    Create a logging setup for Pokelance
+class FileHandler(logging.FileHandler):
+    """Emit a log record.
 
     Parameters
     ----------
-    name: str
-        The name of the logger
+    ext : str
+        The file extension.
+    folder : pathlib.Path | str
+        The folder to save the logs in. Defaults to "logs".
+    """
 
-    Returns
-    -------
-    logging.Logger
-        The logger
+    _last_entry: datetime.datetime = datetime.datetime.today()
+
+    def __init__(self, *, ext: str, folder: t.Union[pathlib.Path, str] = "logs") -> None:
+        """Create a new file handler."""
+        self.folder = pathlib.Path(folder)
+        self.ext = ext
+        self.folder.mkdir(exist_ok=True)
+        super().__init__(
+            self.folder / f"{datetime.datetime.today().strftime('%Y-%m-%d')}-{ext}.log",
+            encoding="utf-8",
+        )
+        self.setFormatter(Formatter())
+
+    def emit(self, record: logging.LogRecord) -> None:
+        """Emit a log record."""
+        if self._last_entry.date() != datetime.datetime.today().date():
+            self._last_entry = datetime.datetime.today()
+            self.close()
+            self.baseFilename = (self.folder / f"{self._last_entry.strftime('%Y-%m-%d')}-{self.ext}.log").as_posix()
+            self.stream = self._open()
+        super().emit(record)
+
+
+class Logger(logging.Logger):
+    """The logger used to log information about the client.
+
+    Parameters
+    ----------
+    name : str
+        The name of the logger.
+    level : int
+        The level of the logger.
+    file_logging : bool
+        Whether or not to log to a file.
+
+    Attributes
+    ----------
+    _handler : logging.StreamHandler
+        The stream handler used to log to the console.
+    _file_handler : t.Optional[logging.FileHandler]
+        The file handler used to log to a file.
 
     Examples
     --------
-    >>> logger = create_logging_setup("test")
-    >>> logger.info("test")
-    [2020-01-01 00:00:00 :  INFO] | test
+
+    >>> logs = Logger(name="pokelance")
+    >>> logs.info("Hello, world!")
+    [2021-08-29 17:05:32,000] | pokelance\logger.py:95 | INFO | Hello, world!
 
     """
-    _LOGGER = logging.getLogger(name)
-    stream = logging.StreamHandler()
-    stream.setFormatter(Logger())
-    _LOGGER.addHandler(stream)
-    _LOGGER.setLevel(logging.DEBUG)
-    return _LOGGER
+
+    file_handler: t.Optional[FileHandler] = None
+
+    def __init__(self, *, name: str, level: int = logging.INFO, file_logging: bool = False) -> None:
+        super().__init__(name, level)
+        self._handler = logging.StreamHandler()
+        self._handler.setFormatter(Formatter())
+        self.addHandler(self._handler)
+        if file_logging:
+            self._file_handler = FileHandler(ext=name)
+            self.addHandler(self._file_handler)
+        logging.addLevelName(FLAIR, "FLAIR")
+
+    def set_formatter(self, formatter: logging.Formatter) -> None:
+        """Set the formatter."""
+        self._handler.setFormatter(formatter)
+        self._file_handler.setFormatter(formatter)
+
+    def flair(self, message: str, *args: t.Any, **kwargs: t.Any) -> None:
+        """Record a flair log."""
+        self.log(FLAIR, message, *args, **kwargs)

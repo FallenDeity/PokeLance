@@ -9,7 +9,7 @@ if t.TYPE_CHECKING:
 
 
 __all__: t.Tuple[str, ...] = ("BaseExtension",)
-_KT = t.TypeVar("_KT")
+_KT = t.TypeVar("_KT", bound="Route")
 _VT = t.TypeVar("_VT")
 
 

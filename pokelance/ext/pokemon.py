@@ -1179,6 +1179,19 @@ class Pokemon(BaseExtension):
         data = await self._client.request(route)
         return self.cache.type.setdefault(route, Type.from_payload(data))
 
+    @property
+    def all_pokemons(self) -> t.Optional[t.List[str]]:
+        """
+        Returns a list of all pokemon names.
+
+        Returns
+        -------
+        t.Optional[t.List[str]]
+            List of all pokemon names. None if not cached yet.
+        """
+        data = list(self.cache.pokemon.endpoints.keys())
+        return data if data else None
+
 
 def setup(lance: "PokeLance") -> None:
     """Setup the pokemon cog."""

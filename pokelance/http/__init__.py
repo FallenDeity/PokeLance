@@ -123,6 +123,30 @@ class HttpClient:
         else:
             raise HTTPException("No session was provided.", route, 0).create()
 
+    async def load_image(self, url: str) -> bytes:
+        """Loads an image from the url.
+
+        Parameters
+        ----------
+        url: str
+            The URL to load the image from.
+
+        Returns
+        -------
+        bytes
+            The image.
+        """
+        if self.session is None:
+            await self.connect()
+        if self.session is not None:
+            async with self.session.get(url) as response:
+                if 300 > response.status >= 200:
+                    data: bytes = await response.read()
+                    return data
+                else:
+                    raise HTTPException(str(response.reason), Route(), response.status).create()
+        return b""
+
     async def ping(self) -> float:
         """Pings the PokeAPI and returns the latency.
 

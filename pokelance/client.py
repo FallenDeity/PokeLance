@@ -1,8 +1,9 @@
 import typing as t
+from functools import lru_cache
 from pathlib import Path
 
 from .http import HttpClient
-from .logger import create_logging_setup
+from .logger import Logger
 
 if t.TYPE_CHECKING:
     import logging
@@ -78,14 +79,23 @@ class PokeLance:
     def __init__(
         self,
         *,
+        image_cache_size: int = 128,
         cache_size: int = 100,
+        logger: t.Optional["logging.Logger"] = None,
+        file_logging: bool = False,
         session: t.Optional["aiohttp.ClientSession"] = None,
     ) -> None:
         """
         Parameters
         ----------
+        image_cache_size : int
+            The size of the image cache. Defaults to 128.
         cache_size : int
             The size of the cache to use for the HTTP client.
+        logger : logging.Logger
+            The logger to use. If not provided, a new logger will be created.
+        file_logging : bool
+            Whether to log to a file. Defaults to False.
         session : typing.Optional[aiohttp.ClientSession]
             The session to use for the HTTP client. It is recommended to use the default.
 
@@ -94,9 +104,11 @@ class PokeLance:
         PokeLance
             The client.
         """
-        self._logger = create_logging_setup("Client")
+        self._logger = logger or Logger(name="pokelance", file_logging=file_logging)
         self._http = HttpClient(client=self, session=session, cache_size=cache_size)
         self._loaders: t.List[t.Tuple[t.Coroutine[t.Any, t.Any, None], str]] = []
+        self._image_cache_size = image_cache_size
+        lru_cache(maxsize=self._image_cache_size)(self.get_image_async)
         self.setup_hook()
 
     async def __aenter__(self) -> "PokeLance":
@@ -159,6 +171,22 @@ class PokeLance:
         if self._http.session is not None:
             await self._http.session.close()
 
+    async def get_image_async(self, url: str) -> bytes:
+        """
+        Gets an image from the url asynchronously.
+
+        Parameters
+        ----------
+        url : str
+            The URL to get the image from.
+
+        Returns
+        -------
+        bytes
+            The image data.
+        """
+        return await self._http.load_image(url)
+
     @property
     def loaders(self) -> t.List[t.Tuple[t.Coroutine[t.Any, t.Any, None], str]]:
         """
@@ -194,3 +222,21 @@ class PokeLance:
             The HTTP client.
         """
         return self._http
+
+    # change lru cache when setter method is called
+    @property
+    def image_cache_size(self) -> int:
+        """
+        The size of the image cache.
+
+        Returns
+        -------
+        int
+            The size of the image cache.
+        """
+        return self._image_cache_size
+
+    @image_cache_size.setter
+    def image_cache_size(self, value: int) -> None:
+        self._image_cache_size = value
+        lru_cache(maxsize=self._image_cache_size)(self.get_image_async)

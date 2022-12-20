@@ -3,6 +3,7 @@ import typing as t
 from collections.abc import MutableMapping
 
 import aiofiles
+import attrs
 
 if t.TYPE_CHECKING:
     from pokelance import models  # noqa: F401
@@ -70,8 +71,9 @@ __all__: t.Tuple[str, ...] = (
     "RegionCache",
 )
 
-_KT = t.TypeVar("_KT")
+_KT = t.TypeVar("_KT", bound="Route")
 _VT = t.TypeVar("_VT")
+_T = t.TypeVar("_T")
 
 
 class BaseCache(MutableMapping[_KT, _VT]):
@@ -121,11 +123,33 @@ class BaseCache(MutableMapping[_KT, _VT]):
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self._cache})"
 
+    def keys(self) -> t.KeysView[_KT]:
+        return self._cache.keys()
+
+    def values(self) -> t.ValuesView[_VT]:
+        return self._cache.values()
+
     def setdefault(self, __key: _KT, __default: t.Any = ...) -> _VT:
-        item = self._cache.setdefault(__key, __default)
-        if item is __default:
-            self._cache[__key] = self._cache.pop(__key)
-        return item
+        if __key not in self:
+            self[__key] = __default
+        return self[__key]
+
+    def clear(self) -> None:
+        self._cache.clear()
+
+    def items(self) -> t.ItemsView[_KT, _VT]:
+        return self._cache.items()
+
+    def get(self, key: _KT, /, default: t.Union[_VT, _T, None] = None) -> t.Union[_VT, _T, None]:  # type: ignore
+        if key in self:
+            return self[key]
+        dummy: t.Dict[str, str] = {str(v): k for k, v in self._endpoints.items()}
+        alias = dummy.get(key.endpoint.split("/")[-1]) or self._endpoints.get(key.endpoint.split("/")[-1])
+        if alias:
+            for k in self.keys():
+                if k.endpoint.split("/")[-1] == str(alias):
+                    return self[k]
+        return default
 
     def load_documents(self, data: t.List[t.Dict[str, str]]) -> None:
         """Load documents into the cache.
@@ -146,8 +170,9 @@ class BaseCache(MutableMapping[_KT, _VT]):
         path: str
             The path to save the cache to.
         """
+        dummy: t.Dict[str, t.Dict[str, t.Any]] = {k.url: attrs.asdict(v) for k, v in self.items()}
         async with aiofiles.open(f"{path}{self.__class__.__name__}.json", "w") as f:
-            await f.write(json.dumps(self._cache, indent=4, ensure_ascii=False))
+            await f.write(json.dumps(dummy, indent=4, ensure_ascii=False))
 
     @property
     def endpoints(self) -> t.Dict[str, int]:
