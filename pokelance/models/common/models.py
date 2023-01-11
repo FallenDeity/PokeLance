@@ -18,6 +18,7 @@ __all__: t.Tuple[str, ...] = (
     "VersionEncounterDetail",
     "VersionGameIndex",
     "VersionGroupFlavorText",
+    "Language",
 )
 
 
@@ -296,4 +297,43 @@ class VersionGroupFlavorText(BaseModel):
             text=payload.get("text", ""),
             language=NamedResource.from_payload(payload.get("language", {}) or {}),
             version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class Language(BaseModel):
+    """Model for a language object
+
+    Attributes
+    ----------
+    id: int
+        The identifier for this resource.
+    name: str
+        The name for this resource.
+    official: bool
+        Whether or not the games are published in this language.
+    iso639: str
+        The two-letter code of the country where this language is spoken. Note that it is not unique.
+    iso3166: str
+        The two-letter code of the language. Note that it is not unique.
+    names: t.List[Name]
+        The name of this resource listed in different languages.
+    """
+
+    id: int = attrs.field(factory=int)
+    name: str = attrs.field(factory=str)
+    official: bool = attrs.field(factory=bool)
+    iso639: str = attrs.field(factory=str)
+    iso3166: str = attrs.field(factory=str)
+    names: t.List[Name] = attrs.field(factory=list)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Language":
+        return cls(
+            id=payload.get("id", 0),
+            name=payload.get("name", ""),
+            official=payload.get("official", False),
+            iso639=payload.get("iso639", ""),
+            iso3166=payload.get("iso3166", ""),
+            names=[Name.from_payload(i) for i in payload.get("names", [])],
         )

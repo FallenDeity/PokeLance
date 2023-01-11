@@ -43,6 +43,16 @@ class Endpoint:
     """Represents an endpoint for the API."""
 
     @classmethod
+    def get_language_endpoints(cls) -> Route:
+        """Gets the language endpoints."""
+        return Route(endpoint="/language", payload={"limit": 10000})
+
+    @classmethod
+    def get_language(cls, language: t.Union[str, int]) -> Route:
+        """Gets a language."""
+        return Route(endpoint=f"/language/{language}")
+
+    @classmethod
     def get_berry_endpoints(cls) -> Route:
         """Get a list of berry endpoints."""
         return Route(endpoint="/berry", payload={"limit": 10000})

@@ -6,6 +6,7 @@ from .models import (
     Encounter,
     FlavorText,
     GenerationGameIndex,
+    Language,
     MachineVersionDetail,
     Name,
     VerboseEffect,
@@ -29,4 +30,5 @@ __all__: t.Tuple[str, ...] = (
     "VersionGroupFlavorText",
     "Resource",
     "NamedResource",
+    "Language",
 )

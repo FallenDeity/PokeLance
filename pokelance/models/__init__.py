@@ -51,6 +51,7 @@ from .abstract import (
     Version,
     VersionGroup,
 )
+from .common import Language
 
 __all__: t.Tuple[str, ...] = (
     "BaseModel",
@@ -102,4 +103,5 @@ __all__: t.Tuple[str, ...] = (
     "PokemonHabitats",
     "PokemonShape",
     "Stat",
+    "Language",
 )
