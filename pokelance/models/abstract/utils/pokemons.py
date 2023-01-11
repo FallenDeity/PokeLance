@@ -119,8 +119,10 @@ class VersionSprite(BaseSprite):
 
     back_gray: str = attrs.field(factory=str)
     back_transperent: str = attrs.field(factory=str)
+    back_shiny_transperent: str = attrs.field(factory=str)
     front_gray: str = attrs.field(factory=str)
     front_transperent: str = attrs.field(factory=str)
+    front_shiny_transperent: str = attrs.field(factory=str)
     animated: Animated = attrs.field(factory=Animated)
 
     @classmethod
@@ -130,10 +132,12 @@ class VersionSprite(BaseSprite):
             back_gray=payload.get("back_gray", ""),
             back_shiny=payload.get("back_shiny", ""),
             back_transperent=payload.get("back_transperent", ""),
+            back_shiny_transperent=payload.get("back_shiny_transperent", ""),
             back_female=payload.get("back_female", ""),
             back_shiny_female=payload.get("back_shiny_female", ""),
             front_default=payload.get("front_default", ""),
             front_shiny=payload.get("front_shiny", ""),
+            front_shiny_transperent=payload.get("front_shiny_transperent", ""),
             front_female=payload.get("front_female", ""),
             front_shiny_female=payload.get("front_shiny_female", ""),
             front_gray=payload.get("front_gray", ""),
@@ -439,14 +443,18 @@ class OfficialArtwork(BaseModel):
     ----------
     front_default: str
         The default depiction of this Pokémon from the official artwork.
+    front_shiny: str
+        The shiny depiction of this Pokémon from the official artwork.
     """
 
     front_default: str = attrs.field(factory=str)
+    front_shiny: str = attrs.field(factory=str)
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "OfficialArtwork":
         return cls(
             front_default=payload.get("front_default", ""),
+            front_shiny=payload.get("front_shiny", ""),
         )
 
 
