@@ -181,6 +181,13 @@ class Languages(enum.Enum):
             "official": False,
         }
     )
+    JA = Language.from_payload({"id": 11, "iso3166": "jp", "iso639": "ja", "name": "ja", "names": [], "official": True})
+    CHINESE_SIMPLIFIED = Language.from_payload(
+        {"id": 12, "iso3166": "cn", "iso639": "zh", "name": "zh-Hans", "names": [], "official": True}
+    )
+    PORTUGAL_BRAZILIAN = Language.from_payload(
+        {"id": 13, "iso3166": "br", "iso639": "pt-BR", "name": "pt-BR", "names": [], "official": False}
+    )
 
     def __str__(self) -> str:
         return str(self.value.name)

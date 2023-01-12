@@ -106,7 +106,7 @@ class Ability(BaseModel):
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             is_main_series=payload.get("is_main_series", False),
-            generation=NamedResource.from_payload(payload.get("generation", {})),
+            generation=NamedResource.from_payload(payload.get("generation", {}) or {}),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
             effect_entries=[VerboseEffect.from_payload(i) for i in payload.get("effect_entries", [])],
             effect_changes=[AbilityEffectChange.from_payload(i) for i in payload.get("effect_changes", [])],
@@ -285,10 +285,10 @@ class Nature(BaseModel):
         return cls(
             id=payload.get("id", 0),
             name=payload.get("name", ""),
-            decreased_stat=NamedResource.from_payload(payload.get("decreased_stat", {})),
-            increased_stat=NamedResource.from_payload(payload.get("increased_stat", {})),
-            hates_flavor=NamedResource.from_payload(payload.get("hates_flavor", {})),
-            likes_flavor=NamedResource.from_payload(payload.get("likes_flavor", {})),
+            decreased_stat=NamedResource.from_payload(payload.get("decreased_stat", {}) or {}),
+            increased_stat=NamedResource.from_payload(payload.get("increased_stat", {}) or {}),
+            hates_flavor=NamedResource.from_payload(payload.get("hates_flavor", {}) or {}),
+            likes_flavor=NamedResource.from_payload(payload.get("likes_flavor", {}) or {}),
             pokeathlon_stat_changes=[
                 NatureStatChange.from_payload(i) for i in payload.get("pokeathlon_stat_changes", [])
             ],
@@ -411,8 +411,8 @@ class Pokemon(BaseModel):
             location_area_encounters=payload.get("location_area_encounters", ""),
             moves=[PokemonMove.from_payload(i) for i in payload.get("moves", [])],
             past_types=[PokemonTypePast.from_payload(i) for i in payload.get("past_types", [])],
-            sprites=PokemonSprite.from_payload(payload.get("sprites", {})),
-            species=NamedResource.from_payload(payload.get("species", {})),
+            sprites=PokemonSprite.from_payload(payload.get("sprites", {}) or {}),
+            species=NamedResource.from_payload(payload.get("species", {}) or {}),
             stats=[PokemonStat.from_payload(i) for i in payload.get("stats", [])],
             types=[PokemonType.from_payload(i) for i in payload.get("types", [])],
             showdown=ShowdownSprites.from_name(payload.get("name", "")),
@@ -437,7 +437,7 @@ class LocationAreaEncounter(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "LocationAreaEncounter":
         return cls(
-            location_area=NamedResource.from_payload(payload.get("location_area", {})),
+            location_area=NamedResource.from_payload(payload.get("location_area", {}) or {}),
             version_details=[VersionEncounterDetail.from_payload(i) for i in payload.get("version_details", [])],
         )
 
@@ -536,12 +536,12 @@ class PokemonForm(BaseModel):
             is_battle_only=payload.get("is_battle_only", False),
             is_mega=payload.get("is_mega", False),
             form_name=payload.get("form_name", ""),
-            pokemon=NamedResource.from_payload(payload.get("pokemon", {})),
-            sprites=PokemonFormSprites.from_payload(payload.get("sprites", {})),
-            version_group=NamedResource.from_payload(payload.get("version_group", {})),
+            pokemon=NamedResource.from_payload(payload.get("pokemon", {}) or {}),
+            sprites=PokemonFormSprites.from_payload(payload.get("sprites", {}) or {}),
+            version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
             form_names=[Name.from_payload(i) for i in payload.get("form_names", [])],
-            pokemon_species=NamedResource.from_payload(payload.get("pokemon_species", {})),
+            pokemon_species=NamedResource.from_payload(payload.get("pokemon_species", {}) or {}),
         )
 
 
@@ -718,15 +718,15 @@ class PokemonSpecies(BaseModel):
             hatch_counter=payload.get("hatch_counter", 0),
             has_gender_differences=payload.get("has_gender_differences", False),
             forms_switchable=payload.get("forms_switchable", False),
-            growth_rate=NamedResource.from_payload(payload.get("growth_rate", {})),
+            growth_rate=NamedResource.from_payload(payload.get("growth_rate", {}) or {}),
             pokedex_numbers=[PokemonSpeciesDexEntry.from_payload(i) for i in payload.get("pokedex_numbers", [])],
             egg_groups=[NamedResource.from_payload(i) for i in payload.get("egg_groups", [])],
-            color=NamedResource.from_payload(payload.get("color", {})),
-            shape=NamedResource.from_payload(payload.get("shape", {})),
+            color=NamedResource.from_payload(payload.get("color", {}) or {}),
+            shape=NamedResource.from_payload(payload.get("shape", {}) or {}),
             evolves_from_species=NamedResource.from_payload(payload.get("evolves_from_species", {}) or {}),
             evolution_chain=Resource.from_payload(payload.get("evolution_chain", {}) or {}),
             habitat=NamedResource.from_payload(payload.get("habitat", {}) or {}),
-            generation=NamedResource.from_payload(payload.get("generation", {})),
+            generation=NamedResource.from_payload(payload.get("generation", {}) or {}),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
             pal_park_encounters=[PalParkEncounterArea.from_payload(i) for i in payload.get("pal_park_encounters", [])],
             flavor_text_entries=[FlavorText.from_payload(i) for i in payload.get("flavor_text_entries", [])],
@@ -832,8 +832,8 @@ class Type(BaseModel):
             name=payload.get("name", ""),
             damage_relations=TypeRelations.from_payload(payload.get("damage_relations", {})),
             game_indices=[GenerationGameIndex.from_payload(i) for i in payload.get("game_indices", [])],
-            generation=NamedResource.from_payload(payload.get("generation", {})),
-            move_damage_class=NamedResource.from_payload(payload.get("move_damage_class", {})),
+            generation=NamedResource.from_payload(payload.get("generation", {}) or {}),
+            move_damage_class=NamedResource.from_payload(payload.get("move_damage_class", {}) or {}),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
             pokemon=[TypePokemon.from_payload(i) for i in payload.get("pokemon", [])],
             moves=[NamedResource.from_payload(i) for i in payload.get("moves", [])],

@@ -677,7 +677,7 @@ class NaturePokeathlonStatAffect(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "NaturePokeathlonStatAffect":
         return cls(
             max_change=payload.get("max_change", 0),
-            nature=NamedResource.from_payload(payload.get("nature", {})),
+            nature=NamedResource.from_payload(payload.get("nature", {}) or {}),
         )
 
 
@@ -727,7 +727,7 @@ class PokemonAbility(BaseModel):
         return cls(
             is_hidden=payload.get("is_hidden", False),
             slot=payload.get("slot", 0),
-            ability=NamedResource.from_payload(payload.get("ability", {})),
+            ability=NamedResource.from_payload(payload.get("ability", {}) or {}),
         )
 
 
@@ -750,7 +750,7 @@ class PokemonType(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonType":
         return cls(
             slot=payload.get("slot", 0),
-            type=NamedResource.from_payload(payload.get("type", {})),
+            type=NamedResource.from_payload(payload.get("type", {}) or {}),
         )
 
 
@@ -773,7 +773,7 @@ class PokemonFormType(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonFormType":
         return cls(
             slot=payload.get("slot", 0),
-            type=NamedResource.from_payload(payload.get("type", {})),
+            type=NamedResource.from_payload(payload.get("type", {}) or {}),
         )
 
 
@@ -795,7 +795,7 @@ class PokemonTypePast(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonTypePast":
         return cls(
-            generation=NamedResource.from_payload(payload.get("generation", {})),
+            generation=NamedResource.from_payload(payload.get("generation", {}) or {}),
             types=[PokemonType.from_payload(i) for i in payload.get("types", [])],
         )
 
@@ -818,7 +818,7 @@ class PokemonHeldItemVersion(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonHeldItemVersion":
         return cls(
-            version=NamedResource.from_payload(payload.get("version", {})),
+            version=NamedResource.from_payload(payload.get("version", {}) or {}),
             rarity=payload.get("rarity", 0),
         )
 
@@ -841,7 +841,7 @@ class PokemonHeldItem(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonHeldItem":
         return cls(
-            item=NamedResource.from_payload(payload.get("item", {})),
+            item=NamedResource.from_payload(payload.get("item", {}) or {}),
             version_details=[PokemonHeldItemVersion.from_payload(i) for i in payload.get("version_details", [])],
         )
 
@@ -867,8 +867,8 @@ class PokemonMoveVersion(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonMoveVersion":
         return cls(
-            move_learn_method=NamedResource.from_payload(payload.get("move_learn_method", {})),
-            version_group=NamedResource.from_payload(payload.get("version_group", {})),
+            move_learn_method=NamedResource.from_payload(payload.get("move_learn_method", {}) or {}),
+            version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
             level_learned_at=payload.get("level_learned_at", 0),
         )
 
@@ -891,7 +891,7 @@ class PokemonMove(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonMove":
         return cls(
-            move=NamedResource.from_payload(payload.get("move", {})),
+            move=NamedResource.from_payload(payload.get("move", {}) or {}),
             version_group_details=[
                 PokemonMoveVersion.from_payload(i) for i in payload.get("version_group_details", [])
             ],
@@ -919,7 +919,7 @@ class PokemonStat(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonStat":
         return cls(
-            stat=NamedResource.from_payload(payload.get("stat", {})),
+            stat=NamedResource.from_payload(payload.get("stat", {}) or {}),
             effort=payload.get("effort", 0),
             base_stat=payload.get("base_stat", 0),
         )
@@ -1006,7 +1006,7 @@ class AwesomeName(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "AwesomeName":
         return cls(
             awesome_name=payload.get("awesome_name", ""),
-            language=NamedResource.from_payload(payload.get("language", {})),
+            language=NamedResource.from_payload(payload.get("language", {}) or {}),
         )
 
 
@@ -1029,7 +1029,7 @@ class Genus(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Genus":
         return cls(
             genus=payload.get("genus", ""),
-            language=NamedResource.from_payload(payload.get("language", {})),
+            language=NamedResource.from_payload(payload.get("language", {}) or {}),
         )
 
 
@@ -1052,7 +1052,7 @@ class PokemonSpeciesDexEntry(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonSpeciesDexEntry":
         return cls(
             entry_number=payload.get("entry_number", 0),
-            pokedex=NamedResource.from_payload(payload.get("pokedex", {})),
+            pokedex=NamedResource.from_payload(payload.get("pokedex", {}) or {}),
         )
 
 
@@ -1079,7 +1079,7 @@ class PalParkEncounterArea(BaseModel):
         return cls(
             base_score=payload.get("base_score", 0),
             rate=payload.get("rate", 0),
-            area=NamedResource.from_payload(payload.get("area", {})),
+            area=NamedResource.from_payload(payload.get("area", {}) or {}),
         )
 
 
@@ -1102,7 +1102,7 @@ class PokemonSpeciesVariety(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonSpeciesVariety":
         return cls(
             is_default=payload.get("is_default", False),
-            pokemon=NamedResource.from_payload(payload.get("pokemon", {})),
+            pokemon=NamedResource.from_payload(payload.get("pokemon", {}) or {}),
         )
 
 
@@ -1125,7 +1125,7 @@ class MoveStatEffect(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveStatEffect":
         return cls(
             change=payload.get("change", 0),
-            stat=NamedResource.from_payload(payload.get("stat", {})),
+            stat=NamedResource.from_payload(payload.get("stat", {}) or {}),
         )
 
 
@@ -1194,7 +1194,7 @@ class TypePokemon(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypePokemon":
         return cls(
             slot=payload.get("slot", 0),
-            pokemon=NamedResource.from_payload(payload.get("pokemon", {})),
+            pokemon=NamedResource.from_payload(payload.get("pokemon", {} or {})),
         )
 
 
