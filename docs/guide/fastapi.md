@@ -36,7 +36,7 @@ class App(FastAPI):
         self.add_route(self.berry_flavor, "/berry-flavor/{name}", methods=["GET"], response_model=models.BerryFlavor)
         self.add_route(self.berry_firmness, "/berry-firmness/{name}", methods=["GET"], response_model=models.BerryFirmness)
         return None
-    
+
     def run(self) -> None:
         uvicorn.run(self, debug=True)
 

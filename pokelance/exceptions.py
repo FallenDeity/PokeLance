@@ -91,6 +91,26 @@ class ResourceNotFound(PokeLanceException):
         return f"{self.message} | {str(self.route)}"
 
 
+class ImageNotFound(HTTPException):
+    """Exception raised when an image is not found.
+
+    Parameters
+    ----------
+    message: str
+        The message to display.
+    route: pokelance.http.Route
+        The route that caused the exception.
+    status: int
+        The status code of the exception.
+    """
+
+    def __init__(self, message: str, route: "Route", status: int) -> None:
+        super().__init__(message, route, status)
+
+    def __str__(self) -> str:
+        return f"{self.message} | {str(self.route)} | {self.status}"
+
+
 class BadRequest(HTTPException):
     """Exception raised when a bad request is made. [HTTP 400]"""
 

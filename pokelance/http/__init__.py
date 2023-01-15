@@ -5,7 +5,7 @@ import typing as t
 import aiohttp
 
 from pokelance.cache import Cache
-from pokelance.exceptions import HTTPException
+from pokelance.exceptions import HTTPException, ImageNotFound
 
 from .endpoints import Endpoint, Route
 
@@ -144,7 +144,7 @@ class HttpClient:
                     data: bytes = await response.read()
                     return data
                 else:
-                    raise HTTPException(str(response.reason), Route(), response.status).create()
+                    raise ImageNotFound(str(response.reason), Route(), response.status).create()
         return b""
 
     async def ping(self) -> float:
