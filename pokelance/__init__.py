@@ -1,4 +1,4 @@
-__version__ = "0.0.6a"
+__version__ = "0.0.7a"
 __author__ = "FallenDeity"
 
 from .client import PokeLance
