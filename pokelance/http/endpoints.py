@@ -34,6 +34,9 @@ class Route:
     method: str = "GET"
     payload: t.Optional[t.Dict[str, t.Any]] = None
 
+    def __str__(self) -> str:
+        return f"<Route endpoint={self.endpoint} method={self.method}>"
+
     @property
     def url(self) -> str:
         return self._url.format(endpoint=self.endpoint)

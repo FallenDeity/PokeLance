@@ -36,7 +36,7 @@ class PokeLanceException(Exception):
         super().__init__(message)
 
     def __str__(self) -> str:
-        return f"{self.message} | {self.route}"
+        return f"{self.message} | {str(self.route)}"
 
 
 class HTTPException(PokeLanceException):
@@ -66,7 +66,7 @@ class HTTPException(PokeLanceException):
         super().__init__(message, route)
 
     def __str__(self) -> str:
-        return f"{self.message} | {self.route} | {self.status}"
+        return f"{self.message} | {str(self.route)} | {self.status}"
 
     def create(self) -> "HTTPException":
         """Creates an exception from the status code."""
@@ -88,7 +88,7 @@ class ResourceNotFound(PokeLanceException):
         super().__init__(message, route)
 
     def __str__(self) -> str:
-        return f"{self.message} | {self.route}"
+        return f"{self.message} | {str(self.route)}"
 
 
 class BadRequest(HTTPException):
