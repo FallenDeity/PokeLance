@@ -8,6 +8,7 @@ __all__: t.Tuple[str, ...] = (
     "PokeLanceException",
     "HTTPException",
     "ResourceNotFound",
+    "ImageNotFound",
 )
 
 
