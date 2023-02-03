@@ -30,7 +30,7 @@ class BerryFlavorMap(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "BerryFlavorMap":
         return cls(
             potency=payload.get("potency", 0),
-            flavor=NamedResource.from_payload(payload.get("flavor", {})),
+            flavor=NamedResource.from_payload(payload.get("flavor", {}) or {}),
         )
 
 
@@ -53,5 +53,5 @@ class FlavorBerryMap(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "FlavorBerryMap":
         return cls(
             potency=payload.get("potency", 0),
-            berry=NamedResource.from_payload(payload.get("berry", {})),
+            berry=NamedResource.from_payload(payload.get("berry", {}) or {}),
         )

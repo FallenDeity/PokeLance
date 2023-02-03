@@ -125,7 +125,7 @@ class Move(BaseModel):
             flavor_text_entries=[MoveFlavorText.from_payload(i) for i in payload.get("flavor_text_entries", [])],
             generation=NamedResource.from_payload(payload.get("generation", {}) or {}),
             machines=[MachineVersionDetail.from_payload(i) for i in payload.get("machines", [])],
-            meta=MoveMetaData.from_payload(payload.get("meta", {})),
+            meta=MoveMetaData.from_payload(payload.get("meta", {}) or {}),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
             past_values=[PastMoveStatValues.from_payload(i) for i in payload.get("past_values", [])],
             stat_changes=[MoveStatChange.from_payload(i) for i in payload.get("stat_changes", [])],

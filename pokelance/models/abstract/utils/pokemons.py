@@ -951,8 +951,8 @@ class PokemonSprite(BaseSprite):
             back_shiny=payload.get("back_shiny", ""),
             back_female=payload.get("back_female", ""),
             back_shiny_female=payload.get("back_shiny_female", ""),
-            other=Other.from_payload(payload.get("other", {})),
-            versions=Versions.from_payload(payload.get("versions", {})),
+            other=Other.from_payload(payload.get("other", {}) or {}),
+            versions=Versions.from_payload(payload.get("versions", {}) or {}),
         )
 
 
