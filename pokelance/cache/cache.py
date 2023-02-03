@@ -1,3 +1,4 @@
+import importlib
 import json
 import typing as t
 from collections.abc import MutableMapping
@@ -7,7 +8,7 @@ import attrs
 
 if t.TYPE_CHECKING:
     from pokelance import models  # noqa: F401
-    from pokelance.http import Route  # noqa: F401
+    from pokelance.http import HttpClient, Route  # noqa: F401
 
 
 __all__: t.Tuple[str, ...] = (
@@ -76,6 +77,25 @@ _VT = t.TypeVar("_VT")
 _T = t.TypeVar("_T")
 
 
+@attrs.define(kw_only=True, slots=True, frozen=True)
+class Endpoint:
+    """Represents an endpoint.
+
+    Parameters
+    ----------
+    id: str | int
+        The ID of the endpoint.
+    url: str
+        The URL of the endpoint.
+    """
+
+    id: t.Union[str, int] = attrs.field()
+    url: str = attrs.field()
+
+    def __str__(self) -> str:
+        return str(self.id)
+
+
 class BaseCache(MutableMapping[_KT, _VT]):
     """Base class for all caches.
 
@@ -97,7 +117,7 @@ class BaseCache(MutableMapping[_KT, _VT]):
     def __init__(self, max_size: int = 100) -> None:
         self._max_size = max_size
         self._cache: t.Dict[_KT, _VT] = {}
-        self._endpoints: t.Dict[str, int] = {}
+        self._endpoints: t.Dict[str, Endpoint] = {}
 
     def __getitem__(self, key: _KT) -> _VT:
         self._cache[key] = self._cache.pop(key)
@@ -160,7 +180,7 @@ class BaseCache(MutableMapping[_KT, _VT]):
             The data to load.
         """
         for document in data:
-            self._endpoints[document["name"]] = int(document["url"].split("/")[-2])
+            self._endpoints[document["name"]] = Endpoint(url=document["url"], id=int(document["url"].split("/")[-2]))
 
     async def save(self, path: str = "") -> None:
         """Save the cache to a file.
@@ -174,13 +194,30 @@ class BaseCache(MutableMapping[_KT, _VT]):
         async with aiofiles.open(f"{path}{self.__class__.__name__}.json", "w") as f:
             await f.write(json.dumps(dummy, indent=4, ensure_ascii=False))
 
+    async def load_all(self, client: "HttpClient") -> None:
+        """Load all documents into the cache.
+
+        Parameters
+        ----------
+        client: HttpClient
+            The client to use to load the documents.
+        """
+        client._client.logger.info(f"Loading {self.__class__.__name__}...")
+        for endpoint in self._endpoints.values():
+            route_model = importlib.import_module("pokelance.http").__dict__["Route"]
+            route = route_model(endpoint=f"/{endpoint.url.strip('/').split('/')[-2]}/{str(endpoint)}/")
+            value_type = str(self.__orig_bases__[0].__args__[1]).split(".")[-1]  # type: ignore
+            model: "models.BaseModel" = importlib.import_module("pokelance.models").__dict__[value_type]
+            self.setdefault(route, model.from_payload(await client.request(route)))
+        client._client.logger.info(f"Loaded {self.__class__.__name__}.")
+
     @property
-    def endpoints(self) -> t.Dict[str, int]:
+    def endpoints(self) -> t.Dict[str, Endpoint]:
         """The endpoints that are cached.
 
         Returns
         -------
-        typing.Dict[str, int]
+        typing.Dict[str, Endpoint]
             The endpoints that are cached.
         """
         return self._endpoints
@@ -209,7 +246,9 @@ class SecondaryTypeCache(BaseCache[_KT, _VT]):
             The data to load.
         """
         for document in data:
-            self._endpoints[document["url"].split("/")[-2]] = int(document["url"].split("/")[-2])
+            self._endpoints[document["url"].split("/")[-2]] = Endpoint(
+                url=document["url"], id=int(document["url"].split("/")[-2])
+            )
 
 
 class BerryCache(BaseCache["Route", "models.Berry"]):
