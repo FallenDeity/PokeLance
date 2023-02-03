@@ -38,7 +38,7 @@ class EvolutionChain(BaseModel):
         return cls(
             id=payload.get("id", 0),
             baby_trigger_item=NamedResource.from_payload(payload.get("baby_trigger_item", {}) or {}),
-            chain=ChainLink.from_payload(payload.get("chain", {})),
+            chain=ChainLink.from_payload(payload.get("chain", {}) or {}),
         )
 
 

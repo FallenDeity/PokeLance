@@ -326,7 +326,7 @@ class PokeathlonStat(BaseModel):
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
-            affecting_natures=NaturePokeathlonStatAffectSet.from_payload(payload.get("affecting_natures", {})),
+            affecting_natures=NaturePokeathlonStatAffectSet.from_payload(payload.get("affecting_natures", {}) or {}),
         )
 
 
@@ -780,8 +780,8 @@ class Stat(BaseModel):
             name=payload.get("name", ""),
             game_index=payload.get("game_index", 0),
             is_battle_only=payload.get("is_battle_only", False),
-            affecting_moves=MoveStatAffectSets.from_payload(payload.get("affecting_moves", {})),
-            affecting_natures=NatureStatAffectSets.from_payload(payload.get("affecting_natures", {})),
+            affecting_moves=MoveStatAffectSets.from_payload(payload.get("affecting_moves", {}) or {}),
+            affecting_natures=NatureStatAffectSets.from_payload(payload.get("affecting_natures", {}) or {}),
             characteristics=[Resource.from_payload(i) for i in payload.get("characteristics", [])],
             move_damage_class=NamedResource.from_payload(payload.get("move_damage_class", {}) or {}),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
@@ -830,7 +830,7 @@ class Type(BaseModel):
         return cls(
             id=payload.get("id", 0),
             name=payload.get("name", ""),
-            damage_relations=TypeRelations.from_payload(payload.get("damage_relations", {})),
+            damage_relations=TypeRelations.from_payload(payload.get("damage_relations", {}) or {}),
             game_indices=[GenerationGameIndex.from_payload(i) for i in payload.get("game_indices", [])],
             generation=NamedResource.from_payload(payload.get("generation", {}) or {}),
             move_damage_class=NamedResource.from_payload(payload.get("move_damage_class", {}) or {}),

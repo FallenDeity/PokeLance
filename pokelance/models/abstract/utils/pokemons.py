@@ -142,7 +142,7 @@ class VersionSprite(BaseSprite):
             front_shiny_female=payload.get("front_shiny_female", ""),
             front_gray=payload.get("front_gray", ""),
             front_transperent=payload.get("front_transperent", ""),
-            animated=Animated.from_payload(payload.get("animated", {})),
+            animated=Animated.from_payload(payload.get("animated", {}) or {}),
         )
 
 
@@ -164,8 +164,8 @@ class GenerationI(Generation):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationI":
         return cls(
-            red_blue=VersionSprite.from_payload(payload.get("red-blue", {})),
-            yellow=VersionSprite.from_payload(payload.get("yellow", {})),
+            red_blue=VersionSprite.from_payload(payload.get("red-blue", {}) or {}),
+            yellow=VersionSprite.from_payload(payload.get("yellow", {}) or {}),
         )
 
 
@@ -190,9 +190,9 @@ class GenerationII(Generation):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationII":
         return cls(
-            crystal=VersionSprite.from_payload(payload.get("crystal", {})),
-            gold=VersionSprite.from_payload(payload.get("gold", {})),
-            silver=VersionSprite.from_payload(payload.get("silver", {})),
+            crystal=VersionSprite.from_payload(payload.get("crystal", {}) or {}),
+            gold=VersionSprite.from_payload(payload.get("gold", {}) or {}),
+            silver=VersionSprite.from_payload(payload.get("silver", {}) or {}),
         )
 
 
@@ -217,9 +217,9 @@ class GenerationIII(Generation):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationIII":
         return cls(
-            emerald=VersionSprite.from_payload(payload.get("emerald", {})),
-            firered_leafgreen=VersionSprite.from_payload(payload.get("firered-leafgreen", {})),
-            ruby_sapphire=VersionSprite.from_payload(payload.get("ruby-sapphire", {})),
+            emerald=VersionSprite.from_payload(payload.get("emerald", {}) or {}),
+            firered_leafgreen=VersionSprite.from_payload(payload.get("firered-leafgreen", {}) or {}),
+            ruby_sapphire=VersionSprite.from_payload(payload.get("ruby-sapphire", {}) or {}),
         )
 
 
@@ -244,9 +244,9 @@ class GenerationIV(Generation):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationIV":
         return cls(
-            diamond_pearl=VersionSprite.from_payload(payload.get("diamond-pearl", {})),
-            heartgold_soulsilver=VersionSprite.from_payload(payload.get("heartgold-soulsilver", {})),
-            platinum=VersionSprite.from_payload(payload.get("platinum", {})),
+            diamond_pearl=VersionSprite.from_payload(payload.get("diamond-pearl", {}) or {}),
+            heartgold_soulsilver=VersionSprite.from_payload(payload.get("heartgold-soulsilver", {}) or {}),
+            platinum=VersionSprite.from_payload(payload.get("platinum", {}) or {}),
         )
 
 
@@ -265,7 +265,7 @@ class GenerationV(Generation):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationV":
         return cls(
-            black_white=VersionSprite.from_payload(payload.get("black-white", {})),
+            black_white=VersionSprite.from_payload(payload.get("black-white", {}) or {}),
         )
 
 
@@ -287,8 +287,8 @@ class GenerationVI(Generation):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationVI":
         return cls(
-            omegaruby_alphasapphire=VersionSprite.from_payload(payload.get("omegaruby-alphasapphire", {})),
-            x_y=VersionSprite.from_payload(payload.get("x-y", {})),
+            omegaruby_alphasapphire=VersionSprite.from_payload(payload.get("omegaruby-alphasapphire", {}) or {}),
+            x_y=VersionSprite.from_payload(payload.get("x-y", {}) or {}),
         )
 
 
@@ -310,8 +310,8 @@ class GenerationVII(Generation):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationVII":
         return cls(
-            icons=VersionSprite.from_payload(payload.get("icons", {})),
-            ultra_sun_ultra_moon=VersionSprite.from_payload(payload.get("ultra-sun-ultra-moon", {})),
+            icons=VersionSprite.from_payload(payload.get("icons", {}) or {}),
+            ultra_sun_ultra_moon=VersionSprite.from_payload(payload.get("ultra-sun-ultra-moon", {}) or {}),
         )
 
 
@@ -330,7 +330,7 @@ class GenerationVIII(Generation):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationVIII":
         return cls(
-            icons=VersionSprite.from_payload(payload.get("icons", {})),
+            icons=VersionSprite.from_payload(payload.get("icons", {}) or {}),
         )
 
 
@@ -370,14 +370,14 @@ class Versions(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Versions":
         return cls(
-            generation_i=GenerationI.from_payload(payload.get("generation-i", {})),
-            generation_ii=GenerationII.from_payload(payload.get("generation-ii", {})),
-            generation_iii=GenerationIII.from_payload(payload.get("generation-iii", {})),
-            generation_iv=GenerationIV.from_payload(payload.get("generation-iv", {})),
-            generation_v=GenerationV.from_payload(payload.get("generation-v", {})),
-            generation_vi=GenerationVI.from_payload(payload.get("generation-vi", {})),
-            generation_vii=GenerationVII.from_payload(payload.get("generation-vii", {})),
-            generation_viii=GenerationVIII.from_payload(payload.get("generation-viii", {})),
+            generation_i=GenerationI.from_payload(payload.get("generation-i", {}) or {}),
+            generation_ii=GenerationII.from_payload(payload.get("generation-ii", {}) or {}),
+            generation_iii=GenerationIII.from_payload(payload.get("generation-iii", {}) or {}),
+            generation_iv=GenerationIV.from_payload(payload.get("generation-iv", {}) or {}),
+            generation_v=GenerationV.from_payload(payload.get("generation-v", {}) or {}),
+            generation_vi=GenerationVI.from_payload(payload.get("generation-vi", {}) or {}),
+            generation_vii=GenerationVII.from_payload(payload.get("generation-vii", {}) or {}),
+            generation_viii=GenerationVIII.from_payload(payload.get("generation-viii", {}) or {}),
         )
 
 
@@ -479,9 +479,9 @@ class Other(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Other":
         return cls(
-            dream_world=DreamWorld.from_payload(payload.get("dream_world", {})),
-            home=Home.from_payload(payload.get("home", {})),
-            official_artwork=OfficialArtwork.from_payload(payload.get("official-artwork", {})),
+            dream_world=DreamWorld.from_payload(payload.get("dream_world", {}) or {}),
+            home=Home.from_payload(payload.get("home", {}) or {}),
+            official_artwork=OfficialArtwork.from_payload(payload.get("official-artwork", {}) or {}),
         )
 
 

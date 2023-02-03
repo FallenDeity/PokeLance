@@ -92,7 +92,7 @@ class Item(BaseModel):
                 GenerationGameIndex.from_payload(game_index) for game_index in payload.get("game_indices", [])
             ],
             names=[Name.from_payload(name) for name in payload.get("names", [])],
-            sprites=ItemSprites.from_payload(payload.get("sprites", {})),
+            sprites=ItemSprites.from_payload(payload.get("sprites", {}) or {}),
             held_by_pokemon=[
                 ItemHolderPokemon.from_payload(held_by_pokemon)
                 for held_by_pokemon in payload.get("held_by_pokemon", [])

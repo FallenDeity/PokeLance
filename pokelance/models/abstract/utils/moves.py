@@ -56,8 +56,8 @@ class ContestComboSet(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ContestComboSet":
         return cls(
-            normal=ContestComboDetail.from_payload(payload.get("normal", {})),
-            super_=ContestComboDetail.from_payload(payload.get("super", {})),
+            normal=ContestComboDetail.from_payload(payload.get("normal", {}) or {}),
+            super_=ContestComboDetail.from_payload(payload.get("super", {}) or {}),
         )
 
 
@@ -182,6 +182,6 @@ class PastMoveStatValues(BaseModel):
             power=payload.get("power", 0),
             pp=payload.get("pp", 0),
             effect_entries=[NamedResource.from_payload(i) for i in payload.get("effect_entries", [])],
-            type=NamedResource.from_payload(payload.get("type", {})),
-            version_group=NamedResource.from_payload(payload.get("version_group", {})),
+            type=NamedResource.from_payload(payload.get("type", {}) or {}),
+            version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
         )
