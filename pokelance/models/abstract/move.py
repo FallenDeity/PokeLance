@@ -115,7 +115,7 @@ class Move(BaseModel):
             pp=payload.get("pp", 0),
             priority=payload.get("priority", 0),
             power=payload.get("power", 0),
-            contest_combos=ContestComboSet.from_payload(payload.get("contest_combos", {})),
+            contest_combos=ContestComboSet.from_payload(payload.get("contest_combos", {}) or {}),
             contest_type=NamedResource.from_payload(payload.get("contest_type", {}) or {}),
             contest_effect=Resource.from_payload(payload.get("contest_effect", {}) or {}),
             damage_class=NamedResource.from_payload(payload.get("damage_class", {}) or {}),
