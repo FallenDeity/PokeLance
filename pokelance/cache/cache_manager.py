@@ -71,7 +71,35 @@ __all__: t.Tuple[str, ...] = (
 
 
 @attrs.define(slots=True, kw_only=True)
-class Encounter:
+class Base:
+    """Base class for all caches.
+
+    Attributes
+    ----------
+    max_size: int
+        The maximum cache size.
+    """
+
+    max_size: int
+
+    def set_size(self, max_size: int = 100) -> None:
+        """Set the maximum cache size.
+
+        Parameters
+        ----------
+        max_size: int
+            The maximum cache size.
+        """
+        self.max_size = max_size
+        obj: attrs.Attribute[BaseCache[t.Any, t.Any]]
+        for obj in self.__attrs_attrs__:  # type: ignore
+            if isinstance(obj.default, BaseCache):
+                if obj.default is not None:
+                    obj.default._max_size = max_size
+
+
+@attrs.define(slots=True, kw_only=True)
+class Encounter(Base):
     """Cache for encounter related endpoints.
 
     Attributes
@@ -95,7 +123,7 @@ class Encounter:
 
 
 @attrs.define(slots=True, kw_only=True)
-class Evolution:
+class Evolution(Base):
     """Cache for evolution related endpoints.
 
     Attributes
@@ -114,7 +142,7 @@ class Evolution:
 
 
 @attrs.define(slots=True, kw_only=True)
-class Machine:
+class Machine(Base):
     """Cache for machine related endpoints.
 
     Attributes
@@ -130,7 +158,7 @@ class Machine:
 
 
 @attrs.define(slots=True, kw_only=True)
-class Game:
+class Game(Base):
     """Cache for game related endpoints.
 
     Attributes
@@ -155,7 +183,7 @@ class Game:
 
 
 @attrs.define(slots=True, kw_only=True)
-class Item:
+class Item(Base):
     """Cache for item related endpoints.
 
     Attributes
@@ -183,7 +211,7 @@ class Item:
 
 
 @attrs.define(slots=True, kw_only=True)
-class Location:
+class Location(Base):
     """Cache for location related endpoints.
 
     Attributes
@@ -204,7 +232,7 @@ class Location:
 
 
 @attrs.define(slots=True, kw_only=True)
-class Move:
+class Move(Base):
     """Cache for move related endpoints.
 
     Attributes
@@ -238,7 +266,7 @@ class Move:
 
 
 @attrs.define(slots=True, kw_only=True)
-class Pokemon:
+class Pokemon(Base):
     """Cache for pokemon related endpoints.
 
     Attributes
@@ -297,7 +325,7 @@ class Pokemon:
 
 
 @attrs.define(slots=True, kw_only=True)
-class Contest:
+class Contest(Base):
     """Cache for contest related endpoints.
 
     Attributes
@@ -319,7 +347,7 @@ class Contest:
 
 
 @attrs.define(slots=True, kw_only=True)
-class Berry:
+class Berry(Base):
     """Cache for berry related endpoints.
 
     Attributes
@@ -340,7 +368,7 @@ class Berry:
     berry_flavor: BerryFlavorCache = attrs.field(default=BerryFlavorCache(max_size=max_size))
 
 
-@attrs.define(slots=True)
+@attrs.define(slots=True, kw_only=True)
 class Cache:
     """Cache for all endpoints.
 
@@ -378,9 +406,16 @@ class Cache:
     game: Game = attrs.field(default=Game(max_size=max_size))
     item: Item = attrs.field(default=Item(max_size=max_size))
     location: Location = attrs.field(default=Location(max_size=max_size))
+    machine: Machine = attrs.field(default=Machine(max_size=max_size))
     move: Move = attrs.field(default=Move(max_size=max_size))
     pokemon: Pokemon = attrs.field(default=Pokemon(max_size=max_size))
-    machine: Machine = attrs.field(default=Machine(max_size=max_size))
+
+    def __attrs_post_init__(self) -> None:
+        obj: attrs.Attribute[Base]
+        for obj in self.__attrs_attrs__:  # type: ignore
+            if isinstance(obj.default, Base):
+                if obj.default is not None:
+                    obj.default.set_size(self.max_size)
 
     def load_documents(self, category: str, _type: str, data: t.List[t.Dict[str, str]]) -> None:
         """Loads the endpoint data into the cache.
