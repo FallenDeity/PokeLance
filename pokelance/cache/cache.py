@@ -205,7 +205,7 @@ class BaseCache(MutableMapping[_KT, _VT]):
         client._client.logger.info(f"Loading {self.__class__.__name__}...")
         for endpoint in self._endpoints.values():
             route_model = importlib.import_module("pokelance.http").__dict__["Route"]
-            route = route_model(endpoint=f"/{endpoint.url.strip('/').split('/')[-2]}/{str(endpoint)}/")
+            route = route_model(endpoint=f"/{endpoint.url.strip('/').split('/')[-2]}/{str(endpoint)}")
             value_type = str(self.__orig_bases__[0].__args__[1]).split(".")[-1]  # type: ignore
             model: "models.BaseModel" = importlib.import_module("pokelance.models").__dict__[value_type]
             self.setdefault(route, model.from_payload(await client.request(route)))
