@@ -80,7 +80,7 @@ class EvolutionDetail(BaseModel):
         return cls(
             item=NamedResource.from_payload(payload.get("item", {}) or {}),
             trigger=NamedResource.from_payload(payload.get("trigger", {}) or {}),
-            gender=GENDER_MAP.get(payload.get("gender", 3), "Genderless"),
+            gender=GENDER_MAP.get(payload.get("gender", 0), ""),
             held_item=NamedResource.from_payload(payload.get("held_item", {}) or {}),
             known_move=NamedResource.from_payload(payload.get("known_move", {}) or {}),
             known_move_type=NamedResource.from_payload(payload.get("known_move_type", {}) or {}),
