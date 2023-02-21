@@ -9,6 +9,7 @@ __all__: t.Tuple[str, ...] = (
     "ChainLink",
     "EvolutionDetail",
 )
+GENDER_MAP: t.Dict[int, str] = {1: "Female", 2: "Male", 3: "Genderless"}
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -21,7 +22,7 @@ class EvolutionDetail(BaseModel):
         The item required to cause evolution this into Pokémon species.
     trigger: NamedResource
         The type of event that triggers evolution into this Pokémon species.
-    gender: int
+    gender: str
         Gender of the evolving Pokémon species must be in order to evolve.
     held_item: NamedResource
         The item the evolving Pokémon species must be holding during the evolution trigger event.
@@ -57,7 +58,7 @@ class EvolutionDetail(BaseModel):
 
     item: NamedResource = attrs.field(factory=NamedResource)
     trigger: NamedResource = attrs.field(factory=NamedResource)
-    gender: int = attrs.field(factory=int)
+    gender: str = attrs.field(factory=str)
     held_item: NamedResource = attrs.field(factory=NamedResource)
     known_move: NamedResource = attrs.field(factory=NamedResource)
     known_move_type: NamedResource = attrs.field(factory=NamedResource)
@@ -79,7 +80,7 @@ class EvolutionDetail(BaseModel):
         return cls(
             item=NamedResource.from_payload(payload.get("item", {}) or {}),
             trigger=NamedResource.from_payload(payload.get("trigger", {}) or {}),
-            gender=payload.get("gender", 0),
+            gender=GENDER_MAP.get(payload.get("gender", 3), "Genderless"),
             held_item=NamedResource.from_payload(payload.get("held_item", {}) or {}),
             known_move=NamedResource.from_payload(payload.get("known_move", {}) or {}),
             known_move_type=NamedResource.from_payload(payload.get("known_move_type", {}) or {}),

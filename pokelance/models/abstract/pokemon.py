@@ -415,7 +415,7 @@ class Pokemon(BaseModel):
             species=NamedResource.from_payload(payload.get("species", {}) or {}),
             stats=[PokemonStat.from_payload(i) for i in payload.get("stats", [])],
             types=[PokemonType.from_payload(i) for i in payload.get("types", [])],
-            showdown=ShowdownSprites.from_name(payload.get("name", "")),
+            showdown=ShowdownSprites.from_id(payload.get("id", 0)),
         )
 
 
