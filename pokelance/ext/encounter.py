@@ -21,14 +21,6 @@ class Encounter(BaseExtension):
         super().__init__(client)
         self.cache = self._cache.encounter
 
-    async def setup(self) -> None:
-        data = await self._client.request(Endpoint.get_encounter_condition_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "encounter_condition", data["results"])
-        data = await self._client.request(Endpoint.get_encounter_method_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "encounter_method", data["results"])
-        data = await self._client.request(Endpoint.get_encounter_condition_value_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "encounter_condition_value", data["results"])
-
     def get_encounter_condition(self, name: t.Union[str, int]) -> t.Optional[EncounterCondition]:
         """Gets an encounter condition from the cache.
 

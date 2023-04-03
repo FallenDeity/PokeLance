@@ -36,23 +36,6 @@ class Move(BaseExtension):
         super().__init__(client)
         self.cache = self._cache.move
 
-    async def setup(self) -> None:
-        """Sets up the extension."""
-        data = await self._client.request(Endpoint.get_move_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "move", data["results"])
-        data = await self._client.request(Endpoint.get_move_ailment_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "move_ailment", data["results"])
-        data = await self._client.request(Endpoint.get_move_battle_style_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "move_battle_style", data["results"])
-        data = await self._client.request(Endpoint.get_move_category_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "move_category", data["results"])
-        data = await self._client.request(Endpoint.get_move_damage_class_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "move_damage_class", data["results"])
-        data = await self._client.request(Endpoint.get_move_learn_method_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "move_learn_method", data["results"])
-        data = await self._client.request(Endpoint.get_move_target_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "move_target", data["results"])
-
     def get_move(self, name: t.Union[str, int]) -> t.Optional[MoveModel]:
         """Gets a move from the cache.
 

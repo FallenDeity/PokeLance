@@ -436,6 +436,11 @@ class Endpoint:
         return Route(endpoint=f"/nature/{nature}")
 
     @classmethod
+    def get_location_area_encounter_endpoints(cls) -> Route:
+        """Get a list of location area encounter endpoints."""
+        return Route(endpoint="/pokemon", payload={"limit": 10000})
+
+    @classmethod
     def get_location_area_encounter(cls, name: t.Union[int, str]) -> Route:
         """Get a location area encounter by its ID or name."""
         return Route(endpoint=f"/pokemon/{name}/encounters")

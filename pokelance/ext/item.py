@@ -36,19 +36,6 @@ class Item(BaseExtension):
         super().__init__(client)
         self.cache = self._cache.item
 
-    async def setup(self) -> None:
-        """Sets up the extension."""
-        data = await self._client.request(Endpoint.get_item_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "item", data["results"])
-        data = await self._client.request(Endpoint.get_item_attribute_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "item_attribute", data["results"])
-        data = await self._client.request(Endpoint.get_item_category_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "item_category", data["results"])
-        data = await self._client.request(Endpoint.get_item_fling_effect_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "item_fling_effect", data["results"])
-        data = await self._client.request(Endpoint.get_item_pocket_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "item_pocket", data["results"])
-
     def get_item(self, name: t.Union[str, int]) -> t.Optional[ItemModel]:
         """Gets an item from the cache.
 

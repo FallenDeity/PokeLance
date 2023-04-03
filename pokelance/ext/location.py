@@ -37,17 +37,6 @@ class Location(BaseExtension):
         super().__init__(client)
         self.cache = self._cache.location
 
-    async def setup(self) -> None:
-        """Sets up the extension."""
-        data = await self._client.request(Endpoint.get_location_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "location", data["results"])
-        data = await self._client.request(Endpoint.get_location_area_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "location_area", data["results"])
-        data = await self._client.request(Endpoint.get_pal_park_area_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "pal_park_area", data["results"])
-        data = await self._client.request(Endpoint.get_region_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "region", data["results"])
-
     def get_location(self, name: t.Union[str, int]) -> t.Optional[LocationModel]:
         """Gets a location from the cache.
 

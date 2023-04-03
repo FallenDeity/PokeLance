@@ -311,7 +311,7 @@ class Pokemon(Base):
     egg_group: EggGroupCache = attrs.field(default=EggGroupCache(max_size=max_size))
     gender: GenderCache = attrs.field(default=GenderCache(max_size=max_size))
     growth_rate: GrowthRateCache = attrs.field(default=GrowthRateCache(max_size=max_size))
-    location_area: PokemonLocationAreaCache = attrs.field(default=PokemonLocationAreaCache(max_size=max_size))
+    location_area_encounter: PokemonLocationAreaCache = attrs.field(default=PokemonLocationAreaCache(max_size=max_size))
     nature: NatureCache = attrs.field(default=NatureCache(max_size=max_size))
     pokeathlon_stat: PokeathlonStatCache = attrs.field(default=PokeathlonStatCache(max_size=max_size))
     pokemon: PokemonCache = attrs.field(default=PokemonCache(max_size=max_size))

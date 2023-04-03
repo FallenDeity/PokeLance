@@ -35,13 +35,6 @@ class Evolution(BaseExtension):
         super().__init__(client)
         self.cache = self._cache.evolution
 
-    async def setup(self) -> None:
-        """Sets up the extension."""
-        data = await self._client.request(Endpoint.get_evolution_chain_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "evolution_chain", data["results"])
-        data = await self._client.request(Endpoint.get_evolution_trigger_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "evolution_trigger", data["results"])
-
     def get_evolution_chain(self, id_: int) -> t.Optional[EvolutionChain]:
         """Gets an evolution chain from the cache.
 

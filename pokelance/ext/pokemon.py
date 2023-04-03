@@ -46,40 +46,6 @@ class Pokemon(BaseExtension):
         super().__init__(client)
         self.cache = self._cache.pokemon
 
-    async def setup(self) -> None:
-        """Sets up the extension."""
-        data = await self._client.request(Endpoint.get_ability_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "ability", data["results"])
-        data = await self._client.request(Endpoint.get_characteristic_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "characteristic", data["results"])
-        data = await self._client.request(Endpoint.get_egg_group_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "egg_group", data["results"])
-        data = await self._client.request(Endpoint.get_gender_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "gender", data["results"])
-        data = await self._client.request(Endpoint.get_growth_rate_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "growth_rate", data["results"])
-        data = await self._client.request(Endpoint.get_nature_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "nature", data["results"])
-        data = await self._client.request(Endpoint.get_pokeathlon_stat_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "pokeathlon_stat", data["results"])
-        data = await self._client.request(Endpoint.get_pokemon_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "pokemon", data["results"])
-        self._cache.load_documents(str(self.__class__.__name__), "location_area", data["results"])
-        data = await self._client.request(Endpoint.get_pokemon_color_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "pokemon_color", data["results"])
-        data = await self._client.request(Endpoint.get_pokemon_form_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "pokemon_form", data["results"])
-        data = await self._client.request(Endpoint.get_pokemon_habitat_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "pokemon_habitat", data["results"])
-        data = await self._client.request(Endpoint.get_pokemon_shape_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "pokemon_shape", data["results"])
-        data = await self._client.request(Endpoint.get_pokemon_species_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "pokemon_species", data["results"])
-        data = await self._client.request(Endpoint.get_stat_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "stat", data["results"])
-        data = await self._client.request(Endpoint.get_type_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "type", data["results"])
-
     def get_ability(self, name: t.Union[str, int]) -> t.Optional[Ability]:
         """Get an ability by name or id.
 
@@ -587,8 +553,8 @@ class Pokemon(BaseExtension):
         'cerulean-city-area'
         """
         route = Endpoint.get_location_area_encounter(name)
-        self._validate_resource(self.cache.location_area, name, route)
-        return self.cache.location_area.get(route, None)
+        self._validate_resource(self.cache.location_area_encounter, name, route)
+        return self.cache.location_area_encounter.get(route, None)
 
     async def fetch_location_area_encounter(self, name: t.Union[str, int]) -> t.Optional[LocationAreaEncounter]:
         """
@@ -623,9 +589,9 @@ class Pokemon(BaseExtension):
         cerulean-city-area
         """
         route = Endpoint.get_location_area_encounter(name)
-        self._validate_resource(self.cache.location_area, name, route)
+        self._validate_resource(self.cache.location_area_encounter, name, route)
         data = await self._client.request(route)
-        return self.cache.location_area.setdefault(route, LocationAreaEncounter.from_payload(data[0]))
+        return self.cache.location_area_encounter.setdefault(route, LocationAreaEncounter.from_payload(data[0]))
 
     def get_pokemon(self, name: t.Union[str, int]) -> t.Optional[PokemonModel]:
         """

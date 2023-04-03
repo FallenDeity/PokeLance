@@ -37,15 +37,6 @@ class Berry(BaseExtension):
         super().__init__(client)
         self.cache = self._cache.berry
 
-    async def setup(self) -> None:
-        """Sets up the extension."""
-        data = await self._client.request(Endpoint.get_berry_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "berry", data["results"])
-        data = await self._client.request(Endpoint.get_berry_flavor_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "berry_flavor", data["results"])
-        data = await self._client.request(Endpoint.get_berry_firmness_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "berry_firmness", data["results"])
-
     def get_berry(self, name: t.Union[str, int]) -> t.Optional[BerryModel]:
         """Gets a berry from the cache.
 

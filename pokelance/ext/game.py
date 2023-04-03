@@ -35,17 +35,6 @@ class Game(BaseExtension):
         super().__init__(client)
         self.cache = self._cache.game
 
-    async def setup(self) -> None:
-        """Sets up the game extension."""
-        data = await self._client.request(Endpoint.get_generation_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "generation", data["results"])
-        data = await self._client.request(Endpoint.get_pokedex_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "pokedex", data["results"])
-        data = await self._client.request(Endpoint.get_version_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "version", data["results"])
-        data = await self._client.request(Endpoint.get_version_group_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "version_group", data["results"])
-
     def get_generation(self, name: t.Union[str, int]) -> t.Optional[Generation]:
         """Gets a generation from the cache.
 

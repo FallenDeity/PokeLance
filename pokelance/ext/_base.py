@@ -2,6 +2,7 @@ import typing as t
 from difflib import get_close_matches
 
 from pokelance.exceptions import ResourceNotFound
+from pokelance.http import Endpoint
 
 if t.TYPE_CHECKING:
     from pokelance.cache import BaseCache, Cache
@@ -91,4 +92,11 @@ class BaseExtension:
 
     async def setup(self) -> None:
         """Sets up the extension."""
-        ...
+        for item in dir(self):
+            if item.startswith("fetch_"):
+                print(f"Loading {item[6:]}...")
+                data = await self._client.request(
+                    t.cast(t.Callable[[], "Route"], getattr(Endpoint, f"get_{item[6:]}_endpoints"))()
+                )
+                print(type(data), len(data["results"]))
+                self._cache.load_documents(str(self.__class__.__name__), item[6:], data["results"])

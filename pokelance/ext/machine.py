@@ -35,11 +35,6 @@ class Machine(BaseExtension):
         super().__init__(client)
         self.cache = self._cache.machine
 
-    async def setup(self) -> None:
-        """Sets up the extension."""
-        data = await self._client.request(Endpoint.get_machine_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "machine", data["results"])
-
     def get_machine(self, id_: int) -> t.Optional[MachineModel]:
         """Gets a machine from the cache.
 

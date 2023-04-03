@@ -36,15 +36,6 @@ class Contest(BaseExtension):
         super().__init__(client)
         self.cache = self._cache.contest
 
-    async def setup(self) -> None:
-        """Sets up the extension."""
-        data = await self._client.request(Endpoint.get_contest_type_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "contest_type", data["results"])
-        data = await self._client.request(Endpoint.get_contest_effect_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "contest_effect", data["results"])
-        data = await self._client.request(Endpoint.get_super_contest_effect_endpoints())
-        self._cache.load_documents(str(self.__class__.__name__), "super_contest_effect", data["results"])
-
     def get_contest_type(self, name: t.Union[str, int]) -> t.Optional[ContestType]:
         """Gets a contest type from the cache.
 
