@@ -98,5 +98,4 @@ class BaseExtension:
                 data = await self._client.request(
                     t.cast(t.Callable[[], "Route"], getattr(Endpoint, f"get_{item[6:]}_endpoints"))()
                 )
-                print(type(data), len(data["results"]))
                 self._cache.load_documents(str(self.__class__.__name__), item[6:], data["results"])

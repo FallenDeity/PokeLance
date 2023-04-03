@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pokelance"
-version = "0.0.18a"
+version = "0.0.19a"
 description = "A flexible and easy to use pokemon library."
 authors = ["FallenDeity <61227305+FallenDeity@users.noreply.github.com>"]
 license = "MIT"
