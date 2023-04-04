@@ -94,7 +94,6 @@ class BaseExtension:
         """Sets up the extension."""
         for item in dir(self):
             if item.startswith("fetch_"):
-                print(f"Loading {item[6:]}...")
                 data = await self._client.request(
                     t.cast(t.Callable[[], "Route"], getattr(Endpoint, f"get_{item[6:]}_endpoints"))()
                 )
