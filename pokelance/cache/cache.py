@@ -1,5 +1,6 @@
 import importlib
 import json
+import pathlib
 import typing as t
 from collections.abc import MutableMapping
 
@@ -112,6 +113,28 @@ class BaseCache(MutableMapping[_KT, _VT]):
         The cache itself.
     _endpoints: typing.Dict[str, int]
         The endpoints that are cached.
+
+    Examples
+    --------
+    >>> import asyncio
+    >>> from pokelance import PokeLance
+    >>>
+    >>> async def main():
+    ...     client = PokeLance()
+    ...     print(await client.ping())
+    ...     await asyncio.sleep(5)  # Wait for all the endpoints to load automatically. If not just load them manually.
+    ...     # from pokelance.http import Endpoint
+    ...     # data = await client.http.request(Endpoint.get_berry_endpoints())
+    ...     # client.berry._cache.load_documents(str(client.berry.__class__.__name__).lower(), "berry", data)
+    ...     # print(client.berry.cache.berry.endpoints)
+    ...     # await client.berry.cache.berry.load_all(client.http)
+    ...     print(client.berry.cache.berry)
+    ...     await client.berry.cache.berry.save('temp')  # Save the cache to a file.
+    ...     await client.berry.cache.berry.load('temp')  # Load the cache from a file.
+    ...     print(client.berry.cache.berry)
+    ...     await client.close()
+    >>>
+    >>> asyncio.run(main())
     """
 
     def __init__(self, max_size: int = 100) -> None:
@@ -190,9 +213,27 @@ class BaseCache(MutableMapping[_KT, _VT]):
         path: str
             The path to save the cache to.
         """
-        dummy: t.Dict[str, t.Dict[str, t.Any]] = {k.url: attrs.asdict(v) for k, v in self.items()}
-        async with aiofiles.open(f"{path}{self.__class__.__name__}.json", "w") as f:
+        pathlib.Path(path).mkdir(parents=True, exist_ok=True)
+        dummy: t.Dict[str, t.Dict[str, t.Any]] = {k.endpoint: attrs.asdict(v) for k, v in self.items()}
+        async with aiofiles.open(pathlib.Path(f"{path}/{self.__class__.__name__}.json"), "w") as f:
             await f.write(json.dumps(dummy, indent=4, ensure_ascii=False))
+
+    async def load(self, path: str = "") -> None:
+        """Load the cache from a file.
+
+        Parameters
+        ----------
+        path: str
+            The path to load the cache from.
+        """
+        async with aiofiles.open(pathlib.Path(f"{path}/{self.__class__.__name__}.json"), "r") as f:
+            data = json.loads(await f.read())
+        route_model = importlib.import_module("pokelance.http").__dict__["Route"]
+        value_type = str(self.__orig_bases__[0].__args__[1]).split(".")[-1]  # type: ignore
+        model: "models.BaseModel" = importlib.import_module("pokelance.models").__dict__[value_type]
+        for endpoint, info in data.items():
+            route = route_model(endpoint=endpoint)
+            self.setdefault(route, model.from_payload(info))
 
     async def load_all(self, client: "HttpClient") -> None:
         """Load all documents into the cache.
@@ -203,11 +244,11 @@ class BaseCache(MutableMapping[_KT, _VT]):
             The client to use to load the documents.
         """
         client._client.logger.info(f"Loading {self.__class__.__name__}...")
+        route_model = importlib.import_module("pokelance.http").__dict__["Route"]
+        value_type = str(self.__orig_bases__[0].__args__[1]).split(".")[-1]  # type: ignore
+        model: "models.BaseModel" = importlib.import_module("pokelance.models").__dict__[value_type]
         for endpoint in self._endpoints.values():
-            route_model = importlib.import_module("pokelance.http").__dict__["Route"]
             route = route_model(endpoint=f"/{endpoint.url.strip('/').split('/')[-2]}/{str(endpoint)}")
-            value_type = str(self.__orig_bases__[0].__args__[1]).split(".")[-1]  # type: ignore
-            model: "models.BaseModel" = importlib.import_module("pokelance.models").__dict__[value_type]
             self.setdefault(route, model.from_payload(await client.request(route)))
         client._client.logger.info(f"Loaded {self.__class__.__name__}.")
 
