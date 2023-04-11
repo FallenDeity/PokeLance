@@ -1194,7 +1194,7 @@ class TypePokemon(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypePokemon":
         return cls(
             slot=payload.get("slot", 0),
-            pokemon=NamedResource.from_payload(payload.get("pokemon", {} or {})),
+            pokemon=NamedResource.from_payload(payload.get("pokemon", {}) or {}),
         )
 
 

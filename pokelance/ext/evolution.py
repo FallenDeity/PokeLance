@@ -7,7 +7,7 @@ from ._base import BaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import PokeLance
-    from pokelance.http import HttpClient
+    from pokelance.cache import Evolution as EvolutionCache
 
 
 __all__: t.Tuple[str, ...] = (
@@ -17,12 +17,8 @@ __all__: t.Tuple[str, ...] = (
 
 
 class Evolution(BaseExtension):
-    """Extension for evolution related endpoints.
-
-    Parameters
-    ----------
-    client: pokelance.http.HttpClient
-        The client to use for requests.
+    """
+    Extension for evolution related endpoints.
 
     Attributes
     ----------
@@ -30,10 +26,7 @@ class Evolution(BaseExtension):
         The cache for this extension.
     """
 
-    def __init__(self, client: "HttpClient") -> None:
-        """Initializes the extension."""
-        super().__init__(client)
-        self.cache = self._cache.evolution
+    cache: "EvolutionCache"
 
     def get_evolution_chain(self, id_: int) -> t.Optional[EvolutionChain]:
         """Gets an evolution chain from the cache.

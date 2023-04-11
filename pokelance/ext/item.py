@@ -8,7 +8,7 @@ from ._base import BaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import PokeLance
-    from pokelance.http import HttpClient
+    from pokelance.cache import Item as ItemCache
 
 
 __all__: t.Tuple[str, ...] = (
@@ -18,12 +18,8 @@ __all__: t.Tuple[str, ...] = (
 
 
 class Item(BaseExtension):
-    """Extension for item related endpoints.
-
-    Parameters
-    ----------
-    client: pokelance.http.HttpClient
-        The client to use for requests.
+    """
+    Extension for item related endpoints.
 
     Attributes
     ----------
@@ -31,10 +27,7 @@ class Item(BaseExtension):
         The cache for this extension.
     """
 
-    def __init__(self, client: "HttpClient") -> None:
-        """Initializes the extension."""
-        super().__init__(client)
-        self.cache = self._cache.item
+    cache: "ItemCache"
 
     def get_item(self, name: t.Union[str, int]) -> t.Optional[ItemModel]:
         """Gets an item from the cache.

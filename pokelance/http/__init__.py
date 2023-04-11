@@ -87,10 +87,9 @@ class HttpClient:
 
     async def connect(self) -> None:
         """Connects the HTTP client."""
-        if not self._is_ready:
-            if self.session is None:
-                self.session = aiohttp.ClientSession()
-                self._load_endpoints()
+        if not self._is_ready and self.session is None:
+            self.session = aiohttp.ClientSession()
+            self._load_endpoints()
 
     async def request(self, route: Route) -> t.Any:
         """Makes a request to the PokeAPI.

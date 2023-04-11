@@ -5,7 +5,7 @@ import attrs
 from pokelance.models import BaseModel
 
 __all__: t.Tuple[str, ...] = ("ShowdownSprites",)
-PATH: str = "https://raw.githubusercontent.com/FallenDeity/sprites/master/sprites/pokemon/showdown/"
+PATH: str = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/"
 
 
 SHOWDOWN_MAP: t.Dict[str, str] = {

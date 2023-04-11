@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pokelance"
-version = "0.0.22a"
+version = "0.0.23a"
 description = "A flexible and easy to use pokemon library."
 authors = ["FallenDeity <61227305+FallenDeity@users.noreply.github.com>"]
 license = "MIT"
@@ -10,8 +10,8 @@ readme = "README.md"
 python = "^3.8"
 attrs = "^22.1.0"
 aiohttp = "^3.8.3"
-types-aiofiles = "^22.1.0.4"
 aiofiles = "^23.1.0"
+types-aiofiles = "^23.1.0.1"
 
 
 [tool.poetry.group.dev.dependencies]

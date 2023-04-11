@@ -219,7 +219,7 @@ class VerboseEffect(BaseModel):
         return cls(
             effect=payload.get("effect", ""),
             short_effect=payload.get("short_effect", ""),
-            language=NamedResource.from_payload(payload.get("language", {} or {})),
+            language=NamedResource.from_payload(payload.get("language", {}) or {}),
         )
 
 

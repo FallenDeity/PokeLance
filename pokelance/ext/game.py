@@ -7,7 +7,7 @@ from ._base import BaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import PokeLance
-    from pokelance.http import HttpClient
+    from pokelance.cache import Game as GameCache
 
 
 __all__: t.Tuple[str, ...] = (
@@ -17,23 +17,17 @@ __all__: t.Tuple[str, ...] = (
 
 
 class Game(BaseExtension):
-    """Extension for game related endpoints.
-
-    Parameters
-    ----------
-    client: pokelance.http.HttpClient
-        The client to use for requests.
+    """
+    Extension for game related endpoints.
 
     Attributes
     ----------
     cache: pokelance.cache.Game
         The cache to use for caching resources.
+
     """
 
-    def __init__(self, client: "HttpClient") -> None:
-        """Initializes the game extension."""
-        super().__init__(client)
-        self.cache = self._cache.game
+    cache: "GameCache"
 
     def get_generation(self, name: t.Union[str, int]) -> t.Optional[Generation]:
         """Gets a generation from the cache.

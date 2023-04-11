@@ -7,7 +7,7 @@ from ._base import BaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import PokeLance
-    from pokelance.http import HttpClient
+    from pokelance.cache import Encounter as EncounterCache
 
 
 __all__: t.Tuple[str, ...] = (
@@ -17,9 +17,16 @@ __all__: t.Tuple[str, ...] = (
 
 
 class Encounter(BaseExtension):
-    def __init__(self, client: "HttpClient") -> None:
-        super().__init__(client)
-        self.cache = self._cache.encounter
+    """
+    Extension for encounter related endpoints.
+
+    Attributes
+    ----------
+    cache: pokelance.cache.Encounter
+        The cache for this extension.
+    """
+
+    cache: "EncounterCache"
 
     def get_encounter_condition(self, name: t.Union[str, int]) -> t.Optional[EncounterCondition]:
         """Gets an encounter condition from the cache.

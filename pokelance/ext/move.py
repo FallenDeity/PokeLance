@@ -8,7 +8,7 @@ from ._base import BaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import PokeLance
-    from pokelance.http import HttpClient
+    from pokelance.cache import Move as MoveCache
 
 
 __all__: t.Tuple[str, ...] = (
@@ -20,21 +20,13 @@ __all__: t.Tuple[str, ...] = (
 class Move(BaseExtension):
     """Extension for move related endpoints.
 
-    Parameters
-    ----------
-    client: pokelance.http.HttpClient
-        The client to use for requests.
-
     Attributes
     ----------
     cache: pokelance.cache.Move
         The cache for this extension.
     """
 
-    def __init__(self, client: "HttpClient") -> None:
-        """Initializes the extension."""
-        super().__init__(client)
-        self.cache = self._cache.move
+    cache: "MoveCache"
 
     def get_move(self, name: t.Union[str, int]) -> t.Optional[MoveModel]:
         """Gets a move from the cache.

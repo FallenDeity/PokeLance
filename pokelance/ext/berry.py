@@ -8,7 +8,7 @@ from ._base import BaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import PokeLance
-    from pokelance.http import HttpClient
+    from pokelance.cache import Berry as BerryCache
 
 
 __all__: t.Tuple[str, ...] = (
@@ -18,24 +18,16 @@ __all__: t.Tuple[str, ...] = (
 
 
 class Berry(BaseExtension):
-    """Extension for berry related endpoints.
-
-    Parameters
-    ----------
-    client: pokelance.http.HttpClient
-        The client to use for requests.
+    """
+    Extension for berry related endpoints.
 
     Attributes
     ----------
     cache: pokelance.cache.Berry
         The cache for this extension.
-
     """
 
-    def __init__(self, client: "HttpClient") -> None:
-        """Initializes the extension."""
-        super().__init__(client)
-        self.cache = self._cache.berry
+    cache: "BerryCache"
 
     def get_berry(self, name: t.Union[str, int]) -> t.Optional[BerryModel]:
         """Gets a berry from the cache.

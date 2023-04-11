@@ -7,11 +7,12 @@ from pokelance.http import Endpoint
 if t.TYPE_CHECKING:
     from pokelance.cache import BaseCache, Cache
     from pokelance.http import HttpClient, Route
+    from pokelance.models import BaseModel
 
 
 __all__: t.Tuple[str, ...] = ("BaseExtension",)
 _KT = t.TypeVar("_KT", bound="Route")
-_VT = t.TypeVar("_VT")
+_VT = t.TypeVar("_VT", bound="BaseModel")
 
 
 class BaseExtension:
@@ -47,6 +48,7 @@ class BaseExtension:
         """
         self._client = client
         self._cache = self._client.cache
+        self.cache = getattr(self._cache, self.__class__.__name__.lower())
 
     def _validate_resource(self, cache: "BaseCache[_KT, _VT]", resource: t.Union[str, int], route: "Route") -> None:
         """Validates a resource.

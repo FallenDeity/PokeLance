@@ -18,7 +18,7 @@ from ._base import BaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import PokeLance
-    from pokelance.http import HttpClient
+    from pokelance.cache import Pokemon as PokemonCache
 
 
 __all__: t.Tuple[str, ...] = (
@@ -30,21 +30,13 @@ __all__: t.Tuple[str, ...] = (
 class Pokemon(BaseExtension):
     """Extension for pokemon related endpoints.
 
-    Parameters
-    ----------
-    client: pokelance.http.HttpClient
-        The client to use for requests.
-
     Attributes
     ----------
     cache: pokelance.cache.Pokemon
         The cache for this extension.
     """
 
-    def __init__(self, client: "HttpClient") -> None:
-        """Initialize the extension."""
-        super().__init__(client)
-        self.cache = self._cache.pokemon
+    cache: "PokemonCache"
 
     def get_ability(self, name: t.Union[str, int]) -> t.Optional[Ability]:
         """Get an ability by name or id.

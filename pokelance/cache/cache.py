@@ -10,6 +10,7 @@ import attrs
 if t.TYPE_CHECKING:
     from pokelance import models  # noqa: F401
     from pokelance.http import HttpClient, Route  # noqa: F401
+    from pokelance.models import BaseModel  # noqa: F401
 
 
 __all__: t.Tuple[str, ...] = (
@@ -74,7 +75,7 @@ __all__: t.Tuple[str, ...] = (
 )
 
 _KT = t.TypeVar("_KT", bound="Route")
-_VT = t.TypeVar("_VT")
+_VT = t.TypeVar("_VT", bound="BaseModel")
 _T = t.TypeVar("_T")
 
 
@@ -113,6 +114,8 @@ class BaseCache(MutableMapping[_KT, _VT]):
         The cache itself.
     _endpoints: typing.Dict[str, int]
         The endpoints that are cached.
+    _endpoints_cached: bool
+        Whether or not the endpoints are cached.
 
     Examples
     --------
@@ -141,6 +144,7 @@ class BaseCache(MutableMapping[_KT, _VT]):
         self._max_size = max_size
         self._cache: t.Dict[_KT, _VT] = {}
         self._endpoints: t.Dict[str, Endpoint] = {}
+        self._endpoints_cached: bool = False
 
     def __getitem__(self, key: _KT) -> _VT:
         self._cache[key] = self._cache.pop(key)
@@ -204,6 +208,7 @@ class BaseCache(MutableMapping[_KT, _VT]):
         """
         for document in data:
             self._endpoints[document["name"]] = Endpoint(url=document["url"], id=int(document["url"].split("/")[-2]))
+        self._endpoints_cached = True
 
     async def save(self, path: str = "") -> None:
         """Save the cache to a file.
@@ -243,6 +248,8 @@ class BaseCache(MutableMapping[_KT, _VT]):
         client: HttpClient
             The client to use to load the documents.
         """
+        if not self._endpoints_cached:
+            raise RuntimeError("The endpoints have not been cached yet.")
         client._client.logger.info(f"Loading {self.__class__.__name__}...")
         route_model = importlib.import_module("pokelance.http").__dict__["Route"]
         value_type = str(self.__orig_bases__[0].__args__[1]).split(".")[-1]  # type: ignore
@@ -290,6 +297,7 @@ class SecondaryTypeCache(BaseCache[_KT, _VT]):
             self._endpoints[document["url"].split("/")[-2]] = Endpoint(
                 url=document["url"], id=int(document["url"].split("/")[-2])
             )
+        self._endpoints_cached = True
 
 
 class BerryCache(BaseCache["Route", "models.Berry"]):

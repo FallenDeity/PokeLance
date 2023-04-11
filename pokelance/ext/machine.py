@@ -7,7 +7,7 @@ from ._base import BaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import PokeLance
-    from pokelance.http import HttpClient
+    from pokelance.cache import Machine as MachineCache
 
 
 __all__: t.Tuple[str, ...] = (
@@ -19,21 +19,13 @@ __all__: t.Tuple[str, ...] = (
 class Machine(BaseExtension):
     """Extension for machine related endpoints.
 
-    Parameters
-    ----------
-    client: pokelance.http.HttpClient
-        The client to use for requests.
-
     Attributes
     ----------
     cache: pokelance.cache.Machine
         The cache for this extension.
     """
 
-    def __init__(self, client: "HttpClient") -> None:
-        """Initializes the extension."""
-        super().__init__(client)
-        self.cache = self._cache.machine
+    cache: "MachineCache"
 
     def get_machine(self, id_: int) -> t.Optional[MachineModel]:
         """Gets a machine from the cache.

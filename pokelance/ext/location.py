@@ -8,7 +8,7 @@ from ._base import BaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import PokeLance
-    from pokelance.http import HttpClient
+    from pokelance.cache import Location as LocationCache
 
 
 __all__: t.Tuple[str, ...] = (
@@ -21,21 +21,13 @@ class Location(BaseExtension):
     """
     Extension for location related endpoints.
 
-    Parameters
-    ----------
-    client: pokelance.http.HttpClient
-        The client to use for requests.
-
     Attributes
     ----------
     cache: pokelance.cache.Location
         The cache for this extension.
     """
 
-    def __init__(self, client: "HttpClient") -> None:
-        """Initializes the extension."""
-        super().__init__(client)
-        self.cache = self._cache.location
+    cache: "LocationCache"
 
     def get_location(self, name: t.Union[str, int]) -> t.Optional[LocationModel]:
         """Gets a location from the cache.

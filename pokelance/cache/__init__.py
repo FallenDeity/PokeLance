@@ -1,6 +1,7 @@
 import typing as t
 
 from .cache_manager import (
+    Base,
     BaseCache,
     Berry,
     Cache,
@@ -16,6 +17,7 @@ from .cache_manager import (
 )
 
 __all__: t.Tuple[str, ...] = (
+    "Base",
     "Cache",
     "BaseCache",
     "Berry",

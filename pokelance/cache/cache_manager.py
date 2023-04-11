@@ -56,6 +56,7 @@ from .cache import (
 
 __all__: t.Tuple[str, ...] = (
     "Cache",
+    "Base",
     "BaseCache",
     "Berry",
     "Contest",
@@ -93,9 +94,8 @@ class Base:
         self.max_size = max_size
         obj: attrs.Attribute[BaseCache[t.Any, t.Any]]
         for obj in self.__attrs_attrs__:  # type: ignore
-            if isinstance(obj.default, BaseCache):
-                if obj.default is not None:
-                    obj.default._max_size = max_size
+            if isinstance(obj.default, BaseCache) and obj.default is not None:
+                obj.default._max_size = max_size
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -413,9 +413,8 @@ class Cache:
     def __attrs_post_init__(self) -> None:
         obj: attrs.Attribute[Base]
         for obj in self.__attrs_attrs__:  # type: ignore
-            if isinstance(obj.default, Base):
-                if obj.default is not None:
-                    obj.default.set_size(self.max_size)
+            if isinstance(obj.default, Base) and obj.default and obj.default.max_size != self.max_size:
+                obj.default.set_size(self.max_size)
 
     def load_documents(self, category: str, _type: str, data: t.List[t.Dict[str, str]]) -> None:
         """Loads the endpoint data into the cache.

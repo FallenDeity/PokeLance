@@ -2,6 +2,7 @@ import typing as t
 from functools import lru_cache
 from pathlib import Path
 
+from .constants import ExtensionEnum, ExtensionsL
 from .http import HttpClient
 from .logger import Logger
 
@@ -12,8 +13,13 @@ if t.TYPE_CHECKING:
     import aiohttp
 
     from .ext import BaseExtension, Berry, Contest, Encounter, Evolution, Game, Item, Location, Machine, Move, Pokemon
+    from .models import BaseModel  # noqa: F401
+
 
 __all__: t.Tuple[str, ...] = ("PokeLance",)
+
+
+BaseType = t.TypeVar("BaseType", bound="BaseModel")
 
 
 class PokeLance:
@@ -171,6 +177,55 @@ class PokeLance:
         if self._http.session is not None:
             await self._http.session.close()
 
+    async def getch_data(
+        self, ext: t.Union[ExtensionEnum, ExtensionsL], category: str, id_: t.Union[int, str]
+    ) -> BaseType:
+        """
+        A getch method that looks up the cache for the data first then gets it from the API if it is not found.
+
+        Parameters
+        ----------
+        ext : Union[ExtensionEnum, ExtensionsL]
+            The extension to get the data from.
+        category : str
+            The category to get the data from.
+        id_ : Union[int, str]
+            The ID of the data to get.
+
+        Returns
+        -------
+        BaseType
+            The data.
+
+        Raises
+        ------
+        ValueError
+            If the extension or category is invalid.
+        HTTPException
+            If the data is not found.
+
+        Examples
+        --------
+        >>> import pokelance
+        >>> import asyncio
+        >>> from pokelance.models import Pokemon
+        >>> client = pokelance.PokeLance()
+        >>> async def main() -> None:
+        ...     pokemon: Pokemon = await client.getch_data("pokemon", "pokemon", 1)
+        ...     print(pokemon.name)
+        ...     await client.close()
+        >>> asyncio.run(main())
+        bulbasaur
+        """
+        if isinstance(ext, str) and ext.lower() not in ExtensionEnum.__members__:
+            raise ValueError(f"Invalid extension: {ext}")
+        categories = ExtensionEnum.get_categories(ext) if isinstance(ext, str) else ext.categories  # type: ignore
+        if category not in categories:
+            raise ValueError(f"Invalid category: {category}")
+        ext_ = getattr(self, ext.lower()) if isinstance(ext, str) else getattr(self, ext.name.lower())
+        get_, fetch_ = getattr(ext_, f"get_{category}"), getattr(ext_, f"fetch_{category}")
+        return t.cast(BaseType, get_(id_) or await fetch_(id_))
+
     async def get_image_async(self, url: str) -> bytes:
         """
         Gets an image from the url asynchronously.
@@ -223,7 +278,6 @@ class PokeLance:
         """
         return self._http
 
-    # change lru cache when setter method is called
     @property
     def image_cache_size(self) -> int:
         """
