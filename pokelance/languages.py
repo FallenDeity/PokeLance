@@ -9,6 +9,39 @@ LANGUAGE = Endpoint.get_language_endpoints().url
 
 
 class Languages(enum.Enum):
+    """
+    Languages that are available on Pokeapi.
+
+    Attributes
+    ----------
+    JAPANESE: Language
+        The Japanese language.
+    ROOMAJI: Language
+        The Japanese language written in roomaji.
+    KOREAN: Language
+        The Korean language.
+    CHINESE: Language
+        The Chinese language.
+    FRENCH: Language
+        The French language.
+    GERMAN: Language
+        The German language.
+    SPANISH: Language
+        The Spanish language.
+    ITALIAN: Language
+        The Italian language.
+    CZECH: Language
+        The Czech language.
+    ENGLISH: Language
+        The English language.
+    JA: Language
+        The Japanese language.
+    CHINESE_SIMPLIFIED: Language
+        The Chinese language written in simplified Chinese.
+    PORTUGAL_BRAZILIAN: Language
+        The Portuguese language written in Brazilian Portuguese.
+    """
+
     JAPANESE = Language.from_payload(
         {
             "id": 1,
@@ -190,7 +223,13 @@ class Languages(enum.Enum):
     )
 
     def __str__(self) -> str:
+        """
+        Returns the name of the language.
+        """
         return str(self.value.name)
 
     def __int__(self) -> int:
+        """
+        Returns the id of the language.
+        """
         return int(self.value.id)

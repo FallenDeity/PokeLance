@@ -43,7 +43,6 @@ plugins:
       handlers:
         python:
           options:
-            heading_level: 3
             show_root_heading: true
             show_root_toc_entry: false
             docstring_style: numpy
@@ -65,6 +64,8 @@ nav:
       - PokeLance: api_reference/pokelance.md
       - Logging: api_reference/logger.md
       - Exceptions: api_reference/exceptions.md
+      - Languages: api_reference/languages.md
+      - Constants: api_reference/constants.md
       - Cache:
           - Cache: api_reference/cache/cache.md
           - CacheManager: api_reference/cache/cache_manager.md
@@ -132,7 +133,7 @@ markdown_extensions:
   - pymdownx.superfences
 
 extra:
-  version: 0.1.0
+  version: 0.1.1
   generator: false
   social:
     - icon: fontawesome/brands/github

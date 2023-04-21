@@ -178,14 +178,14 @@ class PokeLance:
             await self._http.session.close()
 
     async def getch_data(
-        self, ext: t.Union[ExtensionEnum, ExtensionsL], category: str, id_: t.Union[int, str]
+        self, ext: t.Union[ExtensionEnum, ExtensionsL, str], category: str, id_: t.Union[int, str]
     ) -> BaseType:
         """
         A getch method that looks up the cache for the data first then gets it from the API if it is not found.
 
         Parameters
         ----------
-        ext : Union[ExtensionEnum, ExtensionsL]
+        ext : Union[ExtensionEnum, ExtensionsL, str]
             The extension to get the data from.
         category : str
             The category to get the data from.
@@ -208,21 +208,22 @@ class PokeLance:
         --------
         >>> import pokelance
         >>> import asyncio
+        >>> from pokelance.constants import ExtensionEnum
         >>> from pokelance.models import Pokemon
         >>> client = pokelance.PokeLance()
         >>> async def main() -> None:
-        ...     pokemon: Pokemon = await client.getch_data("pokemon", "pokemon", 1)
+        ...     pokemon: Pokemon = await client.getch_data(ExtensionEnum.Pokemon, "pokemon", 1)
         ...     print(pokemon.name)
         ...     await client.close()
         >>> asyncio.run(main())
         bulbasaur
         """
-        if isinstance(ext, str) and ext.lower() not in ExtensionEnum.__members__:
+        if isinstance(ext, str) and (ext := str(ext).title()) not in ExtensionEnum.__members__:
             raise ValueError(f"Invalid extension: {ext}")
         categories = ExtensionEnum.get_categories(ext) if isinstance(ext, str) else ext.categories  # type: ignore
-        if category not in categories:
+        if (category := category.lower()) not in categories:
             raise ValueError(f"Invalid category: {category}")
-        ext_ = getattr(self, ext.lower()) if isinstance(ext, str) else getattr(self, ext.name.lower())
+        ext_ = getattr(self, ext) if isinstance(ext, str) else getattr(self, ext.name.lower())
         get_, fetch_ = getattr(ext_, f"get_{category}"), getattr(ext_, f"fetch_{category}")
         return t.cast(BaseType, get_(id_) or await fetch_(id_))
 

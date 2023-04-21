@@ -113,3 +113,12 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.details
   - pymdownx.superfences
+
+extra:
+  version: 0.1.1
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/FallenDeity/PokeLance
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/yeyEvT5V2J
