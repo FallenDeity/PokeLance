@@ -7,6 +7,7 @@ site_url: https://FallenDeity.github.io/PokeLance
 
 theme:
   name: "material"
+  language: en
   logo: assets/pokelance.png
   favicon: assets/pokelance.png
 
@@ -19,12 +20,20 @@ theme:
     - navigation.tabs
     - navigation.top
     - content.code.annotate
+    - content.code.copy
+    - toc.follow
+    - toc.integrate
+    - navigation.footer
   palette:
     - scheme: light
+      primary: indigo
+      accent: deep purple
       toggle:
         icon: material/weather-sunny
         name: Light Mode
     - scheme: slate
+      primary: indigo
+      accent: deep purple
       toggle:
         icon: material/weather-night
         name: Dark Mode
@@ -34,8 +43,11 @@ plugins:
       handlers:
         python:
           options:
+            heading_level: 3
+            show_root_heading: true
+            show_root_toc_entry: false
             docstring_style: numpy
-            merge_init_into_class: false
+            merge_init_into_class: true
             inherited_members: true
           import:
             - https://docs.python.org/3.9/objects.inv
@@ -104,10 +116,14 @@ nav:
 
 
 markdown_extensions:
+  - abbr
   - admonition
   - attr_list
   - md_in_html
+  - toc:
+      permalink: ⚓︎
   - pymdownx.highlight:
+      auto_title: true
       anchor_linenums: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
@@ -116,7 +132,8 @@ markdown_extensions:
   - pymdownx.superfences
 
 extra:
-  version: 0.0.1a
+  version: 0.1.0
+  generator: false
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/FallenDeity/PokeLance

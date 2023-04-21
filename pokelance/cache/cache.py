@@ -81,18 +81,8 @@ _T = t.TypeVar("_T")
 
 @attrs.define(kw_only=True, slots=True, frozen=True)
 class Endpoint:
-    """Represents an endpoint.
-
-    Parameters
-    ----------
-    id: str | int
-        The ID of the endpoint.
-    url: str
-        The URL of the endpoint.
-    """
-
-    id: t.Union[str, int] = attrs.field()
-    url: str = attrs.field()
+    id: t.Union[str, int] = attrs.field(factory=str)
+    url: str = attrs.field(factory=str)
 
     def __str__(self) -> str:
         return str(self.id)

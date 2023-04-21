@@ -37,13 +37,13 @@ $ python -m pip install pokelance
 
 ## Important Links
 
-- [PokeAPI](https://pokeapi.co/)
-- [PokeAPI Documentation](https://pokeapi.co/docs/v2)
-- [PokeLance Documentation](https://FallenDeity.github.io/PokeLance/)
-- [PokeLance ReadTheDocs](https://pokelance.readthedocs.io/en/latest/)
-- [PokeLance GitHub](https://github.com/FallenDeity/PokeLance)
-- [PokeLance PyPI](https://pypi.org/project/PokeLance/)
-- [PokeLance Discord](https://discord.gg/yeyEvT5V2J)
+- [PokeAPI](https://pokeapi.co/ "Pokeapi Website")
+- [PokeAPI Documentation](https://pokeapi.co/docs/v2 "Pokeapi Documentation")
+- [PokeLance Documentation](https://FallenDeity.github.io/PokeLance/ "Mkdocs render of documentation")
+- [PokeLance ReadTheDocs](https://pokelance.readthedocs.io/en/latest/ "Reathedocs render of documentation")
+- [PokeLance GitHub](https://github.com/FallenDeity/PokeLance "Source Code")
+- [PokeLance PyPI](https://pypi.org/project/PokeLance/ "Pypi Listing")
+- [PokeLance Discord](https://discord.gg/yeyEvT5V2J "Support Discord Server")
 
 ---
 

@@ -73,7 +73,8 @@ class FileHandler(logging.FileHandler):
 
 
 class Logger(logging.Logger):
-    """The logger used to log information about the client.
+    """
+    The logger used to log information about the client.
 
     Parameters
     ----------
