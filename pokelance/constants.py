@@ -22,6 +22,7 @@ __all__: t.Final[t.Tuple[str, ...]] = (
     "ExtensionEnum",
     "ExtensionsL",
     "ShowdownEnum",
+    "RequestObject",
 )
 
 
