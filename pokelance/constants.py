@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import re
 import enum
+import re
 import typing as t
 
 import attrs
@@ -55,6 +55,7 @@ class ShowdownEnum(BaseEnum):
     """
     Represents a showdown enum.
     """
+
     FRONT_DEFAULT = PATH + "{}.gif"
     FRONT_SHINY = PATH + "shiny/{}.gif"
     BACK_DEFAULT = PATH + "back/{}.gif"

@@ -4,7 +4,7 @@ import attrs
 
 
 @attrs.define(hash=True, slots=True, kw_only=True)
-class BaseModel:
+class BaseModel(attrs.AttrsInstance):
     """Base model for all models"""
 
     @classmethod

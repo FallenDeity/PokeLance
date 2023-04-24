@@ -227,7 +227,7 @@ class PokeLance:
         get_, fetch_ = getattr(ext_, f"get_{category}"), getattr(ext_, f"fetch_{category}")
         return t.cast(BaseType, get_(id_) or await fetch_(id_))
 
-    async def from_url(self, url: str) -> BaseType:
+    async def from_url(self, url: str) -> t.Optional[BaseType]:
         """
         Constructs a request from urls present in the data.
 
@@ -238,7 +238,7 @@ class PokeLance:
 
         Returns
         -------
-        BaseType
+        typing.Optional[BaseType]
             The data.
 
         Raises
@@ -246,9 +246,9 @@ class PokeLance:
         ValueError
             If the url is invalid.
         """
-        params = ExtensionEnum.validate_url(url)
-        data = await self.getch_data(params.extension, params.category, params.value)
-        return data
+        if params := ExtensionEnum.validate_url(url):
+            return await self.getch_data(params.extension, params.category, params.value)
+        raise ValueError(f"Invalid URL: {url}")
 
     async def get_image_async(self, url: str) -> bytes:
         """

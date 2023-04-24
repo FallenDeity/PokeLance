@@ -2,9 +2,8 @@ import typing as t
 
 import attrs
 
-from pokelance.models import BaseModel
 from pokelance.constants import ShowdownEnum
-
+from pokelance.models import BaseModel
 
 __all__: t.Tuple[str, ...] = ("ShowdownSprites",)
 
