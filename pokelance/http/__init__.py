@@ -116,6 +116,7 @@ class HttpClient:
         if self.session is not None:
             async with self.session.request(route.method, route.url, params=route.payload) as response:
                 if 300 > response.status >= 200:
+                    self._client.logger.debug(f"Request to {route.url} was successful.")
                     return await response.json()
                 else:
                     raise HTTPException(str(response.reason), route, response.status).create()
