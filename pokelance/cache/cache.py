@@ -1,3 +1,4 @@
+import asyncio
 import importlib
 import json
 import pathlib
@@ -200,7 +201,12 @@ class BaseCache(MutableMapping[_KT, _VT]):
             self._endpoints[document["name"]] = Endpoint(url=document["url"], id=int(document["url"].split("/")[-2]))
         self._endpoints_cached = True
 
-    async def save(self, path: str = "") -> None:
+    async def wait_until_ready(self) -> None:
+        """Wait until the cache is ready."""
+        while not self._endpoints_cached:
+            await asyncio.sleep(0.5)
+
+    async def save(self, path: str = ".") -> None:
         """Save the cache to a file.
 
         Parameters
@@ -213,7 +219,7 @@ class BaseCache(MutableMapping[_KT, _VT]):
         async with aiofiles.open(pathlib.Path(f"{path}/{self.__class__.__name__}.json"), "w") as f:
             await f.write(json.dumps(dummy, indent=4, ensure_ascii=False))
 
-    async def load(self, path: str = "") -> None:
+    async def load(self, path: str = ".") -> None:
         """Load the cache from a file.
 
         Parameters

@@ -114,6 +114,7 @@ nav:
       - Basic Usage: guide/basic_usage.md
       - Discord Bot: guide/discord_bot.md
       - FastAPI: guide/fastapi.md
+      - Cache Usage: guide/advanced_cache.md
 
 
 markdown_extensions:
