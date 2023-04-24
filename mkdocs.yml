@@ -133,7 +133,6 @@ markdown_extensions:
   - pymdownx.superfences
 
 extra:
-  version: 0.1.1
   generator: false
   social:
     - icon: fontawesome/brands/github
