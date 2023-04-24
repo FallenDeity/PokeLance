@@ -6,6 +6,7 @@
 <img src="https://img.shields.io/badge/%20type_checker-mypy-%231674b1?style=flat-square" alt="mypy">
 <img src="https://img.shields.io/badge/%20linter-ruff-%231674b1?style=flat-square" alt="ruff">
 <img src="https://img.shields.io/github/stars/FallenDeity/PokeLance?style=flat-square" alt="stars">
+<img src="https://img.shields.io/pypi/dm/pokelance.svg" alt="downloads">
 <img src="https://img.shields.io/github/last-commit/FallenDeity/PokeLance?style=flat-square" alt="commits">
 <img src="https://img.shields.io/pypi/pyversions/PokeLance?style=flat-square" alt="py">
 <img src="https://img.shields.io/pypi/v/PokeLance?style=flat-square" alt="versions">
