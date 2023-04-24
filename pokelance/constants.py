@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import enum
 import typing as t
 
@@ -20,12 +21,22 @@ __all__: t.Final[t.Tuple[str, ...]] = (
     "PokemonExtension",
     "ExtensionEnum",
     "ExtensionsL",
+    "ShowdownEnum",
 )
 
 
 ExtensionsL = t.Literal[
     "berry", "contest", "encounter", "evolution", "game", "item", "location", "machine", "move", "pokemon"
 ]
+PATH: str = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/"
+EXTENSION_PATTERN: t.Pattern[str] = re.compile(r"https://pokeapi.co/api/v2/(\w+)/(\d+)/")
+
+
+@attrs.define
+class RequestObject:
+    extension: str
+    category: str
+    value: str
 
 
 class BaseEnum(enum.Enum):
@@ -37,6 +48,19 @@ class BaseEnum(enum.Enum):
         """
         Get the value of the enum.
         """
+        return self.value
+
+
+class ShowdownEnum(BaseEnum):
+    """
+    Represents a showdown enum.
+    """
+    FRONT_DEFAULT = PATH + "{}.gif"
+    FRONT_SHINY = PATH + "shiny/{}.gif"
+    BACK_DEFAULT = PATH + "back/{}.gif"
+    BACK_SHINY = PATH + "/back/shiny/{}.gif"
+
+    def __str__(self) -> str:
         return self.value
 
 
@@ -255,6 +279,19 @@ class ExtensionEnum(BaseEnum):
     Machine = MachineExtension(name="machine")
     Move = MoveExtension(name="move")
     Pokemon = PokemonExtension(name="pokemon")
+
+    @classmethod
+    def validate_url(cls, url: str) -> t.Optional[RequestObject]:
+        """
+        Validate the url.
+        """
+        if not url.startswith("https://pokeapi.co/api/v2/") or not (groups := re.match(EXTENSION_PATTERN, url)):
+            raise ValueError(f"Invalid url: {url}")
+        category, value = groups.groups()
+        for i in cls:
+            if category.lower() in i.value.categories:
+                return RequestObject(extension=i.name, category=category, value=value)
+        raise ValueError(f"Invalid url: {url}")
 
     @classmethod
     def get_categories(cls, name: str) -> t.List[str]:

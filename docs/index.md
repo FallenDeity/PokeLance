@@ -92,6 +92,7 @@ asyncio.run(main())
 [Examples](https://fallendeity.github.io/PokeLance/guide/basic_usage/)
 
 Following examples are available open an issue if you want more examples or more details on certain examples.
+
 - Basic Usage
 - Advanced cache usage
 - Discord bot example

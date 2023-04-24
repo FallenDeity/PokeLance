@@ -223,9 +223,32 @@ class PokeLance:
         categories = ExtensionEnum.get_categories(ext) if isinstance(ext, str) else ext.categories  # type: ignore
         if (category := category.lower()) not in categories:
             raise ValueError(f"Invalid category: {category}")
-        ext_ = getattr(self, ext) if isinstance(ext, str) else getattr(self, ext.name.lower())
+        ext_ = getattr(self, ext.lower()) if isinstance(ext, str) else getattr(self, ext.name.lower())
         get_, fetch_ = getattr(ext_, f"get_{category}"), getattr(ext_, f"fetch_{category}")
         return t.cast(BaseType, get_(id_) or await fetch_(id_))
+
+    async def from_url(self, url: str) -> BaseType:
+        """
+        Constructs a request from urls present in the data.
+
+        Parameters
+        ----------
+        url : str
+            The URL to construct the request from.
+
+        Returns
+        -------
+        BaseType
+            The data.
+
+        Raises
+        ------
+        ValueError
+            If the url is invalid.
+        """
+        params = ExtensionEnum.validate_url(url)
+        data = await self.getch_data(params.extension, params.category, params.value)
+        return data
 
     async def get_image_async(self, url: str) -> bytes:
         """

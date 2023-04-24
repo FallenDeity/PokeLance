@@ -1114,18 +1114,18 @@ class MoveStatEffect(BaseModel):
     ----------
     change: int
         The maximum amount of change to the referenced stat.
-    stat: NamedResource
-        The stat being affected.
+    move: NamedResource
+        The move causing the effect.
     """
 
     change: int = attrs.field(factory=int)
-    stat: NamedResource = attrs.field(factory=NamedResource)
+    move: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveStatEffect":
         return cls(
             change=payload.get("change", 0),
-            stat=NamedResource.from_payload(payload.get("stat", {}) or {}),
+            move=NamedResource.from_payload(payload.get("move", {}) or {}),
         )
 
 
