@@ -87,6 +87,17 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
+# Examples
+
+[Examples](https://fallendeity.github.io/PokeLance/guide/basic_usage/)
+
+Following examples are available open an issue if you want more examples or more details on certain examples.
+- Basic Usage
+- Advanced cache usage
+- Discord bot example
+- FastAPI example
+
+
 ## Important Links
 
 
@@ -97,10 +108,3 @@ asyncio.run(main())
 - [PokeLance GitHub](https://github.com/FallenDeity/PokeLance)
 - [PokeLance PyPI](https://pypi.org/project/PokeLance/)
 - [PokeLance Discord](https://discord.gg/yeyEvT5V2J)
-
----
-
-!!! note "Note"
-    This is a work in progress. If you find any bugs or have any suggestions, please open an issue [here](https://github.com/FallenDeity/PokeLance/issues/new).
-
----
