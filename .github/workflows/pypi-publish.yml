@@ -17,11 +17,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Publish PyPi package
-        uses: code-specialist/pypi-poetry-publish@v1
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PUBLISH_REGISTRY_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+          python-version: "3.x"
 
       - name: Create github Release
         uses: ncipollo/release-action@v1
@@ -29,4 +28,18 @@ jobs:
           artifacts: "dist/*"
           token: ${{ secrets.GITHUB_TOKEN }}
           name: ${{ github.ref }}
-          body: ${{ github.event.head_commit.message }}
+          body: |
+            Release ${{ github.ref }} of ${{ github.repository }}
+
+      - name: Install Poetry
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry config virtualenvs.create false
+
+      - name: Configure Poetry
+        run: |
+          poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
+
+      - name: Build and Publish package
+        run: poetry publish --build
