@@ -26,7 +26,7 @@ typing-extensions = "^4.4.0"
 pre-commit = "^2.20.0"
 Pillow = "^9.3.0"
 CairoSVG = "^2.5.2"
-mypy = ">=0.991,<1.4"
+mypy = ">=0.991,<1.5"
 
 [build-system]
 requires = ["poetry-core"]
