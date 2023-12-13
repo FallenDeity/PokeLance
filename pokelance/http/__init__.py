@@ -43,6 +43,8 @@ class HttpClient:
         The cache to use for the HTTP client.
     _client: pokelance.PokeLance
         The client that this HTTP client is for.
+    _tasks_queue: typing.List[asyncio.Task]
+        The queue for the tasks.
     """
 
     __slots__: t.Tuple[str, ...] = (
@@ -50,6 +52,7 @@ class HttpClient:
         "session",
         "_cache",
         "_is_ready",
+        "_tasks_queue",
     )
 
     def __init__(
@@ -75,21 +78,35 @@ class HttpClient:
         self.session = session
         self._is_ready = False
         self._cache = Cache(max_size=cache_size)
+        self._tasks_queue: t.List[asyncio.Task[None]] = []
 
-    def _load_endpoints(self) -> None:
-        """Loads the endpoints for the HTTP client."""
-        for num, (coro, name) in enumerate(self._client.loaders):
-            task = asyncio.create_task(coro)
-            task.add_done_callback(
-                lambda _: self._client.logger.info(f"Loaded {self._client.loaders.pop(0)[1]} endpoints.")
-            )
-        self._is_ready = True
+    async def _load_ext(self, coro: t.Coroutine[t.Any, t.Any, None], message: str) -> None:
+        await coro
+        self._client.logger.info(message)
+
+    async def _schedule_tasks(self) -> None:
+        total = len(self._client.ext_tasks)
+        for num, (coro, name) in enumerate(self._client.ext_tasks):
+            message = f"Extension {name} endpoints ({num + 1}/{total})"
+            self._client.logger.debug(f"Loading {message}")
+            task = asyncio.create_task(self._load_ext(coro, f"Loaded {message}"), name=name)
+            self._tasks_queue.append(task)
+        self._client.ext_tasks.clear()
+
+    async def close(self) -> None:
+        for task in self._tasks_queue:
+            if not task.done():
+                task.cancel()
+                self._client.logger.warning(f"Cancelled task {task.get_name()}")
+        if self.session:
+            await self.session.close()
 
     async def connect(self) -> None:
         """Connects the HTTP client."""
-        if not self._is_ready and self.session is None:
-            self.session = aiohttp.ClientSession()
-            self._load_endpoints()
+        self.session = self.session or aiohttp.ClientSession()
+        if not self._is_ready:
+            await self._schedule_tasks()
+            self._is_ready = True
 
     async def request(self, route: Route) -> t.Any:
         """Makes a request to the PokeAPI.
@@ -111,14 +128,13 @@ class HttpClient:
         """
         if self.session is None:
             await self.connect()
-        if not self._is_ready and self._client.loaders:
-            self._load_endpoints()
         if self.session is not None:
             async with self.session.request(route.method, route.url, params=route.payload) as response:
                 if 300 > response.status >= 200:
                     self._client.logger.debug(f"Request to {route.url} was successful.")
                     return await response.json()
                 else:
+                    self._client.logger.error(f"Request to {route.url} was unsuccessful.")
                     raise HTTPException(str(response.reason), route, response.status).create()
         else:
             raise HTTPException("No session was provided.", route, 0).create()

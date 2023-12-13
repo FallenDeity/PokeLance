@@ -103,7 +103,7 @@ class Logger(logging.Logger):
 
     file_handler: t.Optional[FileHandler] = None
 
-    def __init__(self, *, name: str, level: int = logging.INFO, file_logging: bool = False) -> None:
+    def __init__(self, *, name: str, level: int = logging.DEBUG, file_logging: bool = False) -> None:
         super().__init__(name, level)
         self._handler = logging.StreamHandler()
         self._handler.setFormatter(Formatter())

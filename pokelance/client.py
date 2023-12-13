@@ -33,7 +33,7 @@ class PokeLance:
         The HTTP client used to make requests to the PokeAPI.
     _logger : logging.Logger
         The logger used to log information about the client.
-    _loaders : t.List[t.Tuple[t.Coroutine[t.Any, t.Any, None], str]]
+    _ext_tasks : t.List[t.Tuple[t.Coroutine[t.Any, t.Any, None], str]]
         A list of coroutines to load extension data.
     EXTENSIONS : Path
         The path to the extensions directory.
@@ -112,7 +112,7 @@ class PokeLance:
         """
         self._logger = logger or Logger(name="pokelance", file_logging=file_logging)
         self._http = HttpClient(client=self, session=session, cache_size=cache_size)
-        self._loaders: t.List[t.Tuple[t.Coroutine[t.Any, t.Any, None], str]] = []
+        self._ext_tasks: t.List[t.Tuple[t.Coroutine[t.Any, t.Any, None], str]] = []
         self._image_cache_size = image_cache_size
         lru_cache(maxsize=self._image_cache_size)(self.get_image_async)
         self.setup_hook()
@@ -126,8 +126,8 @@ class PokeLance:
         exc_val: t.Optional[BaseException],
         exc_tb: t.Optional["TracebackType"],
     ) -> None:
-        if self._http.session is not None:
-            await self._http.session.close()
+        self.logger.warning("Closing session!")
+        await self._http.close()
 
     def setup_hook(self) -> None:
         """
@@ -154,7 +154,7 @@ class PokeLance:
         extension : BaseExtension
             The extension to add.
         """
-        self._loaders.append((extension.setup(), name))
+        self._ext_tasks.append((extension.setup(), name))
         setattr(self, name, extension)
 
     async def ping(self) -> float:
@@ -173,9 +173,8 @@ class PokeLance:
         Closes the client session. Recommended to use this when the client is no longer needed.
         Not needed if the client is used in a context manager.
         """
-        self._logger.info("Closing session")
-        if self._http.session is not None:
-            await self._http.session.close()
+        self.logger.warning("Closing session!")
+        await self._http.close()
 
     async def getch_data(
         self, ext: t.Union[ExtensionEnum, ExtensionsL, str], category: str, id_: t.Union[int, str]
@@ -267,16 +266,16 @@ class PokeLance:
         return await self._http.load_image(url)
 
     @property
-    def loaders(self) -> t.List[t.Tuple[t.Coroutine[t.Any, t.Any, None], str]]:
+    def ext_tasks(self) -> t.List[t.Tuple[t.Coroutine[t.Any, t.Any, None], str]]:
         """
-        The list of loaders for the extensions.
+        A list of coroutines to load extension data.
 
         Returns
         -------
         typing.List[typing.Tuple[typing.Coroutine[typing.Any, typing.Any, None], str]]
-            The list of loaders.
+            The list of tasks.
         """
-        return self._loaders
+        return self._ext_tasks
 
     @property
     def logger(self) -> "logging.Logger":
