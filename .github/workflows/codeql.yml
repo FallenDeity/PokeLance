@@ -74,3 +74,11 @@ jobs:
       uses: github/codeql-action/analyze@v2
       with:
         category: "/language:${{matrix.language}}"
+
+    # this step uploads all resulting SARIF files as a single Code Scanning alert
+    # on the pull request or commit that triggered the workflow
+
+    - name: Upload SARIF results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: codeql-results.sarif
