@@ -59,7 +59,7 @@ class Encounter(BaseExtension):
         self._validate_resource(self.cache.encounter_condition, name, route)
         return self.cache.encounter_condition.get(route, None)
 
-    async def fetch_encounter_condition(self, name: t.Union[str, int]) -> t.Optional[EncounterCondition]:
+    async def fetch_encounter_condition(self, name: t.Union[str, int]) -> EncounterCondition:
         """Fetches an encounter condition from the API.
 
         Parameters
@@ -69,8 +69,8 @@ class Encounter(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.EncounterCondition]
-            The encounter condition if it exists in the API, else None.
+        EncounterCondition
+            The encounter condition if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -126,7 +126,7 @@ class Encounter(BaseExtension):
         self._validate_resource(self.cache.encounter_condition_value, name, route)
         return self.cache.encounter_condition_value.get(route, None)
 
-    async def fetch_encounter_condition_value(self, name: t.Union[str, int]) -> t.Optional[EncounterConditionValue]:
+    async def fetch_encounter_condition_value(self, name: t.Union[str, int]) -> EncounterConditionValue:
         """Fetches an encounter condition value from the API.
 
         Parameters
@@ -136,8 +136,8 @@ class Encounter(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.EncounterConditionValue]
-            The encounter condition value if it exists in the API, else None.
+        EncounterConditionValue
+            The encounter condition value if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -193,7 +193,7 @@ class Encounter(BaseExtension):
         self._validate_resource(self.cache.encounter_method, name, route)
         return self.cache.encounter_method.get(route, None)
 
-    async def fetch_encounter_method(self, name: t.Union[str, int]) -> t.Optional[EncounterMethod]:
+    async def fetch_encounter_method(self, name: t.Union[str, int]) -> EncounterMethod:
         """Fetches an encounter method from the API.
 
         Parameters
@@ -203,8 +203,8 @@ class Encounter(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.EncounterMethod]
-            The encounter method if it exists in the API, else None.
+        EncounterMethod
+            The encounter method if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------

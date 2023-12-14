@@ -58,7 +58,7 @@ class Machine(BaseExtension):
         self._validate_resource(self.cache.machine, id_, route)
         return self.cache.machine.get(route, None)
 
-    async def fetch_machine(self, id_: int) -> t.Optional[MachineModel]:
+    async def fetch_machine(self, id_: int) -> MachineModel:
         """Fetches a machine from the API.
 
         Parameters
@@ -68,8 +68,8 @@ class Machine(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.Machine]
-            The machine if it exists in the API, else None.
+        MachineModel
+            The machine if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------

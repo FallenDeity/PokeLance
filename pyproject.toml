@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pokelance"
-version = "0.1.8"
+version = "0.1.9"
 description = "A flexible and easy to use pokemon library."
 authors = ["FallenDeity <61227305+FallenDeity@users.noreply.github.com>"]
 license = "MIT"
@@ -27,6 +27,7 @@ pre-commit = "^2.20.0"
 Pillow = ">=9.3,<11.0"
 CairoSVG = "^2.5.2"
 mypy = ">=0.991,<1.6"
+pipwin = "^0.5.2"
 
 [build-system]
 requires = ["poetry-core"]

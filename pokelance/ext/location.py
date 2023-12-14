@@ -60,7 +60,7 @@ class Location(BaseExtension):
         self._validate_resource(self.cache.location, name, route)
         return self.cache.location.get(route, None)
 
-    async def fetch_location(self, name: t.Union[str, int]) -> t.Optional[LocationModel]:
+    async def fetch_location(self, name: t.Union[str, int]) -> LocationModel:
         """Fetches a location from the API.
 
         Parameters
@@ -70,8 +70,8 @@ class Location(BaseExtension):
 
         Returns
         -------
-        t.Optional[pokelance.models.Location]
-            The location.
+        LocationModel
+            The location if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -127,7 +127,7 @@ class Location(BaseExtension):
         self._validate_resource(self.cache.location_area, name, route)
         return self.cache.location_area.get(route, None)
 
-    async def fetch_location_area(self, name: t.Union[str, int]) -> t.Optional[LocationArea]:
+    async def fetch_location_area(self, name: t.Union[str, int]) -> LocationArea:
         """Fetches a location area from the API.
 
         Parameters
@@ -137,8 +137,8 @@ class Location(BaseExtension):
 
         Returns
         -------
-        t.Optional[pokelance.models.LocationArea]
-            The location area.
+        LocationArea
+            The location area if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -194,7 +194,7 @@ class Location(BaseExtension):
         self._validate_resource(self.cache.pal_park_area, name, route)
         return self.cache.pal_park_area.get(route, None)
 
-    async def fetch_pal_park_area(self, name: t.Union[str, int]) -> t.Optional[PalParkArea]:
+    async def fetch_pal_park_area(self, name: t.Union[str, int]) -> PalParkArea:
         """Fetches a pal park area from the API.
 
         Parameters
@@ -204,8 +204,8 @@ class Location(BaseExtension):
 
         Returns
         -------
-        t.Optional[pokelance.models.PalParkArea]
-            The pal park area.
+        PalParkArea
+            The pal park area if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -261,7 +261,7 @@ class Location(BaseExtension):
         self._validate_resource(self.cache.region, name, route)
         return self.cache.region.get(route, None)
 
-    async def fetch_region(self, name: t.Union[str, int]) -> t.Optional[Region]:
+    async def fetch_region(self, name: t.Union[str, int]) -> Region:
         """Fetches a region from the API.
 
         Parameters
@@ -271,8 +271,8 @@ class Location(BaseExtension):
 
         Returns
         -------
-        t.Optional[pokelance.models.Region]
-            The region.
+        Region
+            The region if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------

@@ -59,7 +59,7 @@ class Move(BaseExtension):
         self._validate_resource(self.cache.move, name, route)
         return self.cache.move.get(route, None)
 
-    async def fetch_move(self, name: t.Union[str, int]) -> t.Optional[MoveModel]:
+    async def fetch_move(self, name: t.Union[str, int]) -> MoveModel:
         """Fetches a move from the API.
 
         Parameters
@@ -69,8 +69,8 @@ class Move(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.Move]
-            The move if it exists in the API, else None.
+        MoveModel
+            The move if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -126,7 +126,7 @@ class Move(BaseExtension):
         self._validate_resource(self.cache.move_ailment, name, route)
         return self.cache.move_ailment.get(route, None)
 
-    async def fetch_move_ailment(self, name: t.Union[str, int]) -> t.Optional[MoveAilment]:
+    async def fetch_move_ailment(self, name: t.Union[str, int]) -> MoveAilment:
         """Fetches a move ailment from the API.
 
         Parameters
@@ -136,8 +136,8 @@ class Move(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.MoveAilment]
-            The move ailment if it exists in the API, else None.
+        MoveAilment
+            The move ailment if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -193,7 +193,7 @@ class Move(BaseExtension):
         self._validate_resource(self.cache.move_battle_style, name, route)
         return self.cache.move_battle_style.get(route, None)
 
-    async def fetch_move_battle_style(self, name: t.Union[str, int]) -> t.Optional[MoveBattleStyle]:
+    async def fetch_move_battle_style(self, name: t.Union[str, int]) -> MoveBattleStyle:
         """Fetches a move battle style from the API.
 
         Parameters
@@ -203,8 +203,8 @@ class Move(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.MoveBattleStyle]
-            The move battle style if it exists in the API, else None.
+        MoveBattleStyle
+            The move battle style if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -260,7 +260,7 @@ class Move(BaseExtension):
         self._validate_resource(self.cache.move_category, name, route)
         return self.cache.move_category.get(route, None)
 
-    async def fetch_move_category(self, name: t.Union[str, int]) -> t.Optional[MoveCategory]:
+    async def fetch_move_category(self, name: t.Union[str, int]) -> MoveCategory:
         """Fetches a move category from the API.
 
         Parameters
@@ -270,8 +270,8 @@ class Move(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.MoveCategory]
-            The move category if it exists in the API, else None.
+        MoveCategory
+            The move category if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -327,7 +327,7 @@ class Move(BaseExtension):
         self._validate_resource(self.cache.move_damage_class, name, route)
         return self.cache.move_damage_class.get(route, None)
 
-    async def fetch_move_damage_class(self, name: t.Union[str, int]) -> t.Optional[MoveDamageClass]:
+    async def fetch_move_damage_class(self, name: t.Union[str, int]) -> MoveDamageClass:
         """Fetches a move damage class from the API.
 
         Parameters
@@ -337,8 +337,8 @@ class Move(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.MoveDamageClass]
-            The move damage class if it exists in the API, else None.
+        MoveDamageClass
+            The move damage class if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -394,7 +394,7 @@ class Move(BaseExtension):
         self._validate_resource(self.cache.move_learn_method, name, route)
         return self.cache.move_learn_method.get(route, None)
 
-    async def fetch_move_learn_method(self, name: t.Union[str, int]) -> t.Optional[MoveLearnMethod]:
+    async def fetch_move_learn_method(self, name: t.Union[str, int]) -> MoveLearnMethod:
         """Fetches a move learn method from the API.
 
         Parameters
@@ -404,8 +404,8 @@ class Move(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.MoveLearnMethod]
-            The move learn method if it exists in the API, else None.
+        MoveLearnMethod
+            The move learn method if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -461,7 +461,7 @@ class Move(BaseExtension):
         self._validate_resource(self.cache.move_target, name, route)
         return self.cache.move_target.get(route, None)
 
-    async def fetch_move_target(self, name: t.Union[str, int]) -> t.Optional[MoveTarget]:
+    async def fetch_move_target(self, name: t.Union[str, int]) -> MoveTarget:
         """Fetches a move target from the API.
 
         Parameters
@@ -471,8 +471,8 @@ class Move(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.MoveTarget]
-            The move target if it exists in the API, else None.
+        MoveTarget
+            The move target if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------

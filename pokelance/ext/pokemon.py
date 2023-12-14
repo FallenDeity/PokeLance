@@ -48,7 +48,7 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        Optional[Ability]
+        t.Optional[Ability]
             The ability if found, else None.
 
         Raises
@@ -69,7 +69,7 @@ class Pokemon(BaseExtension):
         self._validate_resource(self.cache.ability, name, route)
         return self.cache.ability.get(route, None)
 
-    async def fetch_ability(self, name: t.Union[str, int]) -> t.Optional[Ability]:
+    async def fetch_ability(self, name: t.Union[str, int]) -> Ability:
         """Fetch an ability by name or id.
 
         Parameters
@@ -79,8 +79,8 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        Optional[Ability]
-            The ability if found, else None.
+        Ability
+            The ability if found, else raises ResourceNotFound.
 
         Raises
         ------
@@ -115,7 +115,7 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        Optional[Characteristic]
+        t.Optional[Characteristic]
             The characteristic if found, else None.
 
         Raises
@@ -136,7 +136,7 @@ class Pokemon(BaseExtension):
         self._validate_resource(self.cache.characteristic, id_, route)
         return self.cache.characteristic.get(route, None)
 
-    async def fetch_characteristic(self, id_: int) -> t.Optional[Characteristic]:
+    async def fetch_characteristic(self, id_: int) -> Characteristic:
         """Fetch a characteristic by id.
 
         Parameters
@@ -146,8 +146,8 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        Optional[Characteristic]
-            The characteristic if found, else None.
+        Characteristic
+            The characteristic if found, else raises ResourceNotFound.
 
         Raises
         ------
@@ -182,7 +182,7 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        Optional[EggGroup]
+        t.Optional[EggGroup]
             The egg group if found, else None.
 
         Raises
@@ -203,7 +203,7 @@ class Pokemon(BaseExtension):
         self._validate_resource(self.cache.egg_group, name, route)
         return self.cache.egg_group.get(route, None)
 
-    async def fetch_egg_group(self, name: t.Union[str, int]) -> t.Optional[EggGroup]:
+    async def fetch_egg_group(self, name: t.Union[str, int]) -> EggGroup:
         """Fetch an egg group by name or id.
 
         Parameters
@@ -213,8 +213,8 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        Optional[EggGroup]
-            The egg group if found, else None.
+        EggGroup
+            The egg group if found, else raises ResourceNotFound.
 
         Raises
         ------
@@ -271,7 +271,7 @@ class Pokemon(BaseExtension):
         self._validate_resource(self.cache.gender, name, route)
         return self.cache.gender.get(route, None)
 
-    async def fetch_gender(self, name: t.Union[str, int]) -> t.Optional[Gender]:
+    async def fetch_gender(self, name: t.Union[str, int]) -> Gender:
         """
         Fetches a gender model by name or id.
 
@@ -282,8 +282,8 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        t.Optional[Gender]
-            Gender model if found, else None.
+        Gender
+            Gender model if found, else raises ResourceNotFound.
 
         Raises
         ------
@@ -340,7 +340,7 @@ class Pokemon(BaseExtension):
         self._validate_resource(self.cache.growth_rate, name, route)
         return self.cache.growth_rate.get(route, None)
 
-    async def fetch_growth_rate(self, name: t.Union[str, int]) -> t.Optional[GrowthRate]:
+    async def fetch_growth_rate(self, name: t.Union[str, int]) -> GrowthRate:
         """
         Fetches a growth rate model by name or id.
 
@@ -351,8 +351,8 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        t.Optional[GrowthRate]
-            Growth rate model if found, else None.
+        GrowthRate
+            Growth rate model if found, else raises ResourceNotFound.
 
         Raises
         ------
@@ -409,7 +409,7 @@ class Pokemon(BaseExtension):
         self._validate_resource(self.cache.nature, name, route)
         return self.cache.nature.get(route, None)
 
-    async def fetch_nature(self, name: t.Union[str, int]) -> t.Optional[Nature]:
+    async def fetch_nature(self, name: t.Union[str, int]) -> Nature:
         """
         Fetches a nature model by name or id.
 
@@ -420,8 +420,8 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        t.Optional[Nature]
-            Nature model if found, else None.
+        Nature
+            Nature model if found, else raises ResourceNotFound.
 
         Raises
         ------
@@ -478,7 +478,7 @@ class Pokemon(BaseExtension):
         self._validate_resource(self.cache.pokeathlon_stat, name, route)
         return self.cache.pokeathlon_stat.get(route, None)
 
-    async def fetch_pokeathlon_stat(self, name: t.Union[str, int]) -> t.Optional[PokeathlonStat]:
+    async def fetch_pokeathlon_stat(self, name: t.Union[str, int]) -> PokeathlonStat:
         """
         Fetches a pokeathlon stat model by name or id.
 
@@ -489,8 +489,8 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        t.Optional[PokeathlonStat]
-            Pokeathlon stat model if found, else None.
+        PokeathlonStat
+            Pokeathlon stat model if found, else raises ResourceNotFound.
 
         Raises
         ------
@@ -548,7 +548,7 @@ class Pokemon(BaseExtension):
         self._validate_resource(self.cache.location_area_encounter, name, route)
         return self.cache.location_area_encounter.get(route, None)
 
-    async def fetch_location_area_encounter(self, name: t.Union[str, int]) -> t.Optional[LocationAreaEncounter]:
+    async def fetch_location_area_encounter(self, name: t.Union[str, int]) -> LocationAreaEncounter:
         """
         Fetches a location area encounter model by name or id.
 
@@ -559,8 +559,8 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        t.Optional[LocationAreaEncounter]
-            Location area encounter model if found, else None.
+        LocationAreaEncounter
+            Location area encounter model if found, else raises ResourceNotFound.
 
         Raises
         ------
@@ -617,7 +617,7 @@ class Pokemon(BaseExtension):
         self._validate_resource(self.cache.pokemon, name, route)
         return self.cache.pokemon.get(route, None)
 
-    async def fetch_pokemon(self, name: t.Union[str, int]) -> t.Optional[PokemonModel]:
+    async def fetch_pokemon(self, name: t.Union[str, int]) -> PokemonModel:
         """
         Fetches a pokemon model by name or id.
 
@@ -628,8 +628,8 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        t.Optional[PokemonModel]
-            Pokemon model if found, else None.
+        PokemonModel
+            Pokemon model if found, else raises ResourceNotFound.
 
         Raises
         ------
@@ -686,7 +686,7 @@ class Pokemon(BaseExtension):
         self._validate_resource(self.cache.pokemon_color, name, route)
         return self.cache.pokemon_color.get(route, None)
 
-    async def fetch_pokemon_color(self, name: t.Union[str, int]) -> t.Optional[PokemonColor]:
+    async def fetch_pokemon_color(self, name: t.Union[str, int]) -> PokemonColor:
         """
         Fetches a pokemon color model by name or id.
 
@@ -697,8 +697,8 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        t.Optional[PokemonColor]
-            Pokemon color model if found, else None.
+        PokemonColor
+            Pokemon color model if found, else raises ResourceNotFound.
 
         Raises
         ------
@@ -755,7 +755,7 @@ class Pokemon(BaseExtension):
         self._validate_resource(self.cache.pokemon_form, name, route)
         return self.cache.pokemon_form.get(route, None)
 
-    async def fetch_pokemon_form(self, name: t.Union[str, int]) -> t.Optional[PokemonForm]:
+    async def fetch_pokemon_form(self, name: t.Union[str, int]) -> PokemonForm:
         """
         Fetches a pokemon form model by name or id.
 
@@ -766,8 +766,8 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        t.Optional[PokemonForm]
-            Pokemon form model if found, else None.
+        PokemonForm
+            Pokemon form model if found, else raises ResourceNotFound.
 
         Raises
         ------
@@ -824,7 +824,7 @@ class Pokemon(BaseExtension):
         self._validate_resource(self.cache.pokemon_habitat, name, route)
         return self.cache.pokemon_habitat.get(route, None)
 
-    async def fetch_pokemon_habitat(self, name: t.Union[str, int]) -> t.Optional[PokemonHabitats]:
+    async def fetch_pokemon_habitat(self, name: t.Union[str, int]) -> PokemonHabitats:
         """
         Fetches a pokemon habitat model by name or id.
 
@@ -835,8 +835,8 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        t.Optional[PokemonHabitats]
-            Pokemon habitat model if found, else None.
+        PokemonHabitats
+            Pokemon habitat model if found, else raises ResourceNotFound.
 
         Raises
         ------
@@ -893,7 +893,7 @@ class Pokemon(BaseExtension):
         self._validate_resource(self.cache.pokemon_shape, name, route)
         return self.cache.pokemon_shape.get(route, None)
 
-    async def fetch_pokemon_shape(self, name: t.Union[str, int]) -> t.Optional[PokemonShape]:
+    async def fetch_pokemon_shape(self, name: t.Union[str, int]) -> PokemonShape:
         """
         Fetches a pokemon shape model by name or id.
 
@@ -904,8 +904,8 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        t.Optional[PokemonShape]
-            Pokemon shape model if found, else None.
+        PokemonShape
+            Pokemon shape model if found, else raises ResourceNotFound.
 
         Raises
         ------
@@ -962,7 +962,7 @@ class Pokemon(BaseExtension):
         self._validate_resource(self.cache.pokemon_species, name, route)
         return self.cache.pokemon_species.get(route, None)
 
-    async def fetch_pokemon_species(self, name: t.Union[str, int]) -> t.Optional[PokemonSpecies]:
+    async def fetch_pokemon_species(self, name: t.Union[str, int]) -> PokemonSpecies:
         """
         Fetches a pokemon species model by name or id.
 
@@ -973,8 +973,8 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        t.Optional[PokemonSpecies]
-            Pokemon species model if found, else None.
+        PokemonSpecies
+            Pokemon species model if found, else raises ResourceNotFound.
 
         Raises
         ------
@@ -1031,7 +1031,7 @@ class Pokemon(BaseExtension):
         self._validate_resource(self.cache.stat, name, route)
         return self.cache.stat.get(route, None)
 
-    async def fetch_stat(self, name: t.Union[str, int]) -> t.Optional[Stat]:
+    async def fetch_stat(self, name: t.Union[str, int]) -> Stat:
         """
         Fetches a stat model by name or id.
 
@@ -1042,8 +1042,8 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        t.Optional[Stat]
-            Stat model if found, else None.
+        Stat
+            Stat model if found, else raises ResourceNotFound.
 
         Raises
         ------
@@ -1100,7 +1100,7 @@ class Pokemon(BaseExtension):
         self._validate_resource(self.cache.type, name, route)
         return self.cache.type.get(route, None)
 
-    async def fetch_type(self, name: t.Union[str, int]) -> t.Optional[Type]:
+    async def fetch_type(self, name: t.Union[str, int]) -> Type:
         """
         Fetches a type model by name or id.
 
@@ -1111,8 +1111,8 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        t.Optional[Type]
-            Type model if found, else None.
+        Type
+            Type model if found, else raises ResourceNotFound.
 
         Raises
         ------

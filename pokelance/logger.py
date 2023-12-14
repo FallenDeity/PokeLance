@@ -97,8 +97,7 @@ class Logger(logging.Logger):
 
     >>> logs = Logger(name="pokelance")
     >>> logs.info("Hello, world!")
-    [2021-08-29 17:05:32,000] | pokelance\logger.py:95 | INFO | Hello, world!
-
+    [2021-08-29 17:05:32,000] | pokelance/logger.py:95 | INFO | Hello, world!
     """
 
     file_handler: t.Optional[FileHandler] = None

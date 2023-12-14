@@ -8,6 +8,7 @@ from pokelance.models.common import Name, NamedResource
 from .utils import ChainLink
 
 __all__: t.Tuple[str, ...] = (
+    "ChainLink",
     "EvolutionChain",
     "EvolutionTrigger",
 )

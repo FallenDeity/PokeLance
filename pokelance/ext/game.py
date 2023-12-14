@@ -60,13 +60,18 @@ class Game(BaseExtension):
         self._validate_resource(self.cache.generation, name, route)
         return self.cache.generation.get(route, None)
 
-    async def fetch_generation(self, name: t.Union[str, int]) -> t.Optional[Generation]:
+    async def fetch_generation(self, name: t.Union[str, int]) -> Generation:
         """Fetches a generation from the API.
 
         Parameters
         ----------
         name: typing.Union[str, int]
             The name or id of the generation.
+
+        Returns
+        -------
+        pokelance.models.Generation
+            The generation if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -122,13 +127,18 @@ class Game(BaseExtension):
         self._validate_resource(self.cache.pokedex, name, route)
         return self.cache.pokedex.get(route, None)
 
-    async def fetch_pokedex(self, name: t.Union[str, int]) -> t.Optional[Pokedex]:
+    async def fetch_pokedex(self, name: t.Union[str, int]) -> Pokedex:
         """Fetches a pokedex from the API.
 
         Parameters
         ----------
         name: typing.Union[str, int]
             The name or id of the pokedex.
+
+        Returns
+        -------
+        pokelance.models.Pokedex
+            The pokedex if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -184,13 +194,18 @@ class Game(BaseExtension):
         self._validate_resource(self.cache.version, name, route)
         return self.cache.version.get(route, None)
 
-    async def fetch_version(self, name: t.Union[str, int]) -> t.Optional[Version]:
+    async def fetch_version(self, name: t.Union[str, int]) -> Version:
         """Fetches a version from the API.
 
         Parameters
         ----------
         name: typing.Union[str, int]
             The name or id of the version.
+
+        Returns
+        -------
+        pokelance.models.Version
+            The version if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -246,13 +261,18 @@ class Game(BaseExtension):
         self._validate_resource(self.cache.version_group, name, route)
         return self.cache.version_group.get(route, None)
 
-    async def fetch_version_group(self, name: t.Union[str, int]) -> t.Optional[VersionGroup]:
+    async def fetch_version_group(self, name: t.Union[str, int]) -> VersionGroup:
         """Fetches a version group from the API.
 
         Parameters
         ----------
         name: typing.Union[str, int]
             The name or id of the version group.
+
+        Returns
+        -------
+        pokelance.models.VersionGroup
+            The version group if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------

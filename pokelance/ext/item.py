@@ -60,7 +60,7 @@ class Item(BaseExtension):
         self._validate_resource(self.cache.item, name, route)
         return self.cache.item.get(route, None)
 
-    async def fetch_item(self, name: t.Union[str, int]) -> t.Optional[ItemModel]:
+    async def fetch_item(self, name: t.Union[str, int]) -> ItemModel:
         """Fetches an item from the API.
 
         Parameters
@@ -70,8 +70,8 @@ class Item(BaseExtension):
 
         Returns
         -------
-        t.Optional[pokelance.models.Item]
-            The item.
+        ItemModel
+            The item if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -127,7 +127,7 @@ class Item(BaseExtension):
         self._validate_resource(self.cache.item_attribute, name, route)
         return self.cache.item_attribute.get(route, None)
 
-    async def fetch_item_attribute(self, name: t.Union[str, int]) -> t.Optional[ItemAttribute]:
+    async def fetch_item_attribute(self, name: t.Union[str, int]) -> ItemAttribute:
         """Fetches an item attribute from the API.
 
         Parameters
@@ -137,8 +137,8 @@ class Item(BaseExtension):
 
         Returns
         -------
-        t.Optional[pokelance.models.ItemAttribute]
-            The item attribute.
+        ItemAttribute
+            The item attribute if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -194,7 +194,7 @@ class Item(BaseExtension):
         self._validate_resource(self.cache.item_category, name, route)
         return self.cache.item_category.get(route, None)
 
-    async def fetch_item_category(self, name: t.Union[str, int]) -> t.Optional[ItemCategory]:
+    async def fetch_item_category(self, name: t.Union[str, int]) -> ItemCategory:
         """Fetches an item category from the API.
 
         Parameters
@@ -204,8 +204,8 @@ class Item(BaseExtension):
 
         Returns
         -------
-        t.Optional[pokelance.models.ItemCategory]
-            The item category.
+        ItemCategory
+            The item category if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -261,7 +261,7 @@ class Item(BaseExtension):
         self._validate_resource(self.cache.item_fling_effect, name, route)
         return self.cache.item_fling_effect.get(route, None)
 
-    async def fetch_item_fling_effect(self, name: t.Union[str, int]) -> t.Optional[ItemFlingEffect]:
+    async def fetch_item_fling_effect(self, name: t.Union[str, int]) -> ItemFlingEffect:
         """Fetches an item fling effect from the API.
 
         Parameters
@@ -271,8 +271,8 @@ class Item(BaseExtension):
 
         Returns
         -------
-        t.Optional[pokelance.models.ItemFlingEffect]
-            The item fling effect.
+        ItemFlingEffect
+            The item fling effect if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -328,7 +328,7 @@ class Item(BaseExtension):
         self._validate_resource(self.cache.item_pocket, name, route)
         return self.cache.item_pocket.get(route, None)
 
-    async def fetch_item_pocket(self, name: t.Union[str, int]) -> t.Optional[ItemPocket]:
+    async def fetch_item_pocket(self, name: t.Union[str, int]) -> ItemPocket:
         """Fetches an item pocket from the API.
 
         Parameters
@@ -338,8 +338,8 @@ class Item(BaseExtension):
 
         Returns
         -------
-        t.Optional[pokelance.models.ItemPocket]
-            The item pocket.
+        ItemPocket
+            The item pocket if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------

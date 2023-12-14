@@ -59,7 +59,7 @@ class Evolution(BaseExtension):
         self._validate_resource(self.cache.evolution_chain, id_, route)
         return self.cache.evolution_chain.get(route, None)
 
-    async def fetch_evolution_chain(self, id_: int) -> t.Optional[EvolutionChain]:
+    async def fetch_evolution_chain(self, id_: int) -> EvolutionChain:
         """Fetches an evolution chain from the API.
 
         Parameters
@@ -69,8 +69,8 @@ class Evolution(BaseExtension):
 
         Returns
         -------
-        t.Optional[pokelance.models.EvolutionChain]
-            The evolution chain.
+        EvolutionChain
+            The evolution chain if it exists in the cache, else raises ResourceNotFound.
 
         Raises
         ------
@@ -126,7 +126,7 @@ class Evolution(BaseExtension):
         self._validate_resource(self.cache.evolution_trigger, name, route)
         return self.cache.evolution_trigger.get(route, None)
 
-    async def fetch_evolution_trigger(self, name: t.Union[str, int]) -> t.Optional[EvolutionTrigger]:
+    async def fetch_evolution_trigger(self, name: t.Union[str, int]) -> EvolutionTrigger:
         """Fetches an evolution trigger from the API.
 
         Parameters
@@ -136,8 +136,8 @@ class Evolution(BaseExtension):
 
         Returns
         -------
-        t.Optional[pokelance.models.EvolutionTrigger]
-            The evolution trigger.
+        EvolutionTrigger
+            The evolution trigger if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------

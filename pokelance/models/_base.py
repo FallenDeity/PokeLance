@@ -7,6 +7,16 @@ import attrs
 class BaseModel(attrs.AttrsInstance):
     """Base model for all models"""
 
+    def to_dict(self) -> t.Dict[str, t.Any]:
+        """Convert the model to a dict
+
+        Returns
+        -------
+        typing.Dict[str, Any]
+            The model as a dict.
+        """
+        return attrs.asdict(self)
+
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "BaseModel":
         """Create a model from a payload

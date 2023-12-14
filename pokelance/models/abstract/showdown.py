@@ -10,7 +10,11 @@ __all__: t.Tuple[str, ...] = ("ShowdownSprites",)
 
 @attrs.define(kw_only=True, slots=True)
 class ShowdownSprites(BaseModel):
-    """Showdown sprites.
+    """
+    Showdown sprites.
+
+    As of now pokeapi doesn't include showdown sprites in their API payload.
+    But they are available in their sprites repository.
 
     Attributes
     ----------

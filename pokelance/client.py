@@ -33,8 +33,10 @@ class PokeLance:
         The HTTP client used to make requests to the PokeAPI.
     _logger : typing.Union[logging.Logger, Logger]
         The logger used to log information about the client.
-    _ext_tasks : t.List[t.Tuple[t.Coroutine[t.Any, t.Any, None], str]]
+    _ext_tasks : t.List[t.Tuple[t.Callable[[], t.Coroutine[t.Any, t.Any, None]], str]]
         A list of coroutines to load extension data.
+    cache_endpoints : bool
+        Whether to cache endpoints. Defaults to True.
     EXTENSIONS : Path
         The path to the extensions directory.
     berry : Berry
@@ -90,6 +92,7 @@ class PokeLance:
         cache_size: int = 100,
         logger: t.Optional["logging.Logger"] = None,
         file_logging: bool = False,
+        cache_endpoints: bool = True,
         session: t.Optional["aiohttp.ClientSession"] = None,
     ) -> None:
         """
@@ -113,7 +116,8 @@ class PokeLance:
         """
         self._logger = logger or Logger(name="pokelance", file_logging=file_logging)
         self._http = HttpClient(client=self, session=session, cache_size=cache_size)
-        self._ext_tasks: t.List[t.Tuple[t.Coroutine[t.Any, t.Any, None], str]] = []
+        self.cache_endpoints = cache_endpoints
+        self._ext_tasks: t.List[t.Tuple[t.Callable[[], t.Coroutine[t.Any, t.Any, None]], str]] = []
         self._image_cache_size = image_cache_size
         lru_cache(maxsize=self._image_cache_size)(self.get_image_async)
         self.setup_hook()
@@ -155,7 +159,7 @@ class PokeLance:
         extension : BaseExtension
             The extension to add.
         """
-        self._ext_tasks.append((extension.setup(), name))
+        self._ext_tasks.append((extension.setup, name))
         setattr(self, name, extension)
 
     async def ping(self) -> float:
@@ -201,7 +205,7 @@ class PokeLance:
         ------
         ValueError
             If the extension or category is invalid.
-        HTTPException
+        ResourceNotFound
             If the data is not found.
 
         Examples
@@ -221,13 +225,13 @@ class PokeLance:
         if isinstance(ext, str) and (ext := str(ext).title()) not in ExtensionEnum.__members__:
             raise ValueError(f"Invalid extension: {ext}")
         categories = ExtensionEnum.get_categories(ext) if isinstance(ext, str) else ext.categories  # type: ignore
-        if (category := category.lower()) not in categories:
+        if (category := category.lower().replace("-", "_")) not in categories:
             raise ValueError(f"Invalid category: {category}")
         ext_ = getattr(self, ext.lower()) if isinstance(ext, str) else getattr(self, ext.name.lower())
         get_, fetch_ = getattr(ext_, f"get_{category}"), getattr(ext_, f"fetch_{category}")
         return t.cast(BaseType, get_(id_) or await fetch_(id_))
 
-    async def from_url(self, url: str) -> t.Optional[BaseType]:
+    async def from_url(self, url: str) -> BaseType:
         """
         Constructs a request from urls present in the data.
 
@@ -238,8 +242,8 @@ class PokeLance:
 
         Returns
         -------
-        typing.Optional[BaseType]
-            The data.
+        BaseType
+            The data from the URL.
 
         Raises
         ------
@@ -267,13 +271,13 @@ class PokeLance:
         return await self._http.load_image(url)
 
     @property
-    def ext_tasks(self) -> t.List[t.Tuple[t.Coroutine[t.Any, t.Any, None], str]]:
+    def ext_tasks(self) -> t.List[t.Tuple[t.Callable[[], t.Coroutine[t.Any, t.Any, None]], str]]:
         """
         A list of coroutines to load extension data.
 
         Returns
         -------
-        typing.List[typing.Tuple[typing.Coroutine[typing.Any, typing.Any, None], str]]
+        typing.List[typing.Tuple[t.Callable[[], t.Coroutine[t.Any, t.Any, None]], str]]
             The list of tasks.
         """
         return self._ext_tasks

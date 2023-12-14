@@ -30,7 +30,7 @@ ExtensionsL = t.Literal[
     "berry", "contest", "encounter", "evolution", "game", "item", "location", "machine", "move", "pokemon"
 ]
 PATH: str = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/"
-EXTENSION_PATTERN: t.Pattern[str] = re.compile(r"https://pokeapi.co/api/v2/(\w+)/(\d+)/")
+EXTENSION_PATTERN: t.Pattern[str] = re.compile(r"https://pokeapi.co/api/v2/(?P<category>[\w-]+)/(?P<value>[\w-]+)")
 
 
 @attrs.define

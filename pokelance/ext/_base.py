@@ -69,7 +69,7 @@ class BaseExtension:
         """
         data: t.Set[str] = set(list(map(str, cache.endpoints.values())) + list(cache.endpoints.keys()))
         if data and str(resource) not in data:
-            raise ResourceNotFound(self.get_message(str(resource), data), route)
+            raise ResourceNotFound(self.get_message(str(resource), data), route, status=404)
 
     @staticmethod
     def get_message(case: str, data: t.Set[str]) -> str:

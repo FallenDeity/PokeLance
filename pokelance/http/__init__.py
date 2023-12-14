@@ -80,20 +80,20 @@ class HttpClient:
         self._cache = Cache(max_size=cache_size)
         self._tasks_queue: t.List[asyncio.Task[None]] = []
 
-    async def _load_ext(self, coro: t.Coroutine[t.Any, t.Any, None], message: str) -> None:
+    async def _load_ext(self, coroutine: t.Callable[[], t.Coroutine[t.Any, t.Any, None]], message: str) -> None:
         """
         Load an extension's resources.
 
         Parameters
         ----------
-        coro: typing.Coroutine
+        coroutine: typing.Coroutine
             The coroutine to load.
         message: str
             The message to log.
         """
         task: t.Optional[asyncio.Task[None]] = asyncio.current_task()
         self._client.logger.debug(f"Loading {message}")
-        await coro
+        await coroutine()
         if task is not None:
             self._tasks_queue.remove(task)
         self._client.logger.info(f"Loaded {message}")
@@ -101,9 +101,9 @@ class HttpClient:
     async def _schedule_tasks(self) -> None:
         """Schedules the tasks for the HTTP client."""
         total = len(self._client.ext_tasks)
-        for num, (coro, name) in enumerate(self._client.ext_tasks):
+        for num, (coroutine, name) in enumerate(self._client.ext_tasks):
             message = f"Extension {name} endpoints ({num + 1}/{total})"
-            task = asyncio.create_task(coro=self._load_ext(coro, message), name=name)
+            task = asyncio.create_task(coro=self._load_ext(coroutine, message), name=name)
             self._tasks_queue.append(task)
         self._client.ext_tasks.clear()
 
@@ -120,7 +120,8 @@ class HttpClient:
         """Connects the HTTP client."""
         self.session = self.session or aiohttp.ClientSession()
         if not self._is_ready:
-            await self._schedule_tasks()
+            if self._client.cache_endpoints:
+                await self._schedule_tasks()
             self._is_ready = True
 
     async def request(self, route: Route) -> t.Any:
@@ -152,7 +153,7 @@ class HttpClient:
                     self._client.logger.error(f"Request to {route.url} was unsuccessful.")
                     raise HTTPException(str(response.reason), route, response.status).create()
         else:
-            raise HTTPException("No session was provided.", route, 0).create()
+            raise HTTPException("No session was provided.", route, -1).create()
 
     async def load_image(self, url: str) -> bytes:
         """Loads an image from the url.
@@ -169,13 +170,17 @@ class HttpClient:
         """
         if self.session is None:
             await self.connect()
+        _image_formats = ("png", "jpg", "jpeg", "gif", "webp", "svg")
         if self.session is not None:
             async with self.session.get(url) as response:
-                if 300 > response.status >= 200:
-                    data: bytes = await response.read()
-                    return data
+                is_image = any(f_ in response.content_type for f_ in _image_formats)
+                if 300 > response.status >= 200 and is_image:
+                    self._client.logger.debug(f"Request to {url} was successful.")
+                    return await response.read()
                 else:
-                    raise ImageNotFound(str(response.reason), Route(), response.status).create()
+                    self._client.logger.error(f"Request to {url} was unsuccessful.")
+                    message = f"Request to {url} was unsuccessful or the URL is not an image."
+                    raise ImageNotFound(f"{message} ({response.content_type})", Route(), response.status)
         return b""
 
     async def ping(self) -> float:

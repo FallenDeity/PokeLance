@@ -75,6 +75,14 @@ class EvolutionDetail(BaseModel):
     trade_species: NamedResource = attrs.field(factory=NamedResource)
     turn_upside_down: bool = attrs.field(factory=bool)
 
+    @property
+    def simplified_details(self) -> t.Dict[str, t.Any]:
+        simplified_details: t.Dict[str, t.Any] = {}
+        for k, v in self.to_dict().items():
+            if ((is_dict := isinstance(v, dict)) and v.get("name") and v.get("url")) or (not is_dict and v):
+                simplified_details[k] = v
+        return simplified_details
+
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EvolutionDetail":
         return cls(

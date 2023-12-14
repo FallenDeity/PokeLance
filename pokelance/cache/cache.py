@@ -3,7 +3,6 @@ import importlib
 import json
 import pathlib
 import typing as t
-from collections.abc import MutableMapping
 
 import aiofiles
 import attrs
@@ -89,7 +88,7 @@ class Endpoint:
         return str(self.id)
 
 
-class BaseCache(MutableMapping[_KT, _VT]):
+class BaseCache(t.MutableMapping[_KT, _VT]):
     """Base class for all caches.
 
     Parameters

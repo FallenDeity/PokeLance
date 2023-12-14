@@ -59,7 +59,7 @@ class Berry(BaseExtension):
         self._validate_resource(self.cache.berry, name, route)
         return self.cache.berry.get(route, None)
 
-    async def fetch_berry(self, name: t.Union[str, int]) -> t.Optional[BerryModel]:
+    async def fetch_berry(self, name: t.Union[str, int]) -> BerryModel:
         """Fetches a berry from the API.
 
         Parameters
@@ -69,8 +69,8 @@ class Berry(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.Berry]
-            The berry if it exists in the API, else None.
+        BerryModel
+            The berry if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -124,7 +124,7 @@ class Berry(BaseExtension):
         self._validate_resource(self.cache.berry_flavor, name, route)
         return self.cache.berry_flavor.get(route, None)
 
-    async def fetch_berry_flavor(self, name: t.Union[str, int]) -> t.Optional[BerryFlavor]:
+    async def fetch_berry_flavor(self, name: t.Union[str, int]) -> BerryFlavor:
         """Fetches a berry flavor from the API.
 
         Parameters
@@ -134,8 +134,8 @@ class Berry(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.BerryFlavor]
-            The berry flavor if it exists in the API, else None.
+        BerryFlavor
+            The berry flavor if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -157,8 +157,7 @@ class Berry(BaseExtension):
         route = Endpoint.get_berry_flavor(name)
         self._validate_resource(self.cache.berry_flavor, name, route)
         data = await self._client.request(route)
-        self.cache.berry_flavor[route] = BerryFlavor.from_payload(data)
-        return self.cache.berry_flavor[route]
+        return self.cache.berry_flavor.setdefault(route, BerryFlavor.from_payload(data))
 
     def get_berry_firmness(self, name: t.Union[str, int]) -> t.Optional[BerryFirmness]:
         """Gets a berry firmness from the cache.
@@ -190,7 +189,7 @@ class Berry(BaseExtension):
         self._validate_resource(self.cache.berry_firmness, name, route)
         return self.cache.berry_firmness.get(route, None)
 
-    async def fetch_berry_firmness(self, name: t.Union[str, int]) -> t.Optional[BerryFirmness]:
+    async def fetch_berry_firmness(self, name: t.Union[str, int]) -> BerryFirmness:
         """Fetches a berry firmness from the API.
 
         Parameters
@@ -200,8 +199,8 @@ class Berry(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.BerryFirmness]
-            The berry firmness if it exists in the API, else None.
+        BerryFirmness
+            The berry firmness if it exists in the API, else raises ResourceNotFound.
 
         Raises
         ------
@@ -223,8 +222,7 @@ class Berry(BaseExtension):
         route = Endpoint.get_berry_firmness(name)
         self._validate_resource(self.cache.berry_firmness, name, route)
         data = await self._client.request(route)
-        self.cache.berry_firmness[route] = BerryFirmness.from_payload(data)
-        return self.cache.berry_firmness[route]
+        return self.cache.berry_firmness.setdefault(route, BerryFirmness.from_payload(data))
 
 
 def setup(lance: "PokeLance") -> None:

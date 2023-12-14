@@ -59,7 +59,7 @@ class Contest(BaseExtension):
         self._validate_resource(self.cache.contest_type, name, route)
         return self.cache.contest_type.get(route, None)
 
-    async def fetch_contest_type(self, name: t.Union[str, int]) -> t.Optional[ContestType]:
+    async def fetch_contest_type(self, name: t.Union[str, int]) -> ContestType:
         """Fetches a contest type from the API.
 
         Parameters
@@ -69,7 +69,7 @@ class Contest(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.ContestType]
+        ContestType
             The contest type if it exists in the API, else None.
 
         Raises
@@ -126,7 +126,7 @@ class Contest(BaseExtension):
         self._validate_resource(self.cache.contest_effect, id_, route)
         return self.cache.contest_effect.get(route, None)
 
-    async def fetch_contest_effect(self, id_: int) -> t.Optional[ContestEffect]:
+    async def fetch_contest_effect(self, id_: int) -> ContestEffect:
         """Fetches a contest effect from the API.
 
         Parameters
@@ -136,7 +136,7 @@ class Contest(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.ContestEffect]
+        ContestEffect
             The contest effect if it exists in the API, else None.
 
         Raises
@@ -193,7 +193,7 @@ class Contest(BaseExtension):
         self._validate_resource(self.cache.super_contest_effect, id_, route)
         return self.cache.super_contest_effect.get(route, None)
 
-    async def fetch_super_contest_effect(self, id_: int) -> t.Optional[SuperContestEffect]:
+    async def fetch_super_contest_effect(self, id_: int) -> SuperContestEffect:
         """Fetches a super contest effect from the API.
 
         Parameters
@@ -203,7 +203,7 @@ class Contest(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.SuperContestEffect]
+        SuperContestEffect
             The super contest effect if it exists in the API, else None.
 
         Raises
