@@ -81,19 +81,34 @@ class HttpClient:
         self._tasks_queue: t.List[asyncio.Task[None]] = []
 
     async def _load_ext(self, coro: t.Coroutine[t.Any, t.Any, None], message: str) -> None:
+        """
+        Load an extension's resources.
+
+        Parameters
+        ----------
+        coro: typing.Coroutine
+            The coroutine to load.
+        message: str
+            The message to log.
+        """
+        task: t.Optional[asyncio.Task[None]] = asyncio.current_task()
+        self._client.logger.debug(f"Loading {message}")
         await coro
-        self._client.logger.info(message)
+        if task is not None:
+            self._tasks_queue.remove(task)
+        self._client.logger.info(f"Loaded {message}")
 
     async def _schedule_tasks(self) -> None:
+        """Schedules the tasks for the HTTP client."""
         total = len(self._client.ext_tasks)
         for num, (coro, name) in enumerate(self._client.ext_tasks):
             message = f"Extension {name} endpoints ({num + 1}/{total})"
-            self._client.logger.debug(f"Loading {message}")
-            task = asyncio.create_task(self._load_ext(coro, f"Loaded {message}"), name=name)
+            task = asyncio.create_task(coro=self._load_ext(coro, message), name=name)
             self._tasks_queue.append(task)
         self._client.ext_tasks.clear()
 
     async def close(self) -> None:
+        """Closes the HTTP client."""
         for task in self._tasks_queue:
             if not task.done():
                 task.cancel()

@@ -31,7 +31,7 @@ class PokeLance:
     ----------
     _http : HttpClient
         The HTTP client used to make requests to the PokeAPI.
-    _logger : logging.Logger
+    _logger : typing.Union[logging.Logger, Logger]
         The logger used to log information about the client.
     _ext_tasks : t.List[t.Tuple[t.Coroutine[t.Any, t.Any, None], str]]
         A list of coroutines to load extension data.
@@ -71,6 +71,7 @@ class PokeLance:
     """
 
     EXTENSIONS: Path = Path(__file__).parent / "ext"
+    _logger: t.Union["logging.Logger", Logger]
     berry: "Berry"
     contest: "Contest"
     evolution: "Evolution"
@@ -98,7 +99,7 @@ class PokeLance:
             The size of the image cache. Defaults to 128.
         cache_size : int
             The size of the cache to use for the HTTP client.
-        logger : logging.Logger
+        logger : typing.Optional[logging.Logger]
             The logger to use. If not provided, a new logger will be created.
         file_logging : bool
             Whether to log to a file. Defaults to False.
@@ -278,7 +279,7 @@ class PokeLance:
         return self._ext_tasks
 
     @property
-    def logger(self) -> "logging.Logger":
+    def logger(self) -> t.Union["logging.Logger", Logger]:
         """
         The logger used to log information about the client.
 
