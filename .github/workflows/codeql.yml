@@ -75,10 +75,9 @@ jobs:
       with:
         category: "/language:${{matrix.language}}"
 
-    # this step uploads all resulting SARIF files as a single Code Scanning alert
-    # on the pull request or commit that triggered the workflow
-
+    # upload results to GitHub
     - name: Upload SARIF results
       uses: github/codeql-action/upload-sarif@v2
       with:
-        sarif_file: "/results/python.sarif"
+        sarif_file: "../results/python.sarif"
+        
