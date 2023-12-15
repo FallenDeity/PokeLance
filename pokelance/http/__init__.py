@@ -142,7 +142,7 @@ class HttpClient:
         pokelance.exceptions.HTTPException
             An error occurred while making the request.
         """
-        if self.session is None:
+        if self.session is None or not self._is_ready:
             await self.connect()
         if self.session is not None:
             async with self.session.request(route.method, route.url, params=route.payload) as response:
@@ -168,7 +168,7 @@ class HttpClient:
         bytes
             The image.
         """
-        if self.session is None:
+        if self.session is None or not self._is_ready:
             await self.connect()
         _image_formats = ("png", "jpg", "jpeg", "gif", "webp", "svg")
         if self.session is not None:
