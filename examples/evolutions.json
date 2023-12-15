@@ -6,7 +6,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 16
+                "min_level": 16,
+                "depth": 1
             }
         ]
     },
@@ -17,7 +18,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 36
+                "min_level": 36,
+                "depth": 2
             }
         ]
     },
@@ -31,7 +33,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 16
+                "min_level": 16,
+                "depth": 1
             }
         ]
     },
@@ -42,7 +45,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 36
+                "min_level": 36,
+                "depth": 2
             }
         ]
     },
@@ -56,7 +60,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 16
+                "min_level": 16,
+                "depth": 1
             }
         ]
     },
@@ -67,7 +72,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 32
+                "min_level": 32,
+                "depth": 2
             }
         ]
     },
@@ -81,7 +87,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 7
+                "min_level": 7,
+                "depth": 1
             }
         ],
         "cascoon": [
@@ -90,7 +97,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 7
+                "min_level": 7,
+                "depth": 1
             }
         ]
     },
@@ -101,7 +109,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 10
+                "min_level": 10,
+                "depth": 2
             }
         ]
     },
@@ -113,7 +122,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 10
+                "min_level": 10,
+                "depth": 2
             }
         ]
     },
@@ -121,22 +131,28 @@
 },
 {
     "wooper-paldea": {
-        "clodsire": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 20
-        }
+        "clodsire": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 20,
+                "depth": 1
+            }
+        ]
     },
     "wooper": {
-        "quagsire": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 20
-        }
+        "quagsire": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 20,
+                "depth": 1
+            }
+        ]
     },
     "quagsire": {},
     "clodsire": {}
@@ -150,7 +166,8 @@
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
                 "min_level": 20,
-                "relative_physical_stats": 1
+                "relative_physical_stats": 1,
+                "depth": 1
             }
         ],
         "hitmonchan": [
@@ -160,7 +177,8 @@
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
                 "min_level": 20,
-                "relative_physical_stats": -1
+                "relative_physical_stats": -1,
+                "depth": 1
             }
         ],
         "hitmontop": [
@@ -169,7 +187,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 20
+                "min_level": 20,
+                "depth": 1
             }
         ]
     },
@@ -179,20 +198,26 @@
 },
 {
     "toxel": {
-        "toxtricity-low-key": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 30
-        },
-        "toxtricity-amped": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 30
-        }
+        "toxtricity-low-key": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 30,
+                "depth": 1
+            }
+        ],
+        "toxtricity-amped": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 30,
+                "depth": 1
+            }
+        ]
     },
     "toxtricity-amped": {},
     "toxtricity-low-key": {}
@@ -205,7 +230,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 42
+                "min_level": 42,
+                "depth": 1
             }
         ],
         "froslass": [
@@ -218,7 +244,8 @@
                     "name": "use-item",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
                 },
-                "gender": "Female"
+                "gender": "Female",
+                "depth": 1
             }
         ]
     },
@@ -227,30 +254,36 @@
 },
 {
     "sneasel-hisui": {
-        "sneasler": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "held_item": {
-                "name": "razor-claw",
-                "url": "https://pokeapi.co/api/v2/item/303/"
-            },
-            "time_of_day": "day"
-        }
+        "sneasler": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "held_item": {
+                    "name": "razor-claw",
+                    "url": "https://pokeapi.co/api/v2/item/303/"
+                },
+                "time_of_day": "day",
+                "depth": 1
+            }
+        ]
     },
     "sneasel": {
-        "weavile": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "held_item": {
-                "name": "razor-claw",
-                "url": "https://pokeapi.co/api/v2/item/303/"
-            },
-            "time_of_day": "night"
-        }
+        "weavile": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "held_item": {
+                    "name": "razor-claw",
+                    "url": "https://pokeapi.co/api/v2/item/303/"
+                },
+                "time_of_day": "night",
+                "depth": 1
+            }
+        ]
     },
     "weavile": {},
     "sneasler": {}
@@ -263,7 +296,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 20
+                "min_level": 20,
+                "depth": 1
             }
         ]
     },
@@ -274,7 +308,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 30
+                "min_level": 30,
+                "depth": 2
             }
         ],
         "gallade": [
@@ -287,7 +322,8 @@
                     "name": "use-item",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
                 },
-                "gender": "Male"
+                "gender": "Male",
+                "depth": 2
             }
         ]
     },
@@ -302,7 +338,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 21
+                "min_level": 21,
+                "depth": 1
             }
         ]
     },
@@ -316,7 +353,8 @@
                 "trigger": {
                     "name": "use-item",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
-                }
+                },
+                "depth": 2
             }
         ],
         "bellossom": [
@@ -328,7 +366,8 @@
                 "trigger": {
                     "name": "use-item",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
-                }
+                },
+                "depth": 2
             }
         ]
     },
@@ -337,26 +376,32 @@
 },
 {
     "exeggcute": {
-        "exeggutor-alola": {
-            "item": {
-                "name": "leaf-stone",
-                "url": "https://pokeapi.co/api/v2/item/85/"
-            },
-            "trigger": {
-                "name": "use-item",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+        "exeggutor-alola": [
+            {
+                "item": {
+                    "name": "leaf-stone",
+                    "url": "https://pokeapi.co/api/v2/item/85/"
+                },
+                "trigger": {
+                    "name": "use-item",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+                },
+                "depth": 1
             }
-        },
-        "exeggutor": {
-            "item": {
-                "name": "leaf-stone",
-                "url": "https://pokeapi.co/api/v2/item/85/"
-            },
-            "trigger": {
-                "name": "use-item",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+        ],
+        "exeggutor": [
+            {
+                "item": {
+                    "name": "leaf-stone",
+                    "url": "https://pokeapi.co/api/v2/item/85/"
+                },
+                "trigger": {
+                    "name": "use-item",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+                },
+                "depth": 1
             }
-        }
+        ]
     },
     "exeggutor": {},
     "exeggutor-alola": {}
@@ -372,7 +417,8 @@
                 "trigger": {
                     "name": "use-item",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
-                }
+                },
+                "depth": 1
             }
         ],
         "jolteon": [
@@ -384,7 +430,8 @@
                 "trigger": {
                     "name": "use-item",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
-                }
+                },
+                "depth": 1
             }
         ],
         "flareon": [
@@ -396,7 +443,8 @@
                 "trigger": {
                     "name": "use-item",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
-                }
+                },
+                "depth": 1
             }
         ],
         "espeon": [
@@ -406,7 +454,8 @@
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
                 "min_happiness": 160,
-                "time_of_day": "day"
+                "time_of_day": "day",
+                "depth": 1
             }
         ],
         "umbreon": [
@@ -416,7 +465,8 @@
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
                 "min_happiness": 160,
-                "time_of_day": "night"
+                "time_of_day": "night",
+                "depth": 1
             }
         ],
         "leafeon": [
@@ -428,7 +478,8 @@
                 "location": {
                     "name": "eterna-forest",
                     "url": "https://pokeapi.co/api/v2/location/8/"
-                }
+                },
+                "depth": 1
             },
             {
                 "trigger": {
@@ -438,7 +489,8 @@
                 "location": {
                     "name": "pinwheel-forest",
                     "url": "https://pokeapi.co/api/v2/location/375/"
-                }
+                },
+                "depth": 1
             },
             {
                 "trigger": {
@@ -448,7 +500,8 @@
                 "location": {
                     "name": "kalos-route-20",
                     "url": "https://pokeapi.co/api/v2/location/650/"
-                }
+                },
+                "depth": 1
             },
             {
                 "item": {
@@ -458,7 +511,8 @@
                 "trigger": {
                     "name": "use-item",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
-                }
+                },
+                "depth": 1
             }
         ],
         "glaceon": [
@@ -470,7 +524,8 @@
                 "location": {
                     "name": "sinnoh-route-217",
                     "url": "https://pokeapi.co/api/v2/location/48/"
-                }
+                },
+                "depth": 1
             },
             {
                 "trigger": {
@@ -480,7 +535,8 @@
                 "location": {
                     "name": "twist-mountain",
                     "url": "https://pokeapi.co/api/v2/location/380/"
-                }
+                },
+                "depth": 1
             },
             {
                 "trigger": {
@@ -490,7 +546,8 @@
                 "location": {
                     "name": "frost-cavern",
                     "url": "https://pokeapi.co/api/v2/location/640/"
-                }
+                },
+                "depth": 1
             },
             {
                 "item": {
@@ -500,7 +557,8 @@
                 "trigger": {
                     "name": "use-item",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
-                }
+                },
+                "depth": 1
             }
         ],
         "sylveon": [
@@ -513,7 +571,8 @@
                     "name": "fairy",
                     "url": "https://pokeapi.co/api/v2/type/18/"
                 },
-                "min_affection": 2
+                "min_affection": 2,
+                "depth": 1
             },
             {
                 "trigger": {
@@ -524,7 +583,8 @@
                     "name": "fairy",
                     "url": "https://pokeapi.co/api/v2/type/18/"
                 },
-                "min_happiness": 160
+                "min_happiness": 160,
+                "depth": 1
             }
         ]
     },
@@ -539,21 +599,27 @@
 },
 {
     "cubone": {
-        "marowak-alola": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 28,
-            "time_of_day": "night"
-        },
-        "marowak": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 28
-        }
+        "marowak-alola": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 28,
+                "time_of_day": "night",
+                "depth": 1
+            }
+        ],
+        "marowak": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 28,
+                "depth": 1
+            }
+        ]
     },
     "marowak": {},
     "marowak-alola": {}
@@ -569,7 +635,8 @@
                 "held_item": {
                     "name": "deep-sea-tooth",
                     "url": "https://pokeapi.co/api/v2/item/203/"
-                }
+                },
+                "depth": 1
             }
         ],
         "gorebyss": [
@@ -581,7 +648,8 @@
                 "held_item": {
                     "name": "deep-sea-scale",
                     "url": "https://pokeapi.co/api/v2/item/204/"
-                }
+                },
+                "depth": 1
             }
         ]
     },
@@ -599,7 +667,8 @@
                 "trigger": {
                     "name": "use-item",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
-                }
+                },
+                "depth": 1
             }
         ],
         "ceruledge": [
@@ -611,7 +680,8 @@
                 "trigger": {
                     "name": "use-item",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
-                }
+                },
+                "depth": 1
             }
         ]
     },
@@ -620,45 +690,57 @@
 },
 {
     "slowpoke-galar": {
-        "slowking-galar": {
-            "item": {
-                "name": "galarica-wreath",
-                "url": "https://pokeapi.co/api/v2/item/1643/"
-            },
-            "trigger": {
-                "name": "use-item",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+        "slowking-galar": [
+            {
+                "item": {
+                    "name": "galarica-wreath",
+                    "url": "https://pokeapi.co/api/v2/item/1643/"
+                },
+                "trigger": {
+                    "name": "use-item",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+                },
+                "depth": 1
             }
-        },
-        "slowbro-galar": {
-            "item": {
-                "name": "galarica-cuff",
-                "url": "https://pokeapi.co/api/v2/item/1633/"
-            },
-            "trigger": {
-                "name": "use-item",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+        ],
+        "slowbro-galar": [
+            {
+                "item": {
+                    "name": "galarica-cuff",
+                    "url": "https://pokeapi.co/api/v2/item/1633/"
+                },
+                "trigger": {
+                    "name": "use-item",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+                },
+                "depth": 1
             }
-        }
+        ]
     },
     "slowpoke": {
-        "slowking": {
-            "trigger": {
-                "name": "trade",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/2/"
-            },
-            "held_item": {
-                "name": "kings-rock",
-                "url": "https://pokeapi.co/api/v2/item/198/"
+        "slowking": [
+            {
+                "trigger": {
+                    "name": "trade",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/2/"
+                },
+                "held_item": {
+                    "name": "kings-rock",
+                    "url": "https://pokeapi.co/api/v2/item/198/"
+                },
+                "depth": 1
             }
-        },
-        "slowbro": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 37
-        }
+        ],
+        "slowbro": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 37,
+                "depth": 1
+            }
+        ]
     },
     "slowbro": {},
     "slowbro-galar": {},
@@ -676,7 +758,8 @@
                 "held_item": {
                     "name": "metal-coat",
                     "url": "https://pokeapi.co/api/v2/item/210/"
-                }
+                },
+                "depth": 1
             }
         ],
         "kleavor": [
@@ -688,7 +771,8 @@
                 "trigger": {
                     "name": "use-item",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
-                }
+                },
+                "depth": 1
             }
         ]
     },
@@ -697,30 +781,39 @@
 },
 {
     "rockruff": {
-        "lycanroc-dusk": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 25,
-            "time_of_day": "dusk"
-        },
-        "lycanroc-midnight": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 25,
-            "time_of_day": "night"
-        },
-        "lycanroc-midday": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 25,
-            "time_of_day": "day"
-        }
+        "lycanroc-dusk": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 25,
+                "time_of_day": "dusk",
+                "depth": 1
+            }
+        ],
+        "lycanroc-midnight": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 25,
+                "time_of_day": "night",
+                "depth": 1
+            }
+        ],
+        "lycanroc-midday": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 25,
+                "time_of_day": "day",
+                "depth": 1
+            }
+        ]
     },
     "lycanroc-midday": {},
     "lycanroc-midnight": {},
@@ -734,7 +827,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 25
+                "min_level": 25,
+                "depth": 1
             }
         ]
     },
@@ -748,7 +842,8 @@
                 "trigger": {
                     "name": "use-item",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
-                }
+                },
+                "depth": 2
             }
         ],
         "politoed": [
@@ -760,7 +855,8 @@
                 "held_item": {
                     "name": "kings-rock",
                     "url": "https://pokeapi.co/api/v2/item/198/"
-                }
+                },
+                "depth": 2
             }
         ]
     },
@@ -769,35 +865,44 @@
 },
 {
     "pichu": {
-        "pikachu": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_happiness": 220
-        }
+        "pikachu": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_happiness": 220,
+                "depth": 1
+            }
+        ]
     },
     "pikachu": {
-        "raichu-alola": {
-            "item": {
-                "name": "thunder-stone",
-                "url": "https://pokeapi.co/api/v2/item/83/"
-            },
-            "trigger": {
-                "name": "use-item",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+        "raichu-alola": [
+            {
+                "item": {
+                    "name": "thunder-stone",
+                    "url": "https://pokeapi.co/api/v2/item/83/"
+                },
+                "trigger": {
+                    "name": "use-item",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+                },
+                "depth": 2
             }
-        },
-        "raichu": {
-            "item": {
-                "name": "thunder-stone",
-                "url": "https://pokeapi.co/api/v2/item/83/"
-            },
-            "trigger": {
-                "name": "use-item",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+        ],
+        "raichu": [
+            {
+                "item": {
+                    "name": "thunder-stone",
+                    "url": "https://pokeapi.co/api/v2/item/83/"
+                },
+                "trigger": {
+                    "name": "use-item",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+                },
+                "depth": 2
             }
-        }
+        ]
     },
     "raichu": {},
     "raichu-alola": {}
@@ -810,7 +915,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 20
+                "min_level": 20,
+                "depth": 1
             }
         ],
         "shedinja": [
@@ -818,7 +924,8 @@
                 "trigger": {
                     "name": "shed",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/4/"
-                }
+                },
+                "depth": 1
             }
         ]
     },
@@ -827,81 +934,94 @@
 },
 {
     "mime-jr": {
-        "mr-mime-galar": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "known_move": {
-                "name": "mimic",
-                "url": "https://pokeapi.co/api/v2/move/102/"
+        "mr-mime-galar": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "known_move": {
+                    "name": "mimic",
+                    "url": "https://pokeapi.co/api/v2/move/102/"
+                },
+                "depth": 1
             }
-        },
-        "mr-mime": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "known_move": {
-                "name": "mimic",
-                "url": "https://pokeapi.co/api/v2/move/102/"
+        ],
+        "mr-mime": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "known_move": {
+                    "name": "mimic",
+                    "url": "https://pokeapi.co/api/v2/move/102/"
+                },
+                "depth": 1
             }
-        }
+        ]
     },
     "mr-mime-galar": {
-        "mr-rime": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 42
-        }
+        "mr-rime": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 42,
+                "depth": 2
+            }
+        ]
     },
-    "mr-mime": {
-        "mr-rime": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 42
-        }
-    },
+    "mr-mime": {},
     "mr-rime": {}
 },
 {
     "kubfu": {
-        "urshifu-rapid-strike": {
-            "trigger": {
-                "name": "tower-of-waters",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/7/"
+        "urshifu-rapid-strike": [
+            {
+                "trigger": {
+                    "name": "tower-of-waters",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/7/"
+                },
+                "depth": 1
             }
-        },
-        "urshifu-single-strike": {
-            "trigger": {
-                "name": "tower-of-darkness",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/6/"
+        ],
+        "urshifu-single-strike": [
+            {
+                "trigger": {
+                    "name": "tower-of-darkness",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/6/"
+                },
+                "depth": 1
             }
-        }
+        ]
     },
     "urshifu-single-strike": {},
     "urshifu-rapid-strike": {}
 },
 {
     "koffing": {
-        "weezing-galar": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 35
-        },
-        "weezing": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 35
-        }
+        "weezing-galar": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 35,
+                "depth": 1
+            }
+        ],
+        "weezing": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 35,
+                "depth": 1
+            }
+        ]
     },
     "weezing": {},
     "weezing-galar": {}
@@ -914,7 +1034,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 43
+                "min_level": 43,
+                "depth": 1
             }
         ]
     },
@@ -925,7 +1046,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 53
+                "min_level": 53,
+                "depth": 2
             }
         ],
         "lunala": [
@@ -934,7 +1056,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 53
+                "min_level": 53,
+                "depth": 2
             }
         ]
     },
@@ -943,38 +1066,50 @@
 },
 {
     "burmy": {
-        "mothim": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "gender": "Male",
-            "min_level": 20
-        },
-        "wormadam-trash": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "gender": "Female",
-            "min_level": 20
-        },
-        "wormadam-sandy": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "gender": "Female",
-            "min_level": 20
-        },
-        "wormadam-plant": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "gender": "Female",
-            "min_level": 20
-        }
+        "mothim": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "gender": "Male",
+                "min_level": 20,
+                "depth": 1
+            }
+        ],
+        "wormadam-trash": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "gender": "Female",
+                "min_level": 20,
+                "depth": 1
+            }
+        ],
+        "wormadam-sandy": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "gender": "Female",
+                "min_level": 20,
+                "depth": 1
+            }
+        ],
+        "wormadam-plant": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "gender": "Female",
+                "min_level": 20,
+                "depth": 1
+            }
+        ]
     },
     "wormadam-plant": {},
     "wormadam-sandy": {},
@@ -992,7 +1127,8 @@
                 "trigger": {
                     "name": "use-item",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
-                }
+                },
+                "depth": 1
             }
         ],
         "appletun": [
@@ -1004,7 +1140,8 @@
                 "trigger": {
                     "name": "use-item",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
-                }
+                },
+                "depth": 1
             }
         ],
         "dipplin": []
@@ -1015,370 +1152,472 @@
 },
 {
     "dunsparce": {
-        "dudunsparce-three-segment": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "known_move": {
-                "name": "hyper-drill",
-                "url": "https://pokeapi.co/api/v2/move/887/"
+        "dudunsparce-three-segment": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "known_move": {
+                    "name": "hyper-drill",
+                    "url": "https://pokeapi.co/api/v2/move/887/"
+                },
+                "depth": 1
             }
-        },
-        "dudunsparce": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "known_move": {
-                "name": "hyper-drill",
-                "url": "https://pokeapi.co/api/v2/move/887/"
+        ],
+        "dudunsparce": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "known_move": {
+                    "name": "hyper-drill",
+                    "url": "https://pokeapi.co/api/v2/move/887/"
+                },
+                "depth": 1
             }
-        }
+        ]
     },
     "dudunsparce": {},
     "dudunsparce-three-segment": {}
 },
 {
     "tandemaus": {
-        "maushold-family-of-three": {
-            "trigger": {
-                "name": "other",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/10/"
-            },
-            "min_level": 25
-        },
-        "maushold": {
-            "trigger": {
-                "name": "other",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/10/"
-            },
-            "min_level": 25
-        }
+        "maushold-family-of-three": [
+            {
+                "trigger": {
+                    "name": "other",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/10/"
+                },
+                "min_level": 25,
+                "depth": 1
+            }
+        ],
+        "maushold": [
+            {
+                "trigger": {
+                    "name": "other",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/10/"
+                },
+                "min_level": 25,
+                "depth": 1
+            }
+        ]
     },
     "maushold": {},
     "maushold-family-of-three": {}
 },
 {
     "cyndaquil": {
-        "quilava": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 14
-        }
+        "quilava": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 14,
+                "depth": 1
+            }
+        ]
     },
     "quilava": {
-        "typhlosion-hisui": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 36
-        },
-        "typhlosion": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 36
-        }
+        "typhlosion-hisui": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 36,
+                "depth": 2
+            }
+        ],
+        "typhlosion": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 36,
+                "depth": 2
+            }
+        ]
     },
     "typhlosion": {},
     "typhlosion-hisui": {}
 },
 {
     "oshawott": {
-        "dewott": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 17
-        }
+        "dewott": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 17,
+                "depth": 1
+            }
+        ]
     },
     "dewott": {
-        "samurott-hisui": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 36
-        },
-        "samurott": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 36
-        }
+        "samurott-hisui": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 36,
+                "depth": 2
+            }
+        ],
+        "samurott": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 36,
+                "depth": 2
+            }
+        ]
     },
     "samurott": {},
     "samurott-hisui": {}
 },
 {
     "petilil": {
-        "lilligant-hisui": {
-            "item": {
-                "name": "sun-stone",
-                "url": "https://pokeapi.co/api/v2/item/80/"
-            },
-            "trigger": {
-                "name": "use-item",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+        "lilligant-hisui": [
+            {
+                "item": {
+                    "name": "sun-stone",
+                    "url": "https://pokeapi.co/api/v2/item/80/"
+                },
+                "trigger": {
+                    "name": "use-item",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+                },
+                "depth": 1
             }
-        },
-        "lilligant": {
-            "item": {
-                "name": "sun-stone",
-                "url": "https://pokeapi.co/api/v2/item/80/"
-            },
-            "trigger": {
-                "name": "use-item",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+        ],
+        "lilligant": [
+            {
+                "item": {
+                    "name": "sun-stone",
+                    "url": "https://pokeapi.co/api/v2/item/80/"
+                },
+                "trigger": {
+                    "name": "use-item",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+                },
+                "depth": 1
             }
-        }
+        ]
     },
     "lilligant": {},
     "lilligant-hisui": {}
 },
 {
     "rufflet": {
-        "braviary-hisui": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 54
-        },
-        "braviary": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 54
-        }
+        "braviary-hisui": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 54,
+                "depth": 1
+            }
+        ],
+        "braviary": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 54,
+                "depth": 1
+            }
+        ]
     },
     "braviary": {},
     "braviary-hisui": {}
 },
 {
     "goomy": {
-        "sliggoo-hisui": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 40
-        },
-        "sliggoo": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 40
-        }
+        "sliggoo-hisui": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 40,
+                "depth": 1
+            }
+        ],
+        "sliggoo": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 40,
+                "depth": 1
+            }
+        ]
     },
     "sliggoo-hisui": {
-        "goodra-hisui": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 50,
-            "needs_overworld_rain": true
-        }
+        "goodra-hisui": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 50,
+                "needs_overworld_rain": true,
+                "depth": 2
+            }
+        ]
     },
     "sliggoo": {
-        "goodra": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 50,
-            "needs_overworld_rain": true
-        }
+        "goodra": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 50,
+                "needs_overworld_rain": true,
+                "depth": 2
+            }
+        ]
     },
     "goodra": {},
     "goodra-hisui": {}
 },
 {
     "bergmite": {
-        "avalugg-hisui": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 37
-        },
-        "avalugg": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 37
-        }
+        "avalugg-hisui": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 37,
+                "depth": 1
+            }
+        ],
+        "avalugg": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 37,
+                "depth": 1
+            }
+        ]
     },
     "avalugg": {},
     "avalugg-hisui": {}
 },
 {
     "rowlet": {
-        "dartrix": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 17
-        }
+        "dartrix": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 17,
+                "depth": 1
+            }
+        ]
     },
     "dartrix": {
-        "decidueye-hisui": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 34
-        },
-        "decidueye": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 34
-        }
+        "decidueye-hisui": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 34,
+                "depth": 2
+            }
+        ],
+        "decidueye": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 34,
+                "depth": 2
+            }
+        ]
     },
     "decidueye": {},
     "decidueye-hisui": {}
 },
 {
     "vulpix-alola": {
-        "ninetales-alola": {
-            "item": {
-                "name": "ice-stone",
-                "url": "https://pokeapi.co/api/v2/item/885/"
-            },
-            "trigger": {
-                "name": "use-item",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+        "ninetales-alola": [
+            {
+                "item": {
+                    "name": "ice-stone",
+                    "url": "https://pokeapi.co/api/v2/item/885/"
+                },
+                "trigger": {
+                    "name": "use-item",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+                },
+                "depth": 1
             }
-        }
+        ]
     },
     "vulpix": {
-        "ninetales": {
-            "item": {
-                "name": "fire-stone",
-                "url": "https://pokeapi.co/api/v2/item/82/"
-            },
-            "trigger": {
-                "name": "use-item",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+        "ninetales": [
+            {
+                "item": {
+                    "name": "fire-stone",
+                    "url": "https://pokeapi.co/api/v2/item/82/"
+                },
+                "trigger": {
+                    "name": "use-item",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+                },
+                "depth": 1
             }
-        }
+        ]
     },
     "ninetales": {},
     "ninetales-alola": {}
 },
 {
     "sandshrew-alola": {
-        "sandslash-alola": {
-            "item": {
-                "name": "ice-stone",
-                "url": "https://pokeapi.co/api/v2/item/885/"
-            },
-            "trigger": {
-                "name": "use-item",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+        "sandslash-alola": [
+            {
+                "item": {
+                    "name": "ice-stone",
+                    "url": "https://pokeapi.co/api/v2/item/885/"
+                },
+                "trigger": {
+                    "name": "use-item",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+                },
+                "depth": 1
             }
-        }
+        ]
     },
     "sandshrew": {
-        "sandslash": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 22
-        }
+        "sandslash": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 22,
+                "depth": 1
+            }
+        ]
     },
     "sandslash": {},
     "sandslash-alola": {}
 },
 {
     "diglett-alola": {
-        "dugtrio-alola": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 26
-        }
+        "dugtrio-alola": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 26,
+                "depth": 1
+            }
+        ]
     },
     "diglett": {
-        "dugtrio": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 26
-        }
+        "dugtrio": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 26,
+                "depth": 1
+            }
+        ]
     },
     "dugtrio": {},
     "dugtrio-alola": {}
 },
 {
     "darumaka-galar": {
-        "darmanitan-galar-standard": {
-            "item": {
-                "name": "ice-stone",
-                "url": "https://pokeapi.co/api/v2/item/885/"
-            },
-            "trigger": {
-                "name": "use-item",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+        "darmanitan-galar-standard": [
+            {
+                "item": {
+                    "name": "ice-stone",
+                    "url": "https://pokeapi.co/api/v2/item/885/"
+                },
+                "trigger": {
+                    "name": "use-item",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+                },
+                "depth": 1
             }
-        }
+        ]
     },
     "darumaka": {
-        "darmanitan-standard": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 35
-        }
+        "darmanitan-standard": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 35,
+                "depth": 1
+            }
+        ]
     },
     "darmanitan-standard": {},
     "darmanitan-galar-standard": {}
 },
 {
     "meowth-galar": {
-        "perrserker": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 28
-        }
+        "perrserker": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 28,
+                "depth": 1
+            }
+        ]
     },
     "meowth-alola": {
-        "persian-alola": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_happiness": 160
-        }
+        "persian-alola": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_happiness": 160,
+                "depth": 1
+            }
+        ]
     },
     "meowth": {
-        "persian": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 28
-        }
+        "persian": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 28,
+                "depth": 1
+            }
+        ]
     },
     "persian": {},
     "persian-alola": {},
@@ -1386,151 +1625,183 @@
 },
 {
     "growlithe-hisui": {
-        "arcanine-hisui": {
-            "item": {
-                "name": "fire-stone",
-                "url": "https://pokeapi.co/api/v2/item/82/"
-            },
-            "trigger": {
-                "name": "use-item",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+        "arcanine-hisui": [
+            {
+                "item": {
+                    "name": "fire-stone",
+                    "url": "https://pokeapi.co/api/v2/item/82/"
+                },
+                "trigger": {
+                    "name": "use-item",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+                },
+                "depth": 1
             }
-        }
+        ]
     },
     "growlithe": {
-        "arcanine": {
-            "item": {
-                "name": "fire-stone",
-                "url": "https://pokeapi.co/api/v2/item/82/"
-            },
-            "trigger": {
-                "name": "use-item",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+        "arcanine": [
+            {
+                "item": {
+                    "name": "fire-stone",
+                    "url": "https://pokeapi.co/api/v2/item/82/"
+                },
+                "trigger": {
+                    "name": "use-item",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+                },
+                "depth": 1
             }
-        }
+        ]
     },
     "arcanine": {},
     "arcanine-hisui": {}
 },
 {
     "geodude-alola": {
-        "graveler-alola": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 25
-        }
+        "graveler-alola": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 25,
+                "depth": 1
+            }
+        ]
     },
     "geodude": {
-        "graveler": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 25
-        }
+        "graveler": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 25,
+                "depth": 1
+            }
+        ]
     },
     "graveler-alola": {
-        "golem-alola": {
-            "trigger": {
-                "name": "trade",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/2/"
+        "golem-alola": [
+            {
+                "trigger": {
+                    "name": "trade",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/2/"
+                },
+                "depth": 2
             }
-        }
+        ]
     },
     "graveler": {
-        "golem": {
-            "trigger": {
-                "name": "trade",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/2/"
+        "golem": [
+            {
+                "trigger": {
+                    "name": "trade",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/2/"
+                },
+                "depth": 2
             }
-        }
+        ]
     },
     "golem": {},
     "golem-alola": {}
 },
 {
     "ponyta-galar": {
-        "rapidash-galar": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 40
-        }
+        "rapidash-galar": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 40,
+                "depth": 1
+            }
+        ]
     },
     "ponyta": {
-        "rapidash": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 40
-        }
+        "rapidash": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 40,
+                "depth": 1
+            }
+        ]
     },
     "rapidash": {},
     "rapidash-galar": {}
 },
 {
     "farfetchd-galar": {
-        "sirfetchd": {
-            "trigger": {
-                "name": "three-critical-hits",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/8/"
+        "sirfetchd": [
+            {
+                "trigger": {
+                    "name": "three-critical-hits",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/8/"
+                },
+                "depth": 1
             }
-        }
+        ]
     },
-    "farfetchd": {
-        "sirfetchd": {
-            "trigger": {
-                "name": "three-critical-hits",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/8/"
-            }
-        }
-    },
+    "farfetchd": {},
     "sirfetchd": {}
 },
 {
     "grimer-alola": {
-        "muk-alola": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 38
-        }
+        "muk-alola": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 38,
+                "depth": 1
+            }
+        ]
     },
     "grimer": {
-        "muk": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 38
-        }
+        "muk": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 38,
+                "depth": 1
+            }
+        ]
     },
     "muk": {},
     "muk-alola": {}
 },
 {
     "voltorb-hisui": {
-        "electrode-hisui": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 30
-        }
+        "electrode-hisui": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 30,
+                "depth": 1
+            }
+        ]
     },
     "voltorb": {
-        "electrode": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 30
-        }
+        "electrode": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 30,
+                "depth": 1
+            }
+        ]
     },
     "electrode": {},
     "electrode-hisui": {}
@@ -1555,157 +1826,162 @@
 },
 {
     "qwilfish-hisui": {
-        "overqwil": {
-            "trigger": {
-                "name": "strong-style-move",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/12/"
-            },
-            "known_move": {
-                "name": "barb-barrage",
-                "url": "https://pokeapi.co/api/v2/move/839/"
+        "overqwil": [
+            {
+                "trigger": {
+                    "name": "strong-style-move",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/12/"
+                },
+                "known_move": {
+                    "name": "barb-barrage",
+                    "url": "https://pokeapi.co/api/v2/move/839/"
+                },
+                "depth": 1
             }
-        }
+        ]
     },
-    "qwilfish": {
-        "overqwil": {
-            "trigger": {
-                "name": "strong-style-move",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/12/"
-            },
-            "known_move": {
-                "name": "barb-barrage",
-                "url": "https://pokeapi.co/api/v2/move/839/"
-            }
-        }
-    },
+    "qwilfish": {},
     "overqwil": {}
 },
 {
     "corsola-galar": {
-        "cursola": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 38
-        }
+        "cursola": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 38,
+                "depth": 1
+            }
+        ]
     },
-    "corsola": {
-        "cursola": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 38
-        }
-    },
+    "corsola": {},
     "cursola": {}
 },
 {
     "zigzagoon-galar": {
-        "linoone-galar": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 20
-        }
+        "linoone-galar": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 20,
+                "depth": 1
+            }
+        ]
     },
     "zigzagoon": {
-        "linoone": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 20
-        }
+        "linoone": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 20,
+                "depth": 1
+            }
+        ]
     },
     "linoone-galar": {
-        "obstagoon": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 35,
-            "time_of_day": "night"
-        }
+        "obstagoon": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 35,
+                "time_of_day": "night",
+                "depth": 2
+            }
+        ]
     },
-    "linoone": {
-        "obstagoon": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 35,
-            "time_of_day": "night"
-        }
-    },
+    "linoone": {},
     "obstagoon": {}
 },
 {
     "darumaka-galar": {
-        "darmanitan-galar-standard": {
-            "item": {
-                "name": "ice-stone",
-                "url": "https://pokeapi.co/api/v2/item/885/"
-            },
-            "trigger": {
-                "name": "use-item",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+        "darmanitan-galar-standard": [
+            {
+                "item": {
+                    "name": "ice-stone",
+                    "url": "https://pokeapi.co/api/v2/item/885/"
+                },
+                "trigger": {
+                    "name": "use-item",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+                },
+                "depth": 1
             }
-        }
+        ]
     },
     "darumaka": {
-        "darmanitan-standard": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 35
-        }
+        "darmanitan-standard": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 35,
+                "depth": 1
+            }
+        ]
     },
     "darmanitan-standard": {},
     "darmanitan-galar-standard": {}
 },
 {
     "yamask-galar": {
-        "runerigus": {
-            "trigger": {
-                "name": "take-damage",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/9/"
+        "runerigus": [
+            {
+                "trigger": {
+                    "name": "take-damage",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/9/"
+                },
+                "depth": 1
             }
-        }
+        ]
     },
     "yamask": {
-        "cofagrigus": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 34
-        }
+        "cofagrigus": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 34,
+                "depth": 1
+            }
+        ]
     },
     "cofagrigus": {},
     "runerigus": {}
 },
 {
     "zorua-hisui": {
-        "zoroark-hisui": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 30
-        }
+        "zoroark-hisui": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 30,
+                "depth": 1
+            }
+        ]
     },
     "zorua": {
-        "zoroark": {
-            "trigger": {
-                "name": "level-up",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
-            },
-            "min_level": 30
-        }
+        "zoroark": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 30,
+                "depth": 1
+            }
+        ]
     },
     "zoroark": {},
     "zoroark-hisui": {}
@@ -1725,7 +2001,8 @@
                 "known_move": {
                     "name": "psyshield-bash",
                     "url": "https://pokeapi.co/api/v2/move/828/"
-                }
+                },
+                "depth": 1
             }
         ]
     },
@@ -1739,7 +2016,8 @@
                     "name": "level-up",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
                 },
-                "min_level": 30
+                "min_level": 30,
+                "depth": 1
             }
         ]
     },
@@ -1754,7 +2032,8 @@
                     "name": "use-item",
                     "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
                 },
-                "time_of_day": "full-moon"
+                "time_of_day": "full-moon",
+                "depth": 2
             }
         ]
     },
@@ -1762,28 +2041,17 @@
 },
 {
     "basculin-white-striped": {
-        "basculegion": {
-            "trigger": {
-                "name": "recoil-damage",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/13/"
+        "basculegion": [
+            {
+                "trigger": {
+                    "name": "recoil-damage",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/13/"
+                },
+                "depth": 1
             }
-        }
+        ]
     },
-    "basculin-blue-striped": {
-        "basculegion": {
-            "trigger": {
-                "name": "recoil-damage",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/13/"
-            }
-        }
-    },
-    "basculin-red-striped": {
-        "basculegion": {
-            "trigger": {
-                "name": "recoil-damage",
-                "url": "https://pokeapi.co/api/v2/evolution-trigger/13/"
-            }
-        }
-    },
+    "basculin-red-striped": {},
+    "basculin-blue-striped": {},
     "basculegion": {}
 }]

@@ -1,4 +1,5 @@
 import asyncio
+import collections
 import itertools
 import json
 import typing as t
@@ -42,18 +43,30 @@ def get_evolutions(data: EvolutionChain) -> t.Tuple[DATA, DATA]:
     evolution_dict = {}
     details_dict = {}
 
-    def process_evolution_chain(chain: ChainLink) -> None:
+    def process_evolution_chain(chain: ChainLink, n: int = 0) -> None:
         if chain.evolves_to:
             evolution_dict[chain.species.name] = [evo.species.name for evo in chain.evolves_to]
-            details_dict[chain.species.name] = [details.simplified_details for details in chain.evolution_details]
+            details_dict[chain.species.name] = [
+                details.simplified_details | {"depth": n} for details in chain.evolution_details  # type: ignore
+            ]
             for evo in chain.evolves_to:
-                process_evolution_chain(evo)
+                process_evolution_chain(evo, n + 1)
         else:
             evolution_dict[chain.species.name] = []
-            details_dict[chain.species.name] = [details.simplified_details for details in chain.evolution_details]
+            details_dict[chain.species.name] = [
+                details.simplified_details | {"depth": n} for details in chain.evolution_details  # type: ignore
+            ]
 
     process_evolution_chain(data.chain)
     return evolution_dict, details_dict
+
+
+def stringify_dict(data: t.List[t.Dict[str, t.Any]]) -> str:
+    common = collections.defaultdict(set)
+    for i in data:
+        for k, v in i.items():
+            common[k].add(v["name"] if isinstance(v, dict) else v)
+    return "".join([f"{k}: {', '.join(v)}\n" if len(v) > 1 else f"{k}: {v.pop()}\n" for k, v in common.items()])
 
 
 def converge_data(evolution_dict: DATA, details_dict: DATA, variety_dict: t.Optional[DATA]) -> DATA:
@@ -64,17 +77,12 @@ def converge_data(evolution_dict: DATA, details_dict: DATA, variety_dict: t.Opti
     for k, v in evolution_dict.items():
         varieties = variety_dict.get(k, [k])
         details = [
-            {j: details_dict.get(i, [])[(lx % n) - 1 if (lx := len(details_dict.get(i, []))) == 1 else n - 1]}
+            {j: [details_dict.get(i, [])[(lx % n) - 1 if (lx := len(details_dict.get(i, []))) == 1 else n - 1]]}
             for i in v
             for n, j in enumerate(variety_dict.get(i, [i]), start=1)
         ]
-        zipped = (
-            zip(itertools.cycle(varieties[::-1]), details[::-1])
-            if len(details) > len(varieties)
-            else zip(varieties[::-1], itertools.cycle(details[::-1]))
-        )
         # [::-1] specifically for mr. rime since [mr. mime, galarian mr. mime], [mr. rime] is the order
-        for k, v in zipped:
+        for k, v in zip(itertools.cycle(varieties[::-1]), details[::-1]):
             final.setdefault(k, {}).update(v)
         keys.extend(varieties)
     for k in keys:
@@ -161,7 +169,7 @@ async def main() -> None:
             if forms:
                 variety_data[k] = [default] + forms
         strings.append(json.dumps(converge_data(evo_data, detail_data, variety_data), indent=4))
-    with open("examples/evolutions.json", "w") as f:
+    with open("evolutions.json", "w") as f:
         f.write("[" + ",\n".join(strings) + "]")
     await client.close()
 
