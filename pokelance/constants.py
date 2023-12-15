@@ -297,4 +297,4 @@ class ExtensionEnum(BaseEnum):
 
     @classmethod
     def get_categories(cls, name: str) -> t.List[str]:
-        return [i.replace("-", "_") for i in getattr(cls[name].value, "categories", [])]
+        return getattr(cls[name].value, "categories", [])

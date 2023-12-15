@@ -225,8 +225,9 @@ class PokeLance:
         if isinstance(ext, str) and (ext := str(ext).title()) not in ExtensionEnum.__members__:
             raise ValueError(f"Invalid extension: {ext}")
         categories = ExtensionEnum.get_categories(ext) if isinstance(ext, str) else ext.categories  # type: ignore
-        if (category := category.lower().replace("-", "_")) not in categories:
-            raise ValueError(f"Invalid category: {category}")
+        if (category := category.lower().replace("_", "-")) not in categories:
+            raise ValueError(f"Invalid category: {category}, valid categories: {categories}")
+        category = category.replace("-", "_")
         ext_ = getattr(self, ext.lower()) if isinstance(ext, str) else getattr(self, ext.name.lower())
         get_, fetch_ = getattr(ext_, f"get_{category}"), getattr(ext_, f"fetch_{category}")
         return t.cast(BaseType, get_(id_) or await fetch_(id_))
