@@ -110,7 +110,6 @@ nav:
               - Machine: api_reference/models/abstract/machine.md
               - Move: api_reference/models/abstract/move.md
               - Pokemon: api_reference/models/abstract/pokemon.md
-              - Showdown: api_reference/models/abstract/showdown.md
   - Guide:
       - Basic Usage: guide/basic_usage.md
       - Discord Bot: guide/discord_bot.md

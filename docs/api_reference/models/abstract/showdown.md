@@ -1,1 +1,0 @@
-::: pokelance.models.abstract.showdown
