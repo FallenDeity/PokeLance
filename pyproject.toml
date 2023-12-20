@@ -29,6 +29,7 @@ mypy = ">=0.991,<1.6"
 pipwin = "^0.5.2"
 pytest = "^7.4.3"
 pytest-asyncio = "^0.23.2"
+auto-changelog = "^0.6.0"
 
 [build-system]
 requires = ["poetry-core"]
