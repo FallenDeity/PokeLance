@@ -4,6 +4,8 @@
 
 #### Docs
 
+-  (changelogs): Custom changelog workflow
+-  (changelogs): Custom changelog workflow
 -  (remove): Remove old showdown model
 #### Others
 
@@ -12,7 +14,7 @@
 -  update release workflow to use ncipollo
 -  (release): Release Workflow
 
-Full set of changes: [v0.2.4 to 1cdde82](https://github.com/FallenDeity/PokeLance/compare/v0.2.4...1cdde82)
+Full set of changes: [v0.2.4 to 94e2d59](https://github.com/FallenDeity/PokeLance/compare/v0.2.4...94e2d59)
 
 ## v0.2.4 - 2023-12-20
 

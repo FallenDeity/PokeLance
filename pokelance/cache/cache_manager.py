@@ -96,7 +96,7 @@ class Base:
             The client to set.
         """
         obj: attrs.Attribute[BaseCache[t.Any, t.Any]]
-        for obj in self.__attrs_attrs__:  # type: ignore
+        for obj in self.__attrs_attrs__:
             if isinstance(obj.default, BaseCache) and obj.default is not None:
                 obj.default._client = client
 
@@ -110,7 +110,7 @@ class Base:
         """
         self.max_size = max_size
         obj: attrs.Attribute[BaseCache[t.Any, t.Any]]
-        for obj in self.__attrs_attrs__:  # type: ignore
+        for obj in self.__attrs_attrs__:
             if isinstance(obj.default, BaseCache) and obj.default is not None:
                 obj.default._max_size = max_size
 
@@ -432,7 +432,7 @@ class Cache:
 
     def __attrs_post_init__(self) -> None:
         obj: attrs.Attribute[Base]
-        for obj in self.__attrs_attrs__:  # type: ignore
+        for obj in self.__attrs_attrs__:
             if isinstance(obj.default, Base) and obj.default:
                 obj.default.set_size(self.max_size)
                 obj.default.set_client(self.client)
@@ -447,7 +447,7 @@ class Cache:
         """
         self.max_size = max_size
         obj: attrs.Attribute[Base]
-        for obj in self.__attrs_attrs__:  # type: ignore
+        for obj in self.__attrs_attrs__:
             if isinstance(obj.default, Base) and obj.default is not None:
                 obj.default.set_size(max_size)
 
