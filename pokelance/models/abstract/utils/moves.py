@@ -33,6 +33,7 @@ class ContestComboDetail(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ContestComboDetail":
         return cls(
+            raw=payload,
             use_before=[NamedResource.from_payload(i or {}) for i in (payload.get("use_before", []) or [])],
             use_after=[NamedResource.from_payload(i or {}) for i in (payload.get("use_after", []) or [])],
         )
@@ -56,6 +57,7 @@ class ContestComboSet(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ContestComboSet":
         return cls(
+            raw=payload,
             normal=ContestComboDetail.from_payload(payload.get("normal", {}) or {}),
             super_=ContestComboDetail.from_payload(payload.get("super", {}) or {}),
         )
@@ -82,6 +84,7 @@ class MoveFlavorText(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveFlavorText":
         return cls(
+            raw=payload,
             flavor_text=payload.get("flavor_text", ""),
             language=NamedResource.from_payload(payload.get("language", {}) or {}),
             version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
@@ -136,6 +139,7 @@ class MoveMetaData(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveMetaData":
         return cls(
+            raw=payload,
             ailment=NamedResource.from_payload(payload.get("ailment", {}) or {}),
             category=NamedResource.from_payload(payload.get("category", {}) or {}),
             min_hits=payload.get("min_hits", 0) or 1,
@@ -159,6 +163,7 @@ class MoveStatChange(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveStatChange":
         return cls(
+            raw=payload,
             change=payload.get("change", 0),
             stat=NamedResource.from_payload(payload.get("stat", {}) or {}),
         )
@@ -177,6 +182,7 @@ class PastMoveStatValues(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PastMoveStatValues":
         return cls(
+            raw=payload,
             accuracy=payload.get("accuracy", 0),
             effect_chance=payload.get("effect_chance", 0),
             power=payload.get("power", 0),

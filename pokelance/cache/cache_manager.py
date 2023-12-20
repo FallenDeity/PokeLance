@@ -54,6 +54,10 @@ from .cache import (
     TypeCache,
 )
 
+if t.TYPE_CHECKING:
+    from pokelance import PokeLance
+
+
 __all__: t.Tuple[str, ...] = (
     "Cache",
     "Base",
@@ -82,6 +86,19 @@ class Base:
     """
 
     max_size: int
+
+    def set_client(self, client: "PokeLance") -> None:
+        """Set the client for the cache.
+
+        Parameters
+        ----------
+        client: pokelance.PokeLance
+            The client to set.
+        """
+        obj: attrs.Attribute[BaseCache[t.Any, t.Any]]
+        for obj in self.__attrs_attrs__:  # type: ignore
+            if isinstance(obj.default, BaseCache) and obj.default is not None:
+                obj.default._client = client
 
     def set_size(self, max_size: int = 100) -> None:
         """Set the maximum cache size.
@@ -374,6 +391,8 @@ class Cache:
 
     Attributes
     ----------
+    client: PokeLance
+        The pokelance client.
     max_size: int
         The maximum cache size.
     berry: Berry
@@ -398,6 +417,7 @@ class Cache:
         The pokemon cache.
     """
 
+    client: "PokeLance"
     max_size: int = 100
     berry: Berry = attrs.field(default=Berry(max_size=max_size))
     contest: Contest = attrs.field(default=Contest(max_size=max_size))
@@ -413,8 +433,23 @@ class Cache:
     def __attrs_post_init__(self) -> None:
         obj: attrs.Attribute[Base]
         for obj in self.__attrs_attrs__:  # type: ignore
-            if isinstance(obj.default, Base) and obj.default and obj.default.max_size != self.max_size:
+            if isinstance(obj.default, Base) and obj.default:
                 obj.default.set_size(self.max_size)
+                obj.default.set_client(self.client)
+
+    def set_size(self, max_size: int = 100) -> None:
+        """Set the maximum cache size.
+
+        Parameters
+        ----------
+        max_size: int
+            The maximum cache size.
+        """
+        self.max_size = max_size
+        obj: attrs.Attribute[Base]
+        for obj in self.__attrs_attrs__:  # type: ignore
+            if isinstance(obj.default, Base) and obj.default is not None:
+                obj.default.set_size(max_size)
 
     def load_documents(self, category: str, _type: str, data: t.List[t.Dict[str, str]]) -> None:
         """Loads the endpoint data into the cache.

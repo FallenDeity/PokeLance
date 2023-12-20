@@ -31,6 +31,7 @@ class EncounterVersionDetails(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EncounterVersionDetails":
         return cls(
+            raw=payload,
             rate=payload.get("rate", 0),
             version=NamedResource.from_payload(payload.get("version", {}) or {}),
         )
@@ -54,6 +55,7 @@ class EncounterMethodRate(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EncounterMethodRate":
         return cls(
+            raw=payload,
             encounter_method=NamedResource.from_payload(payload.get("encounter_method", {}) or {}),
             version_details=[EncounterVersionDetails.from_payload(i) for i in payload.get("version_details", [])],
         )
@@ -77,6 +79,7 @@ class PokemonEncounter(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonEncounter":
         return cls(
+            raw=payload,
             pokemon=NamedResource.from_payload(payload.get("pokemon", {}) or {}),
             version_details=[EncounterVersionDetails.from_payload(i) for i in payload.get("version_details", [])],
         )
@@ -103,6 +106,7 @@ class PalParkEncounterSpecies(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PalParkEncounterSpecies":
         return cls(
+            raw=payload,
             base_score=payload.get("base_score", 0),
             rate=payload.get("rate", 0),
             pokemon_species=NamedResource.from_payload(payload.get("pokemon_species", {}) or {}),

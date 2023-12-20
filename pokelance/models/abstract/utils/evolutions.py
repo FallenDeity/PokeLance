@@ -86,6 +86,7 @@ class EvolutionDetail(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EvolutionDetail":
         return cls(
+            raw=payload,
             item=NamedResource.from_payload(payload.get("item", {}) or {}),
             trigger=NamedResource.from_payload(payload.get("trigger", {}) or {}),
             gender=GENDER_MAP.get(payload.get("gender", 0), ""),
@@ -131,6 +132,7 @@ class ChainLink(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ChainLink":
         return cls(
+            raw=payload,
             is_baby=payload.get("is_baby", False),
             species=NamedResource.from_payload(payload.get("species", {}) or {}),
             evolution_details=[EvolutionDetail.from_payload(detail) for detail in payload.get("evolution_details", [])],

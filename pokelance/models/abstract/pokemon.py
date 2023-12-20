@@ -15,7 +15,6 @@ from pokelance.models.common import (
     VersionGameIndex,
 )
 
-from .showdown import ShowdownSprites
 from .utils import (
     AbilityEffectChange,
     AbilityFlavorText,
@@ -40,6 +39,7 @@ from .utils import (
     PokemonStat,
     PokemonType,
     PokemonTypePast,
+    ShowdownSprites,
     TypePokemon,
     TypeRelations,
 )
@@ -103,6 +103,7 @@ class Ability(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Ability":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             is_main_series=payload.get("is_main_series", False),
@@ -138,6 +139,7 @@ class Characteristic(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Characteristic":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             gene_modulo=payload.get("gene_modulo", 0),
             possible_values=payload.get("possible_values", []),
@@ -168,6 +170,7 @@ class EggGroup(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EggGroup":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
@@ -196,6 +199,7 @@ class Gender(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Gender":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             pokemon_species_details=[
@@ -234,6 +238,7 @@ class GrowthRate(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GrowthRate":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             formula=payload.get("formula", ""),
@@ -283,6 +288,7 @@ class Nature(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Nature":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             decreased_stat=NamedResource.from_payload(payload.get("decreased_stat", {}) or {}),
@@ -323,6 +329,7 @@ class PokeathlonStat(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokeathlonStat":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
@@ -397,6 +404,7 @@ class Pokemon(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Pokemon":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             base_experience=payload.get("base_experience", 0),
@@ -437,6 +445,7 @@ class LocationAreaEncounter(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "LocationAreaEncounter":
         return cls(
+            raw=payload,
             location_area=NamedResource.from_payload(payload.get("location_area", {}) or {}),
             version_details=[VersionEncounterDetail.from_payload(i) for i in payload.get("version_details", [])],
         )
@@ -466,6 +475,7 @@ class PokemonColor(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonColor":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
@@ -528,6 +538,7 @@ class PokemonForm(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonForm":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             order=payload.get("order", 0),
@@ -569,6 +580,7 @@ class PokemonHabitats(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonHabitats":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
@@ -603,6 +615,7 @@ class PokemonShape(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonShape":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             awesome_names=[AwesomeName.from_payload(i) for i in payload.get("awesome_names", [])],
@@ -706,6 +719,7 @@ class PokemonSpecies(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonSpecies":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             order=payload.get("order", 0),
@@ -776,6 +790,7 @@ class Stat(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Stat":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             game_index=payload.get("game_index", 0),
@@ -828,6 +843,7 @@ class Type(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Type":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             damage_relations=TypeRelations.from_payload(payload.get("damage_relations", {}) or {}),

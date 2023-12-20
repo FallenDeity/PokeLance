@@ -77,7 +77,7 @@ class HttpClient:
         self._client = client
         self.session = session
         self._is_ready = False
-        self._cache = Cache(max_size=cache_size)
+        self._cache = Cache(max_size=cache_size, client=self._client)
         self._tasks_queue: t.List[asyncio.Task[None]] = []
 
     async def _load_ext(self, coroutine: t.Callable[[], t.Coroutine[t.Any, t.Any, None]], message: str) -> None:
@@ -118,7 +118,8 @@ class HttpClient:
 
     async def connect(self) -> None:
         """Connects the HTTP client."""
-        self.session = self.session or aiohttp.ClientSession()
+        if self.session is None:
+            self.session = self.session or aiohttp.ClientSession()
         if not self._is_ready:
             if self._client.cache_endpoints:
                 await self._schedule_tasks()
@@ -142,8 +143,7 @@ class HttpClient:
         pokelance.exceptions.HTTPException
             An error occurred while making the request.
         """
-        if self.session is None or not self._is_ready:
-            await self.connect()
+        await self.connect()
         if self.session is not None:
             async with self.session.request(route.method, route.url, params=route.payload) as response:
                 if 300 > response.status >= 200:
@@ -167,9 +167,13 @@ class HttpClient:
         -------
         bytes
             The image.
+
+        Raises
+        ------
+        pokelance.exceptions.ImageNotFound
+            The image was not found.
         """
-        if self.session is None or not self._is_ready:
-            await self.connect()
+        await self.connect()
         _image_formats = ("png", "jpg", "jpeg", "gif", "webp", "svg")
         if self.session is not None:
             async with self.session.get(url) as response:

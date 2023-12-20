@@ -64,6 +64,7 @@ class Berry(BaseModel):
     @classmethod
     def from_payload(cls, data: t.Dict[str, t.Any]) -> "Berry":
         return cls(
+            raw=data,
             id=data.get("id", 0),
             name=data.get("name", ""),
             growth_time=data.get("growth_time", 0),
@@ -103,6 +104,7 @@ class BerryFirmness(BaseModel):
     @classmethod
     def from_payload(cls, data: t.Dict[str, t.Any]) -> "BerryFirmness":
         return cls(
+            raw=data,
             id=data.get("id", 0),
             name=data.get("name", ""),
             berries=[NamedResource.from_payload(berry) for berry in data.get("berries", [])],
@@ -137,6 +139,7 @@ class BerryFlavor(BaseModel):
     @classmethod
     def from_payload(cls, data: t.Dict[str, t.Any]) -> "BerryFlavor":
         return cls(
+            raw=data,
             id=data.get("id", 0),
             name=data.get("name", ""),
             berries=[FlavorBerryMap.from_payload(berry) for berry in data.get("berries", [])],

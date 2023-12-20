@@ -1,3 +1,4 @@
+import asyncio
 import typing as t
 from functools import lru_cache
 from pathlib import Path
@@ -250,6 +251,8 @@ class PokeLance:
         ------
         ValueError
             If the url is invalid.
+        ResourceNotFound
+            If the data is not found.
         """
         if params := ExtensionEnum.validate_url(url):
             return await self.getch_data(params.extension, params.category, params.value)
@@ -270,6 +273,16 @@ class PokeLance:
             The image data.
         """
         return await self._http.load_image(url)
+
+    async def wait_until_ready(self) -> None:
+        """
+        Waits until the http client caches all the endpoints.
+        """
+        await self._http.connect()
+        self.logger.info("Waiting until ready...")
+        while self._http._tasks_queue and self.cache_endpoints:
+            await asyncio.sleep(0.5)
+        self.logger.info("Ready!")
 
     @property
     def ext_tasks(self) -> t.List[t.Tuple[t.Callable[[], t.Coroutine[t.Any, t.Any, None]], str]]:

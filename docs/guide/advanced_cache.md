@@ -16,7 +16,7 @@ async def main():
     except FileNotFoundError:
         client.logger.info("Loading berry flavors from API...")
         await client.berry.cache.berry_flavor.wait_until_ready()
-        await client.berry.cache.berry_flavor.load_all(client=client.http)
+        await client.berry.cache.berry_flavor.load_all()
         await client.berry.cache.berry_flavor.save()
     client.logger.info(f"Loaded {len(client.berry.cache.berry_flavor)} berry flavors.")
     await client.close()

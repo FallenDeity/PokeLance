@@ -32,6 +32,7 @@ class Machine(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Machine":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             item=NamedResource.from_payload(payload.get("item", {}) or {}),
             move=NamedResource.from_payload(payload.get("move", {}) or {}),

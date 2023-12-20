@@ -54,6 +54,7 @@ class Generation(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Generation":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             abilities=[NamedResource.from_payload(i) for i in payload.get("abilities", [])],
@@ -102,6 +103,7 @@ class Pokedex(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Pokedex":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             is_main_series=payload.get("is_main_series", False),
@@ -137,6 +139,7 @@ class Version(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Version":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
@@ -180,6 +183,7 @@ class VersionGroup(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "VersionGroup":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             order=payload.get("order", 0),

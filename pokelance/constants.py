@@ -61,6 +61,10 @@ class ShowdownEnum(BaseEnum):
     FRONT_SHINY = PATH + "shiny/{}.gif"
     BACK_DEFAULT = PATH + "back/{}.gif"
     BACK_SHINY = PATH + "/back/shiny/{}.gif"
+    FRONT_FEMALE = PATH + "female/{}.gif"
+    FRONT_SHINY_FEMALE = PATH + "shiny/female/{}.gif"
+    BACK_FEMALE = PATH + "back/female/{}.gif"
+    BACK_SHINY_FEMALE = PATH + "back/shiny/female/{}.gif"
 
     def __str__(self) -> str:
         return self.value

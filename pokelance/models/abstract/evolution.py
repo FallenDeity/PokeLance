@@ -37,6 +37,7 @@ class EvolutionChain(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EvolutionChain":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             baby_trigger_item=NamedResource.from_payload(payload.get("baby_trigger_item", {}) or {}),
             chain=ChainLink.from_payload(payload.get("chain", {}) or {}),
@@ -67,6 +68,7 @@ class EvolutionTrigger(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EvolutionTrigger":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             names=[Name.from_payload(name) for name in payload.get("names", [])],

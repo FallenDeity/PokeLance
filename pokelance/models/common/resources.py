@@ -25,6 +25,7 @@ class Resource(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Resource":
         return cls(
+            raw=payload,
             url=payload.get("url", ""),
         )
 
@@ -46,4 +47,4 @@ class NamedResource(BaseModel):
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, str]) -> "NamedResource":
-        return cls(name=payload.get("name", ""), url=payload.get("url", ""))
+        return cls(raw=payload, name=payload.get("name", ""), url=payload.get("url", ""))

@@ -76,6 +76,7 @@ class Item(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Item":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             cost=payload.get("cost", 0),
@@ -127,6 +128,7 @@ class ItemAttribute(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemAttribute":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             items=[NamedResource.from_payload(item) for item in payload.get("items", [])],
@@ -160,6 +162,7 @@ class ItemCategory(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemCategory":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             items=[NamedResource.from_payload(item) for item in payload.get("items", [])],
@@ -192,6 +195,7 @@ class ItemFlingEffect(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemFlingEffect":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             effect_entries=[Effect.from_payload(effect) for effect in payload.get("effect_entries", [])],
@@ -223,6 +227,7 @@ class ItemPocket(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemPocket":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             categories=[NamedResource.from_payload(category) for category in payload.get("categories", [])],

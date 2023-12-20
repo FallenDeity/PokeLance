@@ -46,6 +46,7 @@ class Location(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Location":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             region=NamedResource.from_payload(payload.get("region", {}) or {}),
@@ -91,6 +92,7 @@ class LocationArea(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "LocationArea":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             game_index=payload.get("game_index", 0),
@@ -128,6 +130,7 @@ class PalParkArea(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PalParkArea":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
@@ -168,6 +171,7 @@ class Region(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Region":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             locations=[NamedResource.from_payload(i) for i in payload.get("locations", [])],

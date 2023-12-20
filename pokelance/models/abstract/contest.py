@@ -38,6 +38,7 @@ class ContestType(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ContestType":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             berry_flavor=NamedResource.from_payload(payload.get("berry_flavor", {}) or {}),
@@ -72,6 +73,7 @@ class ContestEffect(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ContestEffect":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             appeal=payload.get("appeal", 0),
             jam=payload.get("jam", 0),
@@ -106,6 +108,7 @@ class SuperContestEffect(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "SuperContestEffect":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             appeal=payload.get("appeal", 0),
             flavor_text_entries=[

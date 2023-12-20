@@ -29,6 +29,7 @@ class ContestName(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ContestName":
         return cls(
+            raw=payload,
             name=payload.get("name", ""),
             color=payload.get("color", ""),
             language=NamedResource.from_payload(payload.get("language", {}) or {}),

@@ -26,6 +26,7 @@ class PokemonEntry(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonEntry":
         return cls(
+            raw=payload,
             entry_number=payload.get("entry_number", 0),
             pokemon_species=NamedResource.from_payload(payload.get("pokemon_species", {}) or {}),
         )

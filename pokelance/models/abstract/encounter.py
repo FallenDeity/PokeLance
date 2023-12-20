@@ -36,6 +36,7 @@ class EncounterMethod(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EncounterMethod":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             order=payload.get("order", 0),
@@ -67,6 +68,7 @@ class EncounterCondition(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EncounterCondition":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             names=[Name.from_payload(name) for name in payload.get("names", [])],
@@ -98,6 +100,7 @@ class EncounterConditionValue(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EncounterConditionValue":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             condition=NamedResource.from_payload(payload.get("condition", {}) or {}),

@@ -7,6 +7,8 @@ import attrs
 class BaseModel(attrs.AttrsInstance):
     """Base model for all models"""
 
+    raw: t.Dict[str, t.Any] = attrs.field(factory=dict, repr=False, eq=False, order=False)
+
     def to_dict(self) -> t.Dict[str, t.Any]:
         """Convert the model to a dict
 
@@ -31,4 +33,4 @@ class BaseModel(attrs.AttrsInstance):
         BaseModel
             The model created from the payload.
         """
-        return cls()
+        return cls(raw=payload)

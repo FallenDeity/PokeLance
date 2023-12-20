@@ -26,7 +26,7 @@ class ItemSprites(BaseModel):
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, str]) -> "ItemSprites":
-        return cls(default=payload.get("default", ""))
+        return cls(raw=payload, default=payload.get("default", ""))
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -47,6 +47,7 @@ class ItemHolderPokemonVersionDetail(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemHolderPokemonVersionDetail":
         return cls(
+            raw=payload,
             rarity=payload.get("rarity", 0),
             version=NamedResource.from_payload(payload.get("version", {}) or {}),
         )
@@ -70,6 +71,7 @@ class ItemHolderPokemon(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemHolderPokemon":
         return cls(
+            raw=payload,
             pokemon=NamedResource.from_payload(payload.get("pokemon", {}) or {}),
             version_details=[
                 ItemHolderPokemonVersionDetail.from_payload(version_detail)

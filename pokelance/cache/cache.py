@@ -8,8 +8,8 @@ import aiofiles
 import attrs
 
 if t.TYPE_CHECKING:
-    from pokelance import models  # noqa: F401
-    from pokelance.http import HttpClient, Route  # noqa: F401
+    from pokelance import PokeLance, models  # noqa: F401
+    from pokelance.http import Route  # noqa: F401
     from pokelance.models import BaseModel  # noqa: F401
 
 
@@ -106,6 +106,8 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
         The endpoints that are cached.
     _endpoints_cached: bool
         Whether or not the endpoints are cached.
+    _client: pokelance.PokeLance
+        The client that this cache is for.
 
     Examples
     --------
@@ -129,6 +131,8 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
     >>>
     >>> asyncio.run(main())
     """
+
+    _client: "PokeLance"
 
     def __init__(self, max_size: int = 100) -> None:
         self._max_size = max_size
@@ -201,8 +205,9 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
         self._endpoints_cached = True
 
     async def wait_until_ready(self) -> None:
-        """Wait until the cache is ready."""
-        while not self._endpoints_cached:
+        """Wait until the all the endpoints are cached."""
+        await self._client.http.connect()
+        while not self._endpoints_cached and self._client.cache_endpoints:
             await asyncio.sleep(0.5)
 
     async def save(self, path: str = ".") -> None:
@@ -214,9 +219,14 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
             The path to save the cache to.
         """
         pathlib.Path(path).mkdir(parents=True, exist_ok=True)
-        dummy: t.Dict[str, t.Dict[str, t.Any]] = {k.endpoint: attrs.asdict(v) for k, v in self.items()}
+        dummy: t.Dict[str, t.Dict[str, t.Any]] = {k.endpoint: v.raw for k, v in self.items()}
         async with aiofiles.open(pathlib.Path(f"{path}/{self.__class__.__name__}.json"), "w") as f:
-            await f.write(json.dumps(dummy, indent=4, ensure_ascii=False))
+            await f.write("{\n")
+            for n, (k, v) in enumerate(dummy.items()):
+                await f.write("\n".join([4 * " " + i for i in f'"{k}": {json.dumps(v, indent=4)}'.split("\n")]))
+                if n != len(dummy) - 1:
+                    await f.write(",\n")
+            await f.write("\n}")
 
     async def load(self, path: str = ".") -> None:
         """Load the cache from a file.
@@ -235,24 +245,22 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
             route = route_model(endpoint=endpoint)
             self.setdefault(route, model.from_payload(info))
 
-    async def load_all(self, client: "HttpClient") -> None:
-        """Load all documents into the cache.
-
-        Parameters
-        ----------
-        client: HttpClient
-            The client to use to load the documents.
+    async def load_all(self) -> None:
+        """
+        Load all documents/data from api into the cache. (Endpoints must be cached first)
         """
         if not self._endpoints_cached:
             raise RuntimeError("The endpoints have not been cached yet.")
-        client._client.logger.info(f"Loading {self.__class__.__name__}...")
+        self._client.logger.info(f"Loading {self.__class__.__name__}...")
         route_model = importlib.import_module("pokelance.http").__dict__["Route"]
         value_type = str(self.__orig_bases__[0].__args__[1]).split(".")[-1]  # type: ignore
         model: "models.BaseModel" = importlib.import_module("pokelance.models").__dict__[value_type]
+        self._max_size = len(self._endpoints)
         for endpoint in self._endpoints.values():
             route = route_model(endpoint=f"/{endpoint.url.strip('/').split('/')[-2]}/{str(endpoint)}")
-            self.setdefault(route, model.from_payload(await client.request(route)))
-        client._client.logger.info(f"Loaded {self.__class__.__name__}.")
+            data = self.get(route, None)
+            self.setdefault(route, data if data else model.from_payload(await self._client.http.request(route)))
+        self._client.logger.info(f"Loaded {self.__class__.__name__}.")
 
     @property
     def endpoints(self) -> t.Dict[str, Endpoint]:

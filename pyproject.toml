@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pokelance"
-version = "0.2.3"
+version = "0.2.4"
 description = "A flexible and easy to use pokemon library."
 authors = ["FallenDeity <61227305+FallenDeity@users.noreply.github.com>"]
 license = "MIT"
@@ -12,7 +12,6 @@ aiohttp = "^3.8.3"
 aiofiles = "^23.1.0"
 types-aiofiles = "^23.1.0.1"
 attrs = "^23.1.0"
-
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.12.0"
@@ -28,6 +27,8 @@ Pillow = ">=9.3,<11.0"
 CairoSVG = "^2.5.2"
 mypy = ">=0.991,<1.6"
 pipwin = "^0.5.2"
+pytest = "^7.4.3"
+pytest-asyncio = "^0.23.2"
 
 [build-system]
 requires = ["poetry-core"]

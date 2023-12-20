@@ -1,6 +1,7 @@
 import datetime
 import enum
 import logging
+import os
 import pathlib
 import typing as t
 
@@ -22,6 +23,13 @@ class LogLevelColors(enum.Enum):
     CRITICAL = "\033[91m"
     ENDC = "\033[0m"
     FLAIR = "\033[95m"
+
+
+class RelativePathFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        """Filter the log record."""
+        record.pathname = record.pathname.replace(os.getcwd(), "~")
+        return True
 
 
 class Formatter(logging.Formatter):
@@ -105,17 +113,20 @@ class Logger(logging.Logger):
     def __init__(self, *, name: str, level: int = logging.DEBUG, file_logging: bool = False) -> None:
         super().__init__(name, level)
         self._handler = logging.StreamHandler()
+        self._handler.addFilter(RelativePathFilter())
         self._handler.setFormatter(Formatter())
         self.addHandler(self._handler)
         if file_logging:
             self._file_handler = FileHandler(ext=name)
+            self._file_handler.addFilter(RelativePathFilter())
             self.addHandler(self._file_handler)
         logging.addLevelName(FLAIR, "FLAIR")
 
     def set_formatter(self, formatter: logging.Formatter) -> None:
         """Set the formatter."""
         self._handler.setFormatter(formatter)
-        self._file_handler.setFormatter(formatter)
+        if self._file_handler is not None:
+            self._file_handler.setFormatter(formatter)
 
     def flair(self, message: str, *args: t.Any, **kwargs: t.Any) -> None:
         """Record a flair log."""

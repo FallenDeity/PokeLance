@@ -108,6 +108,7 @@ class Move(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Move":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             accuracy=payload.get("accuracy", 0),
@@ -160,6 +161,7 @@ class MoveAilment(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveAilment":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             moves=[NamedResource.from_payload(i) for i in payload.get("moves", [])],
@@ -189,6 +191,7 @@ class MoveBattleStyle(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveBattleStyle":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
@@ -220,6 +223,7 @@ class MoveCategory(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveCategory":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             moves=[NamedResource.from_payload(i) for i in payload.get("moves", [])],
@@ -255,6 +259,7 @@ class MoveDamageClass(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveDamageClass":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             descriptions=[Description.from_payload(i) for i in payload.get("descriptions", [])],
@@ -291,6 +296,7 @@ class MoveLearnMethod(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveLearnMethod":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             descriptions=[Description.from_payload(i) for i in payload.get("descriptions", [])],
@@ -310,6 +316,7 @@ class MoveTarget(BaseModel):
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveTarget":
         return cls(
+            raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             descriptions=[Description.from_payload(i) for i in payload.get("descriptions", [])],
