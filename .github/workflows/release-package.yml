@@ -29,8 +29,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: Release ${{ steps.changelog.outputs.date }} (${{ steps.changelog.outputs.version }})
-          tag: ${{ steps.tag_name.outputs.tag_name }}
+          name: Release ${{ steps.changelog.outputs.version }} - (${{ steps.changelog.outputs.date }})
+          tag: v${{ steps.changelog.outputs.version }}
           body: ${{ steps.changelog.outputs.description }}
           prerelease: $${{ steps.changelog.outputs.status == 'prereleased' }}
           draft: $${{ steps.changelog.outputs.status == 'unreleased' }}

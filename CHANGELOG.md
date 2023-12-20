@@ -2,7 +2,7 @@
 
 Changelog for the `pokelance` package.
 
-## 0.2.4 (2023-12-20)
+## 0.2.4 - 2023-12-20
 
 #### New Features
 
