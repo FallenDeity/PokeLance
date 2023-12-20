@@ -65,3 +65,13 @@ repos:
         language: system
         stages:
           - commit
+
+  - repo: local
+    hooks:
+      - id: changelog
+        name: changelog
+        pass_filenames: false
+        entry: poetry run auto-changelog --template ./templates/custom.jinja2 --tag-prefix v --unreleased
+        language: system
+        stages:
+          - commit
