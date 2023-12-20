@@ -13,23 +13,26 @@ jobs:
 
       - name: Get version from tag
         id: tag_name
-        run: echo ::set-output name=tag_name::$(git describe --tags --abbrev=0 || git describe --tags --abbrev=0 --first-parent)
+        run:
+          |
+          echo ::set-output name=tag_name::$(git describe --tags --abbrev=0 | sed 's/v//')
 
-      - name: Get Changelog Entry
-        id: changelog_reader
-        uses: mindsers/changelog-reader-action@v2
+      - name: Parse Changelog
+        id: changelog
+        uses: coditory/changelog-parser@v1
         with:
           version: ${{ steps.tag_name.outputs.tag_name }}
-          path: ./CHANGELOG.md
 
       - name: Create GitHub Release
         id: create_release
         uses: ncipollo/release-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: ${{ steps.changelog_reader.outputs.date }} (${{ steps.changelog_reader.outputs.version }})
+          name: Release ${{ steps.changelog.outputs.date }} (${{ steps.changelog.outputs.version }})
           tag: ${{ steps.tag_name.outputs.tag_name }}
-          body: ${{ steps.changelog_reader.outputs.changes }}
-          prerelease: $${{ steps.changelog_reader.outputs.status == 'prereleased' }}
-          draft: $${{ steps.changelog_reader.outputs.status == 'unreleased' }}
+          body: ${{ steps.changelog.outputs.description }}
+          prerelease: $${{ steps.changelog.outputs.status == 'prereleased' }}
+          draft: $${{ steps.changelog.outputs.status == 'unreleased' }}
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
