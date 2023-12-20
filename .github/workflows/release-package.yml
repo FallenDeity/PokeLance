@@ -13,7 +13,7 @@ jobs:
 
       - name: Get version from tag
         id: tag_name
-        run: echo ::set-output name=tag_name::${GITHUB_REF#refs/tags/v}
+        run: echo ::set-output name=tag_name::$(git describe --tags --abbrev=0 || git describe --tags --abbrev=0 --first-parent)
 
       - name: Get Changelog Entry
         id: changelog_reader
