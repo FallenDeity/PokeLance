@@ -2,7 +2,8 @@ name: Release on GitHub
 
 on:
   push:
-    branches: ["master", "main", "rewrite", "develop"]
+    tags:
+      - v*
 
 jobs:
   release-asset:
@@ -15,7 +16,7 @@ jobs:
         id: tag_name
         run:
           |
-          echo ::set-output name=tag_name::$(git describe --tags --abbrev=0 | sed 's/v//')
+          echo ::set-output name=tag_name::${GITHUB_REF#refs/tags/v}
 
       - name: Parse Changelog
         id: changelog
