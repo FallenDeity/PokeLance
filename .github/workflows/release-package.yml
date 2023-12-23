@@ -2,8 +2,7 @@ name: Release on GitHub
 
 on:
   push:
-    tags:
-      - v*
+    branches: ["master", "main", "rewrite", "develop"]
 
 jobs:
   release-asset:
@@ -16,13 +15,13 @@ jobs:
         id: tag_name
         run:
           |
-          echo ::set-output name=tag_name::${GITHUB_REF#refs/tags/v}
+          echo ::set-output name=tag_name::$(git describe --tags --abbrev=0 | sed 's/v//')
 
       - name: Parse Changelog
         id: changelog
         uses: coditory/changelog-parser@v1
         with:
-          version: v${{ steps.tag_name.outputs.tag_name }}
+          version: ${{ steps.tag_name.outputs.tag_name }}
 
       - name: Create GitHub Release
         id: create_release
