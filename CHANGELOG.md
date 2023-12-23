@@ -1,6 +1,17 @@
 # Changelog
 
-## v0.2.5 - 2023-12-23
+## Unreleased - 2023-12-23
+
+#### Refactorings
+
+-  Edit changelogs
+#### Others
+
+-  edit release package workflow to match v regex
+
+Full set of changes: [v0.2.5 to 422ab1a](https://github.com/FallenDeity/PokeLance/compare/v0.2.5...422ab1a)
+
+## 0.2.5 - 2023-12-23
 
 #### New Features
 
@@ -23,7 +34,7 @@
 
 Full set of changes: [v0.2.4 to v0.2.5](https://github.com/FallenDeity/PokeLance/compare/v0.2.4...v0.2.5)
 
-## v0.2.4 - 2023-12-20
+## 0.2.4 - 2023-12-20
 
 #### New Features
 
@@ -34,7 +45,7 @@ Full set of changes: [v0.2.4 to v0.2.5](https://github.com/FallenDeity/PokeLance
 
 Full set of changes: [v0.2.3 to v0.2.4](https://github.com/FallenDeity/PokeLance/compare/v0.2.3...v0.2.4)
 
-## v0.2.3 - 2023-12-15
+## 0.2.3 - 2023-12-15
 
 #### Fixes
 
@@ -42,7 +53,7 @@ Full set of changes: [v0.2.3 to v0.2.4](https://github.com/FallenDeity/PokeLance
 
 Full set of changes: [v0.2.2 to v0.2.3](https://github.com/FallenDeity/PokeLance/compare/v0.2.2...v0.2.3)
 
-## v0.2.2 - 2023-12-15
+## 0.2.2 - 2023-12-15
 
 #### Fixes
 
@@ -50,7 +61,7 @@ Full set of changes: [v0.2.2 to v0.2.3](https://github.com/FallenDeity/PokeLance
 
 Full set of changes: [v0.2.1 to v0.2.2](https://github.com/FallenDeity/PokeLance/compare/v0.2.1...v0.2.2)
 
-## v0.2.1 - 2023-12-15
+## 0.2.1 - 2023-12-15
 
 #### Fixes
 
@@ -59,7 +70,7 @@ Full set of changes: [v0.2.1 to v0.2.2](https://github.com/FallenDeity/PokeLance
 
 Full set of changes: [v0.2.0 to v0.2.1](https://github.com/FallenDeity/PokeLance/compare/v0.2.0...v0.2.1)
 
-## v0.2.0 - 2023-12-14
+## 0.2.0 - 2023-12-14
 
 #### Fixes
 
@@ -67,7 +78,7 @@ Full set of changes: [v0.2.0 to v0.2.1](https://github.com/FallenDeity/PokeLance
 
 Full set of changes: [v0.1.9, v1.9.0 to v0.2.0](https://github.com/FallenDeity/PokeLance/compare/v0.1.9, v1.9.0...v0.2.0)
 
-## v0.1.9, v1.9.0 - 2023-12-14
+## 0.1.9, v1.9.0 - 2023-12-14
 
 #### New Features
 
@@ -84,7 +95,7 @@ Full set of changes: [v0.1.9, v1.9.0 to v0.2.0](https://github.com/FallenDeity/P
 
 Full set of changes: [v0.1.8 to v0.1.9, v1.9.0](https://github.com/FallenDeity/PokeLance/compare/v0.1.8...v0.1.9, v1.9.0)
 
-## v0.1.8 - 2023-04-24
+## 0.1.8 - 2023-04-24
 
 #### New Features
 

@@ -4,7 +4,7 @@
 {{ changelog.description }}
 {% endif -%}
 {%- for release in changelog.releases %}
-## {{ release.title }} - {{release.date}}
+## {{ release.title[1:] if release.title.startswith('v') else release.title }} - {{release.date}}
 
 {{ macros.section('New Features', release.features) -}}
 
