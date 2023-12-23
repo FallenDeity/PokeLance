@@ -36,7 +36,6 @@ from .pokemons import (
     PokemonStat,
     PokemonType,
     PokemonTypePast,
-    ShowdownSprites,
     TypePokemon,
     TypeRelations,
     TypeRelationsPast,
@@ -93,5 +92,4 @@ __all__: t.Tuple[str, ...] = (
     "TypePokemon",
     "TypeRelationsPast",
     "TypeRelations",
-    "ShowdownSprites",
 )

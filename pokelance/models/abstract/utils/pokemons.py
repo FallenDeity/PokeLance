@@ -35,7 +35,6 @@ __all__: t.Tuple[str, ...] = (
     "MoveStatAffectSets",
     "NatureStatAffectSets",
     "MoveStatEffect",
-    "ShowdownSprites",
     "TypeRelations",
     "TypePokemon",
     "TypeRelationsPast",

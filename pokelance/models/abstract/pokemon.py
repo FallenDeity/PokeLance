@@ -39,7 +39,6 @@ from .utils import (
     PokemonStat,
     PokemonType,
     PokemonTypePast,
-    ShowdownSprites,
     TypePokemon,
     TypeRelations,
 )
@@ -399,7 +398,6 @@ class Pokemon(BaseModel):
     species: NamedResource = attrs.field(factory=NamedResource)
     stats: t.List[PokemonStat] = attrs.field(factory=list)
     types: t.List[PokemonType] = attrs.field(factory=list)
-    showdown: ShowdownSprites = attrs.field(factory=ShowdownSprites)
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Pokemon":
@@ -423,7 +421,6 @@ class Pokemon(BaseModel):
             species=NamedResource.from_payload(payload.get("species", {}) or {}),
             stats=[PokemonStat.from_payload(i) for i in payload.get("stats", [])],
             types=[PokemonType.from_payload(i) for i in payload.get("types", [])],
-            showdown=ShowdownSprites.from_id(payload.get("id", 0)),
         )
 
 

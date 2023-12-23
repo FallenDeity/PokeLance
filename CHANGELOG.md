@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased - 2023-12-21
+## Unreleased - 2023-12-23
 
 #### Docs
 
@@ -13,8 +13,9 @@
 -  update release workflow to use ncipollo
 -  update release workflow to use ncipollo
 -  (release): Release Workflow
+-  (lint): :art: Update typehints for mypy
 
-Full set of changes: [v0.2.4 to 94e2d59](https://github.com/FallenDeity/PokeLance/compare/v0.2.4...94e2d59)
+Full set of changes: [v0.2.4 to 3001217](https://github.com/FallenDeity/PokeLance/compare/v0.2.4...3001217)
 
 ## v0.2.4 - 2023-12-20
 
@@ -58,9 +59,9 @@ Full set of changes: [v0.2.0 to v0.2.1](https://github.com/FallenDeity/PokeLance
 
 -  fix version issue
 
-Full set of changes: [v0.1.9 to v0.2.0](https://github.com/FallenDeity/PokeLance/compare/v0.1.9...v0.2.0)
+Full set of changes: [v0.1.9, v1.9.0 to v0.2.0](https://github.com/FallenDeity/PokeLance/compare/v0.1.9, v1.9.0...v0.2.0)
 
-## v0.1.9 - 2023-12-14
+## v0.1.9, v1.9.0 - 2023-12-14
 
 #### New Features
 
@@ -75,7 +76,7 @@ Full set of changes: [v0.1.9 to v0.2.0](https://github.com/FallenDeity/PokeLance
 -  add upload sarif for codeql
 -  add upload sarif for codeql
 
-Full set of changes: [v0.1.8 to v0.1.9](https://github.com/FallenDeity/PokeLance/compare/v0.1.8...v0.1.9)
+Full set of changes: [v0.1.8 to v0.1.9, v1.9.0](https://github.com/FallenDeity/PokeLance/compare/v0.1.8...v0.1.9, v1.9.0)
 
 ## v0.1.8 - 2023-04-24
 
