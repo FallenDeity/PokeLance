@@ -376,8 +376,6 @@ class Pokemon(BaseModel):
         A list of details showing all the stats this Pokémon has.
     types: t.List[PokemonType]
         A list of details showing types this Pokémon has.
-    showdown: ShowdownSprites
-        A set of sprites used to depict this Pokémon in the Showdown client.
     """
 
     id: int = attrs.field(factory=int)
