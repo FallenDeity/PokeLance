@@ -1,7 +1,10 @@
 # Changelog
 
-## 0.2.5 - 2023-12-23
+## v0.2.5 - 2023-12-23
 
+#### New Features
+
+-  (release): :bookmark: Release version v0.2.5
 #### Refactorings
 
 -  (depreceate): :wastebasket: Update Pokemon model
@@ -18,7 +21,7 @@
 -  (release): Release Workflow
 -  (lint): :art: Update typehints for mypy
 
-Full set of changes: [v0.2.4 to 0.2.5](https://github.com/FallenDeity/PokeLance/compare/v0.2.4...0.2.5)
+Full set of changes: [v0.2.4 to v0.2.5](https://github.com/FallenDeity/PokeLance/compare/v0.2.4...v0.2.5)
 
 ## v0.2.4 - 2023-12-20
 
