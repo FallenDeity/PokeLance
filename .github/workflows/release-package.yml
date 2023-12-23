@@ -21,7 +21,7 @@ jobs:
         id: changelog
         uses: coditory/changelog-parser@v1
         with:
-          version: ${{ steps.tag_name.outputs.tag_name }}
+          version: v0.2.5
 
       - name: Create GitHub Release
         id: create_release
