@@ -238,6 +238,7 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
         """
         async with aiofiles.open(pathlib.Path(f"{path}/{self.__class__.__name__}.json"), "r") as f:
             data = json.loads(await f.read())
+        self._max_size = len(data)
         route_model = importlib.import_module("pokelance.http").__dict__["Route"]
         value_type = str(self.__orig_bases__[0].__args__[1]).split(".")[-1]  # type: ignore
         model: "models.BaseModel" = importlib.import_module("pokelance.models").__dict__[value_type]

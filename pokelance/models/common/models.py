@@ -117,7 +117,7 @@ class FlavorText(BaseModel):
     language: NamedResource
         The language this name is in.
     version: NamedResource
-        The version that this flavor text is extracted from.
+        The version this flavor text entry belongs to.
     """
 
     flavor_text: str = attrs.field(factory=str)

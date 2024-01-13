@@ -25,6 +25,7 @@ __all__: t.Tuple[str, ...] = (
     "PokemonAbility",
     "PokemonMove",
     "PokemonTypePast",
+    "PokemonAbilityPast",
     "PokemonFormType",
     "PokemonFormSprites",
     "AwesomeName",
@@ -721,7 +722,7 @@ class MoveBattleStylePreference(BaseModel):
             raw=payload,
             low_hp_preference=payload.get("low_hp_preference", 0),
             high_hp_preference=payload.get("high_hp_preference", 0),
-            move_battle_style=NamedResource.from_payload(payload.get("battle_style", {}) or {}),
+            move_battle_style=NamedResource.from_payload(payload.get("move_battle_style", {}) or {}),
         )
 
 
@@ -870,6 +871,30 @@ class PokemonTypePast(BaseModel):
             raw=payload,
             generation=NamedResource.from_payload(payload.get("generation", {}) or {}),
             types=[PokemonType.from_payload(i) for i in payload.get("types", [])],
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class PokemonAbilityPast(BaseModel):
+    """A pokemon ability past resource.
+
+    Attributes
+    ----------
+    generation: NamedResource
+        The generation this ability was introduced in.
+    abilities: t.List[NamedResource]
+        The name of the ability.
+    """
+
+    generation: NamedResource = attrs.field(factory=NamedResource)
+    abilities: t.List[PokemonAbility] = attrs.field(factory=list)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonAbilityPast":
+        return cls(
+            raw=payload,
+            generation=NamedResource.from_payload(payload.get("generation", {}) or {}),
+            abilities=[PokemonAbility.from_payload(i) for i in payload.get("abilities", [])],
         )
 
 
@@ -1341,3 +1366,11 @@ class TypeRelationsPast(BaseModel):
 
     generation: NamedResource = attrs.field(factory=NamedResource)
     damage_relations: TypeRelations = attrs.field(factory=TypeRelations)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeRelationsPast":
+        return cls(
+            raw=payload,
+            generation=NamedResource.from_payload(payload.get("generation", {}) or {}),
+            damage_relations=TypeRelations.from_payload(payload.get("damage_relations", {}) or {}),
+        )

@@ -29,6 +29,7 @@ from .utils import (
     NatureStatChange,
     PalParkEncounterArea,
     PokemonAbility,
+    PokemonAbilityPast,
     PokemonFormSprites,
     PokemonHeldItem,
     PokemonMove,
@@ -41,6 +42,7 @@ from .utils import (
     PokemonTypePast,
     TypePokemon,
     TypeRelations,
+    TypeRelationsPast,
 )
 
 __all__: t.Tuple[str, ...] = (
@@ -127,13 +129,16 @@ class Characteristic(BaseModel):
         The remainder of the highest stat/IV divided by 5.
     possible_values: t.List[int]
         The possible values of the highest stat that would result in a Pokémon
-         recieving this characteristic when divided by 5.
-
+        recieving this characteristic when divided by 5.
+    descriptions: t.List[Description]
+        The descriptions of this characteristic listed in different languages.
     """
 
     id: int = attrs.field(factory=int)
     gene_modulo: int = attrs.field(factory=int)
     possible_values: t.List[int] = attrs.field(factory=list)
+    highest_stat: NamedResource = attrs.field(factory=NamedResource)
+    descriptions: t.List[Description] = attrs.field(factory=list)
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Characteristic":
@@ -142,6 +147,8 @@ class Characteristic(BaseModel):
             id=payload.get("id", 0),
             gene_modulo=payload.get("gene_modulo", 0),
             possible_values=payload.get("possible_values", []),
+            highest_stat=NamedResource.from_payload(payload.get("highest_stat", {}) or {}),
+            descriptions=[Description.from_payload(i) for i in payload.get("descriptions", [])],
         )
 
 
@@ -189,11 +196,14 @@ class Gender(BaseModel):
         The name for this gender resource.
     pokemon_species_details: t.List[PokemonSpeciesGender]
         A list of Pokémon species that belong to this gender.
+    required_for_evolution: t.List[NamedAPIResource]
+        A list of Pokémon species that required this gender in order for a Pokémon to evolve into them.
     """
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
     pokemon_species_details: t.List[PokemonSpeciesGender] = attrs.field(factory=list)
+    required_for_evolution: t.List[NamedResource] = attrs.field(factory=list)
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Gender":
@@ -204,6 +214,7 @@ class Gender(BaseModel):
             pokemon_species_details=[
                 PokemonSpeciesGender.from_payload(i) for i in payload.get("pokemon_species_details", [])
             ],
+            required_for_evolution=[NamedResource.from_payload(i) for i in payload.get("required_for_evolution", [])],
         )
 
 
@@ -368,6 +379,10 @@ class Pokemon(BaseModel):
         Location area encounter details for different versions.
     moves: t.List[PokemonMove]
         A list of details showing types this Pokémon has.
+    past_types: t.List[PokemonTypePast]
+        A list of past types this Pokémon has had.
+    past_abilities: t.List[PokemonAbilityPast]
+        A list of past abilities this Pokémon has had.
     species: NamedAPIResource
         The species this Pokémon belongs to.
     sprites: PokemonSprites
@@ -392,6 +407,7 @@ class Pokemon(BaseModel):
     location_area_encounters: str = attrs.field(factory=str)
     moves: t.List[PokemonMove] = attrs.field(factory=list)
     past_types: t.List[PokemonTypePast] = attrs.field(factory=list)
+    past_abilities: t.List[PokemonAbilityPast] = attrs.field(factory=list)
     sprites: PokemonSprite = attrs.field(factory=PokemonSprite)
     species: NamedResource = attrs.field(factory=NamedResource)
     stats: t.List[PokemonStat] = attrs.field(factory=list)
@@ -415,6 +431,7 @@ class Pokemon(BaseModel):
             location_area_encounters=payload.get("location_area_encounters", ""),
             moves=[PokemonMove.from_payload(i) for i in payload.get("moves", [])],
             past_types=[PokemonTypePast.from_payload(i) for i in payload.get("past_types", [])],
+            past_abilities=[PokemonAbilityPast.from_payload(i) for i in payload.get("past_abilities", [])],
             sprites=PokemonSprite.from_payload(payload.get("sprites", {}) or {}),
             species=NamedResource.from_payload(payload.get("species", {}) or {}),
             stats=[PokemonStat.from_payload(i) for i in payload.get("stats", [])],
@@ -503,6 +520,8 @@ class PokemonForm(BaseModel):
         The name of this form.
     pokemon: NamedAPIResource
         The Pokémon that can take on this form.
+    types: t.List[PokemonType]
+        A list of details showing types this Pokémon form has.
     sprites: PokemonFormSprites
         A set of sprites used to depict this Pokémon form in the game.
     version_group: NamedAPIResource
@@ -511,8 +530,6 @@ class PokemonForm(BaseModel):
         The form specific full name of this Pokémon form, or empty if the form does not have a specific name.
     form_names: t.List[Name]
         The form specific form name of this Pokémon form, or empty if the form does not have a specific name.
-    pokemon_species: NamedAPIResource
-        The Pokémon species that this form belongs to.
     """
 
     id: int = attrs.field(factory=int)
@@ -524,11 +541,11 @@ class PokemonForm(BaseModel):
     is_mega: bool = attrs.field(factory=bool)
     form_name: str = attrs.field(factory=str)
     pokemon: NamedResource = attrs.field(factory=NamedResource)
+    types: t.List[PokemonType] = attrs.field(factory=list)
     sprites: PokemonFormSprites = attrs.field(factory=PokemonFormSprites)
     version_group: NamedResource = attrs.field(factory=NamedResource)
     names: t.List[Name] = attrs.field(factory=list)
     form_names: t.List[Name] = attrs.field(factory=list)
-    pokemon_species: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonForm":
@@ -543,11 +560,11 @@ class PokemonForm(BaseModel):
             is_mega=payload.get("is_mega", False),
             form_name=payload.get("form_name", ""),
             pokemon=NamedResource.from_payload(payload.get("pokemon", {}) or {}),
+            types=[PokemonType.from_payload(i) for i in payload.get("types", [])],
             sprites=PokemonFormSprites.from_payload(payload.get("sprites", {}) or {}),
             version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
             form_names=[Name.from_payload(i) for i in payload.get("form_names", [])],
-            pokemon_species=NamedResource.from_payload(payload.get("pokemon_species", {}) or {}),
         )
 
 
@@ -811,6 +828,8 @@ class Type(BaseModel):
         The name for this resource.
     damage_relations: TypeRelations
         A detail of how effective this type is toward others and vice versa.
+    past_damage_relations: TypeRelationsPast
+        A detail of how effective this type was toward others and vice versa in previous generations.
     game_indices: t.List[GenerationGameIndex]
         A list of game indices relevent to this item by generation.
     generation: NamedResource
@@ -828,6 +847,7 @@ class Type(BaseModel):
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
     damage_relations: TypeRelations = attrs.field(factory=TypeRelations)
+    past_damage_relations: TypeRelationsPast = attrs.field(factory=TypeRelationsPast)
     game_indices: t.List[GenerationGameIndex] = attrs.field(factory=list)
     generation: NamedResource = attrs.field(factory=NamedResource)
     move_damage_class: NamedResource = attrs.field(factory=NamedResource)
@@ -842,6 +862,7 @@ class Type(BaseModel):
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             damage_relations=TypeRelations.from_payload(payload.get("damage_relations", {}) or {}),
+            past_damage_relations=TypeRelationsPast.from_payload(payload.get("past_damage_relations", {}) or {}),
             game_indices=[GenerationGameIndex.from_payload(i) for i in payload.get("game_indices", [])],
             generation=NamedResource.from_payload(payload.get("generation", {}) or {}),
             move_damage_class=NamedResource.from_payload(payload.get("move_damage_class", {}) or {}),

@@ -1,15 +1,17 @@
 # Changelog
 
-## Unreleased - 2023-12-23
+## 0.2.6 - 2024-01-14
 
 #### Refactorings
 
 -  Edit changelogs
 #### Others
 
+-  edit release package workflow to work with tags on push
+-  edit release package workflow
 -  edit release package workflow to match v regex
 
-Full set of changes: [v0.2.5 to 422ab1a](https://github.com/FallenDeity/PokeLance/compare/v0.2.5...422ab1a)
+Full set of changes: [v0.2.5 to v0.2.6](https://github.com/FallenDeity/PokeLance/compare/v0.2.5...v0.2.6)
 
 ## 0.2.5 - 2023-12-23
 

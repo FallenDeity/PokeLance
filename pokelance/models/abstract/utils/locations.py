@@ -3,7 +3,7 @@ import typing as t
 import attrs
 
 from pokelance.models import BaseModel
-from pokelance.models.common import NamedResource
+from pokelance.models.common import NamedResource, VersionEncounterDetail
 
 __all__: t.Tuple[str, ...] = (
     "EncounterVersionDetails",
@@ -69,19 +69,19 @@ class PokemonEncounter(BaseModel):
     ----------
     pokemon: NamedResource
         The Pokémon being encountered.
-    version_details: t.List[EncounterVersionDetails]
-        A list of versions and encounters with Pokémon that might happen.
+    version_details: t.List[VersionEncounterDetail]
+        A list of versions and encounters with Pokémon that might happen in the referenced location area.
     """
 
     pokemon: NamedResource = attrs.field(factory=NamedResource)
-    version_details: t.List[EncounterVersionDetails] = attrs.field(factory=list)
+    version_details: t.List[VersionEncounterDetail] = attrs.field(factory=list)
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonEncounter":
         return cls(
             raw=payload,
             pokemon=NamedResource.from_payload(payload.get("pokemon", {}) or {}),
-            version_details=[EncounterVersionDetails.from_payload(i) for i in payload.get("version_details", [])],
+            version_details=[VersionEncounterDetail.from_payload(i) for i in payload.get("version_details", [])],
         )
 
 
