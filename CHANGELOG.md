@@ -2,6 +2,9 @@
 
 ## 0.2.6 - 2024-01-14
 
+#### Fixes
+
+-  :bug: Edit Data Models
 #### Refactorings
 
 -  Edit changelogs
