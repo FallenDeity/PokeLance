@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased - 2024-02-13
+
+#### Docs
+
+-  Update Changelogs
+
+Full set of changes: [v0.2.7 to 961d857](https://github.com/FallenDeity/PokeLance/compare/v0.2.7...961d857)
+
 ## 0.2.7 - 2024-02-12
 
 #### New Features

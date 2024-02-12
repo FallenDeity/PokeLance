@@ -2,6 +2,8 @@ name: Release on GitHub
 
 on:
   push:
+    tags:
+      - v*
 
 jobs:
   release-asset:
@@ -9,12 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - name: Get version from tag
-        id: tag_name
-        run:
-          |
-          echo ::set-output name=tag_name::${GITHUB_REF#refs/tags/v}
 
       - name: Parse Changelog
         id: changelog
