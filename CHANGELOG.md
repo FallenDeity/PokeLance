@@ -1,9 +1,15 @@
 # Changelog
 
-## Unreleased - 2024-02-12
+## 0.2.7 - 2024-02-12
 
+#### New Features
 
-Full set of changes: [v0.2.6 to 53e1600](https://github.com/FallenDeity/PokeLance/compare/v0.2.6...53e1600)
+-  :sparkles: Add Cries Field
+#### Others
+
+-  :bookmark: Bump Version
+
+Full set of changes: [v0.2.6 to v0.2.7](https://github.com/FallenDeity/PokeLance/compare/v0.2.6...v0.2.7)
 
 ## 0.2.6 - 2024-01-14
 
