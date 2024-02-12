@@ -30,6 +30,7 @@ from .utils import (
     PalParkEncounterArea,
     PokemonAbility,
     PokemonAbilityPast,
+    PokemonCries,
     PokemonFormSprites,
     PokemonHeldItem,
     PokemonMove,
@@ -387,6 +388,8 @@ class Pokemon(BaseModel):
         The species this Pokémon belongs to.
     sprites: PokemonSprites
         A set of sprites used to depict this Pokémon in the game.
+    cries: PokemonCries
+        A set of cries used to depict this Pokémon in the game.
     stats: t.List[PokemonStat]
         A list of details showing all the stats this Pokémon has.
     types: t.List[PokemonType]
@@ -409,6 +412,7 @@ class Pokemon(BaseModel):
     past_types: t.List[PokemonTypePast] = attrs.field(factory=list)
     past_abilities: t.List[PokemonAbilityPast] = attrs.field(factory=list)
     sprites: PokemonSprite = attrs.field(factory=PokemonSprite)
+    cries: PokemonCries = attrs.field(factory=PokemonCries)
     species: NamedResource = attrs.field(factory=NamedResource)
     stats: t.List[PokemonStat] = attrs.field(factory=list)
     types: t.List[PokemonType] = attrs.field(factory=list)
@@ -433,6 +437,7 @@ class Pokemon(BaseModel):
             past_types=[PokemonTypePast.from_payload(i) for i in payload.get("past_types", [])],
             past_abilities=[PokemonAbilityPast.from_payload(i) for i in payload.get("past_abilities", [])],
             sprites=PokemonSprite.from_payload(payload.get("sprites", {}) or {}),
+            cries=PokemonCries.from_payload(payload.get("cries", {}) or {}),
             species=NamedResource.from_payload(payload.get("species", {}) or {}),
             stats=[PokemonStat.from_payload(i) for i in payload.get("stats", [])],
             types=[PokemonType.from_payload(i) for i in payload.get("types", [])],

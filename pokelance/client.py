@@ -1,11 +1,11 @@
 import asyncio
 import typing as t
-from functools import lru_cache
 from pathlib import Path
 
 from .constants import ExtensionEnum, ExtensionsL
 from .http import HttpClient
 from .logger import Logger
+from .utils import alru_cache
 
 if t.TYPE_CHECKING:
     import logging
@@ -89,6 +89,7 @@ class PokeLance:
     def __init__(
         self,
         *,
+        audio_cache_size: int = 128,
         image_cache_size: int = 128,
         cache_size: int = 100,
         logger: t.Optional["logging.Logger"] = None,
@@ -99,6 +100,8 @@ class PokeLance:
         """
         Parameters
         ----------
+        audio_cache_size : int
+            The size of the audio cache. Defaults to 128.
         image_cache_size : int
             The size of the image cache. Defaults to 128.
         cache_size : int
@@ -120,7 +123,9 @@ class PokeLance:
         self.cache_endpoints = cache_endpoints
         self._ext_tasks: t.List[t.Tuple[t.Callable[[], t.Coroutine[t.Any, t.Any, None]], str]] = []
         self._image_cache_size = image_cache_size
-        lru_cache(maxsize=self._image_cache_size)(self.get_image_async)
+        self._audio_cache_size = audio_cache_size
+        self.get_image_async.set_size(image_cache_size)
+        self.get_audio_async.set_size(audio_cache_size)
         self.setup_hook()
 
     async def __aenter__(self) -> "PokeLance":
@@ -258,6 +263,7 @@ class PokeLance:
             return await self.getch_data(params.extension, params.category, params.value)
         raise ValueError(f"Invalid URL: {url}")
 
+    @alru_cache(maxsize=128, typed=True)
     async def get_image_async(self, url: str) -> bytes:
         """
         Gets an image from the url asynchronously.
@@ -273,6 +279,23 @@ class PokeLance:
             The image data.
         """
         return await self._http.load_image(url)
+
+    @alru_cache(maxsize=128, typed=True)
+    async def get_audio_async(self, url: str) -> bytes:
+        """
+        Gets an audio from the url asynchronously.
+
+        Parameters
+        ----------
+        url : str
+            The URL to get the audio from.
+
+        Returns
+        -------
+        bytes
+            The audio data.
+        """
+        return await self._http.load_audio(url)
 
     async def wait_until_ready(self) -> None:
         """
@@ -335,4 +358,21 @@ class PokeLance:
     @image_cache_size.setter
     def image_cache_size(self, value: int) -> None:
         self._image_cache_size = value
-        lru_cache(maxsize=self._image_cache_size)(self.get_image_async)
+        self.get_image_async.set_size(value)
+
+    @property
+    def audio_cache_size(self) -> int:
+        """
+        The size of the audio cache.
+
+        Returns
+        -------
+        int
+            The size of the audio cache.
+        """
+        return self._audio_cache_size
+
+    @audio_cache_size.setter
+    def audio_cache_size(self, value: int) -> None:
+        self._audio_cache_size = value
+        self.get_audio_async.set_size(value)

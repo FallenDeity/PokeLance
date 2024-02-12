@@ -9,6 +9,7 @@ __all__: t.Tuple[str, ...] = (
     "HTTPException",
     "ResourceNotFound",
     "ImageNotFound",
+    "AudioNotFound",
 )
 
 
@@ -118,6 +119,26 @@ class ResourceNotFound(NotFound):
 
 class ImageNotFound(NotFound):
     """Exception raised when an image is not found.
+
+    Parameters
+    ----------
+    message: str
+        The message to display.
+    route: pokelance.http.Route
+        The route that caused the exception.
+    status: int
+        The status code of the exception.
+    """
+
+    def __init__(self, message: str, route: "Route", status: int) -> None:
+        super().__init__(message, route, status)
+
+    def __str__(self) -> str:
+        return f"{self.message} | {str(self.route)} | {self.status}"
+
+
+class AudioNotFound(NotFound):
+    """Exception raised when an audio is not found.
 
     Parameters
     ----------

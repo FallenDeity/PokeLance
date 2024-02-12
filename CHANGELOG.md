@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased - 2024-02-12
+
+
+Full set of changes: [v0.2.6 to 53e1600](https://github.com/FallenDeity/PokeLance/compare/v0.2.6...53e1600)
+
 ## 0.2.6 - 2024-01-14
 
 #### Fixes
@@ -8,6 +13,9 @@
 #### Refactorings
 
 -  Edit changelogs
+#### Docs
+
+-  Update Changelogs
 #### Others
 
 -  edit release package workflow to work with tags on push

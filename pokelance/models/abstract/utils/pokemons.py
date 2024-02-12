@@ -22,6 +22,7 @@ __all__: t.Tuple[str, ...] = (
     "PokemonHeldItemVersion",
     "PokemonHeldItem",
     "PokemonSprite",
+    "PokemonCries",
     "PokemonAbility",
     "PokemonMove",
     "PokemonTypePast",
@@ -543,6 +544,31 @@ class Other(BaseModel):
             home=Home.from_payload(payload.get("home", {}) or {}),
             official_artwork=OfficialArtwork.from_payload(payload.get("official-artwork", {}) or {}),
             showdown=ShowdownSprites.from_payload(payload.get("showdown", {}) or {}),
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class PokemonCries(BaseModel):
+    """
+    A pokemon cries resource.
+
+    Attributes
+    ----------
+    latest: str
+        The latest cry of this pokemon based on newer games.
+    legacy: str
+        The legacy cry of this pokemon based on older games. Usually from Gen 1 - 5.
+    """
+
+    latest: str = attrs.field(factory=str)
+    legacy: str = attrs.field(factory=str)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonCries":
+        return cls(
+            raw=payload,
+            latest=payload.get("latest", ""),
+            legacy=payload.get("legacy", ""),
         )
 
 

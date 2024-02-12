@@ -41,3 +41,27 @@ async def test_auto_cache(client: pokelance.PokeLance) -> None:
     assert len(client.http.cache.berry.berry.endpoints) > 0, "Pokemon cache is empty."
     await client.berry.cache.berry_flavor.load_all()  # load all berry flavors
     assert len((c := client.http.cache.berry.berry_flavor).endpoints) == len(c), "Berry flavor cache is not full."
+
+
+@pytest.mark.asyncio
+async def test_image_cache(client: pokelance.PokeLance) -> None:
+    pokemon = await client.pokemon.fetch_pokemon(1)
+    await client.get_image_async(pokemon.sprites.front_default)
+    assert client.get_image_async.__contains__(client, pokemon.sprites.front_default), "Image is not in cache."
+    client.get_image_async.cache_clear()
+    assert (
+        client.get_image_async.__contains__(client, pokemon.sprites.front_default) is False
+    ), "Image is still in cache."
+    client.get_image_async.set_size(10)
+    assert client.get_image_async.cache_info().maxsize == 10, "Image cache size is not 10."
+
+
+@pytest.mark.asyncio
+async def test_audio_cache(client: pokelance.PokeLance) -> None:
+    pokemon = await client.pokemon.fetch_pokemon(1)
+    await client.get_audio_async(pokemon.cries.latest)
+    assert client.get_audio_async.__contains__(client, pokemon.cries.latest), "Audio is not in cache."
+    client.get_audio_async.cache_clear()
+    assert client.get_audio_async.__contains__(client, pokemon.cries.latest) is False, "Audio is still in cache."
+    client.get_audio_async.set_size(10)
+    assert client.get_audio_async.cache_info().maxsize == 10, "Audio cache size is not 10."

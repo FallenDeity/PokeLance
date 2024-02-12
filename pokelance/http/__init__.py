@@ -5,7 +5,7 @@ import typing as t
 import aiohttp
 
 from pokelance.cache import Cache
-from pokelance.exceptions import HTTPException, ImageNotFound
+from pokelance.exceptions import AudioNotFound, HTTPException, ImageNotFound
 
 from .endpoints import Endpoint, Route
 
@@ -185,6 +185,39 @@ class HttpClient:
                     self._client.logger.error(f"Request to {url} was unsuccessful.")
                     message = f"Request to {url} was unsuccessful or the URL is not an image."
                     raise ImageNotFound(f"{message} ({response.content_type})", Route(), response.status)
+        return b""
+
+    async def load_audio(self, url: str) -> bytes:
+        """
+        Loads an audio from the url.
+
+        Parameters
+        ----------
+        url: str
+            The URL to load the audio from.
+
+        Returns
+        -------
+        bytes
+            The audio.
+
+        Raises
+        ------
+        pokelance.exceptions.AudioNotFound
+            The audio was not found.
+        """
+        await self.connect()
+        _cry_formats = ("ogg", "wav", "mp3")
+        if self.session is not None:
+            async with self.session.get(url) as response:
+                is_cry = any(f_ in response.content_type for f_ in _cry_formats)
+                if 300 > response.status >= 200 and is_cry:
+                    self._client.logger.debug(f"Request to {url} was successful.")
+                    return await response.read()
+                else:
+                    self._client.logger.error(f"Request to {url} was unsuccessful.")
+                    message = f"Request to {url} was unsuccessful or the URL is not a cry."
+                    raise AudioNotFound(f"{message} ({response.content_type})", Route(), response.status)
         return b""
 
     async def ping(self) -> float:
