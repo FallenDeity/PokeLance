@@ -55,9 +55,9 @@ plugins:
             - https://docs.python.org/3.9/objects.inv
   - search
   - social:
-      cards_color:
-        fill: "#3761A3"
-        text: "#FFFFFF"
+      cards_layout_options:
+        background_color: "#3761A3"
+        color: "#FFFFFF"
 
 nav:
   - Getting Started: index.md
