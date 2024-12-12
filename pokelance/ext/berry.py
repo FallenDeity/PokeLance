@@ -48,7 +48,8 @@ class Berry(BaseExtension):
             The name or id of the berry is invalid.
 
         Examples
-        -------
+        --------
+
         >>> from pokelance import PokeLance
         >>> client = PokeLance()
         >>> berry = client.berry.get_berry("cheri")  # None if not cached
@@ -78,7 +79,8 @@ class Berry(BaseExtension):
             The name or id of the berry is invalid.
 
         Examples
-        -------
+        --------
+
         >>> from pokelance import PokeLance
         >>> import asyncio
         >>> client = PokeLance()
@@ -87,7 +89,7 @@ class Berry(BaseExtension):
         ...     print(berry.name)
         ...     await client.close()
         >>> asyncio.run(main())
-        cheri
+        'cheri'
         """
         route = Endpoint.get_berry(name)
         self._validate_resource(self.cache.berry, name, route)
@@ -113,7 +115,8 @@ class Berry(BaseExtension):
             The name or id of the berry flavor is invalid.
 
         Examples
-        -------
+        --------
+
         >>> from pokelance import PokeLance
         >>> client = PokeLance()
         >>> berry_flavor = client.berry.get_berry_flavor("spicy")  # None if not cached
@@ -143,7 +146,8 @@ class Berry(BaseExtension):
             The name or id of the berry flavor is invalid.
 
         Examples
-        -------
+        --------
+
         >>> from pokelance import PokeLance
         >>> import asyncio
         >>> client = PokeLance()
@@ -152,7 +156,7 @@ class Berry(BaseExtension):
         ...     print(berry_flavor.name)
         ...     await client.close()
         >>> asyncio.run(main())
-        spicy
+        'spicy'
         """
         route = Endpoint.get_berry_flavor(name)
         self._validate_resource(self.cache.berry_flavor, name, route)
@@ -178,7 +182,8 @@ class Berry(BaseExtension):
             The name or id of the berry firmness is invalid.
 
         Examples
-        -------
+        --------
+
         >>> from pokelance import PokeLance
         >>> client = PokeLance()
         >>> berry_firmness = client.berry.get_berry_firmness("very-soft")  # None if not cached
@@ -208,7 +213,8 @@ class Berry(BaseExtension):
             The name or id of the berry firmness is invalid.
 
         Examples
-        -------
+        --------
+
         >>> from pokelance import PokeLance
         >>> import asyncio
         >>> client = PokeLance()
@@ -217,7 +223,7 @@ class Berry(BaseExtension):
         ...     print(berry_firmness.name)
         ...     await client.close()
         >>> asyncio.run(main())
-        very-soft
+        'very-soft'
         """
         route = Endpoint.get_berry_firmness(name)
         self._validate_resource(self.cache.berry_firmness, name, route)

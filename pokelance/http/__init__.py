@@ -68,11 +68,6 @@ class HttpClient:
             The client that this HTTP client is for.
         session: aiohttp.ClientSession
             The session to use for the HTTP client.
-
-        Returns
-        -------
-        pokelance.http.HttpClient
-            The HTTP client.
         """
         self._client = client
         self.session = session

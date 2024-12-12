@@ -24,6 +24,7 @@ class Route:
 
     Examples
     --------
+    
     >>> pokemon = "pikachu"
     >>> route = Route(endpoint=f"/pokemon/{pokemon}", method="GET")
     """

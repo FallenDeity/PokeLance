@@ -112,11 +112,6 @@ class PokeLance:
             Whether to log to a file. Defaults to False.
         session : typing.Optional[aiohttp.ClientSession]
             The session to use for the HTTP client. It is recommended to use the default.
-
-        Returns
-        -------
-        PokeLance
-            The client.
         """
         self._logger = logger or Logger(name="pokelance", file_logging=file_logging)
         self._http = HttpClient(client=self, session=session, cache_size=cache_size)

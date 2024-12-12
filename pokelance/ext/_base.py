@@ -40,11 +40,6 @@ class BaseExtension:
         ----------
         client: pokelance.http.HttpClient
             The client to use for requests.
-
-        Returns
-        -------
-        pokelance.ext.BaseExtension
-            The extension.
         """
         self._client = client
         self._cache = self._client.cache
