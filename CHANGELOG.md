@@ -1,7 +1,10 @@
 # Changelog
 
-## Unreleased - 2024-12-12
+## 0.2.8 - 2024-12-12
 
+#### New Features
+
+-  :sparkles: Add `__eq__` checks
 #### Docs
 
 -  Update Changelogs
@@ -9,7 +12,7 @@
 
 -  Update release workflow
 
-Full set of changes: [v0.2.7 to 302ac1e](https://github.com/FallenDeity/PokeLance/compare/v0.2.7...302ac1e)
+Full set of changes: [v0.2.7 to v0.2.8](https://github.com/FallenDeity/PokeLance/compare/v0.2.7...v0.2.8)
 
 ## 0.2.7 - 2024-02-12
 
