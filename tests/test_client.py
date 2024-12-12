@@ -83,3 +83,10 @@ async def test_get_image(cached_client: pokelance.PokeLance) -> None:
 async def test_get_image_invalid(cached_client: pokelance.PokeLance) -> None:
     with pytest.raises(ImageNotFound):
         await cached_client.get_image_async("https://pokeapi.co/api/v2/pokemon/invalid")
+
+
+@pytest.mark.asyncio
+async def test_model_equality(cached_client: pokelance.PokeLance) -> None:
+    pokemon_1 = await cached_client.pokemon.fetch_pokemon(1)
+    pokemon_2 = await cached_client.pokemon.fetch_pokemon(1)
+    assert pokemon_1 == pokemon_2, "Pokemon models are not equal."

@@ -3,7 +3,7 @@ import typing as t
 import attrs
 
 
-@attrs.define(hash=True, slots=True, kw_only=True)
+@attrs.define(hash=True, slots=True, kw_only=True, eq=True)
 class BaseModel(attrs.AttrsInstance):
     """Base model for all models"""
 
