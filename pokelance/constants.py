@@ -6,7 +6,7 @@ import typing as t
 
 import attrs
 
-__all__: t.Final[t.Tuple[str, ...]] = (
+__all__: t.Tuple[str, ...] = (
     "BaseEnum",
     "Extension",
     "BerryExtension",
