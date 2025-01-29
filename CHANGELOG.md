@@ -4,6 +4,7 @@
 
 #### New Features
 
+-  Release v0.2.8
 -  :sparkles: Add `__eq__` checks
 #### Fixes
 

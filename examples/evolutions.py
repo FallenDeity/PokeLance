@@ -43,18 +43,21 @@ def get_evolutions(data: EvolutionChain) -> t.Tuple[DATA, DATA]:
     evolution_dict = {}
     details_dict = {}
 
+    def _clean_dict(d: t.Dict[str, t.Any]) -> t.Dict[str, t.Any]:
+        return {k: _clean_dict(v) if isinstance(v, dict) else v for k, v in d.items() if k != "raw"}
+
     def process_evolution_chain(chain: ChainLink, n: int = 0) -> None:
         if chain.evolves_to:
             evolution_dict[chain.species.name] = [evo.species.name for evo in chain.evolves_to]
             details_dict[chain.species.name] = [
-                details.simplified_details | {"depth": n} for details in chain.evolution_details  # type: ignore
+                _clean_dict(details.simplified_details) | {"depth": n} for details in chain.evolution_details  # type: ignore
             ]
             for evo in chain.evolves_to:
                 process_evolution_chain(evo, n + 1)
         else:
             evolution_dict[chain.species.name] = []
             details_dict[chain.species.name] = [
-                details.simplified_details | {"depth": n} for details in chain.evolution_details  # type: ignore
+                _clean_dict(details.simplified_details) | {"depth": n} for details in chain.evolution_details  # type: ignore
             ]
 
     process_evolution_chain(data.chain)

@@ -1148,7 +1148,10 @@
     },
     "flapple": {},
     "appletun": {},
-    "dipplin": {}
+    "dipplin": {
+        "hydrapple": []
+    },
+    "hydrapple": {}
 },
 {
     "dunsparce": {
@@ -1165,7 +1168,7 @@
                 "depth": 1
             }
         ],
-        "dudunsparce": [
+        "dudunsparce-two-segment": [
             {
                 "trigger": {
                     "name": "level-up",
@@ -1179,7 +1182,7 @@
             }
         ]
     },
-    "dudunsparce": {},
+    "dudunsparce-two-segment": {},
     "dudunsparce-three-segment": {}
 },
 {
@@ -1194,7 +1197,7 @@
                 "depth": 1
             }
         ],
-        "maushold": [
+        "maushold-family-of-four": [
             {
                 "trigger": {
                     "name": "other",
@@ -1205,7 +1208,7 @@
             }
         ]
     },
-    "maushold": {},
+    "maushold-family-of-four": {},
     "maushold-family-of-three": {}
 },
 {
