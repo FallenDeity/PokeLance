@@ -204,6 +204,16 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
             self._endpoints[document["name"]] = Endpoint(url=document["url"], id=int(document["url"].split("/")[-2]))
         self._endpoints_cached = True
 
+    def set_size(self, size: int) -> None:
+        """Set the size of the cache.
+
+        Parameters
+        ----------
+        size: int
+            The size of the cache.
+        """
+        self._max_size = size
+
     async def wait_until_ready(self) -> None:
         """Wait until the all the endpoints are cached."""
         await self._client.http.connect()

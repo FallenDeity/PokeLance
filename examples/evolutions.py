@@ -24,6 +24,8 @@ FORM_FLAGS: t.Final[t.Tuple[str, ...]] = (
     "family",
     "breed",
     "striped",
+    "male",
+    "female",
 )
 INVALID_FORMS: t.Final[t.Tuple[str, ...]] = (
     "gmax",  # gmax pokemon like toxtricity
@@ -35,7 +37,15 @@ INVALID_FORMS: t.Final[t.Tuple[str, ...]] = (
 
 def match_variety(name: str) -> bool:
     if len(name.split("-")) > 1:
-        return any(i in name for i in FORM_FLAGS) and not any(i in name for i in INVALID_FORMS)
+        _d_form_flags = [i for i in FORM_FLAGS if "-" in i]
+        _d_invalid_forms = [i for i in INVALID_FORMS if "-" in i]
+        _form_flags = [i for i in FORM_FLAGS if "-" not in i]
+        _invalid_forms = [i for i in INVALID_FORMS if "-" not in i]
+        _form_flag = any(i == segment for segment in name.split("-") for i in _form_flags)
+        _invalid_form = any(i == segment for segment in name.split("-") for i in _invalid_forms)
+        _d_form_flag = any(i in name for i in _d_form_flags)
+        _d_invalid_form = any(i in name for i in _d_invalid_forms)
+        return any((_d_form_flag, _form_flag)) and not any((_d_invalid_form, _invalid_form))
     return False
 
 
@@ -84,7 +94,10 @@ def converge_data(evolution_dict: DATA, details_dict: DATA, variety_dict: t.Opti
             for i in v
             for n, j in enumerate(variety_dict.get(i, [i]), start=1)
         ]
-        # [::-1] specifically for mr. rime since [mr. mime, galarian mr. mime], [mr. rime] is the order
+        # for basculin where it has 3 forms but evolves only from the white stripe form, so we just add another white stripe form
+        # pokeapi holds no such context about forms, so we have to manually add them
+        if len(details) == 2 and set(list(i.keys())[0].split("-")[-1] for i in details) == {"male", "female"}:
+            varieties += [varieties[-1]]
         for k, v in zip(itertools.cycle(varieties[::-1]), details[::-1]):
             final.setdefault(k, {}).update(v)
         keys.extend(varieties)
@@ -156,6 +169,17 @@ async def main() -> None:
         "stunfisk",
         "stantler",
         "teddiursa",
+        "espurr",
+        "salandit",
+        "nidoran-m",
+        "nidoran-f",
+        "combee",
+        "hippopotas",
+        "tranquill",
+        "frillish",
+        "litleo",
+        "indeedee",
+        "lechonk",
         "basculin",
     ]
     client = PokeLance(cache_endpoints=False)

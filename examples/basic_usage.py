@@ -13,6 +13,7 @@ async def main() -> None:
     print(client.berry.get_berry("cheri"))
     print(client.berry.get_berry_flavor("spicy"))
     print(client.berry.get_berry_firmness("very-soft"))
+    await client.close()
     return None
 
 

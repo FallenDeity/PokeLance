@@ -2043,8 +2043,250 @@
     "ursaluna": {}
 },
 {
+    "espurr": {
+        "meowstic-female": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 25,
+                "depth": 1
+            }
+        ],
+        "meowstic-male": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 25,
+                "depth": 1
+            }
+        ]
+    },
+    "meowstic-male": {},
+    "meowstic-female": {}
+},
+{
+    "salandit": {
+        "salazzle": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "gender": "Female",
+                "min_level": 33,
+                "depth": 1
+            }
+        ]
+    },
+    "salazzle": {}
+},
+{
+    "nidoran-m": {
+        "nidorino": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 16,
+                "depth": 1
+            }
+        ]
+    },
+    "nidorino": {
+        "nidoking": [
+            {
+                "item": {
+                    "name": "moon-stone",
+                    "url": "https://pokeapi.co/api/v2/item/81/"
+                },
+                "trigger": {
+                    "name": "use-item",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+                },
+                "depth": 2
+            }
+        ]
+    },
+    "nidoking": {}
+},
+{
+    "nidoran-f": {
+        "nidorina": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 16,
+                "depth": 1
+            }
+        ]
+    },
+    "nidorina": {
+        "nidoqueen": [
+            {
+                "item": {
+                    "name": "moon-stone",
+                    "url": "https://pokeapi.co/api/v2/item/81/"
+                },
+                "trigger": {
+                    "name": "use-item",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/3/"
+                },
+                "depth": 2
+            }
+        ]
+    },
+    "nidoqueen": {}
+},
+{
+    "combee": {
+        "vespiquen": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "gender": "Female",
+                "min_level": 21,
+                "depth": 1
+            }
+        ]
+    },
+    "vespiquen": {}
+},
+{
+    "hippopotas": {
+        "hippowdon": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 34,
+                "depth": 1
+            }
+        ]
+    },
+    "hippowdon": {}
+},
+{
+    "pidove": {
+        "tranquill": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 21,
+                "depth": 1
+            }
+        ]
+    },
+    "tranquill": {
+        "unfezant": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 32,
+                "depth": 2
+            }
+        ]
+    },
+    "unfezant": {}
+},
+{
+    "frillish-female": {
+        "jellicent-female": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 40,
+                "depth": 1
+            }
+        ]
+    },
+    "frillish": {
+        "jellicent": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 40,
+                "depth": 1
+            }
+        ]
+    },
+    "jellicent": {},
+    "jellicent-female": {}
+},
+{
+    "litleo": {
+        "pyroar": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 35,
+                "depth": 1
+            }
+        ]
+    },
+    "pyroar": {}
+},
+{
+    "indeedee-male": {},
+    "indeedee-female": {}
+},
+{
+    "lechonk": {
+        "oinkologne-female": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 18,
+                "depth": 1
+            }
+        ],
+        "oinkologne-male": [
+            {
+                "trigger": {
+                    "name": "level-up",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/1/"
+                },
+                "min_level": 18,
+                "depth": 1
+            }
+        ]
+    },
+    "oinkologne-male": {},
+    "oinkologne-female": {}
+},
+{
     "basculin-white-striped": {
-        "basculegion": [
+        "basculegion-female": [
+            {
+                "trigger": {
+                    "name": "recoil-damage",
+                    "url": "https://pokeapi.co/api/v2/evolution-trigger/13/"
+                },
+                "depth": 1
+            }
+        ],
+        "basculegion-male": [
             {
                 "trigger": {
                     "name": "recoil-damage",
@@ -2056,5 +2298,6 @@
     },
     "basculin-red-striped": {},
     "basculin-blue-striped": {},
-    "basculegion": {}
+    "basculegion-male": {},
+    "basculegion-female": {}
 }]

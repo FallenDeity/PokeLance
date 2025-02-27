@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased - 2025-02-28
+
+#### Others
+
+-  Regenerate example evolutions.json dump
+
+Full set of changes: [v0.2.8 to bec052e](https://github.com/FallenDeity/PokeLance/compare/v0.2.8...bec052e)
+
 ## 0.2.8 - 2024-12-12
 
 #### New Features

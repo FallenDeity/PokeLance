@@ -64,28 +64,8 @@ class BaseExtension:
         """
         data: t.Set[str] = set(list(map(str, cache.endpoints.values())) + list(cache.endpoints.keys()))
         if data and str(resource) not in data:
-            raise ResourceNotFound(self.get_message(str(resource), data), route, status=404)
-
-    @staticmethod
-    def get_message(case: str, data: t.Set[str]) -> str:
-        """Gets the error message for a resource not found error.
-
-        Parameters
-        ----------
-        case: str
-            The case to use for the error message.
-        data: typing.Set[str]
-            The data to use for the error message.
-
-        Returns
-        -------
-        str
-            The error message.
-        """
-        matches = get_close_matches(case, data, n=10, cutoff=0.5)
-        if matches:
-            return f"Resource not found. Did you mean {', '.join(matches)}?"
-        return "Resource not found."
+            suggestions = get_close_matches(str(resource), data, n=10, cutoff=0.5)
+            raise ResourceNotFound(message="Resource not found.", route=route, status=404, suggestions=suggestions)
 
     async def setup(self) -> None:
         """Sets up the extension."""

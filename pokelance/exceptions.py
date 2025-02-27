@@ -108,13 +108,21 @@ class ResourceNotFound(NotFound):
         The message to display.
     route: pokelance.http.Route
         The route that caused the exception.
+    status: int
+        The status code of the exception.
+    suggestions: t.Optional[t.List[str]]
+        Possible suggestions for the resource.
     """
 
-    def __init__(self, message: str, route: "Route", status: int) -> None:
+    def __init__(self, message: str, route: "Route", status: int, suggestions: t.Optional[t.List[str]] = None) -> None:
+        self.suggestions = suggestions
         super().__init__(message, route, status)
 
     def __str__(self) -> str:
-        return f"{self.message} | {str(self.route)} | {self.status}"
+        message = self.message
+        if self.suggestions:
+            message += f" , did you mean {', '.join(self.suggestions)}?"
+        return f"{message} | {str(self.route)} | {self.status}"
 
 
 class ImageNotFound(NotFound):
