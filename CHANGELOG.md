@@ -1,12 +1,15 @@
 # Changelog
 
-## Unreleased - 2025-02-28
+## 0.2.9 - 2025-02-28
 
+#### New Features
+
+-  :sparkles: Add cache size update methods, and property `suggestions` for alternative resources on 404
 #### Others
 
 -  Regenerate example evolutions.json dump
 
-Full set of changes: [v0.2.8 to bec052e](https://github.com/FallenDeity/PokeLance/compare/v0.2.8...bec052e)
+Full set of changes: [v0.2.8 to v0.2.9](https://github.com/FallenDeity/PokeLance/compare/v0.2.8...v0.2.9)
 
 ## 0.2.8 - 2024-12-12
 
