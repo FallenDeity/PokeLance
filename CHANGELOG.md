@@ -1,12 +1,15 @@
 # Changelog
 
-## Unreleased - 2025-02-28
+## 0.2.10 - 2025-02-28
 
+#### New Features
+
+-  :zap: Add a batch load method for cache
 #### Others
 
 -  Fix error message grammar
 
-Full set of changes: [v0.2.9 to 1bfbb9d](https://github.com/FallenDeity/PokeLance/compare/v0.2.9...1bfbb9d)
+Full set of changes: [v0.2.9 to v0.2.10](https://github.com/FallenDeity/PokeLance/compare/v0.2.9...v0.2.10)
 
 ## 0.2.9 - 2025-02-28
 
