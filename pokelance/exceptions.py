@@ -121,7 +121,7 @@ class ResourceNotFound(NotFound):
     def __str__(self) -> str:
         message = self.message
         if self.suggestions:
-            message += f" , did you mean {', '.join(self.suggestions)}?"
+            message += f" Suggestions: {', '.join(self.suggestions)}"
         return f"{message} | {str(self.route)} | {self.status}"
 
 

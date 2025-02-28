@@ -7,6 +7,7 @@
 -  :sparkles: Add cache size update methods, and property `suggestions` for alternative resources on 404
 #### Others
 
+-  :bookmark: Update changelogs v0.2.9, Bump version
 -  Regenerate example evolutions.json dump
 
 Full set of changes: [v0.2.8 to v0.2.9](https://github.com/FallenDeity/PokeLance/compare/v0.2.8...v0.2.9)
