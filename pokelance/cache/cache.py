@@ -251,10 +251,54 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
         self._max_size = len(data)
         route_model = importlib.import_module("pokelance.http").__dict__["Route"]
         value_type = str(self.__orig_bases__[0].__args__[1]).split(".")[-1]  # type: ignore
-        model: "models.BaseModel" = importlib.import_module("pokelance.models").__dict__[value_type]
+        model: t.Type["_VT"] = importlib.import_module("pokelance.models").__dict__[value_type]
         for endpoint, info in data.items():
             route = route_model(endpoint=endpoint)
             self.setdefault(route, model.from_payload(info))
+
+    async def load_all_batch(self, batch_size: int = 20) -> None:
+        """
+        Load all documents/data from api into the cache in parallel. (Endpoints must be cached first)
+
+        Parameters
+        ----------
+        batch_size: int
+            The number of documents to load at once. Default is 20 to avoid overwhelming the API.
+        """
+        if not self._endpoints_cached:
+            raise RuntimeError("The endpoints have not been cached yet.")
+        self._client.logger.info(f"Loading {self.__class__.__name__}...")
+        route_model = importlib.import_module("pokelance.http").__dict__["Route"]
+        value_type = str(self.__orig_bases__[0].__args__[1]).split(".")[-1]  # type: ignore
+        model: t.Type["_VT"] = importlib.import_module("pokelance.models").__dict__[value_type]
+        self._max_size = len(self._endpoints)
+        endpoints = list(self._endpoints.values())
+        total_endpoints = len(endpoints)
+        for i in range(0, total_endpoints, batch_size):
+            batch = endpoints[i : i + batch_size]
+            tasks = []
+            for endpoint in batch:
+                route = route_model(endpoint=f"/{endpoint.url.strip('/').split('/')[-2]}/{str(endpoint)}")
+                data = self.get(route, None)
+                if data:
+                    self.setdefault(route, data)
+                    self._client.logger.info(f"Cached {route} - existing data used.")
+                else:
+                    tasks.append(self._fetch_and_cache(route, model))
+            if tasks:
+                await asyncio.gather(*tasks)
+            self._client.logger.debug(
+                f"Loaded batch {i//batch_size + 1}/{(total_endpoints + batch_size - 1)//batch_size} for {self.__class__.__name__}"
+            )
+        self._client.logger.info(f"Loaded {self.__class__.__name__} - {len(self._cache)}/{total_endpoints} items.")
+
+    async def _fetch_and_cache(self, route: "_KT", model: t.Type["_VT"]) -> None:
+        """Helper method to fetch and cache a single item"""
+        try:
+            data = await self._client.http.request(route)
+            self.setdefault(route, model.from_payload(data))
+        except Exception as e:
+            self._client.logger.error(f"Failed to load {route}: {e}")
 
     async def load_all(self) -> None:
         """

@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased - 2025-02-28
+
+#### Others
+
+-  Fix error message grammar
+
+Full set of changes: [v0.2.9 to 1bfbb9d](https://github.com/FallenDeity/PokeLance/compare/v0.2.9...1bfbb9d)
+
 ## 0.2.9 - 2025-02-28
 
 #### New Features
