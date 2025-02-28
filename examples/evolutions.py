@@ -45,7 +45,6 @@ FORM_FLAGS: t.Final[t.Tuple[str, ...]] = (
     "plumage",
     "tatsugiri",
     "gimmighoul",
-    "pikachu",
     "origin",
     "altered",
     "arceus",
@@ -113,17 +112,20 @@ INVALID_FORMS: t.Final[t.Tuple[str, ...]] = (
     "gmax",  # gmax pokemon like toxtricity
     "totem",  # totem pokemon like marowak
     "zen",  # galarian darmanitan zen mode
-    "meteor",
+    "meteor",  # minior meteor form
+    "cap",  # cap pikachu
 )
 # evolutions that have multiple forms but all of them evolve only to a specific form
 CONVERGING_EVOLUTIONS: t.Final[t.Tuple[str, ...]] = (
     "gimmighoul",
-    "pikachu",
     "slowbro",
 )
 NO_EVOLUTIONS: t.Final[t.Tuple[str, ...]] = ("floette-eternal",)
 
-client = PokeLance(cache_endpoints=True)
+ENABLE_BATTLE_FORMS = False
+
+
+client = PokeLance(cache_endpoints=False)
 
 
 def match_battle_form(name: str) -> bool:
@@ -213,7 +215,6 @@ def converge_data(evolution_dict: DATA, details_dict: DATA, variety_dict: t.Opti
             varieties += [varieties[-1]]
         # cases where multiple forms evolve to a single form
         converging_evolution(varieties, details)
-        print(varieties, details)
         varieties, details = (varieties[::-1], details[::-1]) if len(varieties) > len(details) else (varieties, details)
         for k, v in zip(itertools.cycle(varieties), details):
             final.setdefault(k, {}).update(v)
@@ -224,114 +225,114 @@ def converge_data(evolution_dict: DATA, details_dict: DATA, variety_dict: t.Opti
 
 
 async def main() -> None:
-    # branched = [
-    #     "charmander",
-    #     "squirtle",
-    #     "bulbasaur",
-    #     "wurmple",
-    #     "wooper",
-    #     "tyrogue",
-    #     "toxel",
-    #     "snorunt",
-    #     "weavile",
-    #     "ralts",
-    #     "oddish",
-    #     "exeggcute",
-    #     "eevee",
-    #     "cubone",
-    #     "clamperl",
-    #     "charcadet",
-    #     "slowpoke",
-    #     "scyther",
-    #     "rockruff",
-    #     "poliwag",
-    #     "pichu",
-    #     "nincada",
-    #     "mime-jr",
-    #     "kubfu",
-    #     "koffing",
-    #     "cosmog",
-    #     "burmy",
-    #     "applin",
-    #     "dunsparce",
-    #     "tandemaus",
-    #     "cyndaquil",
-    #     "oshawott",
-    #     "petilil",
-    #     "rufflet",
-    #     "goomy",
-    #     "bergmite",
-    #     "rowlet",
-    #     "vulpix",
-    #     "sandshrew",
-    #     "diglett",
-    #     "darumaka",
-    #     "meowth",
-    #     "growlithe",
-    #     "geodude",
-    #     "ponyta",
-    #     "farfetchd",
-    #     "grimer",
-    #     "voltorb",
-    #     "tauros",
-    #     "articuno",
-    #     "zapdos",
-    #     "moltres",
-    #     "qwilfish",
-    #     "corsola",
-    #     "zigzagoon",
-    #     "yamask",
-    #     "zorua",
-    #     "stunfisk",
-    #     "stantler",
-    #     "teddiursa",
-    #     "espurr",
-    #     "salandit",
-    #     "nidoran-m",
-    #     "nidoran-f",
-    #     "combee",
-    #     "hippopotas",
-    #     "tranquill",
-    #     "frillish",
-    #     "litleo",
-    #     "indeedee",
-    #     "lechonk",
-    #     "basculin",
-    #     "pumpkaboo",
-    #     "deoxys",
-    #     "magearna",
-    #     "sinistea",
-    #     "zarude",
-    #     "squawkabilly",
-    #     "tatsugiri",
-    #     "gimmighoul",
-    #     "sneasel",
-    #     "aegislash",
-    #     "mewtwo",
-    #     "castform",
-    #     "groudon",
-    #     "cherrim",
-    #     "meloetta",
-    #     "greninja",
-    #     "floette",
-    #     "zygarde",
-    #     "hoopa",
-    #     "wishiwashi",
-    #     "minior",
-    #     "mimikyu",
-    #     "necrozma",
-    #     "cramorant",
-    #     "eiscue",
-    #     "zacian",
-    #     "zamazenta",
-    #     "eternatus",
-    #     "calyrex",
-    #     "palafin",
-    #     "terapagos",
-    # ]
-    await client.wait_until_ready()
-    await client.pokemon.cache.pokemon_species.load_all_batch(batch_size=20)
-    branched = [i.name for i in client.pokemon.cache.pokemon_species.values()]
+    branched = [
+        "charmander",
+        "squirtle",
+        "bulbasaur",
+        "wurmple",
+        "wooper",
+        "tyrogue",
+        "toxel",
+        "snorunt",
+        "weavile",
+        "ralts",
+        "oddish",
+        "exeggcute",
+        "eevee",
+        "cubone",
+        "clamperl",
+        "charcadet",
+        "slowpoke",
+        "scyther",
+        "rockruff",
+        "poliwag",
+        "pichu",
+        "nincada",
+        "mime-jr",
+        "kubfu",
+        "koffing",
+        "cosmog",
+        "burmy",
+        "applin",
+        "dunsparce",
+        "tandemaus",
+        "cyndaquil",
+        "oshawott",
+        "petilil",
+        "rufflet",
+        "goomy",
+        "bergmite",
+        "rowlet",
+        "vulpix",
+        "sandshrew",
+        "diglett",
+        "darumaka",
+        "meowth",
+        "growlithe",
+        "geodude",
+        "ponyta",
+        "farfetchd",
+        "grimer",
+        "voltorb",
+        "tauros",
+        "articuno",
+        "zapdos",
+        "moltres",
+        "qwilfish",
+        "corsola",
+        "zigzagoon",
+        "yamask",
+        "zorua",
+        "stunfisk",
+        "stantler",
+        "teddiursa",
+        "espurr",
+        "salandit",
+        "nidoran-m",
+        "nidoran-f",
+        "combee",
+        "hippopotas",
+        "tranquill",
+        "frillish",
+        "litleo",
+        "indeedee",
+        "lechonk",
+        "basculin",
+        "pumpkaboo",
+        "deoxys",
+        "magearna",
+        "sinistea",
+        "zarude",
+        "squawkabilly",
+        "tatsugiri",
+        "gimmighoul",
+        "sneasel",
+        "aegislash",
+        "mewtwo",
+        "castform",
+        "groudon",
+        "cherrim",
+        "meloetta",
+        "greninja",
+        "floette",
+        "zygarde",
+        "hoopa",
+        "wishiwashi",
+        "minior",
+        "mimikyu",
+        "necrozma",
+        "cramorant",
+        "eiscue",
+        "zacian",
+        "zamazenta",
+        "eternatus",
+        "calyrex",
+        "palafin",
+        "terapagos",
+    ]
+    # await client.wait_until_ready()
+    # await client.pokemon.cache.pokemon_species.load_all_batch(batch_size=20)
+    # branched = [i.name for i in client.pokemon.cache.pokemon_species.values()]
     processed_chains = set()
     strings = []
     for n, i in enumerate(branched, start=1):
@@ -352,7 +353,7 @@ async def main() -> None:
             if forms:
                 variety_data[default] = [default] + forms
             battle_forms = [i.pokemon.name for i in varieties if not i.is_default and match_battle_form(i.pokemon.name)]
-            if battle_forms:
+            if ENABLE_BATTLE_FORMS and battle_forms:
                 evo_data[k] = evo_data.get(k, []) + battle_forms
                 form_entries.update({form: [] for form in battle_forms})
                 detail_data.update({form: [{"trigger": {"name": "battle"}}] for form in battle_forms})
