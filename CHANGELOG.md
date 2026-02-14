@@ -1,12 +1,21 @@
 # Changelog
 
-## Unreleased - 2026-02-15
+## 0.2.11 - 2026-02-15
 
 #### New Features
 
+-  :alien: Update models to include new fields
 -  Update the evo script to include toggle flags
+#### Fixes
 
-Full set of changes: [v0.2.10 to 1659b08](https://github.com/FallenDeity/PokeLance/compare/v0.2.10...1659b08)
+-  Update to populate the past_stats field
+#### Others
+
+-  Update uv install dep command
+-  :sparkles: Update pipelines to run on prs
+-  :bookmark: Update changelog for v0.2.11
+
+Full set of changes: [v0.2.10 to v0.2.11](https://github.com/FallenDeity/PokeLance/compare/v0.2.10...v0.2.11)
 
 ## 0.2.10 - 2025-02-28
 
