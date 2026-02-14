@@ -120,6 +120,7 @@ class EvolutionDetail(BaseModel):
             min_beauty=payload.get("min_beauty", 0),
             min_affection=payload.get("min_affection", 0),
             needs_overworld_rain=payload.get("needs_overworld_rain", False),
+            needs_multiplayer=payload.get("needs_multiplayer", False),
             party_species=NamedResource.from_payload(payload.get("party_species", {}) or {}),
             party_type=NamedResource.from_payload(payload.get("party_type", {}) or {}),
             relative_physical_stats=payload.get("relative_physical_stats", 0),

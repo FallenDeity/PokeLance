@@ -1,0 +1,34 @@
+name: Deploy Documentation
+
+on:
+  push:
+    tags: [v*]
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Install Dependencies
+        run: |
+          uv sync --locked --all-extras --dev
+
+      - name: Build and deploy docs
+        run: |
+          uv run mkdocs gh-deploy --force
