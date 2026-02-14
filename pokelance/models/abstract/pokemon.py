@@ -440,6 +440,7 @@ class Pokemon(BaseModel):
             moves=[PokemonMove.from_payload(i) for i in payload.get("moves", [])],
             past_types=[PokemonTypePast.from_payload(i) for i in payload.get("past_types", [])],
             past_abilities=[PokemonAbilityPast.from_payload(i) for i in payload.get("past_abilities", [])],
+            past_stats=[PokemonStatPast.from_payload(i) for i in payload.get("past_stats", [])],
             sprites=PokemonSprite.from_payload(payload.get("sprites", {}) or {}),
             cries=PokemonCries.from_payload(payload.get("cries", {}) or {}),
             species=NamedResource.from_payload(payload.get("species", {}) or {}),
