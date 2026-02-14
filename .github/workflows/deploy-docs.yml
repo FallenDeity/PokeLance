@@ -27,7 +27,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          uv sync --locked --all-extras --dev
+          uv sync --locked --all-groups
 
       - name: Build and deploy docs
         run: |
