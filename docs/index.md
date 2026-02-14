@@ -102,11 +102,8 @@ Following examples are available open an issue if you want more examples or more
 
 ## Important Links
 
-
 - [PokeAPI](https://pokeapi.co/)
-- [PokeAPI Documentation](https://pokeapi.co/docs/v2)
-- [PokeLance Documentation](https://FallenDeity.github.io/PokeLance/)
+- [PokeLance Documentation (MkDocs)](https://FallenDeity.github.io/PokeLance/)
 - [PokeLance ReadTheDocs](https://pokelance.readthedocs.io/en/latest/)
 - [PokeLance GitHub](https://github.com/FallenDeity/PokeLance)
 - [PokeLance PyPI](https://pypi.org/project/PokeLance/)
-- [PokeLance Discord](https://discord.gg/yeyEvT5V2J)
