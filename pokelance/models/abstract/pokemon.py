@@ -39,6 +39,7 @@ from .utils import (
     PokemonSpeciesVariety,
     PokemonSprite,
     PokemonStat,
+    PokemonStatPast,
     PokemonType,
     PokemonTypePast,
     TypePokemon,
@@ -197,7 +198,7 @@ class Gender(BaseModel):
         The name for this gender resource.
     pokemon_species_details: t.List[PokemonSpeciesGender]
         A list of Pokémon species that belong to this gender.
-    required_for_evolution: t.List[NamedAPIResource]
+    required_for_evolution: t.List[NamedResource]
         A list of Pokémon species that required this gender in order for a Pokémon to evolve into them.
     """
 
@@ -269,13 +270,13 @@ class Nature(BaseModel):
         The identifier for this nature resource.
     name: str
         The name for this nature resource.
-    decreased_stat: NamedAPIResource
+    decreased_stat: NamedResource
         The stat decreased by 10% in Pokémon with this nature.
-    increased_stat: NamedAPIResource
+    increased_stat: NamedResource
         The stat increased by 10% in Pokémon with this nature.
-    hates_flavor: NamedAPIResource
+    hates_flavor: NamedResource
         The flavor hated by Pokémon with this nature.
-    likes_flavor: NamedAPIResource
+    likes_flavor: NamedResource
         The flavor liked by Pokémon with this nature.
     pokeathlon_stat_changes: t.List[NatureStatChange]
         A list of Pokéathlon stats this nature effects and how much it effects them.
@@ -370,7 +371,7 @@ class Pokemon(BaseModel):
         The weight of this Pokémon in hectograms.
     abilities: t.List[PokemonAbility]
         A list of abilities this Pokémon could potentially have.
-    forms: t.List[NamedAPIResource]
+    forms: t.List[NamedResource]
         A list of forms this Pokémon can take on.
     game_indices: t.List[VersionGameIndex]
         A list of game indices relevent to Pokémon item by generation.
@@ -384,7 +385,9 @@ class Pokemon(BaseModel):
         A list of past types this Pokémon has had.
     past_abilities: t.List[PokemonAbilityPast]
         A list of past abilities this Pokémon has had.
-    species: NamedAPIResource
+    past_stats: t.List[PokemonStatPast]
+        "A list of details showing stats this pokémon had in previous generations.
+    species: NamedResource
         The species this Pokémon belongs to.
     sprites: PokemonSprites
         A set of sprites used to depict this Pokémon in the game.
@@ -411,6 +414,7 @@ class Pokemon(BaseModel):
     moves: t.List[PokemonMove] = attrs.field(factory=list)
     past_types: t.List[PokemonTypePast] = attrs.field(factory=list)
     past_abilities: t.List[PokemonAbilityPast] = attrs.field(factory=list)
+    past_stats: t.List[PokemonStatPast] = attrs.field(factory=list)
     sprites: PokemonSprite = attrs.field(factory=PokemonSprite)
     cries: PokemonCries = attrs.field(factory=PokemonCries)
     species: NamedResource = attrs.field(factory=NamedResource)
@@ -450,7 +454,7 @@ class LocationAreaEncounter(BaseModel):
 
     Attributes
     ----------
-    location_area: NamedAPIResource
+    location_area: NamedResource
         The location area the referenced Pokémon can be encountered in.
     version_details: t.List[VersionEncounterDetail]
         A list of versions and encounters with the referenced Pokémon that might happen.
@@ -480,7 +484,7 @@ class PokemonColor(BaseModel):
         The name for this Pokémon color resource.
     names: t.List[Name]
         The name of this Pokémon color listed in different languages.
-    pokemon_species: t.List[NamedAPIResource]
+    pokemon_species: t.List[NamedResource]
         A list of the Pokémon species that have this color.
     """
 
@@ -523,13 +527,13 @@ class PokemonForm(BaseModel):
         Whether or not this form requires mega evolution.
     form_name: str
         The name of this form.
-    pokemon: NamedAPIResource
+    pokemon: NamedResource
         The Pokémon that can take on this form.
     types: t.List[PokemonType]
         A list of details showing types this Pokémon form has.
     sprites: PokemonFormSprites
         A set of sprites used to depict this Pokémon form in the game.
-    version_group: NamedAPIResource
+    version_group: NamedResource
         The version group this Pokémon form was introduced in.
     names: t.List[Name]
         The form specific full name of this Pokémon form, or empty if the form does not have a specific name.
@@ -585,7 +589,7 @@ class PokemonHabitats(BaseModel):
         The name for this Pokémon habitat resource.
     names: t.List[Name]
         The name of this Pokémon habitat listed in different languages.
-    pokemon_species: t.List[NamedAPIResource]
+    pokemon_species: t.List[NamedResource]
         A list of the Pokémon species that can be found in this habitat.
     """
 
@@ -619,7 +623,7 @@ class PokemonShape(BaseModel):
         The "scientific" name of this Pokémon shape listed in different languages.
     names: t.List[Name]
         The name of this Pokémon shape listed in different languages.
-    pokemon_species: t.List[NamedAPIResource]
+    pokemon_species: t.List[NamedResource]
         A list of the Pokémon species that have this shape.
     """
 
@@ -673,23 +677,23 @@ class PokemonSpecies(BaseModel):
         Whether or not this Pokémon has visual differences due to gender.
     forms_switchable: bool
         Whether or not this Pokémon has multiple forms and can switch between them.
-    growth_rate: NamedAPIResource
+    growth_rate: NamedResource
         The rate at which this Pokémon species gains levels.
     pokedex_numbers: t.List[PokemonSpeciesDexEntry]
         A list of Pokedexes and the indexes reserved within them for this Pokémon species.
-    egg_groups: t.List[NamedAPIResource]
+    egg_groups: t.List[NamedResource]
         A list of egg groups this Pokémon species is a member of.
-    color: NamedAPIResource
+    color: NamedResource
         The color of this Pokémon for Pokédex search.
-    shape: NamedAPIResource
+    shape: NamedResource
         The shape of this Pokémon for Pokédex search.
-    evolves_from_species: NamedAPIResource
+    evolves_from_species: NamedResource
         The Pokémon species that evolves into this Pokemon_species.
     evolution_chain: APIResource
         The evolution chain this Pokémon species is a member of.
-    habitat: NamedAPIResource
+    habitat: NamedResource
         The habitat this Pokémon species can be encountered in.
-    generation: NamedAPIResource
+    generation: NamedResource
         The generation this Pokémon species was introduced in.
     names: t.List[Name]
         The name of this Pokémon species listed in different languages.

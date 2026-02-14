@@ -23,18 +23,18 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install poetry
-          poetry install
+          pip install uv
+          uv sync
       - name: Format with isort and black
         run: |
-          poetry run isort .
-          poetry run black .
+          uv run isort .
+          uv run black .
       - name: Linting with ruff
         run: |
-          poetry run ruff .
+          uv run ruff .
       - name: Type checking with mypy
         run: |
-          poetry run mypy .
+          uv run mypy .
       - name: Build docs
         run: |
-          poetry run mkdocs gh-deploy --force
+          uv run mkdocs gh-deploy --force

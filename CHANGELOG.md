@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased - 2026-02-15
+
+#### New Features
+
+-  Update the evo script to include toggle flags
+
+Full set of changes: [v0.2.10 to 1659b08](https://github.com/FallenDeity/PokeLance/compare/v0.2.10...1659b08)
+
 ## 0.2.10 - 2025-02-28
 
 #### New Features
@@ -7,6 +15,7 @@
 -  :zap: Add a batch load method for cache
 #### Others
 
+-  :bookmark: Update changelog for v0.2.10
 -  Fix error message grammar
 
 Full set of changes: [v0.2.9 to v0.2.10](https://github.com/FallenDeity/PokeLance/compare/v0.2.9...v0.2.10)

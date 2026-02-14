@@ -21,7 +21,7 @@ repos:
       - id: isort
         name: isort
         pass_filenames: false
-        entry: poetry run isort .
+        entry: uv run isort .
         language: python
         stages:
           - commit
@@ -31,7 +31,7 @@ repos:
       - id: black
         name: black
         pass_filenames: false
-        entry: poetry run black .
+        entry: uv run black .
         language: python
         stages:
           - commit
@@ -41,7 +41,7 @@ repos:
       - id: ruff
         name: ruff
         pass_filenames: false
-        entry: poetry run ruff .
+        entry: uv run ruff .
         language: python
         stages:
           - commit
@@ -51,7 +51,7 @@ repos:
       - id: mypy
         name: mypy
         pass_filenames: false
-        entry: poetry run mypy .
+        entry: uv run mypy .
         language: python
         stages:
           - commit
@@ -61,7 +61,7 @@ repos:
       - id: pytest
         name: pytest
         pass_filenames: false
-        entry: poetry run pytest
+        entry: uv run pytest
         language: system
         stages:
           - commit
@@ -71,7 +71,7 @@ repos:
       - id: changelog
         name: changelog
         pass_filenames: false
-        entry: poetry run auto-changelog --template ./templates/custom.jinja2 --tag-prefix v --unreleased
+        entry: uv run auto-changelog --template ./templates/custom.jinja2 --tag-prefix v --unreleased
         language: system
         stages:
           - commit

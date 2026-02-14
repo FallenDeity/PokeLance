@@ -40,6 +40,8 @@ class EvolutionDetail(BaseModel):
         The minimum required level of happiness the evolving Pokémon species must have.
     min_level: int
         The minimum required level of the evolving Pokémon species.
+    needs_multiplayer: bool
+        Whether or not multiplayer link play is needed to evolve into this Pokémon species (e.g. Union Circle).
     needs_overworld_rain: bool
         Whether or not it must be raining in the overworld to cause evolution this Pokémon species.
     party_species: NamedResource
@@ -54,6 +56,18 @@ class EvolutionDetail(BaseModel):
         The specific Pokémon species that must be traded with the evolving Pokémon species.
     turn_upside_down: bool
         Whether or not the 3DS needs to be turned upside-down as this Pokémon levels up.
+    region: NamedResource
+        The required region in which this evolution can occur.
+    base_form: NamedResource
+        The required form for which this evolution can occur.
+    used_move: NamedResource
+        The move that must be used by the evolving Pokémon species during the evolution trigger event in order to evolve into this Pokémon species.
+    min_move_count: int
+        The minimum number of times a move must be used in order to evolve into this Pokémon species.
+    min_steps: int
+        The minimum number of steps that must be taken in order to evolve into this Pokémon species.
+    min_damage_taken: int
+        The minimum amount of damage taken during the evolution trigger event in order to evolve into this Pokémon species.
     """
 
     item: NamedResource = attrs.field(factory=NamedResource)
@@ -68,12 +82,19 @@ class EvolutionDetail(BaseModel):
     min_beauty: int = attrs.field(factory=int)
     min_affection: int = attrs.field(factory=int)
     needs_overworld_rain: bool = attrs.field(factory=bool)
+    needs_multiplayer: bool = attrs.field(factory=bool)
     party_species: NamedResource = attrs.field(factory=NamedResource)
     party_type: NamedResource = attrs.field(factory=NamedResource)
     relative_physical_stats: int = attrs.field(factory=int)
     time_of_day: str = attrs.field(factory=str)
     trade_species: NamedResource = attrs.field(factory=NamedResource)
     turn_upside_down: bool = attrs.field(factory=bool)
+    region: NamedResource = attrs.field(factory=NamedResource)
+    base_form: NamedResource = attrs.field(factory=NamedResource)
+    used_move: NamedResource = attrs.field(factory=NamedResource)
+    min_move_count: int = attrs.field(factory=int)
+    min_steps: int = attrs.field(factory=int)
+    min_damage_taken: int = attrs.field(factory=int)
 
     @property
     def simplified_details(self) -> t.Dict[str, t.Any]:
@@ -105,6 +126,12 @@ class EvolutionDetail(BaseModel):
             time_of_day=payload.get("time_of_day", ""),
             trade_species=NamedResource.from_payload(payload.get("trade_species", {}) or {}),
             turn_upside_down=payload.get("turn_upside_down", False),
+            region=NamedResource.from_payload(payload.get("region", {}) or {}),
+            base_form=NamedResource.from_payload(payload.get("base_form", {}) or {}),
+            used_move=NamedResource.from_payload(payload.get("used_move", {}) or {}),
+            min_move_count=payload.get("min_move_count", 0),
+            min_steps=payload.get("min_steps", 0),
+            min_damage_taken=payload.get("min_damage_taken", 0),
         )
 
 

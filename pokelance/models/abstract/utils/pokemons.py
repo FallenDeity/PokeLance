@@ -18,6 +18,7 @@ __all__: t.Tuple[str, ...] = (
     "NaturePokeathlonStatAffectSet",
     "PokemonMoveVersion",
     "PokemonStat",
+    "PokemonStatPast",
     "PokemonType",
     "PokemonHeldItemVersion",
     "PokemonHeldItem",
@@ -984,11 +985,14 @@ class PokemonMoveVersion(BaseModel):
         The version group in which the move is learned.
     level_learned_at: int
         The minimum level to learn the move.
+    order: int
+        Order by which the pokemon will learn the move. A newly learnt move will replace the move with lowest order.
     """
 
     move_learn_method: NamedResource = attrs.field(factory=NamedResource)
     version_group: NamedResource = attrs.field(factory=NamedResource)
     level_learned_at: int = attrs.field(factory=int)
+    order: int = attrs.field(factory=int)
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonMoveVersion":
@@ -997,6 +1001,7 @@ class PokemonMoveVersion(BaseModel):
             move_learn_method=NamedResource.from_payload(payload.get("move_learn_method", {}) or {}),
             version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
             level_learned_at=payload.get("level_learned_at", 0),
+            order=payload.get("order", -1),
         )
 
 
@@ -1051,6 +1056,30 @@ class PokemonStat(BaseModel):
             stat=NamedResource.from_payload(payload.get("stat", {}) or {}),
             effort=payload.get("effort", 0),
             base_stat=payload.get("base_stat", 0),
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class PokemonStatPast(BaseModel):
+    """A pokemon stat past resource.
+
+    Attributes
+    ----------
+    generation: NamedResource
+        The last generation in which the referenced pokémon had the listed stats.
+    stats: t.List[PokemonStat]
+        The stat the Pokémon had up to and including the listed generation.
+    """
+
+    generation: NamedResource = attrs.field(factory=NamedResource)
+    stats: t.List[PokemonStat] = attrs.field(factory=list)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonStatPast":
+        return cls(
+            raw=payload,
+            generation=NamedResource.from_payload(payload.get("generation", {}) or {}),
+            stats=[PokemonStat.from_payload(i) for i in payload.get("stats", [])],
         )
 
 
