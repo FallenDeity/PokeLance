@@ -14,7 +14,7 @@ if t.TYPE_CHECKING:
     import aiohttp
 
     from .ext import BaseExtension, Berry, Contest, Encounter, Evolution, Game, Item, Location, Machine, Move, Pokemon
-    from .models import BaseModel  # noqa: F401
+    from .models import BaseModel
 
 
 __all__: t.Tuple[str, ...] = ("PokeLance",)
@@ -298,7 +298,7 @@ class PokeLance:
         """
         await self._http.connect()
         self.logger.info("Waiting until ready...")
-        while self._http._tasks_queue and self.cache_endpoints:
+        while self._http._tasks_queue and self.cache_endpoints:  # pyright: ignore[reportPrivateUsage]
             await asyncio.sleep(0.5)
         self.logger.info("Ready!")
 

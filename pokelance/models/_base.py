@@ -4,7 +4,7 @@ import attrs
 
 
 @attrs.define(hash=True, slots=True, kw_only=True, eq=True)
-class BaseModel(attrs.AttrsInstance):
+class BaseModel:
     """Base model for all models"""
 
     raw: t.Dict[str, t.Any] = attrs.field(factory=dict, repr=False, eq=False, order=False)

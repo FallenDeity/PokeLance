@@ -1,41 +1,56 @@
-[tool.poetry]
+[project]
 name = "pokelance"
 version = "0.2.10"
 description = "A flexible and easy to use pokemon library."
-authors = ["FallenDeity <61227305+FallenDeity@users.noreply.github.com>"]
-license = "MIT"
+authors = [{ name = "FallenDeity", email = "61227305+FallenDeity@users.noreply.github.com" }]
+requires-python = ">=3.8,<4"
 readme = "README.md"
+license = "MIT"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "aiohttp>=3.8.3,<4",
+    "aiofiles>=23.1.0,<24",
+    "types-aiofiles>=23.1.0.1,<24",
+    "attrs>=23.1.0,<24",
+]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-aiohttp = "^3.8.3"
-aiofiles = "^23.1.0"
-types-aiofiles = "^23.1.0.1"
-attrs = "^23.1.0"
+[dependency-groups]
+dev = [
+    "black>=22.12.0,<23",
+    "isort>=5.10.1,<6",
+    "ruff>=0.0.171,<0.1.10",
+    "pygments>=2.16.0,<3",
+    "mkdocs>=1.5.2,<2",
+    "typing-extensions>=4.4.0,<5",
+    "pre-commit>=2.20.0,<3",
+    "Pillow>=9.3,<11.0",
+    "CairoSVG>=2.5.2,<3",
+    "mypy>=0.991,<1.9",
+    "pipwin>=0.5.2,<0.6",
+    "pytest>=7.4.3,<8",
+    "pytest-asyncio>=0.23.2,<0.24",
+    "auto-changelog>=0.6.0,<0.7",
+    "deepdiff>=6.7.1,<7",
+    "pytkdocs[numpy-style]>=0.5.0",
+    "mkdocstrings[python]>=0.18",
+    "mkdocs-material>=9.5.48,<10",
+]
 
-[tool.poetry.group.dev.dependencies]
-black = "^22.12.0"
-isort = "^5.10.1"
-ruff = ">=0.0.171,<0.1.10"
-pygments = "^2.16.0"
-mkdocs = "^1.5.2"
-typing-extensions = "^4.4.0"
-pre-commit = "^2.20.0"
-Pillow = ">=9.3,<11.0"
-CairoSVG = "^2.5.2"
-mypy = ">=0.991,<1.9"
-pipwin = "^0.5.2"
-pytest = "^7.4.3"
-pytest-asyncio = "^0.23.2"
-auto-changelog = "^0.6.0"
-deepdiff = "^6.7.1"
-pytkdocs = {version = ">=0.5.0", extras = ["numpy-style"]}
-mkdocstrings = {version = ">=0.18", extras = ["python"]}
-mkdocs-material = "^9.5.48"
+[tool.uv.build-backend]
+module-root = ""
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.9.17,<0.10.0"]
+build-backend = "uv_build"
 
 [tool.ruff]
 line-length = 120
