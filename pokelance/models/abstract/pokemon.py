@@ -386,7 +386,7 @@ class Pokemon(BaseModel):
     past_abilities: t.List[PokemonAbilityPast]
         A list of past abilities this Pokémon has had.
     past_stats: t.List[PokemonStatPast]
-        "A list of details showing stats this pokémon had in previous generations.
+        A list of details showing stats this Pokémon had in previous generations.
     species: NamedResource
         The species this Pokémon belongs to.
     sprites: PokemonSprites
