@@ -2,13 +2,10 @@
 import json
 import os
 import tempfile
-import typing as t
 
 import pytest
-import pytest_asyncio
 
 import pokelance
-from pokelance.cache import BaseCache
 from pokelance.constants import ExtensionEnum
 from pokelance.http import Endpoint
 from pokelance.models import LocationAreaEncounter, Pokemon
@@ -245,7 +242,7 @@ class TestCacheEviction:
 
         # First Pokemon should be evicted
         route1 = Endpoint.get_pokemon(1)
-        cached1 = client.http.cache.pokemon.pokemon.get(route1)
+        _cached1 = client.http.cache.pokemon.pokemon.get(route1)
         # Note: with LRU, the behavior depends on access order
         # Since we accessed them in order, 1 should be evicted
 
@@ -264,7 +261,7 @@ class TestEndpointAliasing:
         await cached_client.wait_until_ready()
 
         # Fetch a pokemon
-        pokemon = await cached_client.pokemon.fetch_pokemon(1)
+        _pokemon = await cached_client.pokemon.fetch_pokemon(1)
 
         # Try getting with different route formats (if aliasing exists)
         # The cache's get() method has alias logic
