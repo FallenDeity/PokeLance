@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased - 2026-07-25
+
+#### Docs
+
+-  Update important links on README.md
+-  Update important links
+-  Remove work in progress disclaimer
+#### Others
+
+-  Pin deploy docs ci version
+
+Full set of changes: [v0.2.11 to b739564](https://github.com/FallenDeity/PokeLance/compare/v0.2.11...b739564)
+
 ## 0.2.11 - 2026-02-15
 
 #### New Features

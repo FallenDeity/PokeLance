@@ -24,6 +24,9 @@ async def test_endpoint_cache(cached_client: pokelance.PokeLance) -> None:
     exts = [e.value for e in ExtensionEnum]
     for ext in exts:
         for category in ext.categories:
+            list_endpoint_name = f"get_{category.replace('-', '_')}_endpoints"
+            if not hasattr(Endpoint, list_endpoint_name):
+                continue
             cat = category.replace("-", "_")
             attr: BaseCache[t.Any, t.Any] = getattr(getattr(cached_client, f"{ext.name}").cache, cat)
             assert attr.endpoints, f"Endpoint cache for {category} in {ext.name} is empty."

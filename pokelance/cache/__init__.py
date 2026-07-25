@@ -14,6 +14,7 @@ from .cache_manager import (
     Machine,
     Move,
     Pokemon,
+    Utility,
 )
 
 __all__: t.Tuple[str, ...] = (
@@ -30,4 +31,5 @@ __all__: t.Tuple[str, ...] = (
     "Machine",
     "Move",
     "Pokemon",
+    "Utility",
 )

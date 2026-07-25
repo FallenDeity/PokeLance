@@ -10,6 +10,7 @@ from pokelance.models.common import (
     MachineVersionDetail,
     Name,
     NamedResource,
+    Resource,
     VerboseEffect,
     VersionGroupFlavorText,
 )
@@ -51,7 +52,7 @@ class Item(BaseModel):
         A set of sprites used to depict this item in the game.
     held_by_pokemon: t.List[ItemHolderPokemon]
         A list of Pokémon that might be found in the wild holding this item.
-    baby_trigger_for: NamedResource
+    baby_trigger_for: t.Optional[Resource]
         An evolution chain this item requires to produce a bay during mating.
     machines: t.List[MachineVersionDetail]
         A list of the machines related to this item.
@@ -70,7 +71,7 @@ class Item(BaseModel):
     names: t.List[Name] = attrs.field(factory=list)
     sprites: ItemSprites = attrs.field(factory=ItemSprites)
     held_by_pokemon: t.List[ItemHolderPokemon] = attrs.field(factory=list)
-    baby_trigger_for: NamedResource = attrs.field(factory=NamedResource)
+    baby_trigger_for: t.Optional[Resource] = attrs.field(factory=Resource)
     machines: t.List[MachineVersionDetail] = attrs.field(factory=list)
 
     @classmethod
@@ -98,7 +99,9 @@ class Item(BaseModel):
                 ItemHolderPokemon.from_payload(held_by_pokemon)
                 for held_by_pokemon in payload.get("held_by_pokemon", [])
             ],
-            baby_trigger_for=NamedResource.from_payload(payload.get("baby_trigger_for", {}) or {}),
+            baby_trigger_for=Resource.from_payload(payload.get("baby_trigger_for", {}) or {})
+            if payload.get("baby_trigger_for")
+            else None,
             machines=[MachineVersionDetail.from_payload(machine) for machine in payload.get("machines", [])],
         )
 

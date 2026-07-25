@@ -164,5 +164,5 @@ class Evolution(BaseExtension):
 
 
 def setup(lance: "PokeLance") -> None:
-    """Sets up the evolution cog."""
+    """Sets up the evolution extension."""
     lance.add_extension("evolution", Evolution(lance.http))

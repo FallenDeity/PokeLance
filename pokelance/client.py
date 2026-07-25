@@ -13,7 +13,20 @@ if t.TYPE_CHECKING:
 
     import aiohttp
 
-    from .ext import BaseExtension, Berry, Contest, Encounter, Evolution, Game, Item, Location, Machine, Move, Pokemon
+    from .ext import (
+        BaseExtension,
+        Berry,
+        Contest,
+        Encounter,
+        Evolution,
+        Game,
+        Item,
+        Location,
+        Machine,
+        Move,
+        Pokemon,
+        Utility,
+    )
     from .models import BaseModel
 
 
@@ -60,6 +73,8 @@ class PokeLance:
         The move extension.
     pokemon : Pokemon
         The pokemon extension.
+    utility : Utility
+        The utility extension.
 
     Examples
     --------
@@ -85,6 +100,7 @@ class PokeLance:
     move: "Move"
     pokemon: "Pokemon"
     encounter: "Encounter"
+    utility: "Utility"
 
     def __init__(
         self,
@@ -183,7 +199,7 @@ class PokeLance:
         await self._http.close()
 
     async def getch_data(
-        self, ext: t.Union[ExtensionEnum, ExtensionsL, str], category: str, id_: t.Union[int, str]
+        self, ext: t.Union[ExtensionEnum, ExtensionsL, str], category: str, id_: t.Optional[t.Union[int, str]] = None
     ) -> BaseType:
         """
         A getch method that looks up the cache for the data first then gets it from the API if it is not found.
@@ -194,7 +210,7 @@ class PokeLance:
             The extension to get the data from.
         category : str
             The category to get the data from.
-        id_ : Union[int, str]
+        id_ : Optional[Union[int, str]]
             The ID of the data to get.
 
         Returns
@@ -231,7 +247,8 @@ class PokeLance:
         category = category.replace("-", "_")
         ext_ = getattr(self, ext.lower()) if isinstance(ext, str) else getattr(self, ext.name.lower())
         get_, fetch_ = getattr(ext_, f"get_{category}"), getattr(ext_, f"fetch_{category}")
-        return t.cast(BaseType, get_(id_) or await fetch_(id_))
+        params = (id_,) if id_ is not None else ()
+        return t.cast(BaseType, get_(*params) or await fetch_(*params))
 
     async def from_url(self, url: str) -> BaseType:
         """

@@ -2,7 +2,7 @@ import typing as t
 
 import attrs
 
-from pokelance.constants import ShowdownEnum
+from pokelance.constants import PokemonFormTriggerEnum, ShowdownEnum
 from pokelance.models import BaseModel
 from pokelance.models.common import Effect, NamedResource
 
@@ -30,6 +30,7 @@ __all__: t.Tuple[str, ...] = (
     "PokemonAbilityPast",
     "PokemonFormType",
     "PokemonFormSprites",
+    "PokemonFormTriggerCondition",
     "AwesomeName",
     "PokemonSpeciesVariety",
     "PokemonSpeciesDexEntry",
@@ -41,6 +42,7 @@ __all__: t.Tuple[str, ...] = (
     "TypeRelations",
     "TypePokemon",
     "TypeRelationsPast",
+    "TypeIcons",
 )
 
 
@@ -81,8 +83,6 @@ class BaseSprite(BaseModel):
 @attrs.define(kw_only=True, slots=True)
 class Generation(BaseModel):
     """A generation resource."""
-
-    ...
 
 
 @attrs.define(kw_only=True, slots=True)
@@ -154,20 +154,20 @@ class VersionSprite(BaseSprite):
         The gray depiction of this pokemon from the back in battle.
     front_gray: str
         The gray depiction of this pokemon from the front in battle.
-    back_transperent: str
+    back_transparent: str
         The transparent depiction of this pokemon from the back in battle.
-    front_transperent: str
+    front_transparent: str
         The transparent depiction of this pokemon from the front in battle.
     animated: Animated
         The animated depiction of this pokemon.
     """
 
     back_gray: str = attrs.field(factory=str)
-    back_transperent: str = attrs.field(factory=str)
-    back_shiny_transperent: str = attrs.field(factory=str)
+    back_transparent: str = attrs.field(factory=str)
+    back_shiny_transparent: str = attrs.field(factory=str)
     front_gray: str = attrs.field(factory=str)
-    front_transperent: str = attrs.field(factory=str)
-    front_shiny_transperent: str = attrs.field(factory=str)
+    front_transparent: str = attrs.field(factory=str)
+    front_shiny_transparent: str = attrs.field(factory=str)
     animated: Animated = attrs.field(factory=Animated)
 
     @classmethod
@@ -177,17 +177,17 @@ class VersionSprite(BaseSprite):
             back_default=payload.get("back_default", ""),
             back_gray=payload.get("back_gray", ""),
             back_shiny=payload.get("back_shiny", ""),
-            back_transperent=payload.get("back_transperent", ""),
-            back_shiny_transperent=payload.get("back_shiny_transperent", ""),
+            back_transparent=payload.get("back_transparent", ""),
+            back_shiny_transparent=payload.get("back_shiny_transparent", ""),
             back_female=payload.get("back_female", ""),
             back_shiny_female=payload.get("back_shiny_female", ""),
             front_default=payload.get("front_default", ""),
             front_shiny=payload.get("front_shiny", ""),
-            front_shiny_transperent=payload.get("front_shiny_transperent", ""),
+            front_shiny_transparent=payload.get("front_shiny_transparent", ""),
             front_female=payload.get("front_female", ""),
             front_shiny_female=payload.get("front_shiny_female", ""),
             front_gray=payload.get("front_gray", ""),
-            front_transperent=payload.get("front_transperent", ""),
+            front_transparent=payload.get("front_transparent", ""),
             animated=Animated.from_payload(payload.get("animated", {}) or {}),
         )
 
@@ -570,6 +570,265 @@ class PokemonCries(BaseModel):
             raw=payload,
             latest=payload.get("latest", ""),
             legacy=payload.get("legacy", ""),
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class TypeIcon(BaseModel):
+    """A type icon version sprite resource.
+
+    Attributes
+    ----------
+    name_icon: str
+        The name icon of this type.
+    symbol_icon: str
+        The symbol icon of this type.
+    """
+
+    name_icon: str = attrs.field(factory=str)
+    symbol_icon: str = attrs.field(factory=str)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIcon":
+        return cls(
+            raw=payload,
+            name_icon=payload.get("name_icon", ""),
+            symbol_icon=payload.get("symbol_icon", ""),
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class TypeIconGeneration(BaseModel):
+    """A type icon generation resource."""
+
+
+@attrs.define(slots=True, kw_only=True)
+class TypeIconGenerationIII(TypeIconGeneration):
+    """A type icon generation III resource.
+
+    Attributes
+    ----------
+    colosseum: TypeIcon
+        The colosseum depiction of this type.
+    emerald: TypeIcon
+        The emerald depiction of this type.
+    firered_leafgreen: TypeIcon
+        The fire red and leaf green depiction of this type.
+    ruby_sapphire: TypeIcon
+        The ruby and sapphire depiction of this type.
+    xd: TypeIcon
+        The xd depiction of this type.
+    """
+
+    colosseum: TypeIcon = attrs.field(factory=TypeIcon)
+    emerald: TypeIcon = attrs.field(factory=TypeIcon)
+    firered_leafgreen: TypeIcon = attrs.field(factory=TypeIcon)
+    ruby_sapphire: TypeIcon = attrs.field(factory=TypeIcon)
+    xd: TypeIcon = attrs.field(factory=TypeIcon)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIconGenerationIII":
+        return cls(
+            raw=payload,
+            colosseum=TypeIcon.from_payload(payload.get("colosseum", {}) or {}),
+            emerald=TypeIcon.from_payload(payload.get("emerald", {}) or {}),
+            firered_leafgreen=TypeIcon.from_payload(payload.get("firered-leafgreen", {}) or {}),
+            ruby_sapphire=TypeIcon.from_payload(payload.get("ruby-sapphire", {}) or {}),
+            xd=TypeIcon.from_payload(payload.get("xd", {}) or {}),
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class TypeIconGenerationIV(TypeIconGeneration):
+    """A type icon generation IV resource.
+
+    Attributes
+    ----------
+    diamond_pearl: TypeIcon
+        The diamond and pearl depiction of this type.
+    heartgold_soulsilver: TypeIcon
+        The heart gold and soul silver depiction of this type.
+    platinum: TypeIcon
+        The platinum depiction of this type.
+    """
+
+    diamond_pearl: TypeIcon = attrs.field(factory=TypeIcon)
+    heartgold_soulsilver: TypeIcon = attrs.field(factory=TypeIcon)
+    platinum: TypeIcon = attrs.field(factory=TypeIcon)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIconGenerationIV":
+        return cls(
+            raw=payload,
+            diamond_pearl=TypeIcon.from_payload(payload.get("diamond-pearl", {}) or {}),
+            heartgold_soulsilver=TypeIcon.from_payload(payload.get("heartgold-soulsilver", {}) or {}),
+            platinum=TypeIcon.from_payload(payload.get("platinum", {}) or {}),
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class TypeIconGenerationV(TypeIconGeneration):
+    """A type icon generation V resource.
+
+    Attributes
+    ----------
+    black_white: TypeIcon
+        The black and white depiction of this type.
+    black_2_white_2: TypeIcon
+        The black 2 and white 2 depiction of this type.
+    """
+
+    black_white: TypeIcon = attrs.field(factory=TypeIcon)
+    black_2_white_2: TypeIcon = attrs.field(factory=TypeIcon)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIconGenerationV":
+        return cls(
+            raw=payload,
+            black_white=TypeIcon.from_payload(payload.get("black-white", {}) or {}),
+            black_2_white_2=TypeIcon.from_payload(payload.get("black-2-white-2", {}) or {}),
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class TypeIconGenerationVI(TypeIconGeneration):
+    """A type icon generation VI resource.
+
+    Attributes
+    ----------
+    x_y: TypeIcon
+        The x and y depiction of this type.
+    omega_ruby_alpha_sapphire: TypeIcon
+        The omega ruby and alpha sapphire depiction of this type.
+    """
+
+    x_y: TypeIcon = attrs.field(factory=TypeIcon)
+    omega_ruby_alpha_sapphire: TypeIcon = attrs.field(factory=TypeIcon)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIconGenerationVI":
+        return cls(
+            raw=payload,
+            x_y=TypeIcon.from_payload(payload.get("x-y", {}) or {}),
+            omega_ruby_alpha_sapphire=TypeIcon.from_payload(payload.get("omega-ruby-alpha-sapphire", {}) or {}),
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class TypeIconGenerationVII(TypeIconGeneration):
+    """A type icon generation VII resource.
+
+    Attributes
+    ----------
+    sun_moon: TypeIcon
+        The sun and moon depiction of this type.
+    ultra_sun_ultra_moon: TypeIcon
+        The ultra sun and ultra moon depiction of this type.
+    lets_go_pikachu_lets_go_eevee: TypeIcon
+        The let's go pikachu and let's go eevee depiction of this type.
+    """
+
+    sun_moon: TypeIcon = attrs.field(factory=TypeIcon)
+    ultra_sun_ultra_moon: TypeIcon = attrs.field(factory=TypeIcon)
+    lets_go_pikachu_lets_go_eevee: TypeIcon = attrs.field(factory=TypeIcon)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIconGenerationVII":
+        return cls(
+            raw=payload,
+            sun_moon=TypeIcon.from_payload(payload.get("sun-moon", {}) or {}),
+            ultra_sun_ultra_moon=TypeIcon.from_payload(payload.get("ultra-sun-ultra-moon", {}) or {}),
+            lets_go_pikachu_lets_go_eevee=TypeIcon.from_payload(payload.get("lets-go-pikachu-lets-go-eevee", {}) or {}),
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class TypeIconGenerationVIII(TypeIconGeneration):
+    """A type icon generation VIII resource.
+
+    Attributes
+    ----------
+    sword_shield: TypeIcon
+        The sword and shield depiction of this type.
+    brilliant_diamond_shining_pearl: TypeIcon
+        The brilliant diamond and shining pearl depiction of this type.
+    legends_arceus: TypeIcon
+        The legends arceus depiction of this type.
+    """
+
+    sword_shield: TypeIcon = attrs.field(factory=TypeIcon)
+    brilliant_diamond_shining_pearl: TypeIcon = attrs.field(factory=TypeIcon)
+    legends_arceus: TypeIcon = attrs.field(factory=TypeIcon)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIconGenerationVIII":
+        return cls(
+            raw=payload,
+            sword_shield=TypeIcon.from_payload(payload.get("sword-shield", {}) or {}),
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class TypeIconGenerationIX(TypeIconGeneration):
+    """A type icon generation IX resource.
+
+    Attributes
+    ----------
+    scarlet_violet: TypeIcon
+        The scarlet and violet depiction of this type.
+    """
+
+    scarlet_violet: TypeIcon = attrs.field(factory=TypeIcon)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIconGenerationIX":
+        return cls(
+            raw=payload,
+            scarlet_violet=TypeIcon.from_payload(payload.get("scarlet-violet", {}) or {}),
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class TypeIcons(BaseModel):
+    """A type sprite versions resource.
+
+    Attributes
+    ----------
+    generation_iii: TypeIconGenerationIII
+        The generation III depiction of this type.
+    generation_iv: TypeIconGenerationIV
+        The generation IV depiction of this type.
+    generation_v: TypeIconGenerationV
+        The generation V depiction of this type.
+    generation_vi: TypeIconGenerationVI
+        The generation VI depiction of this type.
+    generation_vii: TypeIconGenerationVII
+        The generation VII depiction of this type.
+    generation_viii: TypeIconGenerationVIII
+        The generation VIII depiction of this type.
+    generation_ix: TypeIconGenerationIX
+        The generation IX depiction of this type.
+    """
+
+    generation_iii: TypeIconGenerationIII = attrs.field(factory=TypeIconGenerationIII)
+    generation_iv: TypeIconGenerationIV = attrs.field(factory=TypeIconGenerationIV)
+    generation_v: TypeIconGenerationV = attrs.field(factory=TypeIconGenerationV)
+    generation_vi: TypeIconGenerationVI = attrs.field(factory=TypeIconGenerationVI)
+    generation_vii: TypeIconGenerationVII = attrs.field(factory=TypeIconGenerationVII)
+    generation_viii: TypeIconGenerationVIII = attrs.field(factory=TypeIconGenerationVIII)
+    generation_ix: TypeIconGenerationIX = attrs.field(factory=TypeIconGenerationIX)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIcons":
+        return cls(
+            raw=payload,
+            generation_iii=TypeIconGenerationIII.from_payload(payload.get("generation-iii", {}) or {}),
+            generation_iv=TypeIconGenerationIV.from_payload(payload.get("generation-iv", {}) or {}),
+            generation_v=TypeIconGenerationV.from_payload(payload.get("generation-v", {}) or {}),
+            generation_vi=TypeIconGenerationVI.from_payload(payload.get("generation-vi", {}) or {}),
+            generation_vii=TypeIconGenerationVII.from_payload(payload.get("generation-vii", {}) or {}),
+            generation_viii=TypeIconGenerationVIII.from_payload(payload.get("generation-viii", {}) or {}),
+            generation_ix=TypeIconGenerationIX.from_payload(payload.get("generation-ix", {}) or {}),
         )
 
 
@@ -1125,16 +1384,31 @@ class PokemonFormSprites(BaseModel):
         The default depiction of this pokemon form from the front in battle.
     front_shiny: str
         The shiny depiction of this pokemon form from the front in battle.
+    front_female: str
+        The female depiction of this pokemon form from the front in battle.
+    front_shiny_female: str
+        The shiny female depiction of this pokemon form from the front in battle.
     back_default: str
         The default depiction of this pokemon form from the back in battle.
     back_shiny: str
         The shiny depiction of this pokemon form from the back in battle.
+    back_female: str
+        The female depiction of this pokemon form from the back in battle.
+    back_shiny_female: str
+        The shiny female depiction of this pokemon form from the back in battle.
+    versions: Versions
+        A set of sprites used to depict this Pokémon form in the game.
     """
 
     front_default: str = attrs.field(factory=str)
     front_shiny: str = attrs.field(factory=str)
+    front_female: str = attrs.field(factory=str)
+    front_shiny_female: str = attrs.field(factory=str)
     back_default: str = attrs.field(factory=str)
     back_shiny: str = attrs.field(factory=str)
+    back_female: str = attrs.field(factory=str)
+    back_shiny_female: str = attrs.field(factory=str)
+    versions: Versions = attrs.field(factory=Versions)
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonFormSprites":
@@ -1142,8 +1416,41 @@ class PokemonFormSprites(BaseModel):
             raw=payload,
             front_default=payload.get("front_default", ""),
             front_shiny=payload.get("front_shiny", ""),
+            front_female=payload.get("front_female", ""),
+            front_shiny_female=payload.get("front_shiny_female", ""),
             back_default=payload.get("back_default", ""),
             back_shiny=payload.get("back_shiny", ""),
+            back_female=payload.get("back_female", ""),
+            back_shiny_female=payload.get("back_shiny_female", ""),
+            versions=Versions.from_payload(payload.get("versions", {}) or {}),
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class PokemonFormTriggerCondition(BaseModel):
+    """A pokemon form trigger conditions resource.
+
+    Attributes
+    ----------
+    name: str
+        The name of the condition.
+    trigger: PokemonFormTriggerEnum
+        The trigger that causes this condition to be met.
+    url: str
+        The url of the condition.
+    """
+
+    name: str = attrs.field(factory=str)
+    trigger: t.Optional[PokemonFormTriggerEnum] = attrs.field(converter=PokemonFormTriggerEnum.from_str)  # type: ignore[misc]
+    url: str = attrs.field(factory=str)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonFormTriggerCondition":
+        return cls(
+            raw=payload,
+            name=payload.get("name", ""),
+            trigger=payload.get("trigger", None),
+            url=payload.get("url", ""),
         )
 
 

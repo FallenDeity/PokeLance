@@ -1,6 +1,13 @@
+import enum
 import typing as t
 
 import attrs
+
+
+def _serializer(_instance: t.Any, _field: attrs.Attribute, value: t.Any) -> t.Any:  # type: ignore
+    if isinstance(value, enum.Enum):
+        return value.value
+    return value
 
 
 @attrs.define(hash=True, slots=True, kw_only=True, eq=True)
@@ -17,7 +24,9 @@ class BaseModel:
         typing.Dict[str, Any]
             The model as a dict.
         """
-        return attrs.asdict(self)
+        return attrs.asdict(
+            self, filter=attrs.filters.exclude(attrs.fields(BaseModel).raw), value_serializer=_serializer
+        )
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "BaseModel":

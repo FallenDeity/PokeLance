@@ -2,6 +2,7 @@ import typing as t
 
 import attrs
 
+from pokelance.constants import GenderEnum
 from pokelance.models import BaseModel
 from pokelance.models.common import NamedResource
 
@@ -9,7 +10,6 @@ __all__: t.Tuple[str, ...] = (
     "ChainLink",
     "EvolutionDetail",
 )
-GENDER_MAP: t.Dict[int, str] = {1: "Female", 2: "Male", 3: "Genderless"}
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -18,6 +18,10 @@ class EvolutionDetail(BaseModel):
 
     Attributes
     ----------
+    version_group_id: NamedResource
+        The version group in which the evolution was introduced.
+    is_default: bool
+        Whether the evolution is considered as the expected evolution in a main series game. Each unique Pokémon variety of a line capable of evolution should have exactly one 'default' evolution. For example, the Meowth species has three default evolutions as there are three distinct varieties it can evolve into: Persian, Alolan Persian, and Perrserker.
     item: NamedResource
         The item required to cause evolution this into Pokémon species.
     trigger: NamedResource
@@ -40,6 +44,8 @@ class EvolutionDetail(BaseModel):
         The minimum required level of happiness the evolving Pokémon species must have.
     min_level: int
         The minimum required level of the evolving Pokémon species.
+    near_special_rock: bool
+        Whether or not you need to be near a Moss Rock or Icy Rock to evolve into this Pokémon species.
     needs_multiplayer: bool
         Whether or not multiplayer link play is needed to evolve into this Pokémon species (e.g. Union Circle).
     needs_overworld_rain: bool
@@ -60,6 +66,8 @@ class EvolutionDetail(BaseModel):
         The required region in which this evolution can occur.
     base_form: NamedResource
         The required form for which this evolution can occur.
+    evolved_form: NamedResource
+        The form to which this evolution occurs.
     used_move: NamedResource
         The move that must be used by the evolving Pokémon species during the evolution trigger event in order to evolve into this Pokémon species.
     min_move_count: int
@@ -70,9 +78,11 @@ class EvolutionDetail(BaseModel):
         The minimum amount of damage taken during the evolution trigger event in order to evolve into this Pokémon species.
     """
 
+    version_group: NamedResource = attrs.field(factory=NamedResource)
+    is_default: bool = attrs.field(factory=bool)
     item: NamedResource = attrs.field(factory=NamedResource)
     trigger: NamedResource = attrs.field(factory=NamedResource)
-    gender: str = attrs.field(factory=str)
+    gender: t.Optional[GenderEnum] = attrs.field(converter=GenderEnum.from_int)  # type: ignore[misc]
     held_item: NamedResource = attrs.field(factory=NamedResource)
     known_move: NamedResource = attrs.field(factory=NamedResource)
     known_move_type: NamedResource = attrs.field(factory=NamedResource)
@@ -81,6 +91,7 @@ class EvolutionDetail(BaseModel):
     min_happiness: int = attrs.field(factory=int)
     min_beauty: int = attrs.field(factory=int)
     min_affection: int = attrs.field(factory=int)
+    near_special_rock: bool = attrs.field(factory=bool)
     needs_overworld_rain: bool = attrs.field(factory=bool)
     needs_multiplayer: bool = attrs.field(factory=bool)
     party_species: NamedResource = attrs.field(factory=NamedResource)
@@ -91,6 +102,7 @@ class EvolutionDetail(BaseModel):
     turn_upside_down: bool = attrs.field(factory=bool)
     region: NamedResource = attrs.field(factory=NamedResource)
     base_form: NamedResource = attrs.field(factory=NamedResource)
+    evolved_form: NamedResource = attrs.field(factory=NamedResource)
     used_move: NamedResource = attrs.field(factory=NamedResource)
     min_move_count: int = attrs.field(factory=int)
     min_steps: int = attrs.field(factory=int)
@@ -108,9 +120,11 @@ class EvolutionDetail(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EvolutionDetail":
         return cls(
             raw=payload,
+            version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
+            is_default=payload.get("is_default", False),
             item=NamedResource.from_payload(payload.get("item", {}) or {}),
             trigger=NamedResource.from_payload(payload.get("trigger", {}) or {}),
-            gender=GENDER_MAP.get(payload.get("gender", 0), ""),
+            gender=payload.get("gender", None),
             held_item=NamedResource.from_payload(payload.get("held_item", {}) or {}),
             known_move=NamedResource.from_payload(payload.get("known_move", {}) or {}),
             known_move_type=NamedResource.from_payload(payload.get("known_move_type", {}) or {}),
@@ -119,6 +133,7 @@ class EvolutionDetail(BaseModel):
             min_happiness=payload.get("min_happiness", 0),
             min_beauty=payload.get("min_beauty", 0),
             min_affection=payload.get("min_affection", 0),
+            near_special_rock=payload.get("near_special_rock", False),
             needs_overworld_rain=payload.get("needs_overworld_rain", False),
             needs_multiplayer=payload.get("needs_multiplayer", False),
             party_species=NamedResource.from_payload(payload.get("party_species", {}) or {}),
@@ -129,6 +144,7 @@ class EvolutionDetail(BaseModel):
             turn_upside_down=payload.get("turn_upside_down", False),
             region=NamedResource.from_payload(payload.get("region", {}) or {}),
             base_form=NamedResource.from_payload(payload.get("base_form", {}) or {}),
+            evolved_form=NamedResource.from_payload(payload.get("evolved_form", {}) or {}),
             used_move=NamedResource.from_payload(payload.get("used_move", {}) or {}),
             min_move_count=payload.get("min_move_count", 0),
             min_steps=payload.get("min_steps", 0),

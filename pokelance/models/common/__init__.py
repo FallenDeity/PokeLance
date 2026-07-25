@@ -1,6 +1,7 @@
 import typing as t
 
 from .models import (
+    APIMetadata,
     Description,
     Effect,
     Encounter,
@@ -31,4 +32,5 @@ __all__: t.Tuple[str, ...] = (
     "Resource",
     "NamedResource",
     "Language",
+    "APIMetadata",
 )

@@ -232,5 +232,5 @@ class Berry(BaseExtension):
 
 
 def setup(lance: "PokeLance") -> None:
-    """Sets up the berry cog."""
+    """Sets up the berry extension."""
     lance.add_extension("berry", Berry(lance.http))

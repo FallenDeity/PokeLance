@@ -57,6 +57,11 @@ class Endpoint:
         return Route(endpoint=f"/language/{language}")
 
     @classmethod
+    def get_api_metadata(cls) -> Route:
+        """Gets the API metadata."""
+        return Route(endpoint="/meta")
+
+    @classmethod
     def get_berry_endpoints(cls) -> Route:
         """Get a list of berry endpoints."""
         return Route(endpoint="/berry", payload={"limit": 10000})

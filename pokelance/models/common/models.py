@@ -19,6 +19,7 @@ __all__: t.Tuple[str, ...] = (
     "VersionGameIndex",
     "VersionGroupFlavorText",
     "Language",
+    "APIMetadata",
 )
 
 
@@ -90,7 +91,7 @@ class Encounter(BaseModel):
 
     min_level: int = attrs.field(factory=int)
     max_level: int = attrs.field(factory=int)
-    condition_values: t.List[Resource] = attrs.field(factory=list)
+    condition_values: t.List[NamedResource] = attrs.field(factory=list)
     chance: int = attrs.field(factory=int)
     method: NamedResource = attrs.field(factory=NamedResource)
 
@@ -100,7 +101,7 @@ class Encounter(BaseModel):
             raw=payload,
             min_level=payload.get("min_level", 0),
             max_level=payload.get("max_level", 0),
-            condition_values=[Resource.from_payload(i) for i in payload.get("condition_values", [])],
+            condition_values=[NamedResource.from_payload(i) for i in payload.get("condition_values", [])],
             chance=payload.get("chance", 0),
             method=NamedResource.from_payload(payload.get("method", {}) or {}),
         )
@@ -351,4 +352,32 @@ class Language(BaseModel):
             iso639=payload.get("iso639", ""),
             iso3166=payload.get("iso3166", ""),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class APIMetadata(BaseModel):
+    """Model for an API metadata object
+
+    Attributes
+    ----------
+    hash: str
+        The git commit hash of the current deployed version of the API.
+    deploy_date: str
+        The date the current deployed version of the API was deployed.
+    tag: t.Optional[str]
+        The git tag of the current deployed version of the API, if any.
+    """
+
+    hash: str = attrs.field(factory=str)
+    deploy_date: str = attrs.field(factory=str)
+    tag: t.Optional[str] = attrs.field(default=None)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "APIMetadata":
+        return cls(
+            raw=payload,
+            hash=payload.get("hash", ""),
+            deploy_date=payload.get("deploy_date", ""),
+            tag=payload.get("tag", None),
         )

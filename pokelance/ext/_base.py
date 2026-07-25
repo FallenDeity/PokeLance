@@ -12,7 +12,7 @@ if t.TYPE_CHECKING:
 
 __all__: t.Tuple[str, ...] = ("BaseExtension",)
 _KT = t.TypeVar("_KT", bound="Route")
-_VT = t.TypeVar("_VT", bound="BaseModel")
+_VT = t.TypeVar("_VT", bound="t.Union[BaseModel, t.List[t.Any]]")
 
 
 class BaseExtension:
@@ -71,7 +71,9 @@ class BaseExtension:
         """Sets up the extension."""
         for item in dir(self):
             if item.startswith("fetch_"):
-                data = await self._client.request(
-                    t.cast(t.Callable[[], "Route"], getattr(Endpoint, f"get_{item[6:]}_endpoints"))()
-                )
+                endpoint_name = f"get_{item[6:]}_endpoints"
+                if not hasattr(Endpoint, endpoint_name):
+                    continue
+                endpoint: t.Callable[[], "Route"] = getattr(Endpoint, endpoint_name)
+                data = await self._client.request(endpoint())
                 self._cache.load_documents(str(self.__class__.__name__), item[6:], data["results"])

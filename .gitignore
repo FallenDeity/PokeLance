@@ -151,5 +151,7 @@ cython_debug/
 poetry.lock
 
 # Mkdocs
-
 site/
+
+# Scripts
+scripts/

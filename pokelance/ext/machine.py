@@ -96,5 +96,5 @@ class Machine(BaseExtension):
 
 
 def setup(lance: "PokeLance") -> None:
-    """Sets up the machine cog."""
+    """Sets up the machine extension."""
     lance.add_extension("machine", Machine(lance.http))

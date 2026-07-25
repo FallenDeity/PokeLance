@@ -32,6 +32,7 @@ from .utils import (
     PokemonAbilityPast,
     PokemonCries,
     PokemonFormSprites,
+    PokemonFormTriggerCondition,
     PokemonHeldItem,
     PokemonMove,
     PokemonSpeciesDexEntry,
@@ -42,6 +43,7 @@ from .utils import (
     PokemonStatPast,
     PokemonType,
     PokemonTypePast,
+    TypeIcons,
     TypePokemon,
     TypeRelations,
     TypeRelationsPast,
@@ -532,6 +534,8 @@ class PokemonForm(BaseModel):
         The Pokémon that can take on this form.
     types: t.List[PokemonType]
         A list of details showing types this Pokémon form has.
+    trigger_conditions: t.List[PokemonFormTriggerCondition]
+        A list of conditions that trigger this Pokémon form.
     sprites: PokemonFormSprites
         A set of sprites used to depict this Pokémon form in the game.
     version_group: NamedResource
@@ -551,6 +555,7 @@ class PokemonForm(BaseModel):
     is_mega: bool = attrs.field(factory=bool)
     form_name: str = attrs.field(factory=str)
     pokemon: NamedResource = attrs.field(factory=NamedResource)
+    trigger_conditions: t.List[PokemonFormTriggerCondition] = attrs.field(factory=list)
     types: t.List[PokemonType] = attrs.field(factory=list)
     sprites: PokemonFormSprites = attrs.field(factory=PokemonFormSprites)
     version_group: NamedResource = attrs.field(factory=NamedResource)
@@ -570,6 +575,9 @@ class PokemonForm(BaseModel):
             is_mega=payload.get("is_mega", False),
             form_name=payload.get("form_name", ""),
             pokemon=NamedResource.from_payload(payload.get("pokemon", {}) or {}),
+            trigger_conditions=[
+                PokemonFormTriggerCondition.from_payload(i) for i in payload.get("trigger_conditions", [])
+            ],
             types=[PokemonType.from_payload(i) for i in payload.get("types", [])],
             sprites=PokemonFormSprites.from_payload(payload.get("sprites", {}) or {}),
             version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
@@ -787,6 +795,8 @@ class Stat(BaseModel):
         The stat order in which effects of this stat take place during battle.
     is_battle_only: bool
         Whether this stat only exists within a battle.
+    affecting_items: t.List[NamedResource]
+        A list of items which affect this stat positively or negatively.
     affecting_moves: MoveStatAffectSets
         A detail of moves which affect this stat positively or negatively.
     affecting_natures: NatureStatAffectSets
@@ -803,6 +813,7 @@ class Stat(BaseModel):
     name: str = attrs.field(factory=str)
     game_index: int = attrs.field(factory=int)
     is_battle_only: bool = attrs.field(factory=bool)
+    affecting_items: t.List[NamedResource] = attrs.field(factory=list)
     affecting_moves: MoveStatAffectSets = attrs.field(factory=MoveStatAffectSets)
     affecting_natures: NatureStatAffectSets = attrs.field(factory=NatureStatAffectSets)
     characteristics: t.List[Resource] = attrs.field(factory=list)
@@ -817,6 +828,7 @@ class Stat(BaseModel):
             name=payload.get("name", ""),
             game_index=payload.get("game_index", 0),
             is_battle_only=payload.get("is_battle_only", False),
+            affecting_items=[NamedResource.from_payload(i) for i in payload.get("affecting_items", [])],
             affecting_moves=MoveStatAffectSets.from_payload(payload.get("affecting_moves", {}) or {}),
             affecting_natures=NatureStatAffectSets.from_payload(payload.get("affecting_natures", {}) or {}),
             characteristics=[Resource.from_payload(i) for i in payload.get("characteristics", [])],
@@ -838,7 +850,7 @@ class Type(BaseModel):
         The name for this resource.
     damage_relations: TypeRelations
         A detail of how effective this type is toward others and vice versa.
-    past_damage_relations: TypeRelationsPast
+    past_damage_relations: t.List[TypeRelationsPast]
         A detail of how effective this type was toward others and vice versa in previous generations.
     game_indices: t.List[GenerationGameIndex]
         A list of game indices relevent to this item by generation.
@@ -852,18 +864,21 @@ class Type(BaseModel):
         A list of details of Pokémon that have this type.
     moves: t.List[NamedResource]
         A list of moves that have this type.
+    sprites: TypeIcons
+        A set of sprites used to depict this type in the game.
     """
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
     damage_relations: TypeRelations = attrs.field(factory=TypeRelations)
-    past_damage_relations: TypeRelationsPast = attrs.field(factory=TypeRelationsPast)
+    past_damage_relations: t.List[TypeRelationsPast] = attrs.field(factory=list)
     game_indices: t.List[GenerationGameIndex] = attrs.field(factory=list)
     generation: NamedResource = attrs.field(factory=NamedResource)
     move_damage_class: NamedResource = attrs.field(factory=NamedResource)
     names: t.List[Name] = attrs.field(factory=list)
     pokemon: t.List[TypePokemon] = attrs.field(factory=list)
     moves: t.List[NamedResource] = attrs.field(factory=list)
+    sprites: TypeIcons = attrs.field(factory=TypeIcons)
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Type":
@@ -872,11 +887,12 @@ class Type(BaseModel):
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             damage_relations=TypeRelations.from_payload(payload.get("damage_relations", {}) or {}),
-            past_damage_relations=TypeRelationsPast.from_payload(payload.get("past_damage_relations", {}) or {}),
+            past_damage_relations=[TypeRelationsPast.from_payload(i) for i in payload.get("past_damage_relations", [])],
             game_indices=[GenerationGameIndex.from_payload(i) for i in payload.get("game_indices", [])],
             generation=NamedResource.from_payload(payload.get("generation", {}) or {}),
             move_damage_class=NamedResource.from_payload(payload.get("move_damage_class", {}) or {}),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
             pokemon=[TypePokemon.from_payload(i) for i in payload.get("pokemon", [])],
             moves=[NamedResource.from_payload(i) for i in payload.get("moves", [])],
+            sprites=TypeIcons.from_payload(payload.get("sprites", {}) or {}),
         )

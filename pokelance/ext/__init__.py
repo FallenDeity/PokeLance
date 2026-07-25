@@ -11,6 +11,7 @@ from .location import Location
 from .machine import Machine
 from .move import Move
 from .pokemon import Pokemon
+from .utility import Utility
 
 __all__: t.Tuple[str, ...] = (
     "BaseExtension",
@@ -24,4 +25,5 @@ __all__: t.Tuple[str, ...] = (
     "Machine",
     "Move",
     "Pokemon",
+    "Utility",
 )

@@ -299,5 +299,5 @@ class Location(BaseExtension):
 
 
 def setup(lance: "PokeLance") -> None:
-    """Sets up the location cog."""
+    """Sets up the location extension."""
     lance.add_extension("location", Location(lance.http))

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import time
 import typing as t
@@ -10,7 +12,10 @@ from pokelance.exceptions import AudioNotFound, HTTPException, ImageNotFound
 from .endpoints import Endpoint, Route
 
 if t.TYPE_CHECKING:
+    import logging
+
     from pokelance import PokeLance
+    from pokelance.logger import Logger
 
 
 __all__: t.Tuple[str, ...] = (
@@ -237,3 +242,14 @@ class HttpClient:
             The cache.
         """
         return self._cache
+
+    @property
+    def logger(self) -> t.Union["Logger", "logging.Logger"]:
+        """The logger to use for the HTTP client.
+
+        Returns
+        -------
+        typing.Union[pokelance.logger.Logger, logging.Logger]
+            The logger.
+        """
+        return self._client.logger

@@ -231,5 +231,5 @@ class Encounter(BaseExtension):
 
 
 def setup(lance: "PokeLance") -> None:
-    """Sets up the encounter cog."""
+    """Sets up the encounter extension."""
     lance.add_extension("encounter", Encounter(lance.http))

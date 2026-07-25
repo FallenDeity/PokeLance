@@ -515,7 +515,7 @@ class Pokemon(BaseExtension):
         data = await self._client.request(route)
         return self.cache.pokeathlon_stat.setdefault(route, PokeathlonStat.from_payload(data))
 
-    def get_location_area_encounter(self, name: t.Union[str, int]) -> t.Optional[LocationAreaEncounter]:
+    def get_location_area_encounter(self, name: t.Union[str, int]) -> t.Optional[t.List[LocationAreaEncounter]]:
         """
         Get location area encounter from cache.
         It gets areas where a pokemon can be found.
@@ -527,8 +527,8 @@ class Pokemon(BaseExtension):
 
         Returns
         -------
-        t.Optional[LocationAreaEncounter]
-            Location area encounter model if found, else None.
+        t.Optional[t.List[LocationAreaEncounter]]
+            List of location area encounter models if found, else None.
 
         Raises
         ------
@@ -540,27 +540,27 @@ class Pokemon(BaseExtension):
 
         >>> from pokelance import PokeLance
         >>> client = PokeLance()
-        >>> location_area_encounter = client.pokemon.get_location_area_encounter(1)
-        >>> location_area_encounter.location_area.name
+        >>> location_area_encounters = client.pokemon.get_location_area_encounter(1)
+        >>> location_area_encounters[0].location_area.name
         'cerulean-city-area'
         """
         route = Endpoint.get_location_area_encounter(name)
         self._validate_resource(self.cache.location_area_encounter, name, route)
         return self.cache.location_area_encounter.get(route, None)
 
-    async def fetch_location_area_encounter(self, name: t.Union[str, int]) -> LocationAreaEncounter:
+    async def fetch_location_area_encounter(self, name: t.Union[str, int]) -> t.List[LocationAreaEncounter]:
         """
         Fetches a location area encounter model by name or id.
 
         Parameters
         ----------
         name: Union[str, int]
-            The name or id of the
+            The name or id of the location area encounter.
 
         Returns
         -------
-        LocationAreaEncounter
-            Location area encounter model if found, else raises ResourceNotFound.
+        t.List[LocationAreaEncounter]
+            List of location area encounter models if found, else raises ResourceNotFound.
 
         Raises
         ------
@@ -574,8 +574,8 @@ class Pokemon(BaseExtension):
         >>> import asyncio
         >>> client = PokeLance()
         >>> async def main() -> None:
-        ...    location_area_encounter = await client.pokemon.fetch_location_area_encounter(1)
-        ...    print(location_area_encounter.location_area.name)
+        ...    location_area_encounters = await client.pokemon.fetch_location_area_encounter(1)
+        ...    print(location_area_encounters[0].location_area.name)
         ...    await client.close()
         >>> asyncio.run(main())
         cerulean-city-area
@@ -583,7 +583,9 @@ class Pokemon(BaseExtension):
         route = Endpoint.get_location_area_encounter(name)
         self._validate_resource(self.cache.location_area_encounter, name, route)
         data = await self._client.request(route)
-        return self.cache.location_area_encounter.setdefault(route, LocationAreaEncounter.from_payload(data[0]))
+        return self.cache.location_area_encounter.setdefault(
+            route, [LocationAreaEncounter.from_payload(item) for item in data]
+        )
 
     def get_pokemon(self, name: t.Union[str, int]) -> t.Optional[PokemonModel]:
         """
@@ -1152,5 +1154,5 @@ class Pokemon(BaseExtension):
 
 
 def setup(lance: "PokeLance") -> None:
-    """Setup the pokemon cog."""
+    """Setup the pokemon extension."""
     lance.add_extension("pokemon", Pokemon(lance.http))

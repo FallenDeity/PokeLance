@@ -499,5 +499,5 @@ class Move(BaseExtension):
 
 
 def setup(lance: "PokeLance") -> None:
-    """Sets up the move cog."""
+    """Sets up the move extension."""
     lance.add_extension("move", Move(lance.http))

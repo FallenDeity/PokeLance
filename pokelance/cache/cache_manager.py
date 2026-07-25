@@ -4,6 +4,7 @@ import attrs
 
 from .cache import (
     AbilityCache,
+    APIMetadataCache,
     BaseCache,
     BerryCache,
     BerryFirmnessCache,
@@ -28,6 +29,7 @@ from .cache import (
     ItemCategoryCache,
     ItemFlingEffectCache,
     ItemPocketCache,
+    LanguageCache,
     LocationAreaCache,
     LocationCache,
     MachineCache,
@@ -72,6 +74,7 @@ __all__: t.Tuple[str, ...] = (
     "Machine",
     "Move",
     "Pokemon",
+    "Utility",
 )
 
 
@@ -320,6 +323,8 @@ class Pokemon(Base):
         The stat.
     type: TypeCache
         The type.
+    utility: UtilityCache
+        The utility cache.
     """
 
     max_size: int = 100
@@ -386,6 +391,25 @@ class Berry(Base):
 
 
 @attrs.define(slots=True, kw_only=True)
+class Utility(Base):
+    """Cache for utility related endpoints.
+
+    Attributes
+    ----------
+    max_size: int
+        The maximum cache size.
+    language: LanguageCache
+        The language.
+    api_metadata: APIMetadataCache
+        The API metadata.
+    """
+
+    max_size: int = 100
+    language: LanguageCache = attrs.field(default=LanguageCache(max_size=max_size))
+    api_metadata: APIMetadataCache = attrs.field(default=APIMetadataCache(max_size=max_size))
+
+
+@attrs.define(slots=True, kw_only=True)
 class Cache:
     """Cache for all endpoints.
 
@@ -415,6 +439,8 @@ class Cache:
         The move cache.
     pokemon: Pokemon
         The pokemon cache.
+    utility: Utility
+        The utility cache.
     """
 
     client: "PokeLance"
@@ -429,6 +455,7 @@ class Cache:
     machine: Machine = attrs.field(default=Machine(max_size=max_size))
     move: Move = attrs.field(default=Move(max_size=max_size))
     pokemon: Pokemon = attrs.field(default=Pokemon(max_size=max_size))
+    utility: Utility = attrs.field(default=Utility(max_size=max_size))
 
     def __attrs_post_init__(self) -> None:
         obj: attrs.Attribute[Base]

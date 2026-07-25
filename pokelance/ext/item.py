@@ -366,5 +366,5 @@ class Item(BaseExtension):
 
 
 def setup(lance: "PokeLance") -> None:
-    """Sets up the item cog."""
+    """Sets up the item extension."""
     lance.add_extension("item", Item(lance.http))

@@ -231,5 +231,5 @@ class Contest(BaseExtension):
 
 
 def setup(lance: "PokeLance") -> None:
-    """Sets up the contest cog."""
+    """Sets up the contest extension."""
     lance.add_extension("contest", Contest(lance.http))

@@ -51,7 +51,7 @@ from .abstract import (
     Version,
     VersionGroup,
 )
-from .common import Language
+from .common import APIMetadata, Language
 
 __all__: t.Tuple[str, ...] = (
     "BaseModel",
@@ -104,4 +104,5 @@ __all__: t.Tuple[str, ...] = (
     "PokemonShape",
     "Stat",
     "Language",
+    "APIMetadata",
 )

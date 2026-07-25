@@ -3,7 +3,7 @@ import typing as t
 import attrs
 
 from pokelance.models import BaseModel
-from pokelance.models.common import NamedResource
+from pokelance.models.common import NamedResource, VerboseEffect
 
 __all__: t.Tuple[str, ...] = (
     "ContestComboSet",
@@ -47,19 +47,19 @@ class ContestComboSet(BaseModel):
     ----------
     normal: ContestComboDetail
         A detail of normal moves in a contest combo.
-    super_: ContestComboDetail
+    super: ContestComboDetail
         A detail of super moves in a contest combo.
     """
 
     normal: ContestComboDetail = attrs.field(factory=ContestComboDetail)
-    super_: ContestComboDetail = attrs.field(factory=ContestComboDetail)
+    super: ContestComboDetail = attrs.field(factory=ContestComboDetail)
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ContestComboSet":
         return cls(
             raw=payload,
             normal=ContestComboDetail.from_payload(payload.get("normal", {}) or {}),
-            super_=ContestComboDetail.from_payload(payload.get("super", {}) or {}),
+            super=ContestComboDetail.from_payload(payload.get("super", {}) or {}),
         )
 
 
@@ -175,7 +175,7 @@ class PastMoveStatValues(BaseModel):
     effect_chance: int = attrs.field(factory=int)
     power: int = attrs.field(factory=int)
     pp: int = attrs.field(factory=int)
-    effect_entries: t.List[NamedResource] = attrs.field(factory=list)
+    effect_entries: t.List[VerboseEffect] = attrs.field(factory=list)
     type: NamedResource = attrs.field(factory=NamedResource)
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
@@ -187,7 +187,7 @@ class PastMoveStatValues(BaseModel):
             effect_chance=payload.get("effect_chance", 0),
             power=payload.get("power", 0),
             pp=payload.get("pp", 0),
-            effect_entries=[NamedResource.from_payload(i) for i in payload.get("effect_entries", [])],
+            effect_entries=[VerboseEffect.from_payload(i) for i in payload.get("effect_entries", [])],
             type=NamedResource.from_payload(payload.get("type", {}) or {}),
             version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
         )

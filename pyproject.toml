@@ -43,6 +43,7 @@ dev = [
     "pytkdocs[numpy-style]>=0.5.0",
     "mkdocstrings[python]>=0.18",
     "mkdocs-material>=9.5.48,<10",
+    "pytest-coverage>=0.0",
 ]
 
 [tool.uv.build-backend]

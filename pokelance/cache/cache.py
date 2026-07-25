@@ -7,10 +7,11 @@ import typing as t
 import aiofiles
 import attrs
 
+from pokelance.models import BaseModel
+
 if t.TYPE_CHECKING:
     from pokelance import PokeLance, models  # noqa: F401
     from pokelance.http import Route  # noqa: F401
-    from pokelance.models import BaseModel  # noqa: F401
 
 
 __all__: t.Tuple[str, ...] = (
@@ -72,10 +73,12 @@ __all__: t.Tuple[str, ...] = (
     "PokemonLocationAreaCache",
     "StatCache",
     "RegionCache",
+    "LanguageCache",
+    "APIMetadataCache",
 )
 
 _KT = t.TypeVar("_KT", bound="Route")
-_VT = t.TypeVar("_VT", bound="BaseModel")
+_VT = t.TypeVar("_VT", bound="t.Union[BaseModel, t.List[t.Any]]")
 _T = t.TypeVar("_T")
 
 
@@ -187,9 +190,9 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
         dummy: t.Dict[str, str] = {str(v): k for k, v in self._endpoints.items()}
         alias = dummy.get(key.endpoint.split("/")[-1]) or self._endpoints.get(key.endpoint.split("/")[-1])
         if alias:
-            for k in self.keys():
+            for k, v in self.items():
                 if k.endpoint.split("/")[-1] == str(alias):
-                    return self[k]
+                    return v
         return default
 
     def load_documents(self, data: t.List[t.Dict[str, str]]) -> None:
@@ -229,7 +232,9 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
             The path to save the cache to.
         """
         pathlib.Path(path).mkdir(parents=True, exist_ok=True)
-        dummy: t.Dict[str, t.Dict[str, t.Any]] = {k.endpoint: v.raw for k, v in self.items()}
+        dummy: t.Dict[str, t.Union[t.Dict[str, t.Any], t.List[t.Dict[str, t.Any]]]] = {
+            k.endpoint: ([i.raw for i in v] if isinstance(v, list) else v.raw) for k, v in self.items()  # type: ignore
+        }
         async with aiofiles.open(pathlib.Path(f"{path}/{self.__class__.__name__}.json"), "w") as f:
             await f.write("{\n")
             for n, (k, v) in enumerate(dummy.items()):
@@ -248,13 +253,20 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
         """
         async with aiofiles.open(pathlib.Path(f"{path}/{self.__class__.__name__}.json"), "r") as f:
             data = json.loads(await f.read())
+
         self._max_size = len(data)
         route_model = importlib.import_module("pokelance.http").__dict__["Route"]
-        value_type = str(self.__orig_bases__[0].__args__[1]).split(".")[-1]  # type: ignore
-        model: t.Type["_VT"] = importlib.import_module("pokelance.models").__dict__[value_type]
+        value_type = str(self.__orig_bases__[0].__args__[1]).split(".")[-1].strip("[]")  # type: ignore
+
+        model = importlib.import_module("pokelance.models").__dict__[value_type]
+        if not issubclass(model, BaseModel):
+            raise TypeError(f"Expected a subclass of BaseModel, got {type(model)}")
+
         for endpoint, info in data.items():
             route = route_model(endpoint=endpoint)
-            self.setdefault(route, model.from_payload(info))
+            self.setdefault(
+                route, [model.from_payload(i) for i in info] if isinstance(info, list) else model.from_payload(info)
+            )
 
     async def load_all_batch(self, batch_size: int = 20) -> None:
         """
@@ -267,10 +279,15 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
         """
         if not self._endpoints_cached:
             raise RuntimeError("The endpoints have not been cached yet.")
+
         self._client.logger.info(f"Loading {self.__class__.__name__}...")
         route_model = importlib.import_module("pokelance.http").__dict__["Route"]
         value_type = str(self.__orig_bases__[0].__args__[1]).split(".")[-1]  # type: ignore
-        model: t.Type["_VT"] = importlib.import_module("pokelance.models").__dict__[value_type]
+
+        model = importlib.import_module("pokelance.models").__dict__[value_type]
+        if not issubclass(model, BaseModel):
+            raise TypeError(f"Expected a subclass of BaseModel, got {type(model)}")
+
         self._max_size = len(self._endpoints)
         endpoints = list(self._endpoints.values())
         total_endpoints = len(endpoints)
@@ -294,6 +311,8 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
 
     async def _fetch_and_cache(self, route: "_KT", model: t.Type["_VT"]) -> None:
         """Helper method to fetch and cache a single item"""
+        if not issubclass(model, BaseModel):
+            raise TypeError(f"Expected a subclass of BaseModel, got {type(model)}")
         try:
             data = await self._client.http.request(route)
             self.setdefault(route, model.from_payload(data))
@@ -410,7 +429,7 @@ class PokemonFormCache(BaseCache["Route", "models.PokemonForm"]):
     """A cache for pokemon forms."""
 
 
-class PokemonLocationAreaCache(BaseCache["Route", "models.LocationAreaEncounter"]):
+class PokemonLocationAreaCache(BaseCache["Route", "t.List[models.LocationAreaEncounter]"]):
     """A cache for pokemon location areas."""
 
 
@@ -548,3 +567,11 @@ class ContestEffectCache(SecondaryTypeCache["Route", "models.ContestEffect"]):
 
 class SuperContestEffectCache(SecondaryTypeCache["Route", "models.SuperContestEffect"]):
     """A cache for super contest effects."""
+
+
+class LanguageCache(SecondaryTypeCache["Route", "models.Language"]):
+    """A cache for languages."""
+
+
+class APIMetadataCache(SecondaryTypeCache["Route", "models.APIMetadata"]):
+    """A cache for API metadata."""

@@ -22,6 +22,8 @@ __all__: t.Tuple[str, ...] = (
     "ExtensionEnum",
     "ExtensionsL",
     "ShowdownEnum",
+    "GenderEnum",
+    "PokemonFormTriggerEnum",
     "RequestObject",
 )
 
@@ -51,6 +53,12 @@ class BaseEnum(enum.Enum):
         """
         return self.value
 
+    def __str__(self) -> str:
+        """
+        Get the string representation of the enum.
+        """
+        return str(self.value)
+
 
 class ShowdownEnum(BaseEnum):
     """
@@ -66,8 +74,35 @@ class ShowdownEnum(BaseEnum):
     BACK_FEMALE = PATH + "back/female/{}.gif"
     BACK_SHINY_FEMALE = PATH + "back/shiny/female/{}.gif"
 
-    def __str__(self) -> str:
-        return self.value
+
+class PokemonFormTriggerEnum(BaseEnum):
+    HELD_ITEM = "held-item"
+    CONSUMED_ITEM = "consumed-item"
+    KEY_ITEM = "key-item"
+    ABILITY = "ability"
+    GIGANTAMAX_FACTOR = "gigantamax-factor"
+    MOVE = "move"
+    UNDEFINED = "undefined"
+
+    @classmethod
+    def from_str(cls, value: str | None) -> PokemonFormTriggerEnum | None:
+        if value is None:
+            return None
+        return cls(value) if value in cls._value2member_map_ else cls.UNDEFINED
+
+
+class GenderEnum(BaseEnum):
+    MALE = "male"
+    FEMALE = "female"
+    GENDERLESS = "genderless"
+    UNDEFINED = "undefined"
+
+    @classmethod
+    def from_int(cls, value: int | None) -> GenderEnum | None:
+        if value is None:
+            return None
+        _convert_map: t.Dict[int, GenderEnum] = {1: cls.FEMALE, 2: cls.MALE, 3: cls.GENDERLESS}
+        return cls(_convert_map.get(value, cls.UNDEFINED))
 
 
 @attrs.define(slots=True, frozen=True)
@@ -261,6 +296,7 @@ class PokemonExtension(Extension):
         "egg-group",
         "gender",
         "growth-rate",
+        "location-area-encounter",
         "nature",
         "pokeathlon-stat",
         "pokemon",
@@ -274,6 +310,23 @@ class PokemonExtension(Extension):
     ]
 
 
+@attrs.define(slots=True, frozen=True)
+class UtilityExtension(Extension):
+    """
+    Represents the utility extension.
+
+    Attributes
+    ----------
+    name : str
+        The name of the extension.
+    categories : t.List[str]
+        The categories of the extension.
+    """
+
+    name = "utility"
+    categories: t.List[str] = ["language", "api-metadata"]
+
+
 class ExtensionEnum(BaseEnum):
     Berry = BerryExtension(name="berry")
     Contest = ContestExtension(name="contest")
@@ -285,6 +338,7 @@ class ExtensionEnum(BaseEnum):
     Machine = MachineExtension(name="machine")
     Move = MoveExtension(name="move")
     Pokemon = PokemonExtension(name="pokemon")
+    Utility = UtilityExtension(name="utility")
 
     @classmethod
     def validate_url(cls, url: str) -> t.Optional[RequestObject]:
