@@ -1,7 +1,10 @@
 # Changelog
 
-## Unreleased - 2026-07-25
+## Unreleased - 2026-07-26
 
+#### New Features
+
+-  Add more test cases, and new pokeapi fields
 #### Docs
 
 -  Update important links on README.md
@@ -10,8 +13,9 @@
 #### Others
 
 -  Pin deploy docs ci version
+-  fix unused vars
 
-Full set of changes: [v0.2.11 to b739564](https://github.com/FallenDeity/PokeLance/compare/v0.2.11...b739564)
+Full set of changes: [v0.2.11 to 0d557f5](https://github.com/FallenDeity/PokeLance/compare/v0.2.11...0d557f5)
 
 ## 0.2.11 - 2026-02-15
 

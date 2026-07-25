@@ -104,6 +104,5 @@ Following examples are available open an issue if you want more examples or more
 
 - [PokeAPI](https://pokeapi.co/)
 - [PokeLance Documentation (MkDocs)](https://FallenDeity.github.io/PokeLance/)
-- [PokeLance ReadTheDocs](https://pokelance.readthedocs.io/en/latest/)
 - [PokeLance GitHub](https://github.com/FallenDeity/PokeLance)
 - [PokeLance PyPI](https://pypi.org/project/PokeLance/)

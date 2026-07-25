@@ -70,6 +70,23 @@ use_parentheses = true
 ensure_newline_before_comments = true
 src_paths = ["pokelance"]
 
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = "--cov-report=term-missing --cov-report=html"
+
+[tool.coverage.run]
+source = ["pokelance"]
+branch = true
+
+[tool.coverage.report]
+skip_empty = true
+exclude_lines = [
+    "pragma: no cover",
+    "if t\\.TYPE_CHECKING",
+    "if TYPE_CHECKING",
+    "raise NotImplementedError",
+]
+
 [tool.mypy]
 python_version = "3.8"
 strict = true

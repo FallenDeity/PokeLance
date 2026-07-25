@@ -117,6 +117,13 @@ class Base:
             if isinstance(obj.default, BaseCache) and obj.default is not None:
                 obj.default._max_size = max_size
 
+    def clear(self) -> None:
+        """Clear all caches."""
+        obj: attrs.Attribute[BaseCache[t.Any, t.Any]]
+        for obj in self.__attrs_attrs__:
+            if isinstance(obj.default, BaseCache) and obj.default is not None:
+                obj.default.clear()
+
 
 @attrs.define(slots=True, kw_only=True)
 class Encounter(Base):
@@ -491,3 +498,10 @@ class Cache:
             The data to load.
         """
         getattr(getattr(self, category.lower()), _type).load_documents(data)
+
+    def clear(self) -> None:
+        """Clear all caches."""
+        obj: attrs.Attribute[Base]
+        for obj in self.__attrs_attrs__:
+            if isinstance(obj.default, Base) and obj.default is not None:
+                obj.default.clear()

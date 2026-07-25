@@ -41,3 +41,7 @@ jobs:
       - name: Type checking with mypy
         run: |
           uv run mypy .
+
+      - name: Run tests with pytest
+        run: |
+          uv run pytest
