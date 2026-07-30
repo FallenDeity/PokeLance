@@ -21,7 +21,7 @@ Features:
 
 - Modern and pythonic API asynchronously built on top of aiohttp
 - Flexible and easy to use
-- Statically typed with mypy
+- Fully typed with mypy
 - Linted with ruff
 - Well documented
 - Optimized for speed and performance
@@ -88,22 +88,18 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-# Examples
+# Guide
 
-[Examples](https://fallendeity.github.io/PokeLance/guide/basic_usage/)
+Head to the [Guide](guide/index.md) for a full walkthrough covering quickstart, configuration,
+caching, error handling, media helpers, and the extensions reference and recipes for integrating
+PokeLance with other frameworks and libraries.
 
-Following examples are available open an issue if you want more examples or more details on certain examples.
-
-- Basic Usage
-- Advanced cache usage
-- Discord bot example
-- FastAPI example
+Open an issue if you'd like additional examples or more detail on an existing one.
 
 
 ## Important Links
 
 - [PokeAPI](https://pokeapi.co/)
 - [PokeLance Documentation (MkDocs)](https://FallenDeity.github.io/PokeLance/)
-- [PokeLance ReadTheDocs](https://pokelance.readthedocs.io/en/latest/)
 - [PokeLance GitHub](https://github.com/FallenDeity/PokeLance)
 - [PokeLance PyPI](https://pypi.org/project/PokeLance/)

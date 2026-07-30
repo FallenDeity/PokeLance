@@ -167,14 +167,14 @@ async def get_evolutions(data: EvolutionChain) -> t.Tuple[DATA, DATA]:
                 for i in chain.evolves_to
             ]
             details_dict[mon_name] = [
-                _clean_dict(details.simplified_details) | {"depth": n} for details in chain.evolution_details  # type: ignore
+                _clean_dict(details.simplified_details) | {"depth": n} for details in chain.evolution_details
             ]
             for evo in chain.evolves_to:
                 await process_evolution_chain(evo, n + 1)
         else:
             evolution_dict[mon_name] = []
             details_dict[mon_name] = [
-                _clean_dict(details.simplified_details) | {"depth": n} for details in chain.evolution_details  # type: ignore
+                _clean_dict(details.simplified_details) | {"depth": n} for details in chain.evolution_details
             ]
 
     await process_evolution_chain(data.chain)

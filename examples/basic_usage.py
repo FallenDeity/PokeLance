@@ -7,8 +7,9 @@ client = PokeLance()
 
 async def main() -> None:
     print(await client.ping())
-    x = await client.pokemon.fetch_pokemon_form("charmander")
-    print(x.to_dict())
+    pokemon = await client.pokemon.fetch_pokemon("pikachu")
+    print(pokemon.sprites.other.showdown)
+    await client.close()
     return None
 
 

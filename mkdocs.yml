@@ -1,5 +1,7 @@
 site_name: PokeLance
+repo_name: FallenDeity/PokeLance
 repo_url: https://github.com/FallenDeity/PokeLance
+edit_uri: edit/master/docs/
 site_description: Documentation for the PokeApi wrapper, PokeLance.
 site_author: FallenDeity
 copyright: Copyright FallenDeity ( 2022 - present )
@@ -8,25 +10,40 @@ site_url: https://FallenDeity.github.io/PokeLance
 theme:
   name: "material"
   language: en
+  custom_dir: docs/overrides
   logo: assets/pokelance.png
   favicon: assets/pokelance.png
 
   font:
     text: Ubuntu
+    code: JetBrains Mono
+
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    view: material/eye
+    annotation: material/plus-circle
 
   features:
     - navigation.instant
+    - navigation.instant.progress
     - navigation.tracking
     - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.indexes
     - navigation.top
     - navigation.sections
+    - navigation.expand
+    - navigation.footer
     - content.code.annotate
     - content.code.copy
     - content.tabs.link
+    - content.action.edit
+    - content.action.view
     - toc.follow
-    - toc.integrate
-    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - search.share
   palette:
     - scheme: light
       primary: indigo
@@ -42,6 +59,8 @@ theme:
         name: Dark Mode
 
 plugins:
+  - search
+  - markdown-exec
   - mkdocstrings:
       handlers:
         python:
@@ -51,9 +70,16 @@ plugins:
             docstring_style: numpy
             merge_init_into_class: true
             inherited_members: true
-          import:
-            - https://docs.python.org/3.9/objects.inv
-  - search
+          inventories:
+            - https://docs.python.org/3/objects.inv
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: timeago
+      fallback_to_build_date: true
+  - mkdocs-jupyter:
+      include_source: true
+      execute: false
+      ignore_h1_titles: true
   - social:
       cards_layout_options:
         background_color: "#3761A3"
@@ -61,12 +87,26 @@ plugins:
 
 nav:
   - Getting Started: index.md
+  - Guide:
+      - Overview: guide/index.md
+      - Installation: guide/installation.md
+      - Quickstart: guide/quickstart.md
+      - Configuration: guide/configuration.md
+      - Fetching Data: guide/fetching_data.md
+      - Extensions Reference: guide/extensions.md
+      - Caching In Depth: guide/caching.md
+      - Error Handling: guide/error_handling.md
+      - Media - Sprites & Cries: guide/media.md
+      - Recipes:
+          - Discord Bot: guide/recipes/discord_bot.md
+          - FastAPI Service: guide/recipes/fastapi.md
+          - Notebook Playground: guide/recipes/playground.ipynb
   - API Reference:
       - PokeLance: api_reference/pokelance.md
       - Logging: api_reference/logger.md
       - Exceptions: api_reference/exceptions.md
-      - Languages: api_reference/languages.md
       - Constants: api_reference/constants.md
+      - Utilities: api_reference/utils.md
       - Cache:
           - Cache: api_reference/cache/cache.md
           - CacheManager: api_reference/cache/cache_manager.md
@@ -85,6 +125,7 @@ nav:
           - machine: api_reference/ext/machine.md
           - move: api_reference/ext/move.md
           - pokemon: api_reference/ext/pokemon.md
+          - utility: api_reference/ext/utility.md
       - Models:
           - Base: api_reference/models/base.md
           - Common:
@@ -110,11 +151,6 @@ nav:
               - Machine: api_reference/models/abstract/machine.md
               - Move: api_reference/models/abstract/move.md
               - Pokemon: api_reference/models/abstract/pokemon.md
-  - Guide:
-      - Basic Usage: guide/basic_usage.md
-      - Discord Bot: guide/discord_bot.md
-      - FastAPI: guide/fastapi.md
-      - Cache Usage: guide/advanced_cache.md
 
 markdown_extensions:
   - tables
@@ -130,7 +166,6 @@ markdown_extensions:
   - attr_list
   - md_in_html
   - pymdownx.details
-  - pymdownx.superfences
   - def_list
   - pymdownx.inlinehilite
   - pymdownx.snippets
@@ -141,14 +176,24 @@ markdown_extensions:
       line_spans: __span
       anchor_linenums: true
   - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tabbed:
       alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 extra:
-  version: 0.2.11
+  version: 0.2.12
   generator: false
+  comments:
+    enabled: true
+    mode: giscus
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/FallenDeity/PokeLance

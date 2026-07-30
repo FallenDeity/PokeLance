@@ -128,6 +128,8 @@ class PokeLance:
             Whether to log to a file. Defaults to False.
         session : typing.Optional[aiohttp.ClientSession]
             The session to use for the HTTP client. It is recommended to use the default.
+            If a session is provided, the caller owns its lifecycle: ``close()`` will not
+            close it, so the caller is responsible for closing it themselves.
         """
         self._logger = logger or Logger(name="pokelance", file_logging=file_logging)
         self._http = HttpClient(client=self, session=session, cache_size=cache_size)

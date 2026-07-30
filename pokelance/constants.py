@@ -21,7 +21,6 @@ __all__: t.Tuple[str, ...] = (
     "PokemonExtension",
     "ExtensionEnum",
     "ExtensionsL",
-    "ShowdownEnum",
     "GenderEnum",
     "PokemonFormTriggerEnum",
     "RequestObject",
@@ -31,7 +30,6 @@ __all__: t.Tuple[str, ...] = (
 ExtensionsL = t.Literal[
     "berry", "contest", "encounter", "evolution", "game", "item", "location", "machine", "move", "pokemon"
 ]
-PATH: str = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/"
 EXTENSION_PATTERN: t.Pattern[str] = re.compile(r"https://pokeapi.co/api/v2/(?P<category>[\w-]+)/(?P<value>[\w-]+)")
 
 
@@ -58,21 +56,6 @@ class BaseEnum(enum.Enum):
         Get the string representation of the enum.
         """
         return str(self.value)
-
-
-class ShowdownEnum(BaseEnum):
-    """
-    Represents a showdown enum.
-    """
-
-    FRONT_DEFAULT = PATH + "{}.gif"
-    FRONT_SHINY = PATH + "shiny/{}.gif"
-    BACK_DEFAULT = PATH + "back/{}.gif"
-    BACK_SHINY = PATH + "/back/shiny/{}.gif"
-    FRONT_FEMALE = PATH + "female/{}.gif"
-    FRONT_SHINY_FEMALE = PATH + "shiny/female/{}.gif"
-    BACK_FEMALE = PATH + "back/female/{}.gif"
-    BACK_SHINY_FEMALE = PATH + "back/shiny/female/{}.gif"
 
 
 class PokemonFormTriggerEnum(BaseEnum):
@@ -128,7 +111,7 @@ class BerryExtension(Extension):
         The categories of the extension.
     """
 
-    name = "berry"
+    name: str = "berry"
     categories: t.List[str] = ["berry", "berry-firmness", "berry-flavor"]
 
 
@@ -145,7 +128,7 @@ class ContestExtension(Extension):
         The categories of the extension.
     """
 
-    name = "contest"
+    name: str = "contest"
     categories: t.List[str] = ["contest-type", "contest-effect", "super-contest-effect"]
 
 
@@ -162,7 +145,7 @@ class EncounterExtension(Extension):
         The categories of the extension.
     """
 
-    name = "encounter"
+    name: str = "encounter"
     categories: t.List[str] = ["encounter-method", "encounter-condition", "encounter-condition-value"]
 
 
@@ -179,7 +162,7 @@ class EvolutionExtension(Extension):
         The categories of the extension.
     """
 
-    name = "evolution"
+    name: str = "evolution"
     categories: t.List[str] = ["evolution-chain", "evolution-trigger"]
 
 
@@ -196,7 +179,7 @@ class GameExtension(Extension):
         The categories of the extension.
     """
 
-    name = "game"
+    name: str = "game"
     categories: t.List[str] = ["generation", "pokedex", "version", "version-group"]
 
 
@@ -213,7 +196,7 @@ class ItemExtension(Extension):
         The categories of the extension.
     """
 
-    name = "item"
+    name: str = "item"
     categories: t.List[str] = ["item", "item-attribute", "item-category", "item-fling-effect", "item-pocket"]
 
 
@@ -230,7 +213,7 @@ class LocationExtension(Extension):
         The categories of the extension.
     """
 
-    name = "location"
+    name: str = "location"
     categories: t.List[str] = ["location", "location-area", "pal-park-area", "region"]
 
 
@@ -247,7 +230,7 @@ class MachineExtension(Extension):
         The categories of the extension.
     """
 
-    name = "machine"
+    name: str = "machine"
     categories: t.List[str] = ["machine"]
 
 
@@ -264,7 +247,7 @@ class MoveExtension(Extension):
         The categories of the extension.
     """
 
-    name = "move"
+    name: str = "move"
     categories: t.List[str] = [
         "move",
         "move-ailment",
@@ -289,7 +272,7 @@ class PokemonExtension(Extension):
         The categories of the extension.
     """
 
-    name = "pokemon"
+    name: str = "pokemon"
     categories: t.List[str] = [
         "ability",
         "characteristic",
@@ -323,22 +306,22 @@ class UtilityExtension(Extension):
         The categories of the extension.
     """
 
-    name = "utility"
+    name: str = "utility"
     categories: t.List[str] = ["language", "api-metadata"]
 
 
 class ExtensionEnum(BaseEnum):
-    Berry = BerryExtension(name="berry")
-    Contest = ContestExtension(name="contest")
-    Encounter = EncounterExtension(name="encounter")
-    Evolution = EvolutionExtension(name="evolution")
-    Game = GameExtension(name="game")
-    Item = ItemExtension(name="item")
-    Location = LocationExtension(name="location")
-    Machine = MachineExtension(name="machine")
-    Move = MoveExtension(name="move")
-    Pokemon = PokemonExtension(name="pokemon")
-    Utility = UtilityExtension(name="utility")
+    Berry = BerryExtension()
+    Contest = ContestExtension()
+    Encounter = EncounterExtension()
+    Evolution = EvolutionExtension()
+    Game = GameExtension()
+    Item = ItemExtension()
+    Location = LocationExtension()
+    Machine = MachineExtension()
+    Move = MoveExtension()
+    Pokemon = PokemonExtension()
+    Utility = UtilityExtension()
 
     @classmethod
     def validate_url(cls, url: str) -> t.Optional[RequestObject]:

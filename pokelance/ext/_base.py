@@ -62,7 +62,7 @@ class BaseExtension:
         pokelance.exceptions.ResourceNotFound
             The resource was not found in the cache.
         """
-        data: t.Set[str] = set(list(map(str, cache.endpoints.values())) + list(cache.endpoints.keys()))
+        data: t.Set[str] = cache.identifiers
         if data and str(resource) not in data:
             suggestions = get_close_matches(str(resource), data, n=10, cutoff=0.5)
             raise ResourceNotFound(message="Resource not found.", route=route, status=404, suggestions=suggestions)

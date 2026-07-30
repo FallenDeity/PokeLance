@@ -1,14 +1,13 @@
 [project]
 name = "pokelance"
-version = "0.2.11"
+version = "0.2.12"
 description = "A flexible and easy to use pokemon library."
 authors = [{ name = "FallenDeity", email = "61227305+FallenDeity@users.noreply.github.com" }]
-requires-python = ">=3.8,<4"
+requires-python = ">=3.9,<4"
 readme = "README.md"
 license = "MIT"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -17,10 +16,10 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "aiohttp>=3.8.3,<4",
     "aiofiles>=23.1.0,<24",
     "types-aiofiles>=23.1.0.1,<24",
     "attrs>=23.1.0,<24",
+    "aiohttp>=3.13.5",
 ]
 
 [dependency-groups]
@@ -44,6 +43,9 @@ dev = [
     "mkdocstrings[python]>=0.18",
     "mkdocs-material>=9.5.48,<10",
     "pytest-coverage>=0.0",
+    "markdown-exec[ansi]>=1.9.3",
+    "mkdocs-git-revision-date-localized-plugin>=1.4.7",
+    "mkdocs-jupyter>=0.25.1",
 ]
 
 [tool.uv.build-backend]
@@ -55,11 +57,11 @@ build-backend = "uv_build"
 
 [tool.ruff]
 line-length = 120
-target-version = "py38"
+target-version = "py39"
 
 [tool.black]
 line-length = 120
-target-version = ['py38']
+target-version = ['py39']
 
 [tool.isort]
 line_length = 120
@@ -70,6 +72,23 @@ use_parentheses = true
 ensure_newline_before_comments = true
 src_paths = ["pokelance"]
 
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = "--cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["pokelance"]
+branch = true
+
+[tool.coverage.report]
+skip_empty = true
+exclude_lines = [
+    "pragma: no cover",
+    "if t\\.TYPE_CHECKING",
+    "if TYPE_CHECKING",
+    "raise NotImplementedError",
+]
+
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 strict = true
