@@ -20,7 +20,7 @@ A flexible, statically typed and easy to use pokeapi wrapper for python 🚀
 Features:
 - Modern and pythonic API asynchronously built on top of aiohttp
 - Flexible and easy to use
-- Statically typed with mypy
+- Fully typed with mypy
 - Linted with ruff
 - Well documented
 - Optimized for speed and performance

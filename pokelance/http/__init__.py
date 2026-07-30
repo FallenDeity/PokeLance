@@ -36,7 +36,8 @@ class HttpClient:
     cache_size: int
         The size of the cache.
     session: aiohttp.ClientSession
-        The session to use for the HTTP client.
+        The session to use for the HTTP client. If not provided, one is created
+        internally on the first request and owned by this client.
 
     Attributes
     ----------
@@ -50,6 +51,9 @@ class HttpClient:
         The client that this HTTP client is for.
     _tasks_queue: typing.List[asyncio.Task]
         The queue for the tasks.
+    _session_owner: bool
+        Whether the session was created internally (True) or passed in by the
+        caller (False). Only owned sessions are closed by ``close()``.
     """
 
     __slots__: t.Tuple[str, ...] = (
@@ -58,6 +62,7 @@ class HttpClient:
         "_cache",
         "_is_ready",
         "_tasks_queue",
+        "_session_owner",
     )
 
     def __init__(
@@ -79,6 +84,7 @@ class HttpClient:
         self._is_ready = False
         self._cache = Cache(max_size=cache_size, client=self._client)
         self._tasks_queue: t.List[asyncio.Task[None]] = []
+        self._session_owner = session is None
 
     async def _load_ext(self, coroutine: t.Callable[[], t.Coroutine[t.Any, t.Any, None]], message: str) -> None:
         """
@@ -108,18 +114,26 @@ class HttpClient:
         self._client.ext_tasks.clear()
 
     async def close(self) -> None:
-        """Closes the HTTP client."""
+        """Closes the HTTP client.
+
+        Only closes the underlying session if it was created internally.
+        A session passed in by the caller is left open, since the caller
+        owns its lifecycle and may still be using it elsewhere.
+        """
         for task in self._tasks_queue:
             if not task.done():
                 task.cancel()
                 self._client.logger.warning(f"Cancelled task {task.get_name()}")
-        if self.session:
+        if self.session and self._session_owner:
             await self.session.close()
+        elif self.session:
+            self._client.logger.debug("Session was provided externally, not closing it.")
 
     async def connect(self) -> None:
         """Connects the HTTP client."""
         if self.session is None:
-            self.session = self.session or aiohttp.ClientSession()
+            self.session = aiohttp.ClientSession()
+            self._session_owner = True
         if not self._is_ready:
             if self._client.cache_endpoints:
                 await self._schedule_tasks()

@@ -119,6 +119,45 @@ async def test_load_documents_populates_name_and_id(client: pokelance.PokeLance)
     assert cache.endpoints["ivysaur"].id == 2
 
 
+@pytest.mark.asyncio
+async def test_load_documents_populates_reverse_id_index(client: pokelance.PokeLance) -> None:
+    """
+    load_documents() should also populate _endpoints_by_id, the reverse index
+    BaseCache.get() uses for alias resolution. Previously this reverse mapping
+    was rebuilt from scratch (inverting the whole `_endpoints` dict) on every
+    single get() miss; it should now be a standing index built once here.
+    """
+    fake_results = [
+        {"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"},
+        {"name": "ivysaur", "url": "https://pokeapi.co/api/v2/pokemon/2/"},
+    ]
+    cache = client.http.cache.pokemon.pokemon
+    cache.load_documents(fake_results)
+
+    assert cache._endpoints_by_id["1"] == "bulbasaur"
+    assert cache._endpoints_by_id["2"] == "ivysaur"
+
+
+@pytest.mark.asyncio
+async def test_secondary_type_cache_populates_reverse_id_index(client: pokelance.PokeLance) -> None:
+    """
+    SecondaryTypeCache keys `_endpoints` by id rather than name (these
+    categories have no name field), so the reverse index maps id -> id for
+    consistency with the same get() lookup path used by name-keyed caches.
+    """
+    fake_results = [
+        {"name": "1", "url": "https://pokeapi.co/api/v2/machine/1/"},
+        {"name": "2", "url": "https://pokeapi.co/api/v2/machine/2/"},
+    ]
+    cache = client.http.cache.machine.machine
+    cache.load_documents(fake_results)
+
+    assert "1" in cache.endpoints
+    assert "2" in cache.endpoints
+    assert cache._endpoints_by_id["1"] == "1"
+    assert cache._endpoints_by_id["2"] == "2"
+
+
 # ---------------------------------------------------------------------------
 # load_all() fills the data cache from endpoints
 # ---------------------------------------------------------------------------

@@ -2,7 +2,7 @@ import typing as t
 
 import attrs
 
-from pokelance.constants import PokemonFormTriggerEnum, ShowdownEnum
+from pokelance.constants import PokemonFormTriggerEnum
 from pokelance.models import BaseModel
 from pokelance.models.common import Effect, NamedResource
 
@@ -114,20 +114,6 @@ class ShowdownSprites(BaseSprite):
     As of now pokeapi doesn't include showdown sprites in their API payload.
     But they are available in their sprites repository.
     """
-
-    @classmethod
-    def from_id(cls, id_: int) -> "ShowdownSprites":
-        return cls(
-            raw={},
-            front_default=str(ShowdownEnum["front_default".upper()]).format(id_),
-            front_shiny=str(ShowdownEnum["front_shiny".upper()]).format(id_),
-            back_shiny=str(ShowdownEnum["back_shiny".upper()]).format(id_),
-            back_default=str(ShowdownEnum["back_default".upper()]).format(id_),
-            front_female=str(ShowdownEnum["front_female".upper()]).format(id_),
-            front_shiny_female=str(ShowdownEnum["front_shiny_female".upper()]).format(id_),
-            back_female=str(ShowdownEnum["back_female".upper()]).format(id_),
-            back_shiny_female=str(ShowdownEnum["back_shiny_female".upper()]).format(id_),
-        )
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ShowdownSprites":

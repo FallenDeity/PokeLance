@@ -75,6 +75,7 @@ __all__: t.Tuple[str, ...] = (
     "RegionCache",
     "LanguageCache",
     "APIMetadataCache",
+    "CacheEndpoint",
 )
 
 _KT = t.TypeVar("_KT", bound="Route")
@@ -83,7 +84,17 @@ _T = t.TypeVar("_T")
 
 
 @attrs.define(kw_only=True, slots=True, frozen=True)
-class Endpoint:
+class CacheEndpoint:
+    """Represents a cached API endpoint.
+
+    Attributes
+    ----------
+    id : t.Union[str, int]
+        The ID of the endpoint.
+    url : str
+        The URL of the endpoint.
+    """
+
     id: t.Union[str, int] = attrs.field(factory=str)
     url: str = attrs.field(factory=str)
 
@@ -105,8 +116,12 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
         The maximum size of the cache.
     _cache: typing.Dict[_KT, _VT]
         The cache itself.
-    _endpoints: typing.Dict[str, int]
+    _endpoints: typing.Dict[str, CacheEndpoint]
         The endpoints that are cached.
+    _endpoints_by_id: typing.Dict[str, str]
+        Reverse lookup of id (as a string) to CacheEndpoint, for alias resolution.
+    _identifiers: typing.Set[str]
+        The union of every valid name and id (as strings) for this category.
     _endpoints_cached: bool
         Whether or not the endpoints are cached.
     _client: pokelance.PokeLance
@@ -140,7 +155,9 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
     def __init__(self, max_size: int = 100) -> None:
         self._max_size = max_size
         self._cache: t.Dict[_KT, _VT] = {}
-        self._endpoints: t.Dict[str, Endpoint] = {}
+        self._endpoints: t.Dict[str, CacheEndpoint] = {}
+        self._endpoints_by_id: t.Dict[str, str] = {}
+        self._identifiers: t.Set[str] = set()
         self._endpoints_cached: bool = False
 
     def __getitem__(self, key: _KT) -> _VT:
@@ -184,11 +201,20 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
     def items(self) -> t.ItemsView[_KT, _VT]:
         return self._cache.items()
 
-    def get(self, key: _KT, /, default: t.Union[_VT, _T, None] = None) -> t.Union[_VT, _T, None]:  # type: ignore
+    def get(self, key: _KT, default: t.Union[_VT, _T, None] = None) -> t.Union[_VT, _T, None]:  # type: ignore
+        """Get an item from the cache. If the exact key isn't found, it will attempt to resolve an alias (e.g. numeric id vs. name).
+
+        Parameters
+        ----------
+        key: _KT
+            The key to get.
+        default: typing.Union[_VT, _T, None]
+            The default value to return if the key isn't found.
+        """
         if key in self:
             return self[key]
-        dummy: t.Dict[str, str] = {str(v): k for k, v in self._endpoints.items()}
-        alias = dummy.get(key.endpoint.split("/")[-1]) or self._endpoints.get(key.endpoint.split("/")[-1])
+        requested = key.endpoint.split("/")[-1]
+        alias = self._endpoints_by_id.get(requested) or self._endpoints.get(requested)
         if alias:
             for k, v in self.items():
                 if k.endpoint.split("/")[-1] == str(alias):
@@ -204,7 +230,10 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
             The data to load.
         """
         for document in data:
-            self._endpoints[document["name"]] = Endpoint(url=document["url"], id=int(document["url"].split("/")[-2]))
+            id_ = int(document["url"].split("/")[-2])
+            self._endpoints[document["name"]] = CacheEndpoint(url=document["url"], id=id_)
+            self._endpoints_by_id[str(id_)] = document["name"]
+        self._identifiers = set(self._endpoints) | set(self._endpoints_by_id)
         self._endpoints_cached = True
 
     def set_size(self, size: int) -> None:
@@ -337,15 +366,29 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
         self._client.logger.info(f"Loaded {self.__class__.__name__}.")
 
     @property
-    def endpoints(self) -> t.Dict[str, Endpoint]:
+    def endpoints(self) -> t.Dict[str, CacheEndpoint]:
         """The endpoints that are cached.
 
         Returns
         -------
-        typing.Dict[str, Endpoint]
+        typing.Dict[str, CacheEndpoint]
             The endpoints that are cached.
         """
         return self._endpoints
+
+    @property
+    def identifiers(self) -> t.Set[str]:
+        """Every valid name and id (as strings) for this category.
+
+        Built once when the registry loads so all identifiers/aliases can be validated
+        without needing to rebuild the set on every `get_*`/`fetch_*` call.
+
+        Returns
+        -------
+        typing.Set[str]
+            The set of valid identifiers.
+        """
+        return self._identifiers
 
     @property
     def cache(self) -> t.Dict[_KT, _VT]:
@@ -371,9 +414,10 @@ class SecondaryTypeCache(BaseCache[_KT, _VT]):
             The data to load.
         """
         for document in data:
-            self._endpoints[document["url"].split("/")[-2]] = Endpoint(
-                url=document["url"], id=int(document["url"].split("/")[-2])
-            )
+            id_ = int(document["url"].split("/")[-2])
+            self._endpoints[str(id_)] = CacheEndpoint(url=document["url"], id=id_)
+            self._endpoints_by_id[str(id_)] = str(id_)
+        self._identifiers = set(self._endpoints) | set(self._endpoints_by_id)
         self._endpoints_cached = True
 
 

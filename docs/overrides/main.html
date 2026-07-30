@@ -1,0 +1,342 @@
+{% extends "base.html" %}
+{% block content %}
+{% if page.nb_url %}
+    <a href="{{ page.nb_url }}" title="Download Notebook" class="md-content__button md-icon">
+        {% include ".icons/material/download.svg" %}
+    </a>
+{% endif %}
+{{ super() }}
+<style>
+.jp-Notebook {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.jp-Cell {
+    margin: 0 0 0.75rem 0 !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+.jp-Cell-inputWrapper,
+.jp-Cell-outputWrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+.jp-Cell-outputWrapper {
+    margin-top: 0.25rem !important;
+}
+
+.jp-InputPrompt {
+    font-family: var(--md-code-font-family, "Roboto Mono", monospace) !important;
+    font-size: 0.5rem !important;
+    text-align: left !important;
+    opacity: 0.5 !important;
+}
+
+.jp-InputArea {
+    background: transparent !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.jp-InputArea-editor {
+    background: var(--md-code-bg-color) !important;
+    border: 1px solid var(--md-default-fg-color--lightest) !important;
+    border-radius: 0.2rem !important;
+    margin: 0 !important;
+}
+
+.jp-InputArea-editor pre,
+.jp-InputArea-editor .cm-content {
+    background: transparent !important;
+    color: var(--md-code-fg-color) !important;
+    font-family: var(--md-code-font-family, "Roboto Mono", monospace) !important;
+    font-size: 0.85em !important;
+    line-height: 1.4 !important;
+    padding: 0.6rem 0.8rem !important;
+    margin: 0 !important;
+}
+
+.jp-OutputPrompt {
+    display: flex !important;
+    font-family: var(--md-code-font-family, "Roboto Mono", monospace) !important;
+    align-items: center !important;
+    font-size: 0.5rem !important;
+    text-align: left !important;
+    opacity: 0.5 !important;
+}
+
+.jp-OutputArea {
+    display: flex !important;
+    flex-direction: column !important;
+    background: transparent !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.jp-OutputArea-output {
+    background: transparent !important;
+    color: var(--md-typeset-color) !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: var(--md-typeset-font-size, 0.64rem) !important;
+    line-height: var(--md-typeset-line-height, 1.6) !important;
+}
+
+.jp-OutputArea-output pre {
+    background: var(--md-code-bg-color) !important;
+    color: var(--md-code-fg-color) !important;
+    font-family: var(--md-code-font-family, "Roboto Mono", monospace) !important;
+    font-size: 0.85em !important;
+    line-height: 1.4 !important;
+    padding: 0.6rem 0.8rem !important;
+    border-radius: 0.2rem !important;
+    border: none !important;
+    margin: 0.25rem 0 !important;
+}
+
+.jp-OutputArea-output code {
+    background: var(--md-code-bg-color) !important;
+    color: var(--md-code-fg-color) !important;
+    font-family: var(--md-code-font-family, "Roboto Mono", monospace) !important;
+    font-size: 0.85em !important;
+    padding: 0.1em 0.3em !important;
+    border-radius: 0.2rem !important;
+}
+
+.jp-OutputArea-output.jp-RenderedText pre {
+    background: transparent !important;
+    color: var(--md-typeset-color) !important;
+    border: none !important;
+    padding: 0.25rem 0 !important;
+    padding-left: 0.35rem !important;
+    margin: 0 !important;
+}
+
+.jp-Cell-outputArea .jp-OutputArea-executeResult ~ .jp-OutputArea-executeResult .jp-OutputPrompt {
+    visibility: hidden !important;
+}
+
+.jp-RenderedHTMLCommon {
+    color: var(--md-typeset-color) !important;
+    font-family: var(--md-text-font-family) !important;
+    font-size: var(--md-typeset-font-size, 0.64rem) !important;
+    line-height: var(--md-typeset-line-height, 1.6) !important;
+}
+
+.jp-RenderedHTMLCommon p,
+.jp-RenderedHTMLCommon li,
+.jp-RenderedHTMLCommon td,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon dd,
+.jp-RenderedHTMLCommon dt {
+    font-size: var(--md-typeset-font-size, 0.64rem) !important;
+    line-height: var(--md-typeset-line-height, 1.6) !important;
+    color: var(--md-typeset-color) !important;
+    margin: 0.25rem 0 !important;
+}
+
+.jp-RenderedHTMLCommon ul,
+.jp-RenderedHTMLCommon ol {
+    padding-left: 1.5em !important;
+    margin: 0 !important;
+}
+
+.jp-RenderedHTMLCommon li {
+    margin: 0 !important;
+}
+
+.jp-RenderedHTMLCommon p {
+    margin: 0 !important;
+}
+
+.jp-RenderedHTMLCommon h1,
+.jp-RenderedHTMLCommon h2,
+.jp-RenderedHTMLCommon h3,
+.jp-RenderedHTMLCommon h4,
+.jp-RenderedHTMLCommon h5,
+.jp-RenderedHTMLCommon h6 {
+    color: var(--md-default-fg-color) !important;
+    font-family: var(--md-heading-font-family, var(--md-text-font-family)) !important;
+    font-weight: 600 !important;
+    border: none !important;
+    margin: 0.5rem 0 !important;
+}
+
+.jp-RenderedHTMLCommon h1 { font-size: 2em !important; font-weight: 300 !important; }
+.jp-RenderedHTMLCommon h2 { font-size: 1.5625em !important; font-weight: 300 !important; }
+.jp-RenderedHTMLCommon h3 { font-size: 1.25em !important; font-weight: 400 !important; }
+.jp-RenderedHTMLCommon h4 { font-size: 1em !important; font-weight: 400 !important; }
+.jp-RenderedHTMLCommon h5 { font-size: 0.8em !important; font-weight: 700 !important; }
+.jp-RenderedHTMLCommon h6 { font-size: 0.8em !important; font-weight: 700 !important; }
+
+.jp-RenderedHTMLCommon a {
+    color: var(--md-typeset-a-color) !important;
+    text-decoration: none !important;
+}
+
+.jp-RenderedHTMLCommon a:hover {
+    color: var(--md-accent-fg-color) !important;
+    text-decoration: underline !important;
+}
+
+.jp-RenderedHTMLCommon pre {
+    background: var(--md-code-bg-color) !important;
+    color: var(--md-code-fg-color) !important;
+    font-family: var(--md-code-font-family, "Roboto Mono", monospace) !important;
+    font-size: 0.85em !important;
+    line-height: 1.4 !important;
+    padding: 0.6rem 0.8rem !important;
+    border-radius: 0.2rem !important;
+    border: none !important;
+    margin: 0.5rem 0 !important;
+}
+
+.jp-RenderedHTMLCommon code {
+    background: var(--md-code-bg-color) !important;
+    color: var(--md-code-fg-color) !important;
+    font-family: var(--md-code-font-family, "Roboto Mono", monospace) !important;
+    font-size: 0.85em !important;
+    padding: 0.1em 0.3em !important;
+    border-radius: 0.2rem !important;
+}
+
+.jp-RenderedHTMLCommon pre code {
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+.jp-RenderedHTMLCommon blockquote {
+    border-left: 4px solid var(--md-primary-fg-color) !important;
+    background: var(--md-primary-fg-color--transparent, rgba(63, 81, 181, 0.05)) !important;
+    color: var(--md-typeset-color) !important;
+    padding: 0.5rem 1rem !important;
+    margin: 0.5rem 0 !important;
+    border-radius: 0 0.2rem 0.2rem 0 !important;
+}
+
+.jp-RenderedHTMLCommon table {
+    border-collapse: collapse !important;
+    border: none !important;
+    font-size: var(--md-typeset-font-size, 0.64rem) !important;
+    margin: 0.5rem 0 !important;
+}
+
+.jp-RenderedHTMLCommon th {
+    background: var(--md-default-fg-color--lightest) !important;
+    color: var(--md-default-fg-color) !important;
+    font-weight: 700 !important;
+    padding: 0.5rem 1rem !important;
+    border: none !important;
+    border-bottom: 1px solid var(--md-default-fg-color--lightest) !important;
+}
+
+.jp-RenderedHTMLCommon td {
+    padding: 0.5rem 1rem !important;
+    border: none !important;
+    border-bottom: 1px solid var(--md-default-fg-color--lightest) !important;
+}
+
+.jp-RenderedHTMLCommon hr {
+    border: 0 !important;
+    border-top: 1px solid var(--md-default-fg-color--lightest) !important;
+    margin: 0.75rem 0 !important;
+}
+
+.jp-OutputArea-output img {
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 0.2rem !important;
+}
+
+.jp-OutputArea-output iframe {
+    max-width: 100% !important;
+    border: 1px solid var(--md-default-fg-color--lightest) !important;
+    border-radius: 0.2rem !important;
+}
+
+[data-md-color-scheme="slate"] .jp-RenderedHTMLCommon blockquote {
+    background: rgba(124, 77, 255, 0.08) !important;
+    border-left-color: var(--md-accent-fg-color) !important;
+}
+
+[data-md-color-scheme="slate"] .jp-InputArea-editor {
+    border-color: var(--md-default-fg-color--lightest) !important;
+}
+</style>
+{% if config.extra.comments.enabled %}
+<h2 id="__comments">{{ lang.t("meta.comments") }}</h2>
+{% if config.extra.comments.mode == "giscus" %}
+<script async
+        crossorigin="anonymous"
+        data-category="General"
+        data-category-id="R_kgDOIlz6wA"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-lang="en"
+        data-loading="lazy"
+        data-mapping="title"
+        data-reactions-enabled="1"
+        data-repo="FallenDeity/PokeLance"
+        data-repo-id="R_kgDOJ2QXiA"
+        data-strict="0"
+        data-theme="preferred_color_scheme"
+        src="https://giscus.app/client.js">
+</script>
+{% else %}
+<script src="https://utteranc.es/client.js"
+        repo="FallenDeity/PokeLance"
+        issue-term="title"
+        theme="preferred-color-scheme"
+        crossorigin="anonymous"
+        async>
+</script>
+{% endif %}
+<!-- Synchronize Giscus theme with palette -->
+<script>
+	/* Set palette on initial load */
+	var palette = __md_get("__palette")
+	if (palette && typeof palette.color === "object") {
+		{% if config.extra.comments.mode == "giscus" %}
+			var giscus = document.querySelector("script[src*=giscus]")
+			var theme = palette.color.scheme === "slate" ? "dark_dimmed" : "light"
+			giscus.setAttribute("data-theme", theme)
+		{% else %}
+			var utterances = document.querySelector("script[src*=utteranc]")
+			var theme = palette.color.scheme === "slate" ? "dark-blue" : "github-light"
+			utterances.setAttribute("data-theme", theme)
+		{% endif %}
+	}
+
+	/* Register event handlers after documented loaded */
+	document.addEventListener("DOMContentLoaded", function () {
+		var ref = document.querySelector("[data-md-component=palette]")
+		ref.addEventListener("change", function () {
+			var palette = __md_get("__palette")
+			if (palette && typeof palette.color === "object") {
+				{% if config.extra.comments.mode == "giscus" %}
+					var theme = palette.color.scheme === "slate" ? "dark_dimmed" : "light"
+					var frame = document.querySelector(".giscus-frame")
+					frame.contentWindow.postMessage(
+							{giscus: {setConfig: {theme}}},
+							"https://giscus.app"
+					)
+				{% else %}
+					var theme = palette.color.scheme === "slate" ? "dark-blue" : "github-light"
+					var frame = document.querySelector(".utterances-frame")
+					const iframe = document.querySelector(".utterances-frame")
+					iframe.contentWindow.postMessage({type: 'set-theme', theme: theme}, 'https://utteranc.es');
+				{% endif %}
+			}
+		})
+	})
+</script>
+{% endif %}
+{% endblock %}
