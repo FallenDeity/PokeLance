@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.12 - 2026-07-31
+## 0.2.13 - 2026-07-31
 
 #### New Features
 
@@ -14,9 +14,10 @@
 #### Others
 
 -  Pin deploy docs ci version
+-  bump python version
 -  fix unused vars
 
-Full set of changes: [v0.2.11 to v0.2.12](https://github.com/FallenDeity/PokeLance/compare/v0.2.11...v0.2.12)
+Full set of changes: [v0.2.11 to v0.2.13](https://github.com/FallenDeity/PokeLance/compare/v0.2.11...v0.2.13)
 
 ## 0.2.11 - 2026-02-15
 
