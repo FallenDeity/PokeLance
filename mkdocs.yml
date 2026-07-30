@@ -72,10 +72,6 @@ plugins:
             inherited_members: true
           inventories:
             - https://docs.python.org/3/objects.inv
-  - git-revision-date-localized:
-      enable_creation_date: true
-      type: timeago
-      fallback_to_build_date: true
   - mkdocs-jupyter:
       include_source: true
       execute: false
