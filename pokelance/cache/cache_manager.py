@@ -494,7 +494,7 @@ class Cache:
             The category of the endpoint.
         _type: str
             The type of the endpoint.
-        data: typing.List[Dict[str, str]]
+        data: t.List[Dict[str, str]]
             The data to load.
         """
         getattr(getattr(self, category.lower()), _type).load_documents(data)

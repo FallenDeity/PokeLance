@@ -18,15 +18,15 @@ class ItemSprites(BaseModel):
 
     Attributes
     ----------
-    default: str
+    default: t.Optional[str]
         The default depiction of this item.
     """
 
-    default: str = attrs.field(factory=str)
+    default: t.Optional[str] = attrs.field(default=None)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, str]) -> "ItemSprites":
-        return cls(raw=payload, default=payload.get("default", ""))
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemSprites":
+        return cls(raw=payload, default=payload.get("default"))
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -49,7 +49,7 @@ class ItemHolderPokemonVersionDetail(BaseModel):
         return cls(
             raw=payload,
             rarity=payload.get("rarity", 0),
-            version=NamedResource.from_payload(payload.get("version", {}) or {}),
+            version=NamedResource.from_payload(payload.get("version", {})),
         )
 
 
@@ -59,20 +59,20 @@ class ItemHolderPokemon(BaseModel):
 
     Attributes
     ----------
-    pokemon: str
+    pokemon: NamedResource
         The Pokémon that holds this item.
     version_details: t.List[ItemHolderPokemonVersionDetail]
         The details for the version that this item is held in by the Pokémon.
     """
 
     pokemon: NamedResource = attrs.field(factory=NamedResource)
-    version_details: t.List["ItemHolderPokemonVersionDetail"] = attrs.field(factory=list)
+    version_details: t.List[ItemHolderPokemonVersionDetail] = attrs.field(factory=list)
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemHolderPokemon":
         return cls(
             raw=payload,
-            pokemon=NamedResource.from_payload(payload.get("pokemon", {}) or {}),
+            pokemon=NamedResource.from_payload(payload.get("pokemon", {})),
             version_details=[
                 ItemHolderPokemonVersionDetail.from_payload(version_detail)
                 for version_detail in payload.get("version_details", [])

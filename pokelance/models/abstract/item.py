@@ -32,15 +32,15 @@ class Item(BaseModel):
         The name for this resource.
     cost: int
         The price of this item in stores.
-    fling_power: int
+    fling_power: t.Optional[int]
         The power of the move Fling when used with this item.
-    fling_effect: NamedResource
+    fling_effect: t.Optional[NamedResource]
         The effect of the move Fling when used with this item.
     attributes: t.List[NamedResource]
         A list of attributes this item has.
     category: NamedResource
         The category of items this item falls into.
-    effect_entries: t.List[Effect]
+    effect_entries: t.List[VerboseEffect]
         The effect of this ability listed in different languages.
     flavor_text_entries: t.List[VersionGroupFlavorText]
         The flavor text of this ability listed in different languages.
@@ -61,8 +61,8 @@ class Item(BaseModel):
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
     cost: int = attrs.field(factory=int)
-    fling_power: int = attrs.field(factory=int)
-    fling_effect: NamedResource = attrs.field(factory=NamedResource)
+    fling_power: t.Optional[int] = attrs.field(default=None)
+    fling_effect: t.Optional[NamedResource] = attrs.field(default=None)
     attributes: t.List[NamedResource] = attrs.field(factory=list)
     category: NamedResource = attrs.field(factory=NamedResource)
     effect_entries: t.List[VerboseEffect] = attrs.field(factory=list)
@@ -71,7 +71,7 @@ class Item(BaseModel):
     names: t.List[Name] = attrs.field(factory=list)
     sprites: ItemSprites = attrs.field(factory=ItemSprites)
     held_by_pokemon: t.List[ItemHolderPokemon] = attrs.field(factory=list)
-    baby_trigger_for: t.Optional[Resource] = attrs.field(factory=Resource)
+    baby_trigger_for: t.Optional[Resource] = attrs.field(default=None)
     machines: t.List[MachineVersionDetail] = attrs.field(factory=list)
 
     @classmethod
@@ -81,10 +81,10 @@ class Item(BaseModel):
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             cost=payload.get("cost", 0),
-            fling_power=payload.get("fling_power", 0),
-            fling_effect=NamedResource.from_payload(payload.get("fling_effect", {}) or {}),
+            fling_power=payload.get("fling_power"),
+            fling_effect=NamedResource.optional_from_payload(payload.get("fling_effect")),
             attributes=[NamedResource.from_payload(attribute) for attribute in payload.get("attributes", [])],
-            category=NamedResource.from_payload(payload.get("category", {}) or {}),
+            category=NamedResource.from_payload(payload.get("category", {})),
             effect_entries=[VerboseEffect.from_payload(effect) for effect in payload.get("effect_entries", [])],
             flavor_text_entries=[
                 VersionGroupFlavorText.from_payload(flavor_text)
@@ -94,14 +94,12 @@ class Item(BaseModel):
                 GenerationGameIndex.from_payload(game_index) for game_index in payload.get("game_indices", [])
             ],
             names=[Name.from_payload(name) for name in payload.get("names", [])],
-            sprites=ItemSprites.from_payload(payload.get("sprites", {}) or {}),
+            sprites=ItemSprites.from_payload(payload.get("sprites", {})),
             held_by_pokemon=[
                 ItemHolderPokemon.from_payload(held_by_pokemon)
                 for held_by_pokemon in payload.get("held_by_pokemon", [])
             ],
-            baby_trigger_for=Resource.from_payload(payload.get("baby_trigger_for", {}) or {})
-            if payload.get("baby_trigger_for")
-            else None,
+            baby_trigger_for=Resource.optional_from_payload(payload.get("baby_trigger_for")),
             machines=[MachineVersionDetail.from_payload(machine) for machine in payload.get("machines", [])],
         )
 
@@ -120,6 +118,8 @@ class ItemAttribute(BaseModel):
         A list of items that have this attribute.
     names: t.List[Name]
         The name of this resource listed in different languages.
+    descriptions: t.List[Description]
+        The description of this resource listed in different languages.
     """
 
     id: int = attrs.field(factory=int)
@@ -154,6 +154,8 @@ class ItemCategory(BaseModel):
         A list of items that are a part of this category.
     names: t.List[Name]
         The name of this resource listed in different languages.
+    pocket: NamedResource
+        The pocket this category of items falls into.
     """
 
     id: int = attrs.field(factory=int)
@@ -170,7 +172,7 @@ class ItemCategory(BaseModel):
             name=payload.get("name", ""),
             items=[NamedResource.from_payload(item) for item in payload.get("items", [])],
             names=[Name.from_payload(name) for name in payload.get("names", [])],
-            pocket=NamedResource.from_payload(payload.get("pocket", {}) or {}),
+            pocket=NamedResource.from_payload(payload.get("pocket", {})),
         )
 
 

@@ -33,12 +33,12 @@ class Contest(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the contest type.
 
         Returns
         -------
-        typing.Optional[pokelance.models.ContestType]
+        t.Optional[ContestType]
             The contest type if it exists in the cache, else None.
 
         Raises
@@ -64,7 +64,7 @@ class Contest(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the contest type.
 
         Returns
@@ -105,7 +105,7 @@ class Contest(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.ContestEffect]
+        t.Optional[ContestEffect]
             The contest effect if it exists in the cache, else None.
 
         Raises
@@ -172,7 +172,7 @@ class Contest(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.SuperContestEffect]
+        t.Optional[SuperContestEffect]
             The super contest effect if it exists in the cache, else None.
 
         Raises

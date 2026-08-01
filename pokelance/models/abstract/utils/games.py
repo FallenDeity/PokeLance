@@ -28,5 +28,5 @@ class PokemonEntry(BaseModel):
         return cls(
             raw=payload,
             entry_number=payload.get("entry_number", 0),
-            pokemon_species=NamedResource.from_payload(payload.get("pokemon_species", {}) or {}),
+            pokemon_species=NamedResource.from_payload(payload.get("pokemon_species", {})),
         )

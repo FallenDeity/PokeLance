@@ -49,7 +49,7 @@ class HttpClient:
         The cache to use for the HTTP client.
     _client: pokelance.PokeLance
         The client that this HTTP client is for.
-    _tasks_queue: typing.List[asyncio.Task]
+    _tasks_queue: t.List[asyncio.Task]
         The queue for the tasks.
     _session_owner: bool
         Whether the session was created internally (True) or passed in by the
@@ -92,7 +92,7 @@ class HttpClient:
 
         Parameters
         ----------
-        coroutine: typing.Coroutine
+        coroutine: t.Coroutine
             The coroutine to load.
         message: str
             The message to log.
@@ -263,7 +263,7 @@ class HttpClient:
 
         Returns
         -------
-        typing.Union[pokelance.logger.Logger, logging.Logger]
+        t.Union[pokelance.logger.Logger, logging.Logger]
             The logger.
         """
         return self._client.logger

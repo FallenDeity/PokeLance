@@ -34,12 +34,12 @@ class Berry(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the berry.
 
         Returns
         -------
-        typing.Optional[pokelance.models.Berry]
+        t.Optional[BerryModel]
             The berry if it exists in the cache, else None.
 
         Raises
@@ -65,7 +65,7 @@ class Berry(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the berry.
 
         Returns
@@ -101,12 +101,12 @@ class Berry(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the berry flavor.
 
         Returns
         -------
-        typing.Optional[pokelance.models.BerryFlavor]
+        t.Optional[BerryFlavor]
             The berry flavor if it exists in the cache, else None.
 
         Raises
@@ -132,7 +132,7 @@ class Berry(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the berry flavor.
 
         Returns
@@ -168,12 +168,12 @@ class Berry(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the berry firmness.
 
         Returns
         -------
-        typing.Optional[pokelance.models.BerryFirmness]
+        t.Optional[BerryFirmness]
             The berry firmness if it exists in the cache, else None.
 
         Raises
@@ -199,7 +199,7 @@ class Berry(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the berry firmness.
 
         Returns

@@ -23,8 +23,8 @@ class EncounterMethod(BaseModel):
     name: str
         The name for this encounter method resource.
     order: int
-        A good value for sorting.
-    names: typing.List[pokelance.models.common.Name]
+        A good value for sorting
+    names: t.List[Name]
         The name of this encounter method listed in different languages.
     """
 
@@ -54,9 +54,9 @@ class EncounterCondition(BaseModel):
         The identifier for this encounter condition resource.
     name: str
         The name for this encounter condition resource.
-    names: typing.List[pokelance.models.common.Name]
+    names: t.List[Name]
         The name of this encounter condition listed in different languages.
-    values: typing.List[pokelance.models.common.NamedResource]
+    values: t.List[NamedResource]
         A list of possible values for this encounter condition.
     """
 
@@ -86,9 +86,9 @@ class EncounterConditionValue(BaseModel):
         The identifier for this encounter condition value resource.
     name: str
         The name for this encounter condition value resource.
-    condition: pokelance.models.common.NamedResource
+    condition: NamedResource
         The condition this encounter condition value pertains to.
-    names: typing.List[pokelance.models.common.Name]
+    names: t.List[Name]
         The name of this encounter condition value listed in different languages.
     """
 
@@ -103,6 +103,6 @@ class EncounterConditionValue(BaseModel):
             raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
-            condition=NamedResource.from_payload(payload.get("condition", {}) or {}),
+            condition=NamedResource.from_payload(payload.get("condition", {})),
             names=[Name.from_payload(name) for name in payload.get("names", [])],
         )

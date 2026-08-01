@@ -33,12 +33,12 @@ class Encounter(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the encounter condition.
 
         Returns
         -------
-        typing.Optional[pokelance.models.EncounterCondition]
+        t.Optional[EncounterCondition]
             The encounter condition if it exists in the cache, else None.
 
         Raises
@@ -64,7 +64,7 @@ class Encounter(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the encounter condition.
 
         Returns
@@ -100,12 +100,12 @@ class Encounter(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the encounter condition value.
 
         Returns
         -------
-        typing.Optional[pokelance.models.EncounterConditionValue]
+        t.Optional[EncounterConditionValue]
             The encounter condition value if it exists in the cache, else None.
 
         Raises
@@ -131,7 +131,7 @@ class Encounter(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the encounter condition value.
 
         Returns
@@ -167,12 +167,12 @@ class Encounter(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the encounter method.
 
         Returns
         -------
-        typing.Optional[pokelance.models.EncounterMethod]
+        t.Optional[EncounterMethod]
             The encounter method if it exists in the cache, else None.
 
         Raises
@@ -198,7 +198,7 @@ class Encounter(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the encounter method.
 
         Returns

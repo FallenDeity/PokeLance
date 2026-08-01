@@ -25,7 +25,7 @@ class Location(BaseModel):
         The identifier for this resource.
     name: str
         The name for this resource.
-    region: NamedResource
+    region: t.Optional[NamedResource]
         The region this location can be found in.
     names: t.List[Name]
         The name of this resource listed in different languages.
@@ -38,7 +38,7 @@ class Location(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    region: NamedResource = attrs.field(factory=NamedResource)
+    region: t.Optional[NamedResource] = attrs.field(default=None)
     names: t.List[Name] = attrs.field(factory=list)
     game_indices: t.List[GenerationGameIndex] = attrs.field(factory=list)
     areas: t.List[NamedResource] = attrs.field(factory=list)
@@ -49,7 +49,7 @@ class Location(BaseModel):
             raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
-            region=NamedResource.from_payload(payload.get("region", {}) or {}),
+            region=NamedResource.optional_from_payload(payload.get("region")),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
             game_indices=[GenerationGameIndex.from_payload(i) for i in payload.get("game_indices", [])],
             areas=[NamedResource.from_payload(i) for i in payload.get("areas", [])],
@@ -97,7 +97,7 @@ class LocationArea(BaseModel):
             name=payload.get("name", ""),
             game_index=payload.get("game_index", 0),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
-            location=NamedResource.from_payload(payload.get("location", {}) or {}),
+            location=NamedResource.from_payload(payload.get("location", {})),
             encounter_method_rates=[
                 EncounterMethodRate.from_payload(i) for i in payload.get("encounter_method_rates", [])
             ],
@@ -150,7 +150,7 @@ class Region(BaseModel):
         The name for this resource.
     locations: t.List[NamedResource]
         A list of locations that can be found in this region.
-    main_generation: NamedResource
+    main_generation: t.Optional[NamedResource]
         The generation this region was introduced in.
     names: t.List[Name]
         The name of this resource listed in different languages.
@@ -163,7 +163,7 @@ class Region(BaseModel):
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
     locations: t.List[NamedResource] = attrs.field(factory=list)
-    main_generation: NamedResource = attrs.field(factory=NamedResource)
+    main_generation: t.Optional[NamedResource] = attrs.field(default=None)
     names: t.List[Name] = attrs.field(factory=list)
     pokedexes: t.List[NamedResource] = attrs.field(factory=list)
     version_groups: t.List[NamedResource] = attrs.field(factory=list)
@@ -175,7 +175,7 @@ class Region(BaseModel):
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             locations=[NamedResource.from_payload(i) for i in payload.get("locations", [])],
-            main_generation=NamedResource.from_payload(payload.get("main_generation", {}) or {}),
+            main_generation=NamedResource.optional_from_payload(payload.get("main_generation")),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
             pokedexes=[NamedResource.from_payload(i) for i in payload.get("pokedexes", [])],
             version_groups=[NamedResource.from_payload(i) for i in payload.get("version_groups", [])],

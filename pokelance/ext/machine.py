@@ -37,7 +37,7 @@ class Machine(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.Machine]
+        t.Optional[MachineModel]
             The machine if it exists in the cache, else None.
 
         Raises

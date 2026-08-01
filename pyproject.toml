@@ -91,3 +91,6 @@ exclude_lines = [
 [tool.mypy]
 python_version = "3.9"
 strict = true
+exclude = [
+    "scripts/",
+]

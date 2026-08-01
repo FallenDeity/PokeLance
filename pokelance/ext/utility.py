@@ -33,12 +33,12 @@ class Utility(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the language.
 
         Returns
         -------
-        typing.Optional[pokelance.models.Language]
+        t.Optional[Language]
             The language if it exists in the cache, else None.
 
         Raises
@@ -55,12 +55,12 @@ class Utility(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the language.
 
         Returns
         -------
-        pokelance.models.Language
+        Language
             The language.
 
         Raises
@@ -78,7 +78,7 @@ class Utility(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.APIMetadata]
+        t.Optional[APIMetadata]
             The API metadata if it exists in the cache, else None.
         """
         route = Endpoint.get_api_metadata()
@@ -89,7 +89,7 @@ class Utility(BaseExtension):
 
         Returns
         -------
-        pokelance.models.APIMetadata
+        APIMetadata
             The API metadata.
         """
         route = Endpoint.get_api_metadata()

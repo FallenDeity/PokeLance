@@ -50,9 +50,9 @@ class BaseExtension:
 
         Parameters
         ----------
-        cache: pokelance.cache.BaseCache[typing.Any, typing.Any]
+        cache: pokelance.cache.BaseCache[t.Any, t.Any]
             The cache to use for the validation.
-        resource: typing.Union[str, int]
+        resource: t.Union[str, int]
             The resource to validate.
         route: pokelance.http.Route
             The route to use for the validation.
@@ -65,7 +65,9 @@ class BaseExtension:
         data: t.Set[str] = cache.identifiers
         if data and str(resource) not in data:
             suggestions = get_close_matches(str(resource), data, n=10, cutoff=0.5)
-            raise ResourceNotFound(message="Resource not found.", route=route, status=404, suggestions=suggestions)
+            raise ResourceNotFound(
+                message=f"Resource not found - {route.url}", route=route, status=404, suggestions=suggestions
+            )
 
     async def setup(self) -> None:
         """Sets up the extension."""

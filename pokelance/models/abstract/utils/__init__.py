@@ -1,7 +1,7 @@
 import typing as t
 
 from .berries import BerryFlavorMap, FlavorBerryMap
-from .contests import ContestName
+from .contests import ContestEffectFlavorText, ContestName, SuperContestEffectFlavorText
 from .evolutions import ChainLink, EvolutionDetail
 from .games import PokemonEntry
 from .items import ItemHolderPokemon, ItemHolderPokemonVersionDetail, ItemSprites
@@ -15,8 +15,8 @@ from .pokemons import (
     Genus,
     GrowthRateExperienceLevel,
     MoveBattleStylePreference,
+    MoveStatAffect,
     MoveStatAffectSets,
-    MoveStatEffect,
     NaturePokeathlonStatAffect,
     NaturePokeathlonStatAffectSet,
     NatureStatAffectSets,
@@ -32,6 +32,7 @@ from .pokemons import (
     PokemonHeldItemVersion,
     PokemonMove,
     PokemonMoveVersion,
+    PokemonPastAbility,
     PokemonSpeciesDexEntry,
     PokemonSpeciesGender,
     PokemonSpeciesVariety,
@@ -50,6 +51,8 @@ __all__: t.Tuple[str, ...] = (
     "BerryFlavorMap",
     "FlavorBerryMap",
     "ContestName",
+    "ContestEffectFlavorText",
+    "SuperContestEffectFlavorText",
     "EvolutionDetail",
     "ChainLink",
     "PokemonEntry",
@@ -76,6 +79,7 @@ __all__: t.Tuple[str, ...] = (
     "NaturePokeathlonStatAffect",
     "NaturePokeathlonStatAffectSet",
     "PokemonAbility",
+    "PokemonPastAbility",
     "PokemonFormType",
     "PokemonHeldItemVersion",
     "PokemonHeldItem",
@@ -96,7 +100,7 @@ __all__: t.Tuple[str, ...] = (
     "PokemonSpeciesVariety",
     "PalParkEncounterArea",
     "NatureStatAffectSets",
-    "MoveStatEffect",
+    "MoveStatAffect",
     "MoveStatAffectSets",
     "TypePokemon",
     "TypeRelationsPast",

@@ -34,12 +34,12 @@ class Game(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the generation.
 
         Returns
         -------
-        typing.Optional[pokelance.models.Generation]
+        t.Optional[Generation]
             The generation if it exists in the cache, else None.
 
         Raises
@@ -65,12 +65,12 @@ class Game(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the generation.
 
         Returns
         -------
-        pokelance.models.Generation
+        Generation
             The generation if it exists in the API, else raises ResourceNotFound.
 
         Raises
@@ -101,12 +101,12 @@ class Game(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the pokedex.
 
         Returns
         -------
-        typing.Optional[pokelance.models.Pokedex]
+        t.Optional[Pokedex]
             The pokedex if it exists in the cache, else None.
 
         Raises
@@ -132,12 +132,12 @@ class Game(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the pokedex.
 
         Returns
         -------
-        pokelance.models.Pokedex
+        Pokedex
             The pokedex if it exists in the API, else raises ResourceNotFound.
 
         Raises
@@ -168,12 +168,12 @@ class Game(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the version.
 
         Returns
         -------
-        typing.Optional[pokelance.models.Version]
+        t.Optional[Version]
             The version if it exists in the cache, else None.
 
         Raises
@@ -199,12 +199,12 @@ class Game(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the version.
 
         Returns
         -------
-        pokelance.models.Version
+        Version
             The version if it exists in the API, else raises ResourceNotFound.
 
         Raises
@@ -235,12 +235,12 @@ class Game(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the version group.
 
         Returns
         -------
-        typing.Optional[pokelance.models.VersionGroup]
+        t.Optional[VersionGroup]
             The version group if it exists in the cache, else None.
 
         Raises
@@ -266,12 +266,12 @@ class Game(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the version group.
 
         Returns
         -------
-        pokelance.models.VersionGroup
+        VersionGroup
             The version group if it exists in the API, else raises ResourceNotFound.
 
         Raises

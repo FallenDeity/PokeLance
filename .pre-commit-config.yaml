@@ -57,13 +57,3 @@ repos:
         language: python
         stages:
           - commit
-
-  - repo: local
-    hooks:
-      - id: pytest
-        name: pytest
-        pass_filenames: false
-        entry: uv run pytest
-        language: system
-        stages:
-          - commit

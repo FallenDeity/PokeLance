@@ -38,7 +38,7 @@ class Move(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.Move]
+        t.Optional[MoveModel]
             The move if it exists in the cache, else None.
 
         Raises
@@ -105,7 +105,7 @@ class Move(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.MoveAilment]
+        t.Optional[MoveAilment]
             The move ailment if it exists in the cache, else None.
 
         Raises
@@ -172,7 +172,7 @@ class Move(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.MoveBattleStyle]
+        t.Optional[MoveBattleStyle]
             The move battle style if it exists in the cache, else None.
 
         Raises
@@ -239,7 +239,7 @@ class Move(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.MoveCategory]
+        t.Optional[MoveCategory]
             The move category if it exists in the cache, else None.
 
         Raises
@@ -306,7 +306,7 @@ class Move(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.MoveDamageClass]
+        t.Optional[MoveDamageClass]
             The move damage class if it exists in the cache, else None.
 
         Raises
@@ -373,7 +373,7 @@ class Move(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.MoveLearnMethod]
+        t.Optional[MoveLearnMethod]
             The move learn method if it exists in the cache, else None.
 
         Raises
@@ -440,7 +440,7 @@ class Move(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.MoveTarget]
+        t.Optional[MoveTarget]
             The move target if it exists in the cache, else None.
 
         Raises

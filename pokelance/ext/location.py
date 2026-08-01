@@ -34,12 +34,12 @@ class Location(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the location.
 
         Returns
         -------
-        typing.Optional[pokelance.models.Location]
+        t.Optional[LocationModel]
             The location if it exists in the cache, else None.
 
         Raises
@@ -65,7 +65,7 @@ class Location(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the location.
 
         Returns
@@ -101,12 +101,12 @@ class Location(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the location area.
 
         Returns
         -------
-        typing.Optional[pokelance.models.LocationArea]
+        t.Optional[LocationArea]
             The location area if it exists in the cache, else None.
 
         Raises
@@ -132,7 +132,7 @@ class Location(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the location area.
 
         Returns
@@ -168,12 +168,12 @@ class Location(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the pal park area.
 
         Returns
         -------
-        typing.Optional[pokelance.models.PalParkArea]
+        t.Optional[PalParkArea]
             The pal park area if it exists in the cache, else None.
 
         Raises
@@ -199,7 +199,7 @@ class Location(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the pal park area.
 
         Returns
@@ -235,12 +235,12 @@ class Location(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the region.
 
         Returns
         -------
-        typing.Optional[pokelance.models.Region]
+        t.Optional[Region]
             The region if it exists in the cache, else None.
 
         Raises
@@ -266,7 +266,7 @@ class Location(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the region.
 
         Returns

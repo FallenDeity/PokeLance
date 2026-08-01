@@ -7,6 +7,9 @@ import typing as t
 import attrs
 
 __all__: t.Tuple[str, ...] = (
+    "BASE_URL",
+    "EXTENSION_PATTERN",
+    "_SUBCATEGORY_MAP",
     "BaseEnum",
     "Extension",
     "BerryExtension",
@@ -26,17 +29,26 @@ __all__: t.Tuple[str, ...] = (
     "RequestObject",
 )
 
+BASE_URL = "https://pokeapi.co/api/v2"
 
 ExtensionsL = t.Literal[
     "berry", "contest", "encounter", "evolution", "game", "item", "location", "machine", "move", "pokemon"
 ]
-EXTENSION_PATTERN: t.Pattern[str] = re.compile(r"https://pokeapi.co/api/v2/(?P<category>[\w-]+)/(?P<value>[\w-]+)")
+EXTENSION_PATTERN: t.Pattern[str] = re.compile(
+    rf"{re.escape(BASE_URL)}/(?P<category>[\w-]+)/(?P<value>[\w-]+)(?:/(?P<sub_category>[\w-]+))?/?"
+)
+# Special case subcategory /pokemon/{id}/encounters endpoint for getch_data and from_url methods, due to inconsistent naming in the API
+_SUBCATEGORY_MAP: t.Dict[str, str] = {"encounters": "location-area-encounter"}
+
+
+def _convert_category(value: str) -> str:
+    return _SUBCATEGORY_MAP.get(value, value)
 
 
 @attrs.define
 class RequestObject:
     extension: str
-    category: str
+    category: str = attrs.field(converter=_convert_category)
     value: str
 
 
@@ -68,9 +80,9 @@ class PokemonFormTriggerEnum(BaseEnum):
     UNDEFINED = "undefined"
 
     @classmethod
-    def from_str(cls, value: str | None) -> PokemonFormTriggerEnum | None:
+    def from_str(cls, value: str | None) -> PokemonFormTriggerEnum:
         if value is None:
-            return None
+            return PokemonFormTriggerEnum.UNDEFINED
         return cls(value) if value in cls._value2member_map_ else cls.UNDEFINED
 
 
@@ -328,12 +340,12 @@ class ExtensionEnum(BaseEnum):
         """
         Validate the url.
         """
-        if not url.startswith("https://pokeapi.co/api/v2/") or not (groups := re.match(EXTENSION_PATTERN, url)):
+        if not url.startswith(BASE_URL) or not (groups := re.match(EXTENSION_PATTERN, url)):
             raise ValueError(f"Invalid url: {url}")
-        category, value = groups.groups()
+        category, value, subcategory = groups.groups()
         for i in cls:
             if category.lower() in i.value.categories:
-                return RequestObject(extension=i.name, category=category, value=value)
+                return RequestObject(extension=i.name, category=subcategory or category, value=value)
         raise ValueError(f"Invalid url: {url}")
 
     @classmethod

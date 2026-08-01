@@ -114,13 +114,13 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
     ----------
     _max_size: int
         The maximum size of the cache.
-    _cache: typing.Dict[_KT, _VT]
+    _cache: t.Dict[_KT, _VT]
         The cache itself.
-    _endpoints: typing.Dict[str, CacheEndpoint]
+    _endpoints: t.Dict[str, CacheEndpoint]
         The endpoints that are cached.
-    _endpoints_by_id: typing.Dict[str, str]
+    _endpoints_by_id: t.Dict[str, str]
         Reverse lookup of id (as a string) to CacheEndpoint, for alias resolution.
-    _identifiers: typing.Set[str]
+    _identifiers: t.Set[str]
         The union of every valid name and id (as strings) for this category.
     _endpoints_cached: bool
         Whether or not the endpoints are cached.
@@ -208,7 +208,7 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
         ----------
         key: _KT
             The key to get.
-        default: typing.Union[_VT, _T, None]
+        default: t.Union[_VT, _T, None]
             The default value to return if the key isn't found.
         """
         if key in self:
@@ -226,7 +226,7 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
 
         Parameters
         ----------
-        data: typing.List[typing.Dict[str, str]]
+        data: t.List[t.Dict[str, str]]
             The data to load.
         """
         for document in data:
@@ -311,7 +311,7 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
 
         self._client.logger.info(f"Loading {self.__class__.__name__}...")
         route_model = importlib.import_module("pokelance.http").__dict__["Route"]
-        value_type = str(self.__orig_bases__[0].__args__[1]).split(".")[-1]  # type: ignore
+        value_type = str(self.__orig_bases__[0].__args__[1]).split(".")[-1].strip("[]")  # type: ignore
 
         model = importlib.import_module("pokelance.models").__dict__[value_type]
         if not issubclass(model, BaseModel):
@@ -324,7 +324,7 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
             batch = endpoints[i : i + batch_size]
             tasks = []
             for endpoint in batch:
-                route = route_model(endpoint=f"/{endpoint.url.strip('/').split('/')[-2]}/{str(endpoint)}")
+                route = route_model.from_raw_url(endpoint.url)
                 data = self.get(route, None)
                 if data:
                     self.setdefault(route, data)
@@ -344,7 +344,9 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
             raise TypeError(f"Expected a subclass of BaseModel, got {type(model)}")
         try:
             data = await self._client.http.request(route)
-            self.setdefault(route, model.from_payload(data))
+            self.setdefault(
+                route, [model.from_payload(i) for i in data] if isinstance(data, list) else model.from_payload(data)
+            )
         except Exception as e:
             self._client.logger.error(f"Failed to load {route}: {e}")
 
@@ -356,11 +358,11 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
             raise RuntimeError("The endpoints have not been cached yet.")
         self._client.logger.info(f"Loading {self.__class__.__name__}...")
         route_model = importlib.import_module("pokelance.http").__dict__["Route"]
-        value_type = str(self.__orig_bases__[0].__args__[1]).split(".")[-1]  # type: ignore
+        value_type = str(self.__orig_bases__[0].__args__[1]).split(".")[-1].strip("[]")  # type: ignore
         model: "models.BaseModel" = importlib.import_module("pokelance.models").__dict__[value_type]
         self._max_size = len(self._endpoints)
         for endpoint in self._endpoints.values():
-            route = route_model(endpoint=f"/{endpoint.url.strip('/').split('/')[-2]}/{str(endpoint)}")
+            route = route_model.from_raw_url(endpoint.url)
             data = self.get(route, None)
             self.setdefault(route, data if data else model.from_payload(await self._client.http.request(route)))
         self._client.logger.info(f"Loaded {self.__class__.__name__}.")
@@ -371,7 +373,7 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
 
         Returns
         -------
-        typing.Dict[str, CacheEndpoint]
+        t.Dict[str, CacheEndpoint]
             The endpoints that are cached.
         """
         return self._endpoints
@@ -385,7 +387,7 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
 
         Returns
         -------
-        typing.Set[str]
+        t.Set[str]
             The set of valid identifiers.
         """
         return self._identifiers
@@ -396,7 +398,7 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
 
         Returns
         -------
-        typing.Dict[_KT, _VT]
+        t.Dict[_KT, _VT]
             The cache itself.
         """
         return self._cache
@@ -410,7 +412,7 @@ class SecondaryTypeCache(BaseCache[_KT, _VT]):
 
         Parameters
         ----------
-        data: typing.List[typing.Dict[str, str]]
+        data: t.List[t.Dict[str, str]]
             The data to load.
         """
         for document in data:
@@ -475,6 +477,15 @@ class PokemonFormCache(BaseCache["Route", "models.PokemonForm"]):
 
 class PokemonLocationAreaCache(BaseCache["Route", "t.List[models.LocationAreaEncounter]"]):
     """A cache for pokemon location areas."""
+
+    def load_documents(self, data: t.List[t.Dict[str, str]]) -> None:
+        for document in data:
+            encounter_url = f"{document['url'].strip('/')}/encounters"
+            id_ = int(encounter_url.split("/")[-2])
+            self._endpoints[document["name"]] = CacheEndpoint(url=encounter_url, id=id_)
+            self._endpoints_by_id[str(id_)] = document["name"]
+        self._identifiers = set(self._endpoints) | set(self._endpoints_by_id)
+        self._endpoints_cached = True
 
 
 class PokemonHabitatCache(BaseCache["Route", "models.PokemonHabitats"]):

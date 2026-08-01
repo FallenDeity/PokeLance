@@ -31,7 +31,7 @@ class BerryFlavorMap(BaseModel):
         return cls(
             raw=payload,
             potency=payload.get("potency", 0),
-            flavor=NamedResource.from_payload(payload.get("flavor", {}) or {}),
+            flavor=NamedResource.from_payload(payload.get("flavor", {})),
         )
 
 
@@ -55,5 +55,5 @@ class FlavorBerryMap(BaseModel):
         return cls(
             raw=payload,
             potency=payload.get("potency", 0),
-            berry=NamedResource.from_payload(payload.get("berry", {}) or {}),
+            berry=NamedResource.from_payload(payload.get("berry", {})),
         )

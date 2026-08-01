@@ -21,21 +21,21 @@ class ContestComboDetail(BaseModel):
 
     Attributes
     ----------
-    use_before: NamedResource
+    use_before: t.Optional[t.List[NamedResource]]
         A detail of moves this move can be used before, i.e. leading into this move.
-    use_after: NamedResource
+    use_after: t.Optional[t.List[NamedResource]]
         A detail of moves this move can be used after, i.e. result in this move being used.
     """
 
-    use_before: t.List[NamedResource] = attrs.field(factory=list)
-    use_after: t.List[NamedResource] = attrs.field(factory=list)
+    use_before: t.Optional[t.List[NamedResource]] = attrs.field(default=None)
+    use_after: t.Optional[t.List[NamedResource]] = attrs.field(default=None)
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ContestComboDetail":
         return cls(
             raw=payload,
-            use_before=[NamedResource.from_payload(i or {}) for i in (payload.get("use_before", []) or [])],
-            use_after=[NamedResource.from_payload(i or {}) for i in (payload.get("use_after", []) or [])],
+            use_before=[NamedResource.from_payload(i) for i in ub] if (ub := payload.get("use_before")) else None,
+            use_after=[NamedResource.from_payload(i) for i in ua] if (ua := payload.get("use_after")) else None,
         )
 
 
@@ -58,8 +58,8 @@ class ContestComboSet(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ContestComboSet":
         return cls(
             raw=payload,
-            normal=ContestComboDetail.from_payload(payload.get("normal", {}) or {}),
-            super=ContestComboDetail.from_payload(payload.get("super", {}) or {}),
+            normal=ContestComboDetail.from_payload(payload.get("normal", {})),
+            super=ContestComboDetail.from_payload(payload.get("super", {})),
         )
 
 
@@ -86,8 +86,8 @@ class MoveFlavorText(BaseModel):
         return cls(
             raw=payload,
             flavor_text=payload.get("flavor_text", ""),
-            language=NamedResource.from_payload(payload.get("language", {}) or {}),
-            version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
+            language=NamedResource.from_payload(payload.get("language", {})),
+            version_group=NamedResource.from_payload(payload.get("version_group", {})),
         )
 
 
@@ -101,13 +101,13 @@ class MoveMetaData(BaseModel):
         The status ailment this move inflicts on its target.
     category: NamedResource
         The category of move this move falls under, e.g. damage or ailment.
-    min_hits: int
+    min_hits: t.Optional[int]
         The minimum number of times this move hits. Null if it always only hits once.
-    max_hits: int
+    max_hits: t.Optional[int]
         The maximum number of times this move hits. Null if it always only hits once.
-    min_turns: int
+    min_turns: t.Optional[int]
         The minimum number of turns this move continues to take effect. Null if it always only lasts one turn.
-    max_turns: int
+    max_turns: t.Optional[int]
         The maximum number of turns this move continues to take effect. Null if it always only lasts one turn.
     drain: int
         HP drain (if positive) or Recoil damage (if negative), in percent of damage done.
@@ -125,10 +125,10 @@ class MoveMetaData(BaseModel):
 
     ailment: NamedResource = attrs.field(factory=NamedResource)
     category: NamedResource = attrs.field(factory=NamedResource)
-    min_hits: int = attrs.field(factory=int)
-    max_hits: int = attrs.field(factory=int)
-    min_turns: int = attrs.field(factory=int)
-    max_turns: int = attrs.field(factory=int)
+    min_hits: t.Optional[int] = attrs.field(default=None)
+    max_hits: t.Optional[int] = attrs.field(default=None)
+    min_turns: t.Optional[int] = attrs.field(default=None)
+    max_turns: t.Optional[int] = attrs.field(default=None)
     drain: int = attrs.field(factory=int)
     healing: int = attrs.field(factory=int)
     crit_rate: int = attrs.field(factory=int)
@@ -140,12 +140,12 @@ class MoveMetaData(BaseModel):
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveMetaData":
         return cls(
             raw=payload,
-            ailment=NamedResource.from_payload(payload.get("ailment", {}) or {}),
-            category=NamedResource.from_payload(payload.get("category", {}) or {}),
-            min_hits=payload.get("min_hits", 0) or 1,
-            max_hits=payload.get("max_hits", 0) or 1,
-            min_turns=payload.get("min_turns", 0) or 1,
-            max_turns=payload.get("max_turns", 0) or 1,
+            ailment=NamedResource.from_payload(payload.get("ailment", {})),
+            category=NamedResource.from_payload(payload.get("category", {})),
+            min_hits=payload.get("min_hits"),
+            max_hits=payload.get("max_hits"),
+            min_turns=payload.get("min_turns"),
+            max_turns=payload.get("max_turns"),
             drain=payload.get("drain", 0),
             healing=payload.get("healing", 0),
             crit_rate=payload.get("crit_rate", 0),
@@ -157,6 +157,16 @@ class MoveMetaData(BaseModel):
 
 @attrs.define(slots=True, kw_only=True)
 class MoveStatChange(BaseModel):
+    """A move stat change resource.
+
+    Attributes
+    ----------
+    change: int
+        The amount of change.
+    stat: NamedResource
+        The stat being affected.
+    """
+
     change: int = attrs.field(factory=int)
     stat: NamedResource = attrs.field(factory=NamedResource)
 
@@ -165,29 +175,49 @@ class MoveStatChange(BaseModel):
         return cls(
             raw=payload,
             change=payload.get("change", 0),
-            stat=NamedResource.from_payload(payload.get("stat", {}) or {}),
+            stat=NamedResource.from_payload(payload.get("stat", {})),
         )
 
 
 @attrs.define(slots=True, kw_only=True)
 class PastMoveStatValues(BaseModel):
-    accuracy: int = attrs.field(factory=int)
-    effect_chance: int = attrs.field(factory=int)
-    power: int = attrs.field(factory=int)
-    pp: int = attrs.field(factory=int)
+    """A past move stat values resource.
+
+    Attributes
+    ----------
+    accuracy: t.Optional[int]
+        The accuracy of this move.
+    effect_chance: t.Optional[int]
+        The chance of this move causing an effect.
+    power: t.Optional[int]
+        The power of this move.
+    pp: t.Optional[int]
+        The amount of PP this move has.
+    effect_entries: t.List[VerboseEffect]
+        The effect of this move listed in different languages.
+    type: t.Optional[NamedResource]
+        The type of this move.
+    version_group: NamedResource
+        The version group in which these move stat values were in effect.
+    """
+
+    accuracy: t.Optional[int] = attrs.field(default=None)
+    effect_chance: t.Optional[int] = attrs.field(default=None)
+    power: t.Optional[int] = attrs.field(default=None)
+    pp: t.Optional[int] = attrs.field(default=None)
     effect_entries: t.List[VerboseEffect] = attrs.field(factory=list)
-    type: NamedResource = attrs.field(factory=NamedResource)
+    type: t.Optional[NamedResource] = attrs.field(default=None)
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PastMoveStatValues":
         return cls(
             raw=payload,
-            accuracy=payload.get("accuracy", 0),
-            effect_chance=payload.get("effect_chance", 0),
-            power=payload.get("power", 0),
-            pp=payload.get("pp", 0),
+            accuracy=payload.get("accuracy"),
+            effect_chance=payload.get("effect_chance"),
+            power=payload.get("power"),
+            pp=payload.get("pp"),
             effect_entries=[VerboseEffect.from_payload(i) for i in payload.get("effect_entries", [])],
-            type=NamedResource.from_payload(payload.get("type", {}) or {}),
-            version_group=NamedResource.from_payload(payload.get("version_group", {}) or {}),
+            type=NamedResource.optional_from_payload(payload.get("type")),
+            version_group=NamedResource.from_payload(payload.get("version_group", {})),
         )

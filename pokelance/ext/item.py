@@ -34,12 +34,12 @@ class Item(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the item.
 
         Returns
         -------
-        typing.Optional[pokelance.models.Item]
+        t.Optional[ItemModel]
             The item if it exists in the cache, else None.
 
         Raises
@@ -65,7 +65,7 @@ class Item(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the item.
 
         Returns
@@ -101,12 +101,12 @@ class Item(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the item attribute.
 
         Returns
         -------
-        typing.Optional[pokelance.models.ItemAttribute]
+        t.Optional[ItemAttribute]
             The item attribute if it exists in the cache, else None.
 
         Raises
@@ -132,7 +132,7 @@ class Item(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the item attribute.
 
         Returns
@@ -168,12 +168,12 @@ class Item(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the item category.
 
         Returns
         -------
-        typing.Optional[pokelance.models.ItemCategory]
+        t.Optional[ItemCategory]
             The item category if it exists in the cache, else None.
 
         Raises
@@ -199,7 +199,7 @@ class Item(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the item category.
 
         Returns
@@ -235,12 +235,12 @@ class Item(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the item fling effect.
 
         Returns
         -------
-        typing.Optional[pokelance.models.ItemFlingEffect]
+        t.Optional[ItemFlingEffect]
             The item fling effect if it exists in the cache, else None.
 
         Raises
@@ -266,7 +266,7 @@ class Item(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the item fling effect.
 
         Returns
@@ -302,12 +302,12 @@ class Item(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the item pocket.
 
         Returns
         -------
-        typing.Optional[pokelance.models.ItemPocket]
+        t.Optional[ItemPocket]
             The item pocket if it exists in the cache, else None.
 
         Raises
@@ -333,7 +333,7 @@ class Item(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the item pocket.
 
         Returns

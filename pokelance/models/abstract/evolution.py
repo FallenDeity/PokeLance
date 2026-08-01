@@ -31,7 +31,7 @@ class EvolutionChain(BaseModel):
     """
 
     id: int = attrs.field(factory=int)
-    baby_trigger_item: NamedResource = attrs.field(factory=NamedResource)
+    baby_trigger_item: t.Optional[NamedResource] = attrs.field(default=None)
     chain: ChainLink = attrs.field(factory=ChainLink)
 
     @classmethod
@@ -39,8 +39,8 @@ class EvolutionChain(BaseModel):
         return cls(
             raw=payload,
             id=payload.get("id", 0),
-            baby_trigger_item=NamedResource.from_payload(payload.get("baby_trigger_item", {}) or {}),
-            chain=ChainLink.from_payload(payload.get("chain", {}) or {}),
+            baby_trigger_item=NamedResource.optional_from_payload(payload.get("baby_trigger_item")),
+            chain=ChainLink.from_payload(payload.get("chain", {})),
         )
 
 

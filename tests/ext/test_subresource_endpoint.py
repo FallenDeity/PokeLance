@@ -139,8 +139,8 @@ async def test_different_pokemon_have_different_encounters(cached_client: pokela
     enc_bulbasaur = await cached_client.pokemon.fetch_location_area_encounter(1)
     enc_pikachu = await cached_client.pokemon.fetch_location_area_encounter(25)
     # Different Pokemon should encounter different areas (or at least differ in count)
-    areas_bulba = {e.location_area.name for e in enc_bulbasaur}
-    areas_pika = {e.location_area.name for e in enc_pikachu}
+    areas_bulba = {e.location_area.name for e in enc_bulbasaur if e.location_area}
+    areas_pika = {e.location_area.name for e in enc_pikachu if e.location_area}
     assert areas_bulba != areas_pika or len(enc_bulbasaur) != len(
         enc_pikachu
     ), "Bulbasaur and Pikachu should have different encounter area lists."
@@ -204,7 +204,7 @@ async def test_load_restores_encounter_list(cached_client: pokelance.PokeLance) 
 async def test_round_trip_encounter_values_match(cached_client: pokelance.PokeLance) -> None:
     """Each encounter's location_area.name must survive the save/load round-trip."""
     original = await cached_client.pokemon.fetch_location_area_encounter(1)
-    original_areas = {e.location_area.name for e in original}
+    original_areas = {e.location_area.name for e in original if e.location_area}
     with tempfile.TemporaryDirectory() as tmpdir:
         await cached_client.http.cache.pokemon.location_area_encounter.save(tmpdir)
 
@@ -213,7 +213,7 @@ async def test_round_trip_encounter_values_match(cached_client: pokelance.PokeLa
             route = Endpoint.get_location_area_encounter(1)
             loaded = new_client.http.cache.pokemon.location_area_encounter.get(route)
             assert loaded is not None
-            loaded_areas = {e.location_area.name for e in loaded}
+            loaded_areas = {e.location_area.name for e in loaded if e.location_area}
             assert original_areas == loaded_areas
 
 

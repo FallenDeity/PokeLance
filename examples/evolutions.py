@@ -153,19 +153,25 @@ def match_variety(name: str) -> bool:
 
 
 async def get_evolutions(data: EvolutionChain) -> t.Tuple[DATA, DATA]:
-    evolution_dict = {}
-    details_dict = {}
+    evolution_dict: t.Dict[str, t.List[str]] = {}
+    details_dict: t.Dict[str, t.List[t.Dict[str, t.Any]]] = {}
 
     def _clean_dict(d: t.Dict[str, t.Any]) -> t.Dict[str, t.Any]:
         return {k: _clean_dict(v) if isinstance(v, dict) else v for k, v in d.items() if k != "raw"}
 
     async def process_evolution_chain(chain: ChainLink, n: int = 0) -> None:
-        mon_name = (await client.pokemon.fetch_pokemon_species(chain.species.name)).varieties[0].pokemon.name
+        species = await client.pokemon.fetch_pokemon_species(chain.species.name)
+        pokemon = species.varieties[0].pokemon
+        if not species.varieties or not (pokemon := species.varieties[0].pokemon):
+            return
+        mon_name = pokemon.name
         if chain.evolves_to:
-            evolution_dict[mon_name] = [
-                (await client.pokemon.fetch_pokemon_species(i.species.name)).varieties[0].pokemon.name
-                for i in chain.evolves_to
-            ]
+            for i in chain.evolves_to:
+                s = await client.pokemon.fetch_pokemon_species(i.species.name)
+                p = s.varieties[0].pokemon
+                if not s.varieties or not (p := s.varieties[0].pokemon):
+                    continue
+                evolution_dict.setdefault(mon_name, []).append(p.name)
             details_dict[mon_name] = [
                 _clean_dict(details.simplified_details) | {"depth": n} for details in chain.evolution_details
             ]
@@ -182,7 +188,7 @@ async def get_evolutions(data: EvolutionChain) -> t.Tuple[DATA, DATA]:
 
 
 def stringify_dict(data: t.List[t.Dict[str, t.Any]]) -> str:
-    common = collections.defaultdict(set)
+    common: t.DefaultDict[str, t.Set[t.Any]] = collections.defaultdict(set)
     for i in data:
         for k, v in i.items():
             common[k].add(v["name"] if isinstance(v, dict) else v)
@@ -191,7 +197,7 @@ def stringify_dict(data: t.List[t.Dict[str, t.Any]]) -> str:
 
 def converging_evolution(varieties: t.List[str], details: t.List[t.Dict[str, t.Any]]) -> None:
     evos = details[:]
-    evo_map = {k: v for i in evos for k, v in i.items()}
+    evo_map: t.Dict[str, t.Any] = {k: v for i in evos for k, v in i.items()}
     if any(i in varieties for i in CONVERGING_EVOLUTIONS):
         for _ in range(len(varieties)):
             details.append(evo_map)
@@ -333,10 +339,12 @@ async def main() -> None:
     # await client.wait_until_ready()
     # await client.pokemon.cache.pokemon_species.load_all_batch(batch_size=20)
     # branched = [i.name for i in client.pokemon.cache.pokemon_species.values()]
-    processed_chains = set()
-    strings = []
+    processed_chains: t.Set[int] = set()
+    strings: t.List[str] = []
     for n, i in enumerate(branched, start=1):
         species: PokemonSpecies = await client.pokemon.fetch_pokemon_species(i)
+        if not species.evolution_chain:
+            continue
         evolution_chain: EvolutionChain = await client.from_url(species.evolution_chain.url)
         if evolution_chain.id in processed_chains:
             client.logger.info(f"Skipping {evolution_chain.id} | {n}/{len(branched)}")
@@ -364,7 +372,7 @@ async def main() -> None:
         evo_data.update(form_entries)
         strings.append(json.dumps(converge_data(evo_data, detail_data, variety_data), indent=4))
         client.logger.info(f"Processed {evolution_chain.id} | {n}/{len(branched)}")
-    with open("evolutions.json", "w") as f:
+    with open("evolutions.json", "w", encoding="utf-8") as f:
         f.write("[" + ",\n".join(strings) + "]")
     await client.close()
 

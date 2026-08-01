@@ -23,7 +23,7 @@ class BaseModel:
 
         Returns
         -------
-        typing.Dict[str, Any]
+        t.Dict[str, Any]
             The model as a dict.
         """
         return attrs.asdict(
@@ -40,7 +40,7 @@ class BaseModel:
 
         Parameters
         ----------
-        payload: typing.Dict[str, Any]
+        payload: t.Dict[str, Any]
             The payload to create the model from.
 
         Returns

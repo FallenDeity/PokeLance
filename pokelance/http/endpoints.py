@@ -2,6 +2,8 @@ import typing as t
 
 import attrs
 
+from pokelance.constants import BASE_URL, EXTENSION_PATTERN
+
 __all__: t.Tuple[str, ...] = ("Endpoint", "Route")
 
 
@@ -30,8 +32,7 @@ class Route:
     """
 
     endpoint: str = attrs.field(factory=str)
-    _url: str = "https://pokeapi.co/api/v2{endpoint}"
-    _api_version: int = 2
+    _url: str = f"{BASE_URL}{{endpoint}}"
     method: str = "GET"
     payload: t.Optional[t.Dict[str, t.Any]] = None
 
@@ -41,6 +42,26 @@ class Route:
     @property
     def url(self) -> str:
         return self._url.format(endpoint=self.endpoint)
+
+    @classmethod
+    def from_raw_url(cls, url: str) -> "Route":
+        """Creates a Route object from a raw PokeAPI URL.
+
+        Parameters
+        ----------
+        url: str
+            The raw URL to create the Route from.
+
+        Returns
+        -------
+        Route
+            The created Route object.
+        """
+        match = EXTENSION_PATTERN.match(url)
+        if not match:
+            raise ValueError(f"Invalid URL: {url}")
+        category, value, subcategory = match.groups()
+        return cls(endpoint=f"/{category}/{value}" + (f"/{subcategory}" if subcategory else ""))
 
 
 class Endpoint:

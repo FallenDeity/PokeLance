@@ -38,7 +38,7 @@ class Evolution(BaseExtension):
 
         Returns
         -------
-        typing.Optional[pokelance.models.EvolutionChain]
+        t.Optional[EvolutionChain]
             The evolution chain if it exists in the cache, else None.
 
         Raises
@@ -100,12 +100,12 @@ class Evolution(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the encounter method.
 
         Returns
         -------
-        typing.Optional[pokelance.models.EvolutionTrigger]
+        t.Optional[EvolutionTrigger]
             The evolution trigger if it exists in the cache, else None.
 
         Raises
@@ -131,7 +131,7 @@ class Evolution(BaseExtension):
 
         Parameters
         ----------
-        name: typing.Union[str, int]
+        name: t.Union[str, int]
             The name or id of the encounter method.
 
         Returns
