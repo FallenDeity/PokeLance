@@ -84,7 +84,7 @@ from pokelance import PokeLance
 
 async def main() -> None:
     client = PokeLance()
-    # Implicitly schedules on first request or call to wait_until_ready, 
+    # Implicitly schedules on first request or call to wait_until_ready,
     # blocks until finished
     await client.wait_until_ready()
     print(len(client.pokemon.all_pokemons or []))

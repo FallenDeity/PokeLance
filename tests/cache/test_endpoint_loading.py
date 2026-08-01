@@ -168,9 +168,7 @@ async def test_secondary_type_cache_populates_reverse_id_index(client: pokelance
 async def test_reset_endpoints_clears_registry_and_rearms_event(client: pokelance.PokeLance) -> None:
     """reset_endpoints() must clear all endpoint metadata and re-arm the event."""
     cache = client.pokemon.cache.pokemon
-    cache.load_documents(
-        [{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}]
-    )
+    cache.load_documents([{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}])
     assert cache._endpoints_cached
     assert cache._endpoints_ready.is_set()
     assert "bulbasaur" in cache.endpoints
@@ -188,9 +186,7 @@ async def test_reset_endpoints_clears_registry_and_rearms_event(client: pokelanc
 async def test_load_documents_after_reset_replaces_registry(client: pokelance.PokeLance) -> None:
     """After reset_endpoints(), load_documents() can re-populate cleanly."""
     cache = client.pokemon.cache.pokemon
-    cache.load_documents(
-        [{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}]
-    )
+    cache.load_documents([{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}])
     cache.reset_endpoints()
     cache.load_documents(
         [
@@ -209,14 +205,10 @@ async def test_load_documents_after_reset_replaces_registry(client: pokelance.Po
 async def test_reset_endpoints_on_secondary_type_cache(client: pokelance.PokeLance) -> None:
     """reset_endpoints() works on SecondaryTypeCache (machine) too."""
     cache = client.machine.cache.machine
-    cache.load_documents(
-        [{"name": "1", "url": "https://pokeapi.co/api/v2/machine/1/"}]
-    )
+    cache.load_documents([{"name": "1", "url": "https://pokeapi.co/api/v2/machine/1/"}])
     cache.reset_endpoints()
     assert cache._endpoints == {}
-    cache.load_documents(
-        [{"name": "2", "url": "https://pokeapi.co/api/v2/machine/2/"}]
-    )
+    cache.load_documents([{"name": "2", "url": "https://pokeapi.co/api/v2/machine/2/"}])
     assert "2" in cache.endpoints
     assert "1" not in cache.endpoints
 
@@ -225,9 +217,7 @@ async def test_reset_endpoints_on_secondary_type_cache(client: pokelance.PokeLan
 async def test_reset_endpoints_blocks_wait_until_ready(client: pokelance.PokeLance) -> None:
     """After reset_endpoints(), wait_until_ready() must block until the new load finishes."""
     cache = client.pokemon.cache.pokemon
-    cache.load_documents(
-        [{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}]
-    )
+    cache.load_documents([{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}])
     assert cache._endpoints_ready.is_set()
 
     cache.reset_endpoints()

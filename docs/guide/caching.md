@@ -121,7 +121,7 @@ endpoint registry (e.g. numeric id vs. name) and returns the cached entry under 
 if found. This is how `get_pokemon(1)` and `get_pokemon("bulbasaur")` can return the same
 cached instance even though only one of those two forms was ever actually fetched.
 
-## Waiting for endpoint registries 
+## Waiting for endpoint registries
 
 With `cache_endpoints=True` (the default), registries load in the background right after the
 client connects. You can wait for endpoint registries to complete loading at three different levels:
@@ -151,14 +151,14 @@ client = PokeLance()
 async def main() -> None:
     # 1. Wait for initial global load
     await client.wait_until_ready()
-    
+
     # 2. Reset and re-load the 'berry' extension specifically
     client.berry.cache.reset()
     await client.berry.setup()
-    
+
     # 3. Wait specifically for the 'berry' extension to be ready again
     await client.berry.cache.wait_until_ready()
-    
+
     try:
         # 4. Fetch a berry to confirm the cache is working
         print(await client.berry.fetch_berry("chery"))  # Intentional typo for demonstration
