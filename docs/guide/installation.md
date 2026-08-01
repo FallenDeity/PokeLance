@@ -1,12 +1,12 @@
 # Installation
 
-PokeLance targets Python 3.9+ and ships with full inline type hints (`py.typed`), so your
+PokeLance targets Python 3.10+ and ships with full inline type hints (`py.typed`), so your
 type checker picks up the API surface immediately after install, no stub packages
 required.
 
 ## Requirements
 
-- Python `>=3.9,<4`
+- Python `>=3.10,<4`
 - [`aiohttp`](https://docs.aiohttp.org/) `>=3.13.5` for the async HTTP layer
 - [`attrs`](https://www.attrs.org/) `>=23.1.0,<24` for the (frozen, slotted) models
 - [`aiofiles`](https://github.com/Tinche/aiofiles) `>=23.1.0,<24` for non-blocking disk cache I/O

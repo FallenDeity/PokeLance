@@ -3,12 +3,11 @@ name = "pokelance"
 version = "0.2.15"
 description = "A flexible and easy to use pokemon library."
 authors = [{ name = "FallenDeity", email = "61227305+FallenDeity@users.noreply.github.com" }]
-requires-python = ">=3.9,<4"
+requires-python = ">=3.10,<4"
 readme = "README.md"
 license = "MIT"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -16,35 +15,35 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "aiohttp>=3.13.5",
-    "attrs>=23.2.0",
+    "aiohttp>=3.14.3",
+    "attrs>=26.1.0",
     "aiofiles>=25.1.0",
-    "types-aiofiles>=25.1.0.20251011",
+    "types-aiofiles>=25.1.0.20260518",
 ]
 
 [dependency-groups]
 dev = [
     "black>=22.12.0,<23",
-    "isort>=5.10.1,<6",
-    "ruff>=0.0.171,<0.1.10",
-    "pygments>=2.16.0,<3",
-    "mkdocs>=1.5.2,<2",
-    "typing-extensions>=4.4.0,<5",
-    "pre-commit>=2.20.0,<3",
-    "Pillow>=9.3,<11.0",
+    "isort>=5.13.2,<6",
+    "ruff>=0.1.9,<0.1.10",
+    "pygments>=2.20.0,<3",
+    "mkdocs>=1.6.1,<2",
+    "typing-extensions>=4.16.0,<5",
+    "pre-commit>=2.21.0,<3",
     "CairoSVG>=2.5.2,<3",
-    "mypy>=0.991,<1.9",
+    "mypy>=1.8.0,<1.9",
     "pipwin>=0.5.2,<0.6",
-    "pytest>=7.4.3,<8",
-    "pytest-asyncio>=0.23.2,<0.24",
+    "pytest>=7.4.4,<8",
+    "pytest-asyncio>=0.23.8,<0.24",
     "auto-changelog>=0.6.0,<0.7",
     "deepdiff>=6.7.1,<7",
-    "pytkdocs[numpy-style]>=0.5.0",
-    "mkdocstrings[python]>=0.18",
-    "mkdocs-material>=9.5.48,<10",
+    "pytkdocs[numpy-style]>=0.16.5",
+    "mkdocstrings[python]>=1.0.6",
+    "mkdocs-material>=9.7.7,<10",
     "pytest-coverage>=0.0",
-    "markdown-exec[ansi]>=1.9.3",
-    "mkdocs-jupyter>=0.25.1",
+    "markdown-exec[ansi]>=1.12.3",
+    "mkdocs-jupyter>=0.26.3",
+    "pillow>=10.4.0",
 ]
 
 [tool.uv.build-backend]
@@ -56,11 +55,11 @@ build-backend = "uv_build"
 
 [tool.ruff]
 line-length = 120
-target-version = "py39"
+target-version = "py310"
 
 [tool.black]
 line-length = 120
-target-version = ['py39']
+target-version = ['py310']
 
 [tool.isort]
 line_length = 120
@@ -89,7 +88,7 @@ exclude_lines = [
 ]
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 strict = true
 exclude = [
     "scripts/",
