@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.14 - 2026-08-01
+
+#### New Features
+
+-  Make certain fields nullable, improve docstrings, add location area encounter caching
+-  Add encounter pokemon details field
+#### Docs
+
+-  update notebook example
+-  remove git revision plugin mkdocs
+#### Others
+
+-  bump docs build python version
+-  bump package version
+-  run uv lock
+
+Full set of changes: [v0.2.13 to v0.2.14](https://github.com/FallenDeity/PokeLance/compare/v0.2.13...v0.2.14)
+
 ## 0.2.13 - 2026-07-31
 
 #### New Features
