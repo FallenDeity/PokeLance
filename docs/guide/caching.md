@@ -121,29 +121,56 @@ endpoint registry (e.g. numeric id vs. name) and returns the cached entry under 
 if found. This is how `get_pokemon(1)` and `get_pokemon("bulbasaur")` can return the same
 cached instance even though only one of those two forms was ever actually fetched.
 
-## Waiting for endpoint registries
+## Waiting for endpoint registries 
 
 With `cache_endpoints=True` (the default), registries load in the background right after the
-client connects. Await [`wait_until_ready()`][pokelance.client.PokeLance.wait_until_ready] on the
-client (or [`BaseCache.wait_until_ready()`][pokelance.cache.cache.BaseCache.wait_until_ready] on an individual
-cache) to block until they've finished:
+client connects. You can wait for endpoint registries to complete loading at three different levels:
 
-```python exec="true" source="above" result="text"
+- `client.wait_until_ready()` waits for all extensions to finish their initial setup.
+- `client.<ext>.wait_until_ready()` waits for a specific extension and associated endpoint group to finish setup.
+- `client.<ext>.cache.<category>.wait_until_ready()` waits for a specific category's endpoint registry to finish setup.
+
+## Loading endpoint registries
+
+Similarly, you can load endpoint registries at three different levels:
+
+- `client.http.connect()` triggers all extensions to load their endpoint registries, runs only once per client on first connect/request, or when triggered manually via the global `client.wait_until_ready()`.
+- `client.<ext>.setup()` triggers a specific extension to load its endpoint registries, this is what is called under the hood by `client.http.connect()`. You can also call it manually to refresh a specific extension's registries without restarting the entire client.
+- `client.<ext>.cache.<category>.load_documents(data)` triggers a specific category to load its endpoint registry from a list of documents, this is what is called under the hood by `client.<ext>.setup()`. You can also call it manually by passing the list of documents you want to load, using the `Endpoint.get_*_endpoints()` route builders to fetch the data yourself if you want to bypass the built-in setup.
+
+## Resetting and re-loading an extension
+
+If you need to refresh the endpoint registries for a specific extension without restarting the entire client, you can use the extension's cache container to reset and re-trigger setup:
+
+```python exec="true" source="above" result="python"
 import asyncio
 from pokelance import PokeLance
 
 client = PokeLance()
 
-
-async def main() -> str:
+async def main() -> None:
+    # 1. Wait for initial global load
     await client.wait_until_ready()
-    n = len(client.berry.cache.berry.endpoints)
-    await client.close()
-    return f"{n} berries registered"
+    
+    # 2. Reset and re-load the 'berry' extension specifically
+    client.berry.cache.reset()
+    await client.berry.setup()
+    
+    # 3. Wait specifically for the 'berry' extension to be ready again
+    await client.berry.cache.wait_until_ready()
+    
+    try:
+        # 4. Fetch a berry to confirm the cache is working
+        print(await client.berry.fetch_berry("chery"))  # Intentional typo for demonstration
+    except Exception as e:
+        print(f"Error fetching berry: {e}")
+    finally:
+        await client.close()
 
-
-print(asyncio.run(main()))
+asyncio.run(main())
 ```
+
+This pattern allows you to maintain cache isolation and only incur the cost of re-loading data for the extensions you actually need to refresh.
 
 ## Bulk-loading an entire category
 

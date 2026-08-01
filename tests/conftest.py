@@ -36,6 +36,7 @@ def _clear() -> None:
     # call the full cascade: Cache.clear() -> Base.clear() -> BaseCache.clear()
     c = pokelance.PokeLance(cache_endpoints=False)
     c.http.cache.clear()
+    c.http.cache.reset()
     pokelance.PokeLance.get_image_async.cache_clear()
     pokelance.PokeLance.get_audio_async.cache_clear()
 

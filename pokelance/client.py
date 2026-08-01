@@ -324,8 +324,7 @@ class PokeLance:
         """
         await self._http.connect()
         self.logger.info("Waiting until ready...")
-        while self._http._tasks_queue and self.cache_endpoints:
-            await asyncio.sleep(0.5)
+        await self._http._ready_event.wait()
         self.logger.info("Ready!")
 
     @property

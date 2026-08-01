@@ -35,7 +35,8 @@ async def test_wait_until_ready_no_cache_completes(client: pokelance.PokeLance) 
 @pytest.mark.asyncio
 async def test_wait_until_ready_with_cache(cached_client: pokelance.PokeLance) -> None:
     """cached_client fixture already called wait_until_ready; all tasks must be done."""
-    assert not cached_client.http._tasks_queue, "All background tasks should be complete."
+    assert cached_client.http._ready_event.is_set(), "All background tasks should be complete."
+    assert not cached_client.http._tasks, "No background tasks should remain."
 
 
 # ---------------------------------------------------------------------------
@@ -156,6 +157,88 @@ async def test_secondary_type_cache_populates_reverse_id_index(client: pokelance
     assert "2" in cache.endpoints
     assert cache._endpoints_by_id["1"] == "1"
     assert cache._endpoints_by_id["2"] == "2"
+
+
+# ---------------------------------------------------------------------------
+# reset_endpoints() allows safe reload
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_reset_endpoints_clears_registry_and_rearms_event(client: pokelance.PokeLance) -> None:
+    """reset_endpoints() must clear all endpoint metadata and re-arm the event."""
+    cache = client.pokemon.cache.pokemon
+    cache.load_documents(
+        [{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}]
+    )
+    assert cache._endpoints_cached
+    assert cache._endpoints_ready.is_set()
+    assert "bulbasaur" in cache.endpoints
+
+    cache.reset_endpoints()
+
+    assert not cache._endpoints_cached
+    assert not cache._endpoints_ready.is_set()
+    assert cache._endpoints == {}
+    assert cache._endpoints_by_id == {}
+    assert cache._identifiers == set()
+
+
+@pytest.mark.asyncio
+async def test_load_documents_after_reset_replaces_registry(client: pokelance.PokeLance) -> None:
+    """After reset_endpoints(), load_documents() can re-populate cleanly."""
+    cache = client.pokemon.cache.pokemon
+    cache.load_documents(
+        [{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}]
+    )
+    cache.reset_endpoints()
+    cache.load_documents(
+        [
+            {"name": "charmander", "url": "https://pokeapi.co/api/v2/pokemon/4/"},
+            {"name": "squirtle", "url": "https://pokeapi.co/api/v2/pokemon/7/"},
+        ]
+    )
+    assert "charmander" in cache.endpoints
+    assert "squirtle" in cache.endpoints
+    assert "bulbasaur" not in cache.endpoints, "stale entry from previous load must be gone"
+    assert cache._endpoints_cached
+    assert cache._endpoints_ready.is_set()
+
+
+@pytest.mark.asyncio
+async def test_reset_endpoints_on_secondary_type_cache(client: pokelance.PokeLance) -> None:
+    """reset_endpoints() works on SecondaryTypeCache (machine) too."""
+    cache = client.machine.cache.machine
+    cache.load_documents(
+        [{"name": "1", "url": "https://pokeapi.co/api/v2/machine/1/"}]
+    )
+    cache.reset_endpoints()
+    assert cache._endpoints == {}
+    cache.load_documents(
+        [{"name": "2", "url": "https://pokeapi.co/api/v2/machine/2/"}]
+    )
+    assert "2" in cache.endpoints
+    assert "1" not in cache.endpoints
+
+
+@pytest.mark.asyncio
+async def test_reset_endpoints_blocks_wait_until_ready(client: pokelance.PokeLance) -> None:
+    """After reset_endpoints(), wait_until_ready() must block until the new load finishes."""
+    cache = client.pokemon.cache.pokemon
+    cache.load_documents(
+        [{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}]
+    )
+    assert cache._endpoints_ready.is_set()
+
+    cache.reset_endpoints()
+    assert not cache._endpoints_ready.is_set(), "reset_endpoints() must clear the ready event"
+
+    client.cache_endpoints = True
+
+    await cache.wait_until_ready()  # invokes the background load of endpoints
+    assert "charmander" in cache.endpoints
+
+    client.cache_endpoints = False  # restore default for other tests
 
 
 # ---------------------------------------------------------------------------

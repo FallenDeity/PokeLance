@@ -49,8 +49,15 @@ class HttpClient:
         The cache to use for the HTTP client.
     _client: pokelance.PokeLance
         The client that this HTTP client is for.
-    _tasks_queue: t.List[asyncio.Task]
-        The queue for the tasks.
+    _tasks: t.Set[asyncio.Task[None]]
+        Background endpoint-loading tasks. Used for cancellation in ``close()``;
+        not used as a wait condition.
+    _remaining: int
+        Number of in-flight endpoint-loading tasks. Drives ``_ready_event``.
+    _ready_event: asyncio.Event
+        Set when ``_remaining`` reaches 0 (all endpoint tasks finished) or
+        immediately when no tasks were scheduled. ``PokeLance.wait_until_ready``
+        awaits this event.
     _session_owner: bool
         Whether the session was created internally (True) or passed in by the
         caller (False). Only owned sessions are closed by ``close()``.
@@ -61,7 +68,9 @@ class HttpClient:
         "session",
         "_cache",
         "_is_ready",
-        "_tasks_queue",
+        "_tasks",
+        "_remaining",
+        "_ready_event",
         "_session_owner",
     )
 
@@ -83,7 +92,10 @@ class HttpClient:
         self.session = session
         self._is_ready = False
         self._cache = Cache(max_size=cache_size, client=self._client)
-        self._tasks_queue: t.List[asyncio.Task[None]] = []
+        self._tasks: t.Set[asyncio.Task[None]] = set()
+        self._remaining: int = 0
+        self._ready_event: asyncio.Event = asyncio.Event()
+        self._ready_event.set()
         self._session_owner = session is None
 
     async def _load_ext(self, coroutine: t.Callable[[], t.Coroutine[t.Any, t.Any, None]], message: str) -> None:
@@ -97,21 +109,32 @@ class HttpClient:
         message: str
             The message to log.
         """
-        task: t.Optional[asyncio.Task[None]] = asyncio.current_task()
         self._client.logger.debug(f"Loading {message}")
-        await coroutine()
-        if task is not None:
-            self._tasks_queue.remove(task)
+        try:
+            await coroutine()
+        finally:
+            self._remaining -= 1
+            if self._remaining <= 0:
+                self._ready_event.set()
         self._client.logger.info(f"Loaded {message}")
 
     async def _schedule_tasks(self) -> None:
         """Schedules the tasks for the HTTP client."""
+        self._ready_event.clear()
+        if not self._client.cache_endpoints:
+            self._ready_event.set()
+            self._client.ext_tasks.clear()
+            return
         total = len(self._client.ext_tasks)
+        self._remaining = total
         for num, (coroutine, name) in enumerate(self._client.ext_tasks):
             message = f"Extension {name} endpoints ({num + 1}/{total})"
             task = asyncio.create_task(coro=self._load_ext(coroutine, message), name=name)
-            self._tasks_queue.append(task)
+            self._tasks.add(task)
+            task.add_done_callback(self._tasks.discard)
         self._client.ext_tasks.clear()
+        if self._remaining == 0:
+            self._ready_event.set()
 
     async def close(self) -> None:
         """Closes the HTTP client.
@@ -120,10 +143,12 @@ class HttpClient:
         A session passed in by the caller is left open, since the caller
         owns its lifecycle and may still be using it elsewhere.
         """
-        for task in self._tasks_queue:
+        for task in list(self._tasks):
             if not task.done():
                 task.cancel()
                 self._client.logger.warning(f"Cancelled task {task.get_name()}")
+        if self._tasks:
+            await asyncio.gather(*self._tasks, return_exceptions=True)
         if self.session and self._session_owner:
             await self.session.close()
         elif self.session:

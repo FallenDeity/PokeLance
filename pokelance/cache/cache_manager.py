@@ -1,3 +1,4 @@
+import asyncio
 import typing as t
 
 import attrs
@@ -123,6 +124,24 @@ class Base:
         for obj in self.__attrs_attrs__:
             if isinstance(obj.default, BaseCache) and obj.default is not None:
                 obj.default.clear()
+
+    def reset(self) -> None:
+        """Reset all endpoint registries."""
+        obj: attrs.Attribute[BaseCache[t.Any, t.Any]]
+        for obj in self.__attrs_attrs__:
+            if isinstance(obj.default, BaseCache) and obj.default is not None:
+                obj.default.reset_endpoints()
+
+    async def wait_until_ready(self) -> None:
+        """Wait for all sub-caches in this extension to be ready."""
+        tasks: t.List[t.Awaitable[None]] = []
+        obj: attrs.Attribute[BaseCache[t.Any, t.Any]]
+        for obj in self.__attrs_attrs__:
+            sub_cache = getattr(self, obj.name)
+            if isinstance(sub_cache, BaseCache):
+                tasks.append(sub_cache.wait_until_ready())
+        if tasks:
+            await asyncio.gather(*tasks)
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -505,3 +524,10 @@ class Cache:
         for obj in self.__attrs_attrs__:
             if isinstance(obj.default, Base) and obj.default is not None:
                 obj.default.clear()
+
+    def reset(self) -> None:
+        """Reset all endpoint registries."""
+        obj: attrs.Attribute[Base]
+        for obj in self.__attrs_attrs__:
+            if isinstance(obj.default, Base) and obj.default is not None:
+                obj.default.reset()

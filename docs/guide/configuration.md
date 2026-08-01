@@ -55,9 +55,7 @@ client.audio_cache_size = 32
 
 ## Disabling endpoint pre-loading
 
-By default (`cache_endpoints=True`), as soon as the client connects it schedules background
-tasks that fetch every extension's *list* endpoints (e.g. `GET /pokemon?limit=10000`) so
-that `get_*`/`fetch_*` calls can validate names/ids and suggest corrections immediately.
+By default (`cache_endpoints=True`), as soon as the client connects (either implicitly via your first API request, or explicitly via `wait_until_ready()`), it schedules background tasks that fetch every extension's *list* endpoints (e.g. `GET /pokemon?limit=10000`) so that `get_*`/`fetch_*` calls can validate names/ids and suggest corrections immediately.
 
 If you only ever fetch a handful of known resources and want to skip that warm-up entirely
 (useful in tests, or serverless functions with a cold-start budget), disable it:
@@ -86,6 +84,8 @@ from pokelance import PokeLance
 
 async def main() -> None:
     client = PokeLance()
+    # Implicitly schedules on first request or call to wait_until_ready, 
+    # blocks until finished
     await client.wait_until_ready()
     print(len(client.pokemon.all_pokemons or []))
     await client.close()

@@ -159,6 +159,7 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
         self._endpoints_by_id: t.Dict[str, str] = {}
         self._identifiers: t.Set[str] = set()
         self._endpoints_cached: bool = False
+        self._endpoints_ready: asyncio.Event = asyncio.Event()
 
     def __getitem__(self, key: _KT) -> _VT:
         self._cache[key] = self._cache.pop(key)
@@ -196,7 +197,27 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
         return self[__key]
 
     def clear(self) -> None:
+        """Clear the cached data only. The endpoint registry is left intact
+        so that a previously-fetched list of names/ids does not need to be
+        re-fetched just to repopulate the data cache."""
         self._cache.clear()
+
+    def _mark_endpoints_cached(self) -> None:
+        self._identifiers = set(self._endpoints) | set(self._endpoints_by_id)
+        self._endpoints_cached = True
+        self._endpoints_ready.set()
+
+    def reset_endpoints(self) -> None:
+        """Clear the endpoint registry and re-arm the per-cache ready event.
+
+        After this call, ``wait_until_ready()`` on this cache will block
+        again until ``_mark_endpoints_cached()`` is invoked by the new load.
+        """
+        self._endpoints.clear()
+        self._endpoints_by_id.clear()
+        self._identifiers.clear()
+        self._endpoints_cached = False
+        self._endpoints_ready.clear()
 
     def items(self) -> t.ItemsView[_KT, _VT]:
         return self._cache.items()
@@ -229,12 +250,12 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
         data: t.List[t.Dict[str, str]]
             The data to load.
         """
+        self.reset_endpoints()
         for document in data:
             id_ = int(document["url"].split("/")[-2])
             self._endpoints[document["name"]] = CacheEndpoint(url=document["url"], id=id_)
             self._endpoints_by_id[str(id_)] = document["name"]
-        self._identifiers = set(self._endpoints) | set(self._endpoints_by_id)
-        self._endpoints_cached = True
+        self._mark_endpoints_cached()
 
     def set_size(self, size: int) -> None:
         """Set the size of the cache.
@@ -249,8 +270,8 @@ class BaseCache(t.MutableMapping[_KT, _VT]):
     async def wait_until_ready(self) -> None:
         """Wait until the all the endpoints are cached."""
         await self._client.http.connect()
-        while not self._endpoints_cached and self._client.cache_endpoints:
-            await asyncio.sleep(0.5)
+        if self._client.cache_endpoints:
+            await self._endpoints_ready.wait()
 
     async def save(self, path: str = ".") -> None:
         """Save the cache to a file.
@@ -415,12 +436,12 @@ class SecondaryTypeCache(BaseCache[_KT, _VT]):
         data: t.List[t.Dict[str, str]]
             The data to load.
         """
+        self.reset_endpoints()
         for document in data:
             id_ = int(document["url"].split("/")[-2])
             self._endpoints[str(id_)] = CacheEndpoint(url=document["url"], id=id_)
             self._endpoints_by_id[str(id_)] = str(id_)
-        self._identifiers = set(self._endpoints) | set(self._endpoints_by_id)
-        self._endpoints_cached = True
+        self._mark_endpoints_cached()
 
 
 class BerryCache(BaseCache["Route", "models.Berry"]):
@@ -479,13 +500,13 @@ class PokemonLocationAreaCache(BaseCache["Route", "t.List[models.LocationAreaEnc
     """A cache for pokemon location areas."""
 
     def load_documents(self, data: t.List[t.Dict[str, str]]) -> None:
+        self.reset_endpoints()
         for document in data:
             encounter_url = f"{document['url'].strip('/')}/encounters"
             id_ = int(encounter_url.split("/")[-2])
             self._endpoints[document["name"]] = CacheEndpoint(url=encounter_url, id=id_)
             self._endpoints_by_id[str(id_)] = document["name"]
-        self._identifiers = set(self._endpoints) | set(self._endpoints_by_id)
-        self._endpoints_cached = True
+        self._mark_endpoints_cached()
 
 
 class PokemonHabitatCache(BaseCache["Route", "models.PokemonHabitats"]):
