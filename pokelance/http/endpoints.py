@@ -2,7 +2,7 @@ import typing as t
 
 import attrs
 
-from pokelance.constants import BASE_URL, EXTENSION_PATTERN
+from pokelance.constants import get_base_url, validate_url
 
 __all__: t.Tuple[str, ...] = ("Endpoint", "Route")
 
@@ -32,7 +32,7 @@ class Route:
     """
 
     endpoint: str = attrs.field(factory=str)
-    _url: str = f"{BASE_URL}{{endpoint}}"
+    _url: str = attrs.field(factory=lambda: f"{get_base_url()}{{endpoint}}")
     method: str = "GET"
     payload: t.Optional[t.Dict[str, t.Any]] = None
 
@@ -57,7 +57,7 @@ class Route:
         Route
             The created Route object.
         """
-        match = EXTENSION_PATTERN.match(url)
+        match = validate_url(url)
         if not match:
             raise ValueError(f"Invalid URL: {url}")
         category, value, subcategory = match.groups()

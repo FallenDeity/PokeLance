@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 import enum
+import os
 import re
 import typing as t
 
 import attrs
 
 __all__: t.Tuple[str, ...] = (
-    "BASE_URL",
-    "EXTENSION_PATTERN",
-    "_SUBCATEGORY_MAP",
+    "DEFAULT_BASE_URL",
     "BaseEnum",
     "Extension",
     "BerryExtension",
@@ -27,16 +26,16 @@ __all__: t.Tuple[str, ...] = (
     "GenderEnum",
     "PokemonFormTriggerEnum",
     "RequestObject",
+    "get_base_url",
+    "validate_url",
 )
 
-BASE_URL = "https://pokeapi.co/api/v2"
+DEFAULT_BASE_URL = "https://pokeapi.co/api/v2"
 
 ExtensionsL = t.Literal[
     "berry", "contest", "encounter", "evolution", "game", "item", "location", "machine", "move", "pokemon"
 ]
-EXTENSION_PATTERN: t.Pattern[str] = re.compile(
-    rf"{re.escape(BASE_URL)}/(?P<category>[\w-]+)/(?P<value>[\w-]+)(?:/(?P<sub_category>[\w-]+))?/?"
-)
+
 # Special case subcategory /pokemon/{id}/encounters endpoint for getch_data and from_url methods, due to inconsistent naming in the API
 _SUBCATEGORY_MAP: t.Dict[str, str] = {"encounters": "location-area-encounter"}
 
@@ -50,6 +49,17 @@ class RequestObject:
     extension: str
     category: str = attrs.field(converter=_convert_category)
     value: str
+
+
+def get_base_url() -> str:
+    return os.environ.get("POKEAPI_BASE_URL", DEFAULT_BASE_URL).rstrip("/")
+
+
+def validate_url(url: str) -> t.Optional[re.Match[str]]:
+    pattern = re.compile(
+        rf"{re.escape(get_base_url())}/(?P<category>[\w-]+)/(?P<value>[\w-]+)(?:/(?P<sub_category>[\w-]+))?/?"
+    )
+    return pattern.match(url)
 
 
 class BaseEnum(enum.Enum):
@@ -340,7 +350,7 @@ class ExtensionEnum(BaseEnum):
         """
         Validate the url.
         """
-        if not url.startswith(BASE_URL) or not (groups := re.match(EXTENSION_PATTERN, url)):
+        if not url.startswith(get_base_url()) or not (groups := validate_url(url)):
             raise ValueError(f"Invalid url: {url}")
         category, value, subcategory = groups.groups()
         for i in cls:

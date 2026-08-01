@@ -17,7 +17,7 @@ import typing as t
 import pytest
 
 import pokelance
-from pokelance.constants import ExtensionEnum
+from pokelance.constants import DEFAULT_BASE_URL, ExtensionEnum, get_base_url
 from pokelance.exceptions import ImageNotFound, ResourceNotFound
 from pokelance.http import Endpoint
 from pokelance.models import Pokemon
@@ -186,3 +186,20 @@ async def test_model_equality(cached_client: pokelance.PokeLance) -> None:
     p1 = await cached_client.pokemon.fetch_pokemon(1)
     p2 = await cached_client.pokemon.fetch_pokemon(1)
     assert p1 == p2
+
+
+@pytest.mark.asyncio
+async def test_base_url_env_var(monkeypatch: pytest.MonkeyPatch) -> None:
+    staging_url = "https://staging.pokeapi.co/api/v2"
+
+    assert get_base_url() == DEFAULT_BASE_URL
+
+    monkeypatch.setenv("POKEAPI_BASE_URL", staging_url)
+
+    assert get_base_url() == staging_url
+
+    async with pokelance.PokeLance(cache_endpoints=False) as client:
+        berry = await client.berry.fetch_berry(1)
+
+        assert berry.item.url.startswith(staging_url)
+        assert berry.name == "cheri"
