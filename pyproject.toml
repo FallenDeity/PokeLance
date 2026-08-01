@@ -16,10 +16,10 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "aiofiles>=23.1.0,<24",
-    "types-aiofiles>=23.1.0.1,<24",
-    "attrs>=23.1.0,<24",
     "aiohttp>=3.13.5",
+    "attrs>=23.2.0",
+    "aiofiles>=25.1.0",
+    "types-aiofiles>=25.1.0.20251011",
 ]
 
 [dependency-groups]
