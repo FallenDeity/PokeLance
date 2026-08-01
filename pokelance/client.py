@@ -2,7 +2,7 @@ import asyncio
 import typing as t
 from pathlib import Path
 
-from .constants import ExtensionEnum, ExtensionsL
+from .constants import Extension, ExtensionEnum, ExtensionsL
 from .http import HttpClient
 from .logger import Logger
 from .utils import alru_cache
@@ -241,13 +241,20 @@ class PokeLance:
         >>> asyncio.run(main())
         bulbasaur
         """
-        if isinstance(ext, str) and (ext := str(ext).title()) not in ExtensionEnum.__members__:
-            raise ValueError(f"Invalid extension: {ext}")
-        categories = ExtensionEnum.get_categories(ext) if isinstance(ext, str) else ext.categories  # type: ignore
+        if isinstance(ext, str):
+            ext = ext.title()
+            if ext not in ExtensionEnum.__members__:
+                raise ValueError(f"Invalid extension: {ext}")
+            ext = getattr(ExtensionEnum, ext)
+
+        extension = t.cast(Extension, ext)
+        categories = extension.categories
+        ext_ = getattr(self, extension.name.lower())
+
         if (category := category.lower().replace("_", "-")) not in categories:
             raise ValueError(f"Invalid category: {category}, valid categories: {categories}")
+
         category = category.replace("-", "_")
-        ext_ = getattr(self, ext.lower()) if isinstance(ext, str) else getattr(self, ext.name.lower())
         get_, fetch_ = getattr(ext_, f"get_{category}"), getattr(ext_, f"fetch_{category}")
         params = (id_,) if id_ is not None else ()
         return t.cast(BaseType, get_(*params) or await fetch_(*params))

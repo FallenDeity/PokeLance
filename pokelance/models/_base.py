@@ -3,6 +3,8 @@ import typing as t
 
 import attrs
 
+_T = t.TypeVar("_T", bound="BaseModel")
+
 
 def _serializer(_instance: t.Any, _field: attrs.Attribute, value: t.Any) -> t.Any:  # type: ignore
     if isinstance(value, enum.Enum):
@@ -29,7 +31,11 @@ class BaseModel:
         )
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "BaseModel":
+    def optional_from_payload(cls: t.Type[_T], data: t.Optional[t.Dict[str, t.Any]]) -> t.Optional[_T]:
+        return cls.from_payload(data) if data else None
+
+    @classmethod
+    def from_payload(cls: t.Type[_T], payload: t.Dict[str, t.Any]) -> _T:
         """Create a model from a payload
 
         Parameters

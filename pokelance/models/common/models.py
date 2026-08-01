@@ -72,6 +72,38 @@ class Effect(BaseModel):
 
 
 @attrs.define(slots=True, kw_only=True)
+class EncounterPokemonDetail(BaseModel):
+    """Details about a Pokémon encounter.
+
+    Attributes
+    ----------
+    min_perfect_ivs: t.Optional[int]
+        The minimum number of perfect IVs the Pokémon can have.
+    always_shiny: bool
+        Whether or not the Pokémon is always shiny.
+    never_shiny: bool
+        Whether or not the Pokémon is never shiny.
+    is_alpha: bool
+        Whether or not the Pokémon is an alpha Pokémon. Relevant to Pokémon Legends: Arceus.
+    """
+
+    min_perfect_ivs: t.Optional[int] = attrs.field(default=None)
+    always_shiny: bool = attrs.field(factory=bool)
+    never_shiny: bool = attrs.field(factory=bool)
+    is_alpha: bool = attrs.field(factory=bool)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EncounterPokemonDetail":
+        return cls(
+            raw=payload,
+            min_perfect_ivs=payload.get("min_perfect_ivs", None),
+            always_shiny=payload.get("always_shiny", False),
+            never_shiny=payload.get("never_shiny", False),
+            is_alpha=payload.get("is_alpha", False),
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
 class Encounter(BaseModel):
     """Model for an encounter object
 
@@ -87,6 +119,8 @@ class Encounter(BaseModel):
         The chance of the encounter to occur on a version of the game.
     method: NamedResource
         The method by which this encounter happens.
+    pokemon_details: t.Optional[EncounterPokemonDetail]
+        Details about the Pokémon encounter.
     """
 
     min_level: int = attrs.field(factory=int)
@@ -94,6 +128,7 @@ class Encounter(BaseModel):
     condition_values: t.List[NamedResource] = attrs.field(factory=list)
     chance: int = attrs.field(factory=int)
     method: NamedResource = attrs.field(factory=NamedResource)
+    pokemon_details: t.Optional[EncounterPokemonDetail] = attrs.field(default=None)
 
     @classmethod
     def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Encounter":
@@ -104,6 +139,7 @@ class Encounter(BaseModel):
             condition_values=[NamedResource.from_payload(i) for i in payload.get("condition_values", [])],
             chance=payload.get("chance", 0),
             method=NamedResource.from_payload(payload.get("method", {}) or {}),
+            pokemon_details=EncounterPokemonDetail.optional_from_payload(payload.get("pokemon_details")),
         )
 
 
