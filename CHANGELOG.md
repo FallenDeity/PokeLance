@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.14 - 2026-08-01
+## 0.2.15 - 2026-08-01
 
 #### New Features
 
@@ -8,6 +8,7 @@
 -  Add encounter pokemon details field
 #### Docs
 
+-  Update docs and bump package version
 -  update notebook example
 -  remove git revision plugin mkdocs
 #### Others
@@ -16,7 +17,7 @@
 -  bump package version
 -  run uv lock
 
-Full set of changes: [v0.2.13 to v0.2.14](https://github.com/FallenDeity/PokeLance/compare/v0.2.13...v0.2.14)
+Full set of changes: [v0.2.13 to v0.2.15](https://github.com/FallenDeity/PokeLance/compare/v0.2.13...v0.2.15)
 
 ## 0.2.13 - 2026-07-31
 

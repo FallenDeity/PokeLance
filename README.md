@@ -87,18 +87,23 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
-# Examples
+## Documentation
 
-[Examples](https://fallendeity.github.io/PokeLance/guide/basic_usage/)
+- [Getting Started](https://fallendeity.github.io/PokeLance/)
+- [Quickstart](https://fallendeity.github.io/PokeLance/guide/quickstart/)
+- [Fetching Data](https://fallendeity.github.io/PokeLance/guide/fetching_data/)
+- [Caching In Depth](https://fallendeity.github.io/PokeLance/guide/caching/)
+- [Error Handling](https://fallendeity.github.io/PokeLance/guide/error_handling/)
+- [Media - Sprites & Cries](https://fallendeity.github.io/PokeLance/guide/media/)
+- [API Reference](https://fallendeity.github.io/PokeLance/api_reference/pokelance/)
 
-Following examples are available open an issue if you want more examples or more details on certain examples.
-- Basic Usage
-- Advanced cache usage
-- Discord bot example
-- FastAPI example
+## Recipes
 
+- [Discord Bot](https://fallendeity.github.io/PokeLance/guide/recipes/discord_bot/)
+- [FastAPI Service](https://fallendeity.github.io/PokeLance/guide/recipes/fastapi/)
+- [Notebook Playground](https://fallendeity.github.io/PokeLance/guide/recipes/playground/)
 
-## Important Links
+## Links
 
 - [PokeAPI](https://pokeapi.co/)
 - [PokeLance Documentation](https://FallenDeity.github.io/PokeLance/)
