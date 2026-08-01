@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.16 - 2026-08-02
+
+#### New Features
+
+-  bump package version
+-  Bump to python 3.10
+-  Move endpoint caching to asyncio.Event and make itmore granular
+-  Add dynamic base url
+#### Others
+
+-  Disable fail fast
+-  Use a matrix testing strategy
+-  run uv lock
+-  bump uv build system
+-  bump deps
+
+Full set of changes: [v0.2.15 to v0.2.16](https://github.com/FallenDeity/PokeLance/compare/v0.2.15...v0.2.16)
+
 ## 0.2.15 - 2026-08-01
 
 #### New Features
