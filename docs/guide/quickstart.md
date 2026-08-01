@@ -173,6 +173,36 @@ See [Fetching Data](fetching_data.md) for the full rationale, and
 [`getch_data`][pokelance.client.PokeLance.getch_data] for a single call that does both steps
 for you across any extension.
 
+## Configuring the API Base URL
+
+By default, PokeLance connects to `https://pokeapi.co/api/v2/`. You can override this by setting the `POKEAPI_BASE_URL` environment variable:
+
+```bash
+export POKEAPI_BASE_URL=https://my-pokeapi-proxy.com/api/v2
+```
+
+This is useful for using the library with local instances, proxies, or mock servers.
+
+```python exec="true" source="above" result="text" session="quickstart"
+import os
+import asyncio
+
+from pokelance import PokeLance
+
+os.environ["POKEAPI_BASE_URL"] = "https://staging.pokeapi.co/api/v2"
+
+
+client = PokeLance()
+
+async def main() -> None:
+    berry = await client.berry.fetch_berry("cheri")
+    print(berry.item)
+    await client.close()
+
+
+asyncio.run(main())
+```
+
 ## Next steps
 
 - [Configuration](configuration.md): cache sizes, logging, endpoint pre-loading
