@@ -44,6 +44,7 @@ dev = [
     "markdown-exec[ansi]>=1.12.3",
     "mkdocs-jupyter>=0.26.3",
     "pillow>=12.3.0",
+    "pytest-rerunfailures>=16.1",
 ]
 
 [tool.uv.build-backend]
@@ -72,7 +73,7 @@ src_paths = ["pokelance"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-addopts = "--cov-report=term-missing"
+addopts = "--cov-report=term-missing --reruns 3 --reruns-delay 2"
 
 [tool.coverage.run]
 source = ["pokelance"]

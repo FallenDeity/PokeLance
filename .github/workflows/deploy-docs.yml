@@ -2,8 +2,16 @@ name: Deploy Documentation
 
 on:
   push:
-    tags: [v*]
-  workflow_dispatch:  # Allow manual trigger
+    branches:
+      - "main"
+      - "master"
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/deploy-docs.yml"
+  workflow_dispatch:
 
 permissions:
   contents: write

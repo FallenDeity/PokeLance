@@ -3,8 +3,16 @@ name: Code formatter and linter
 on:
   push:
     branches: ["**"]
+    paths: &paths
+      - "**.py"
+      - "pokelance/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/format-and-lint.yml"
   pull_request:
     branches: ["**"]
+    paths: *paths
 
 jobs:
 
