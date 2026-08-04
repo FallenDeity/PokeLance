@@ -219,7 +219,14 @@ class ItemExtension(Extension):
     """
 
     name: str = "item"
-    categories: t.List[str] = ["currency", "item", "item-attribute", "item-category", "item-fling-effect", "item-pocket"]
+    categories: t.List[str] = [
+        "currency",
+        "item",
+        "item-attribute",
+        "item-category",
+        "item-fling-effect",
+        "item-pocket",
+    ]
 
 
 @attrs.define(slots=True, frozen=True)
