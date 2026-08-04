@@ -4,7 +4,7 @@ from .berries import BerryFlavorMap, FlavorBerryMap
 from .contests import ContestEffectFlavorText, ContestName, SuperContestEffectFlavorText
 from .evolutions import ChainLink, EvolutionDetail
 from .games import PokemonEntry
-from .items import ItemHolderPokemon, ItemHolderPokemonVersionDetail, ItemSprites
+from .items import ItemHolderPokemon, ItemHolderPokemonVersionDetail, ItemPrice, ItemSprites
 from .locations import EncounterMethodRate, EncounterVersionDetails, PalParkEncounterSpecies, PokemonEncounter
 from .moves import ContestComboDetail, ContestComboSet, MoveFlavorText, MoveMetaData, MoveStatChange, PastMoveStatValues
 from .pokemons import (
@@ -59,6 +59,7 @@ __all__: t.Tuple[str, ...] = (
     "ItemHolderPokemonVersionDetail",
     "ItemHolderPokemon",
     "ItemSprites",
+    "ItemPrice",
     "EncounterVersionDetails",
     "EncounterMethodRate",
     "PokemonEncounter",

@@ -233,6 +233,16 @@ class Endpoint:
         return Route(endpoint=f"/version-group/{version_group}")
 
     @classmethod
+    def get_currency_endpoints(cls) -> Route:
+        """Get a list of currency endpoints."""
+        return Route(endpoint="/currency", payload={"limit": 10000})
+
+    @classmethod
+    def get_currency(cls, currency: t.Union[int, str]) -> Route:
+        """Get a currency by its ID or name."""
+        return Route(endpoint=f"/currency/{currency}")
+
+    @classmethod
     def get_item_endpoints(cls) -> Route:
         """Get a list of item endpoints."""
         return Route(endpoint="/item", payload={"limit": 10000})
