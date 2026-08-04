@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.17 - 2026-08-04
+
+#### New Features
+
+-  Add latest item.prices field and currency resource
+#### Docs
+
+-  Add POKEAPI_BASE_URL env var docs
+#### Others
+
+-  Run black
+-  Gate workflows behind file changes, add retry for transient api errors
+-  Bump package version
+
+Full set of changes: [v0.2.16 to v0.2.17](https://github.com/FallenDeity/PokeLance/compare/v0.2.16...v0.2.17)
+
 ## 0.2.16 - 2026-08-02
 
 #### New Features

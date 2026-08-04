@@ -1978,7 +1978,7 @@ wheels = [
 
 [[package]]
 name = "pokelance"
-version = "0.2.16"
+version = "0.2.17"
 source = { editable = "." }
 dependencies = [
     { name = "aiofiles" },

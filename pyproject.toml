@@ -1,6 +1,6 @@
 [project]
 name = "pokelance"
-version = "0.2.16"
+version = "0.2.17"
 description = "A flexible and easy to use pokemon library."
 authors = [{ name = "FallenDeity", email = "61227305+FallenDeity@users.noreply.github.com" }]
 requires-python = ">=3.10,<4"
