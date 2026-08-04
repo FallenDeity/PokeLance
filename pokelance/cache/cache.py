@@ -16,6 +16,7 @@ if t.TYPE_CHECKING:
 
 __all__: t.Tuple[str, ...] = (
     "PokemonCache",
+    "CurrencyCache",
     "BaseCache",
     "BerryCache",
     "PalParkAreaCache",
@@ -559,6 +560,10 @@ class GamesVersionCache(BaseCache["Route", "models.Version"]):
 
 class GamesVersionGroupCache(BaseCache["Route", "models.VersionGroup"]):
     """A cache for games version groups."""
+
+
+class CurrencyCache(BaseCache["Route", "models.Currency"]):
+    """A cache for currencies."""
 
 
 class ItemCache(BaseCache["Route", "models.Item"]):

@@ -9,6 +9,7 @@ __all__: t.Tuple[str, ...] = (
     "ItemSprites",
     "ItemHolderPokemon",
     "ItemHolderPokemonVersionDetail",
+    "ItemPrice",
 )
 
 
@@ -77,4 +78,36 @@ class ItemHolderPokemon(BaseModel):
                 ItemHolderPokemonVersionDetail.from_payload(version_detail)
                 for version_detail in payload.get("version_details", [])
             ],
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class ItemPrice(BaseModel):
+    """An item price resource.
+
+    Attributes
+    ----------
+    currency: NamedResource
+        The currency used for this price.
+    purchase_price: t.Optional[int]
+        The purchase price of this item in this version group. Null if the item cannot be purchased.
+    sell_price: t.Optional[int]
+        The sell price of this item in this version group. Null if the item cannot be sold.
+    version_group: NamedResource
+        The version group these prices apply to.
+    """
+
+    currency: NamedResource = attrs.field(factory=NamedResource)
+    purchase_price: t.Optional[int] = attrs.field(default=None)
+    sell_price: t.Optional[int] = attrs.field(default=None)
+    version_group: NamedResource = attrs.field(factory=NamedResource)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemPrice":
+        return cls(
+            raw=payload,
+            currency=NamedResource.from_payload(payload.get("currency", {})),
+            purchase_price=payload.get("purchase_price"),
+            sell_price=payload.get("sell_price"),
+            version_group=NamedResource.from_payload(payload.get("version_group", {})),
         )

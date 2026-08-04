@@ -1,6 +1,7 @@
 import typing as t
 
 from pokelance.http import Endpoint
+from pokelance.models import Currency
 from pokelance.models import Item as ItemModel
 from pokelance.models import ItemAttribute, ItemCategory, ItemFlingEffect, ItemPocket
 
@@ -363,6 +364,73 @@ class Item(BaseExtension):
         self._validate_resource(self.cache.item_pocket, name, route)
         data = await self._client.request(route)
         return self.cache.item_pocket.setdefault(route, ItemPocket.from_payload(data))
+
+    def get_currency(self, name: t.Union[str, int]) -> t.Optional[Currency]:
+        """Gets a currency from the cache.
+
+        Parameters
+        ----------
+        name: t.Union[str, int]
+            The name or id of the currency.
+
+        Returns
+        -------
+        t.Optional[Currency]
+            The currency if it exists in the cache, else None.
+
+        Raises
+        ------
+        pokelance.exceptions.ResourceNotFound
+            The name or id of the currency is invalid.
+
+        Examples
+        --------
+
+        >>> from pokelance import PokeLance
+        >>> client = PokeLance()
+        >>> currency = client.item.get_currency("poke-dollar")
+        >>> currency.id
+        1
+        """
+        route = Endpoint.get_currency(name)
+        self._validate_resource(self.cache.currency, name, route)
+        return self.cache.currency.get(route, None)
+
+    async def fetch_currency(self, name: t.Union[str, int]) -> Currency:
+        """Fetches a currency from the API.
+
+        Parameters
+        ----------
+        name: t.Union[str, int]
+            The name or id of the currency.
+
+        Returns
+        -------
+        Currency
+            The currency if it exists in the API, else raises ResourceNotFound.
+
+        Raises
+        ------
+        pokelance.exceptions.ResourceNotFound
+            The name or id of the currency is invalid.
+
+        Examples
+        --------
+
+        >>> from pokelance import PokeLance
+        >>> import asyncio
+        >>> client = PokeLance()
+        >>> async def main() -> None:
+        ...     currency = await client.item.fetch_currency("poke-dollar")
+        ...     print(currency.id)
+        ...     await client.close()
+        >>> asyncio.run(main())
+        1
+        """
+        route = Endpoint.get_currency(name)
+        self._validate_resource(self.cache.currency, name, route)
+        data = await self._client.request(route)
+        return self.cache.currency.setdefault(route, Currency.from_payload(data))
 
 
 def setup(lance: "PokeLance") -> None:

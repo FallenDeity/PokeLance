@@ -5,7 +5,7 @@ from .contest import ContestEffect, ContestType, SuperContestEffect
 from .encounter import EncounterCondition, EncounterConditionValue, EncounterMethod
 from .evolution import EvolutionChain, EvolutionTrigger
 from .game import Generation, Pokedex, Version, VersionGroup
-from .item import Item, ItemAttribute, ItemCategory, ItemFlingEffect, ItemPocket
+from .item import Currency, Item, ItemAttribute, ItemCategory, ItemFlingEffect, ItemPocket
 from .location import Location, LocationArea, PalParkArea, Region
 from .machine import Machine
 from .move import Move, MoveAilment, MoveBattleStyle, MoveCategory, MoveDamageClass, MoveLearnMethod, MoveTarget
@@ -34,6 +34,7 @@ __all__: t.Tuple[str, ...] = (
     "BerryFlavor",
     "ContestEffect",
     "ContestType",
+    "Currency",
     "SuperContestEffect",
     "EncounterCondition",
     "EncounterConditionValue",

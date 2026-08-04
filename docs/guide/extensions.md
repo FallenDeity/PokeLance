@@ -72,6 +72,7 @@ you never construct them yourself.
 
     | Category            | Key        | Returns                                                                    |
     | ------------------- | ---------- | -------------------------------------------------------------------------- |
+    | `currency`          | name or id | [`models.Currency`][pokelance.models.abstract.item.Currency]               |
     | `item`              | name or id | [`models.Item`][pokelance.models.abstract.item.Item]                       |
     | `item-attribute`    | name or id | [`models.ItemAttribute`][pokelance.models.abstract.item.ItemAttribute]     |
     | `item-category`     | name or id | [`models.ItemCategory`][pokelance.models.abstract.item.ItemCategory]       |

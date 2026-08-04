@@ -15,9 +15,9 @@ from pokelance.models.common import (
     VersionGroupFlavorText,
 )
 
-from .utils import ItemHolderPokemon, ItemSprites
+from .utils import ItemHolderPokemon, ItemPrice, ItemSprites
 
-__all__: t.Tuple[str, ...] = ("Item", "ItemAttribute", "ItemCategory", "ItemFlingEffect", "ItemPocket")
+__all__: t.Tuple[str, ...] = ("Currency", "Item", "ItemAttribute", "ItemCategory", "ItemFlingEffect", "ItemPocket")
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -30,8 +30,8 @@ class Item(BaseModel):
         The identifier for this resource.
     name: str
         The name for this resource.
-    cost: int
-        The price of this item in stores.
+    prices: t.List[ItemPrice]
+        The purchase and sell prices of this item for each version group.
     fling_power: t.Optional[int]
         The power of the move Fling when used with this item.
     fling_effect: t.Optional[NamedResource]
@@ -60,7 +60,7 @@ class Item(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    cost: int = attrs.field(factory=int)
+    prices: t.List[ItemPrice] = attrs.field(factory=list)
     fling_power: t.Optional[int] = attrs.field(default=None)
     fling_effect: t.Optional[NamedResource] = attrs.field(default=None)
     attributes: t.List[NamedResource] = attrs.field(factory=list)
@@ -80,7 +80,7 @@ class Item(BaseModel):
             raw=payload,
             id=payload.get("id", 0),
             name=payload.get("name", ""),
-            cost=payload.get("cost", 0),
+            prices=[ItemPrice.from_payload(price) for price in payload.get("prices", [])],
             fling_power=payload.get("fling_power"),
             fling_effect=NamedResource.optional_from_payload(payload.get("fling_effect")),
             attributes=[NamedResource.from_payload(attribute) for attribute in payload.get("attributes", [])],
@@ -236,5 +236,33 @@ class ItemPocket(BaseModel):
             id=payload.get("id", 0),
             name=payload.get("name", ""),
             categories=[NamedResource.from_payload(category) for category in payload.get("categories", [])],
+            names=[Name.from_payload(name) for name in payload.get("names", [])],
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class Currency(BaseModel):
+    """Currency model.
+
+    Attributes
+    ----------
+    id: int
+        The identifier for this resource.
+    name: str
+        The name for this resource.
+    names: t.List[Name]
+        The name of this resource listed in different languages.
+    """
+
+    id: int = attrs.field(factory=int)
+    name: str = attrs.field(factory=str)
+    names: t.List[Name] = attrs.field(factory=list)
+
+    @classmethod
+    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Currency":
+        return cls(
+            raw=payload,
+            id=payload.get("id", 0),
+            name=payload.get("name", ""),
             names=[Name.from_payload(name) for name in payload.get("names", [])],
         )

@@ -13,6 +13,7 @@ from .cache import (
     CharacteristicCache,
     ContestEffectCache,
     ContestTypeCache,
+    CurrencyCache,
     EggGroupCache,
     EncounterConditionCache,
     EncounterConditionValueCache,
@@ -246,6 +247,8 @@ class Item(Base):
         The fling effect of an item.
     item_pocket: ItemPocketCache
         The pocket of an item.
+    currency: CurrencyCache
+        The currency of an item.
     """
 
     max_size: int = 100
@@ -254,6 +257,7 @@ class Item(Base):
     item_category: ItemCategoryCache = attrs.field(default=ItemCategoryCache(max_size=max_size))
     item_fling_effect: ItemFlingEffectCache = attrs.field(default=ItemFlingEffectCache(max_size=max_size))
     item_pocket: ItemPocketCache = attrs.field(default=ItemPocketCache(max_size=max_size))
+    currency: CurrencyCache = attrs.field(default=CurrencyCache(max_size=max_size))
 
 
 @attrs.define(slots=True, kw_only=True)
