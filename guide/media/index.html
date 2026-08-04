@@ -1,0 +1,3535 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for the PokeApi wrapper, PokeLance.">
+      
+      
+        <meta name="author" content="FallenDeity">
+      
+      
+        <link rel="canonical" href="https://FallenDeity.github.io/PokeLance/guide/media/">
+      
+      
+        <link rel="prev" href="../error_handling/">
+      
+      
+        <link rel="next" href="../recipes/discord_bot/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/pokelance.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Media - Sprites & Cries - PokeLance</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+  
+  
+  
+  
+  <style>:root{--md-annotation-icon:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M17%2013h-4v4h-2v-4H7v-2h4V7h2v4h4m-5-9A10%2010%200%200%200%202%2012a10%2010%200%200%200%2010%2010%2010%2010%200%200%200%2010-10A10%2010%200%200%200%2012%202%22/%3E%3C/svg%3E');}</style>
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Ubuntu";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_markdown_exec_pyodide.css">
+    
+      <link rel="stylesheet" href="../../assets/_markdown_exec_ansi.css">
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Media - Sprites & Cries - PokeLance" />
+<meta property="og:description" content="Documentation for the PokeApi wrapper, PokeLance." />
+<meta property="og:image" content="https://FallenDeity.github.io/PokeLance/assets/images/social/guide/media.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:url" content="https://FallenDeity.github.io/PokeLance/guide/media/" />
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:title" content="Media - Sprites & Cries - PokeLance" />
+<meta property="twitter:description" content="Documentation for the PokeApi wrapper, PokeLance." />
+<meta property="twitter:image" content="https://FallenDeity.github.io/PokeLance/assets/images/social/guide/media.png" />
+</head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="light" data-md-color-primary="indigo" data-md-color-accent="deep-purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#media-sprites-cries" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="PokeLance" class="md-header__button md-logo" aria-label="PokeLance" data-md-component="logo">
+      
+  <img src="../../assets/pokelance.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            PokeLance
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Media - Sprites & Cries
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="light" data-md-color-primary="indigo" data-md-color-accent="deep-purple"  aria-label="Light Mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Light Mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="deep-purple"  aria-label="Dark Mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Dark Mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/FallenDeity/PokeLance" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    FallenDeity/PokeLance
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../api_reference/pokelance/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="PokeLance" class="md-nav__button md-logo" aria-label="PokeLance" data-md-component="logo">
+      
+  <img src="../../assets/pokelance.png" alt="logo">
+
+    </a>
+    PokeLance
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/FallenDeity/PokeLance" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    FallenDeity/PokeLance
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fetching_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fetching Data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../extensions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Extensions Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../caching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Caching In Depth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../error_handling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Error Handling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Media - Sprites & Cries
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Media - Sprites & Cries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#fetching-an-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetching an image
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fetching an image">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#embedding-it-as-img" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Embedding it as &lt;img&gt;
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fetching-a-cry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetching a cry
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fetching a cry">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#embedding-it-as-audio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Embedding it as &lt;audio&gt;
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-these-are-cached-separately" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why these are cached separately
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error handling
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_10" id="__nav_2_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recipes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Recipes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../recipes/discord_bot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord Bot
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../recipes/fastapi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FastAPI Service
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../recipes/playground/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Notebook Playground
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/pokelance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PokeLance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/logger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exceptions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/constants/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Constants
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cache
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Cache
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/cache/cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/cache/cache_manager/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CacheManager
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Http
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Http
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/http/httpclient/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Client
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/http/routes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Routes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_8" id="__nav_3_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Extensions
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Extensions
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/ext/_base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    base
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/ext/berry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    berry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/ext/contest/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    contest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/ext/encounter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    encounter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/ext/evolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    evolution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/ext/game/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    game
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/ext/item/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    item
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/ext/location/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    location
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/ext/machine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    machine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/ext/move/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    move
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/ext/pokemon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pokemon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/ext/utility/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    utility
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_9" id="__nav_3_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Base
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_9_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_9_2" id="__nav_3_9_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Common
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_9_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_9_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Common
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/common/resources/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Resources
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/common/models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_9_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_9_3" id="__nav_3_9_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Abstract
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_9_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_9_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Abstract
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_9_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_9_3_1" id="__nav_3_9_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utility
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_3_9_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_9_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Utility
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/utils/berries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Berries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/utils/contests/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contests
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/utils/evolutions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evolutions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/utils/games/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Games
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/utils/items/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Items
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/utils/locations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Locations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/utils/moves/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Moves
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/utils/pokemons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pokemons
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/berry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Berry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/contest/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contest
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/encounter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Encounter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/evolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evolution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/game/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/item/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Item
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/location/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Location
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/machine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Machine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/move/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Move
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_reference/models/abstract/pokemon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pokemon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#fetching-an-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetching an image
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fetching an image">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#embedding-it-as-img" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Embedding it as &lt;img&gt;
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fetching-a-cry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fetching a cry
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fetching a cry">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#embedding-it-as-audio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Embedding it as &lt;audio&gt;
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-these-are-cached-separately" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why these are cached separately
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error handling
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+
+
+                  
+
+
+  
+    <a href="https://github.com/FallenDeity/PokeLance/edit/master/docs/guide/media.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/FallenDeity/PokeLance/raw/master/docs/guide/media.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5 5 5 0 0 1 5-5 5 5 0 0 1 5 5 5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5"/></svg>
+    </a>
+  
+
+
+<h1 id="media-sprites-cries">Media: Sprites &amp; Cries<a class="headerlink" href="#media-sprites-cries" title="Permanent link">⚓︎</a></h1>
+<p>Pokémon models come back from PokéAPI full of URLs to sprites and cries, not the raw bytes.
+PokeLance gives you two async helpers to fetch those, each backed by their own async LRU
+cache so re-downloading the same sprite is instant. This page also shows both rendered
+inline, live: the bytes are downloaded at doc-build time, base64-encoded, and dropped
+straight into an <code>&lt;img&gt;</code>/<code>&lt;audio&gt;</code> tag.</p>
+<h2 id="fetching-an-image">Fetching an image<a class="headerlink" href="#fetching-an-image" title="Permanent link">⚓︎</a></h2>
+<p><a class="autorefs autorefs-internal" title="get_image_async(url)
+
+  
+      async
+  " href="../../api_reference/pokelance/#pokelance.client.PokeLance.get_image_async"><code>get_image_async</code></a> downloads and validates any
+sprite URL, returning raw <code>bytes</code>:</p>
+<div class="highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pokelance</span><span class="w"> </span><span class="kn">import</span> <span class="n">PokeLance</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">client</span> <span class="o">=</span> <span class="n">PokeLance</span><span class="p">()</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">pokemon</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">pokemon</span><span class="o">.</span><span class="n">fetch_pokemon</span><span class="p">(</span><span class="s2">&quot;pikachu&quot;</span><span class="p">)</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">img</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get_image_async</span><span class="p">(</span><span class="n">pokemon</span><span class="o">.</span><span class="n">sprites</span><span class="o">.</span><span class="n">front_default</span><span class="p">)</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;downloaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">img</span><span class="p">)</span><span class="si">}</span><span class="s2"> bytes from </span><span class="si">{</span><span class="n">pokemon</span><span class="o">.</span><span class="n">sprites</span><span class="o">.</span><span class="n">front_default</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="nb">print</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">()))</span>
+</span></code></pre></div>
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>downloaded 597 bytes from https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png
+</span></code></pre></div>
+<p>Accepted content types are <code>png</code>, <code>jpg</code>, <code>jpeg</code>, <code>gif</code>, <code>webp</code>, and <code>svg</code>, anything else
+(or a non-2xx response) raises <a class="autorefs autorefs-internal" title="ImageNotFound(message, route, status)" href="../../api_reference/exceptions/#pokelance.exceptions.ImageNotFound"><code>ImageNotFound</code></a>.</p>
+<h3 id="embedding-it-as-img">Embedding it as <code>&lt;img&gt;</code><a class="headerlink" href="#embedding-it-as-img" title="Permanent link">⚓︎</a></h3>
+<div class="highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pokelance</span><span class="w"> </span><span class="kn">import</span> <span class="n">PokeLance</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">client</span> <span class="o">=</span> <span class="n">PokeLance</span><span class="p">()</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">pokemon</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">pokemon</span><span class="o">.</span><span class="n">fetch_pokemon</span><span class="p">(</span><span class="s2">&quot;pikachu&quot;</span><span class="p">)</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">img</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get_image_async</span><span class="p">(</span><span class="n">pokemon</span><span class="o">.</span><span class="n">sprites</span><span class="o">.</span><span class="n">front_default</span><span class="p">)</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">encoded</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">img</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;data:image/png;base64,</span><span class="si">{</span><span class="n">encoded</span><span class="si">}</span><span class="s1">&quot; alt=&quot;pikachu sprite&quot; width=&quot;96&quot; height=&quot;96&quot;/&gt;&#39;</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="nb">print</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">()))</span>
+</span></code></pre></div>
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgBAMAAAAQtmoLAAAAKlBMVEUAAAAAAAApKSlBQUpiMQhzc4OcUgDFIBjelADmWkH2vSD25lL/9qT////Vai+KAAAAAXRSTlMAQObYZgAAAdlJREFUWMPtlsFqwkAQhjclhB6ztRRReqiHXnoSbz0piLX2JcwliD6A0JsgEuoDlNJTQKzsnkJpSDN9A3PpG3U2ST12J4dCKftjNML/MTObndkwZmRkZPTX5Vb0Wxe/DrQq5nRSHehWBK4PQKtFAWpiU9wctTodygI0SsCZQqfTJgK+P3ZmgAClfltsJ9k+Qf8bKQACQZZlgHptqwC+lhh+ZNleAVz5HRjrAEwGUi4Tr/wX61JaSMzm8wrygo9BD5wjENVKYI3hNDnZbRiqlHJfAHrAuVQmeH9eqooJwB3AABN5egyL+rVF3MrldDtJ5/OwDKADbkSuHJAVgJf7kE1FTmg2lCNKheoOCa7froU2OSo5owLSHeG33s+aJQCuTfKzJhQBsNjRlpEAJHZSrY4tKBNkHeNSqk3XZXUKYEFSApH18D1BfgYAmwZ7CKJhsOsRgHUB7CAMgj5lGM9AIfgJ6wtGA2Ko45UK7lPmUjPGmRThlQr3zCMAM/BxhXz1MLhPAKyiBwCkEH2PkJIlCn+apiKklGDlPQBCYoSQdKBMxUG0o6hx8O9oh53VEAHnqndIj42x/kotpjWYrGgB7Djp5c6R8GgR+Gn5G0cVXwl41bcUIyMjo/+qLw92FGczGN4XAAAAAElFTkSuQmCC" alt="pikachu sprite" width="96" height="96"/>
+
+<h2 id="fetching-a-cry">Fetching a cry<a class="headerlink" href="#fetching-a-cry" title="Permanent link">⚓︎</a></h2>
+<p><a class="autorefs autorefs-internal" title="get_audio_async(url)
+
+  
+      async
+  " href="../../api_reference/pokelance/#pokelance.client.PokeLance.get_audio_async"><code>get_audio_async</code></a> works identically, for the
+newer <code>cries</code> field on <a class="autorefs autorefs-internal" href="../../api_reference/models/abstract/pokemon/#pokelance.models.abstract.pokemon.Pokemon"><code>Pokemon</code></a> models:</p>
+<div class="highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pokelance</span><span class="w"> </span><span class="kn">import</span> <span class="n">PokeLance</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">client</span> <span class="o">=</span> <span class="n">PokeLance</span><span class="p">()</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">pokemon</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">pokemon</span><span class="o">.</span><span class="n">fetch_pokemon</span><span class="p">(</span><span class="s2">&quot;pikachu&quot;</span><span class="p">)</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">audio</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get_audio_async</span><span class="p">(</span><span class="n">pokemon</span><span class="o">.</span><span class="n">cries</span><span class="o">.</span><span class="n">latest</span><span class="p">)</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;downloaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">audio</span><span class="p">)</span><span class="si">}</span><span class="s2"> bytes from </span><span class="si">{</span><span class="n">pokemon</span><span class="o">.</span><span class="n">cries</span><span class="o">.</span><span class="n">latest</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="nb">print</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">()))</span>
+</span></code></pre></div>
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>downloaded 7080 bytes from https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/25.ogg
+</span></code></pre></div>
+<p>Accepted content types here are <code>ogg</code>, <code>wav</code>, and <code>mp3</code>; anything else raises
+<a class="autorefs autorefs-internal" title="AudioNotFound(message, route, status)" href="../../api_reference/exceptions/#pokelance.exceptions.AudioNotFound"><code>AudioNotFound</code></a>.</p>
+<h3 id="embedding-it-as-audio">Embedding it as <code>&lt;audio&gt;</code><a class="headerlink" href="#embedding-it-as-audio" title="Permanent link">⚓︎</a></h3>
+<div class="highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pokelance</span><span class="w"> </span><span class="kn">import</span> <span class="n">PokeLance</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">client</span> <span class="o">=</span> <span class="n">PokeLance</span><span class="p">()</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">pokemon</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">pokemon</span><span class="o">.</span><span class="n">fetch_pokemon</span><span class="p">(</span><span class="s2">&quot;pikachu&quot;</span><span class="p">)</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">audio</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get_audio_async</span><span class="p">(</span><span class="n">pokemon</span><span class="o">.</span><span class="n">cries</span><span class="o">.</span><span class="n">latest</span><span class="p">)</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">encoded</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">audio</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="k">return</span> <span class="p">(</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        <span class="sa">f</span><span class="s1">&#39;&lt;audio controls preload=&quot;none&quot;&gt;&#39;</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>        <span class="sa">f</span><span class="s1">&#39;&lt;source src=&quot;data:audio/ogg;base64,</span><span class="si">{</span><span class="n">encoded</span><span class="si">}</span><span class="s1">&quot; type=&quot;audio/ogg&quot;&gt;&lt;/audio&gt;&#39;</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="p">)</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="nb">print</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">()))</span>
+</span></code></pre></div>
+<audio controls preload="none"><source src="data:audio/ogg;base64,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" type="audio/ogg"></audio>
+
+<h2 id="why-these-are-cached-separately">Why these are cached separately<a class="headerlink" href="#why-these-are-cached-separately" title="Permanent link">⚓︎</a></h2>
+<p>Unlike model caches (bounded by <code>cache_size</code>), image and audio helpers are decorated with
+PokeLance's own <a href="../../api_reference/utils/"><code>alru_cache</code></a>, an async-aware LRU cache that
+also de-duplicates concurrent in-flight requests for the same URL (two coroutines awaiting
+the same sprite at the same time share one download instead of firing two).</p>
+<p>Sizes are configured independently from the model cache, via the client constructor or
+properties (see <a href="../configuration/#cache-sizing">Configuration</a>):</p>
+<div class="highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">client</span> <span class="o">=</span> <span class="n">PokeLance</span><span class="p">(</span><span class="n">image_cache_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">audio_cache_size</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">client</span><span class="o">.</span><span class="n">image_cache_size</span> <span class="o">=</span> <span class="mi">512</span>  <span class="c1"># can also be changed after construction</span>
+</span></code></pre></div>
+<p>A cached hit is measurably faster since it skips the network entirely:</p>
+<div class="highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pokelance</span><span class="w"> </span><span class="kn">import</span> <span class="n">PokeLance</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">client</span> <span class="o">=</span> <span class="n">PokeLance</span><span class="p">()</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">url</span> <span class="o">=</span> <span class="p">(</span><span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">pokemon</span><span class="o">.</span><span class="n">fetch_pokemon</span><span class="p">(</span><span class="s2">&quot;pikachu&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">sprites</span><span class="o">.</span><span class="n">front_default</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get_image_async</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">first</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get_image_async</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>  <span class="c1"># same URL: served from the LRU cache</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">second</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t1</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;first fetch: </span><span class="si">{</span><span class="n">first</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">s, second fetch: </span><span class="si">{</span><span class="n">second</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    <span class="k">assert</span> <span class="n">first</span> <span class="o">&gt;</span> <span class="n">second</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>    <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</span></code></pre></div>
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>first fetch: 0.0221s, second fetch: 0.0000s
+</span></code></pre></div>
+<h2 id="error-handling">Error handling<a class="headerlink" href="#error-handling" title="Permanent link">⚓︎</a></h2>
+<p>Both helpers raise before returning any bytes if the response isn't actually image/audio
+content, or the request failed outright:</p>
+<div class="highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pokelance</span><span class="w"> </span><span class="kn">import</span> <span class="n">PokeLance</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pokelance.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageNotFound</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">client</span> <span class="o">=</span> <span class="n">PokeLance</span><span class="p">()</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get_image_async</span><span class="p">(</span><span class="s2">&quot;https://pokeapi.co/api/v2/pokemon/invalid&quot;</span><span class="p">)</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="k">except</span> <span class="n">ImageNotFound</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>  <span class="c1"># e.g. &quot;... was unsuccessful or the URL is not an image. (...) | ... | 404&quot;</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="k">finally</span><span class="p">:</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</span></code></pre></div>
+<div class="highlight"><span class="filename">Text Only</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Request to https://pokeapi.co/api/v2/pokemon/invalid was unsuccessful or the URL is not an image. (text/plain) | &lt;Route endpoint= method=GET&gt; | 404
+</span></code></pre></div>
+<p>See <a href="../error_handling/">Error Handling</a> for the full exception hierarchy.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+<style>
+.jp-Notebook {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.jp-Cell {
+    margin: 0 0 0.75rem 0 !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+.jp-Cell-inputWrapper,
+.jp-Cell-outputWrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+.jp-Cell-outputWrapper {
+    margin-top: 0.25rem !important;
+}
+
+.jp-InputPrompt {
+    font-family: var(--md-code-font-family, "Roboto Mono", monospace) !important;
+    font-size: 0.5rem !important;
+    text-align: left !important;
+    opacity: 0.5 !important;
+}
+
+.jp-InputArea {
+    background: transparent !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.jp-InputArea-editor {
+    background: var(--md-code-bg-color) !important;
+    border: 1px solid var(--md-default-fg-color--lightest) !important;
+    border-radius: 0.2rem !important;
+    margin: 0 !important;
+}
+
+.jp-InputArea-editor pre,
+.jp-InputArea-editor .cm-content {
+    background: transparent !important;
+    color: var(--md-code-fg-color) !important;
+    font-family: var(--md-code-font-family, "Roboto Mono", monospace) !important;
+    font-size: 0.85em !important;
+    line-height: 1.4 !important;
+    padding: 0.6rem 0.8rem !important;
+    margin: 0 !important;
+}
+
+.jp-OutputPrompt {
+    display: flex !important;
+    font-family: var(--md-code-font-family, "Roboto Mono", monospace) !important;
+    align-items: center !important;
+    font-size: 0.5rem !important;
+    text-align: left !important;
+    opacity: 0.5 !important;
+}
+
+.jp-OutputArea {
+    display: flex !important;
+    flex-direction: column !important;
+    background: transparent !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.jp-OutputArea-output {
+    background: transparent !important;
+    color: var(--md-typeset-color) !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: var(--md-typeset-font-size, 0.64rem) !important;
+    line-height: var(--md-typeset-line-height, 1.6) !important;
+}
+
+.jp-OutputArea-output pre {
+    background: var(--md-code-bg-color) !important;
+    color: var(--md-code-fg-color) !important;
+    font-family: var(--md-code-font-family, "Roboto Mono", monospace) !important;
+    font-size: 0.85em !important;
+    line-height: 1.4 !important;
+    padding: 0.6rem 0.8rem !important;
+    border-radius: 0.2rem !important;
+    border: none !important;
+    margin: 0.25rem 0 !important;
+}
+
+.jp-OutputArea-output code {
+    background: var(--md-code-bg-color) !important;
+    color: var(--md-code-fg-color) !important;
+    font-family: var(--md-code-font-family, "Roboto Mono", monospace) !important;
+    font-size: 0.85em !important;
+    padding: 0.1em 0.3em !important;
+    border-radius: 0.2rem !important;
+}
+
+.jp-OutputArea-output.jp-RenderedText pre {
+    background: transparent !important;
+    color: var(--md-typeset-color) !important;
+    border: none !important;
+    padding: 0.25rem 0 !important;
+    padding-left: 0.35rem !important;
+    margin: 0 !important;
+}
+
+.jp-Cell-outputArea .jp-OutputArea-executeResult ~ .jp-OutputArea-executeResult .jp-OutputPrompt {
+    visibility: hidden !important;
+}
+
+.jp-RenderedHTMLCommon {
+    color: var(--md-typeset-color) !important;
+    font-family: var(--md-text-font-family) !important;
+    font-size: var(--md-typeset-font-size, 0.64rem) !important;
+    line-height: var(--md-typeset-line-height, 1.6) !important;
+}
+
+.jp-RenderedHTMLCommon p,
+.jp-RenderedHTMLCommon li,
+.jp-RenderedHTMLCommon td,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon dd,
+.jp-RenderedHTMLCommon dt {
+    font-size: var(--md-typeset-font-size, 0.64rem) !important;
+    line-height: var(--md-typeset-line-height, 1.6) !important;
+    color: var(--md-typeset-color) !important;
+    margin: 0.25rem 0 !important;
+}
+
+.jp-RenderedHTMLCommon ul,
+.jp-RenderedHTMLCommon ol {
+    padding-left: 1.5em !important;
+    margin: 0 !important;
+}
+
+.jp-RenderedHTMLCommon li {
+    margin: 0 !important;
+}
+
+.jp-RenderedHTMLCommon p {
+    margin: 0 !important;
+}
+
+.jp-RenderedHTMLCommon h1,
+.jp-RenderedHTMLCommon h2,
+.jp-RenderedHTMLCommon h3,
+.jp-RenderedHTMLCommon h4,
+.jp-RenderedHTMLCommon h5,
+.jp-RenderedHTMLCommon h6 {
+    color: var(--md-default-fg-color) !important;
+    font-family: var(--md-heading-font-family, var(--md-text-font-family)) !important;
+    font-weight: 600 !important;
+    border: none !important;
+    margin: 0.5rem 0 !important;
+}
+
+.jp-RenderedHTMLCommon h1 { font-size: 2em !important; font-weight: 300 !important; }
+.jp-RenderedHTMLCommon h2 { font-size: 1.5625em !important; font-weight: 300 !important; }
+.jp-RenderedHTMLCommon h3 { font-size: 1.25em !important; font-weight: 400 !important; }
+.jp-RenderedHTMLCommon h4 { font-size: 1em !important; font-weight: 400 !important; }
+.jp-RenderedHTMLCommon h5 { font-size: 0.8em !important; font-weight: 700 !important; }
+.jp-RenderedHTMLCommon h6 { font-size: 0.8em !important; font-weight: 700 !important; }
+
+.jp-RenderedHTMLCommon a {
+    color: var(--md-typeset-a-color) !important;
+    text-decoration: none !important;
+}
+
+.jp-RenderedHTMLCommon a:hover {
+    color: var(--md-accent-fg-color) !important;
+    text-decoration: underline !important;
+}
+
+.jp-RenderedHTMLCommon pre {
+    background: var(--md-code-bg-color) !important;
+    color: var(--md-code-fg-color) !important;
+    font-family: var(--md-code-font-family, "Roboto Mono", monospace) !important;
+    font-size: 0.85em !important;
+    line-height: 1.4 !important;
+    padding: 0.6rem 0.8rem !important;
+    border-radius: 0.2rem !important;
+    border: none !important;
+    margin: 0.5rem 0 !important;
+}
+
+.jp-RenderedHTMLCommon code {
+    background: var(--md-code-bg-color) !important;
+    color: var(--md-code-fg-color) !important;
+    font-family: var(--md-code-font-family, "Roboto Mono", monospace) !important;
+    font-size: 0.85em !important;
+    padding: 0.1em 0.3em !important;
+    border-radius: 0.2rem !important;
+}
+
+.jp-RenderedHTMLCommon pre code {
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+.jp-RenderedHTMLCommon blockquote {
+    border-left: 4px solid var(--md-primary-fg-color) !important;
+    background: var(--md-primary-fg-color--transparent, rgba(63, 81, 181, 0.05)) !important;
+    color: var(--md-typeset-color) !important;
+    padding: 0.5rem 1rem !important;
+    margin: 0.5rem 0 !important;
+    border-radius: 0 0.2rem 0.2rem 0 !important;
+}
+
+.jp-RenderedHTMLCommon table {
+    border-collapse: collapse !important;
+    border: none !important;
+    font-size: var(--md-typeset-font-size, 0.64rem) !important;
+    margin: 0.5rem 0 !important;
+}
+
+.jp-RenderedHTMLCommon th {
+    background: var(--md-default-fg-color--lightest) !important;
+    color: var(--md-default-fg-color) !important;
+    font-weight: 700 !important;
+    padding: 0.5rem 1rem !important;
+    border: none !important;
+    border-bottom: 1px solid var(--md-default-fg-color--lightest) !important;
+}
+
+.jp-RenderedHTMLCommon td {
+    padding: 0.5rem 1rem !important;
+    border: none !important;
+    border-bottom: 1px solid var(--md-default-fg-color--lightest) !important;
+}
+
+.jp-RenderedHTMLCommon hr {
+    border: 0 !important;
+    border-top: 1px solid var(--md-default-fg-color--lightest) !important;
+    margin: 0.75rem 0 !important;
+}
+
+.jp-OutputArea-output img {
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 0.2rem !important;
+}
+
+.jp-OutputArea-output iframe {
+    max-width: 100% !important;
+    border: 1px solid var(--md-default-fg-color--lightest) !important;
+    border-radius: 0.2rem !important;
+}
+
+[data-md-color-scheme="slate"] .jp-RenderedHTMLCommon blockquote {
+    background: rgba(124, 77, 255, 0.08) !important;
+    border-left-color: var(--md-accent-fg-color) !important;
+}
+
+[data-md-color-scheme="slate"] .jp-InputArea-editor {
+    border-color: var(--md-default-fg-color--lightest) !important;
+}
+</style>
+
+<h2 id="__comments">Comments</h2>
+
+<script async
+        crossorigin="anonymous"
+        data-category="General"
+        data-category-id="R_kgDOIlz6wA"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-lang="en"
+        data-loading="lazy"
+        data-mapping="title"
+        data-reactions-enabled="1"
+        data-repo="FallenDeity/PokeLance"
+        data-repo-id="R_kgDOJ2QXiA"
+        data-strict="0"
+        data-theme="preferred_color_scheme"
+        src="https://giscus.app/client.js">
+</script>
+
+<!-- Synchronize Giscus theme with palette -->
+<script>
+	/* Set palette on initial load */
+	var palette = __md_get("__palette")
+	if (palette && typeof palette.color === "object") {
+		
+			var giscus = document.querySelector("script[src*=giscus]")
+			var theme = palette.color.scheme === "slate" ? "dark_dimmed" : "light"
+			giscus.setAttribute("data-theme", theme)
+		
+	}
+
+	/* Register event handlers after documented loaded */
+	document.addEventListener("DOMContentLoaded", function () {
+		var ref = document.querySelector("[data-md-component=palette]")
+		ref.addEventListener("change", function () {
+			var palette = __md_get("__palette")
+			if (palette && typeof palette.color === "object") {
+				
+					var theme = palette.color.scheme === "slate" ? "dark_dimmed" : "light"
+					var frame = document.querySelector(".giscus-frame")
+					frame.contentWindow.postMessage(
+							{giscus: {setConfig: {theme}}},
+							"https://giscus.app"
+					)
+				
+			}
+		})
+	})
+</script>
+
+
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../error_handling/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Error Handling">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Error Handling
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../recipes/discord_bot/" class="md-footer__link md-footer__link--next" aria-label="Next: Discord Bot">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Discord Bot
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright FallenDeity ( 2022 - present )
+    </div>
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/FallenDeity/PokeLance" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://discord.gg/yeyEvT5V2J" target="_blank" rel="noopener" title="discord.gg" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M492.5 69.8c-.2-.3-.4-.6-.8-.7-38.1-17.5-78.4-30-119.7-37.1-.4-.1-.8 0-1.1.1s-.6.4-.8.8c-5.5 9.9-10.5 20.2-14.9 30.6-44.6-6.8-89.9-6.8-134.4 0-4.5-10.5-9.5-20.7-15.1-30.6-.2-.3-.5-.6-.8-.8s-.7-.2-1.1-.2C162.5 39 122.2 51.5 84.1 69c-.3.1-.6.4-.8.7C7.1 183.5-13.8 294.6-3.6 404.2c0 .3.1.5.2.8s.3.4.5.6c44.4 32.9 94 58 146.8 74.2.4.1.8.1 1.1 0s.7-.4.9-.7c11.3-15.4 21.4-31.8 30-48.8.1-.2.2-.5.2-.8s0-.5-.1-.8-.2-.5-.4-.6-.4-.3-.7-.4c-15.8-6.1-31.2-13.4-45.9-21.9-.3-.2-.5-.4-.7-.6s-.3-.6-.3-.9 0-.6.2-.9.3-.5.6-.7c3.1-2.3 6.2-4.7 9.1-7.1.3-.2.6-.4.9-.4s.7 0 1 .1c96.2 43.9 200.4 43.9 295.5 0 .3-.1.7-.2 1-.2s.7.2.9.4c2.9 2.4 6 4.9 9.1 7.2.2.2.4.4.6.7s.2.6.2.9-.1.6-.3.9-.4.5-.6.6c-14.7 8.6-30 15.9-45.9 21.8-.2.1-.5.2-.7.4s-.3.4-.4.7-.1.5-.1.8.1.5.2.8c8.8 17 18.8 33.3 30 48.8.2.3.6.6.9.7s.8.1 1.1 0c52.9-16.2 102.6-41.3 147.1-74.2.2-.2.4-.4.5-.6s.2-.5.2-.8c12.3-126.8-20.5-236.9-86.9-334.5zm-302 267.7c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.4 59.2-52.8 59.2m195.4 0c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.2 59.2-52.8 59.2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.instant.progress", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "navigation.top", "navigation.sections", "navigation.expand", "navigation.footer", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.action.edit", "content.action.view", "toc.follow", "search.suggest", "search.highlight", "search.share"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": "0.2.17"}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../assets/_markdown_exec_pyodide.js"></script>
+      
+    
+  </body>
+</html>
