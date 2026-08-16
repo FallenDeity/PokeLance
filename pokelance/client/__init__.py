@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import typing as t
 
+from pokelance.client._base import _ClientBase
 from pokelance.client.async_client import PokeLanceAsyncClient
 from pokelance.client.sync_client import PokeLanceSyncClient
-
-__version__ = "0.2.17"
-__author__ = "FallenDeity"
 
 __all__: t.Tuple[str, ...] = (
     "PokeLanceAsyncClient",
     "PokeLanceSyncClient",
+    "_ClientBase",
 )

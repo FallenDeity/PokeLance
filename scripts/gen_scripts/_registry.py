@@ -9,7 +9,7 @@ from __future__ import annotations
 import typing as t
 from dataclasses import dataclass
 
-from pokelance import models
+import pokelance.models as models
 from pokelance.http.endpoints import Endpoint, Route
 
 

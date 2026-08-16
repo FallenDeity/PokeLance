@@ -6,76 +6,55 @@ from __future__ import annotations
 import typing as t
 import attrs
 from pokelance import models
-from pokelance.cache._base import Base
-from pokelance.cache.sync.base import SyncBaseCache
+from pokelance.cache.sync.base import SyncBaseCache, SyncCacheGroup
 from pokelance.http.endpoints import Route
 if t.TYPE_CHECKING:
     from pokelance.client.sync_client import PokeLanceSyncClient
-__all__ = ('SyncCacheManager', 'Base')
+__all__ = ('SyncCacheManager', 'SyncCacheGroup')
 
 
 
 @attrs.define(slots=True, kw_only=True)
-class Berry(Base['PokeLanceSyncClient']):
+class Berry(SyncCacheGroup):
     """Cache aggregate for berry endpoints."""
     max_size: int = 100
     berry: SyncBaseCache[Route, models.Berry] = attrs.field(factory=lambda: SyncBaseCache(model=models.Berry, name='berry'))
     berry_firmness: SyncBaseCache[Route, models.BerryFirmness] = attrs.field(factory=lambda: SyncBaseCache(model=models.BerryFirmness, name='berry_firmness'))
     berry_flavor: SyncBaseCache[Route, models.BerryFlavor] = attrs.field(factory=lambda: SyncBaseCache(model=models.BerryFlavor, name='berry_flavor'))
 
-    def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        for cache in self._walk_caches():
-            cache.wait_until_ready()
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Contest(Base['PokeLanceSyncClient']):
+class Contest(SyncCacheGroup):
     """Cache aggregate for contest endpoints."""
     max_size: int = 100
     contest_type: SyncBaseCache[Route, models.ContestType] = attrs.field(factory=lambda: SyncBaseCache(model=models.ContestType, name='contest_type'))
     contest_effect: SyncBaseCache[Route, models.ContestEffect] = attrs.field(factory=lambda: SyncBaseCache(model=models.ContestEffect, name='contest_effect', endpoint_key_is_id=True))
     super_contest_effect: SyncBaseCache[Route, models.SuperContestEffect] = attrs.field(factory=lambda: SyncBaseCache(model=models.SuperContestEffect, name='super_contest_effect', endpoint_key_is_id=True))
 
-    def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        for cache in self._walk_caches():
-            cache.wait_until_ready()
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Encounter(Base['PokeLanceSyncClient']):
+class Encounter(SyncCacheGroup):
     """Cache aggregate for encounter endpoints."""
     max_size: int = 100
     encounter_method: SyncBaseCache[Route, models.EncounterMethod] = attrs.field(factory=lambda: SyncBaseCache(model=models.EncounterMethod, name='encounter_method'))
     encounter_condition: SyncBaseCache[Route, models.EncounterCondition] = attrs.field(factory=lambda: SyncBaseCache(model=models.EncounterCondition, name='encounter_condition'))
     encounter_condition_value: SyncBaseCache[Route, models.EncounterConditionValue] = attrs.field(factory=lambda: SyncBaseCache(model=models.EncounterConditionValue, name='encounter_condition_value'))
 
-    def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        for cache in self._walk_caches():
-            cache.wait_until_ready()
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Evolution(Base['PokeLanceSyncClient']):
+class Evolution(SyncCacheGroup):
     """Cache aggregate for evolution endpoints."""
     max_size: int = 100
     evolution_chain: SyncBaseCache[Route, models.EvolutionChain] = attrs.field(factory=lambda: SyncBaseCache(model=models.EvolutionChain, name='evolution_chain', endpoint_key_is_id=True))
     evolution_trigger: SyncBaseCache[Route, models.EvolutionTrigger] = attrs.field(factory=lambda: SyncBaseCache(model=models.EvolutionTrigger, name='evolution_trigger'))
 
-    def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        for cache in self._walk_caches():
-            cache.wait_until_ready()
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Game(Base['PokeLanceSyncClient']):
+class Game(SyncCacheGroup):
     """Cache aggregate for game endpoints."""
     max_size: int = 100
     generation: SyncBaseCache[Route, models.Generation] = attrs.field(factory=lambda: SyncBaseCache(model=models.Generation, name='generation'))
@@ -83,15 +62,10 @@ class Game(Base['PokeLanceSyncClient']):
     version: SyncBaseCache[Route, models.Version] = attrs.field(factory=lambda: SyncBaseCache(model=models.Version, name='version'))
     version_group: SyncBaseCache[Route, models.VersionGroup] = attrs.field(factory=lambda: SyncBaseCache(model=models.VersionGroup, name='version_group'))
 
-    def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        for cache in self._walk_caches():
-            cache.wait_until_ready()
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Item(Base['PokeLanceSyncClient']):
+class Item(SyncCacheGroup):
     """Cache aggregate for item endpoints."""
     max_size: int = 100
     item: SyncBaseCache[Route, models.Item] = attrs.field(factory=lambda: SyncBaseCache(model=models.Item, name='item'))
@@ -100,15 +74,10 @@ class Item(Base['PokeLanceSyncClient']):
     item_fling_effect: SyncBaseCache[Route, models.ItemFlingEffect] = attrs.field(factory=lambda: SyncBaseCache(model=models.ItemFlingEffect, name='item_fling_effect'))
     item_pocket: SyncBaseCache[Route, models.ItemPocket] = attrs.field(factory=lambda: SyncBaseCache(model=models.ItemPocket, name='item_pocket'))
 
-    def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        for cache in self._walk_caches():
-            cache.wait_until_ready()
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Location(Base['PokeLanceSyncClient']):
+class Location(SyncCacheGroup):
     """Cache aggregate for location endpoints."""
     max_size: int = 100
     location: SyncBaseCache[Route, models.Location] = attrs.field(factory=lambda: SyncBaseCache(model=models.Location, name='location'))
@@ -116,28 +85,18 @@ class Location(Base['PokeLanceSyncClient']):
     pal_park_area: SyncBaseCache[Route, models.PalParkArea] = attrs.field(factory=lambda: SyncBaseCache(model=models.PalParkArea, name='pal_park_area'))
     region: SyncBaseCache[Route, models.Region] = attrs.field(factory=lambda: SyncBaseCache(model=models.Region, name='region'))
 
-    def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        for cache in self._walk_caches():
-            cache.wait_until_ready()
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Machine(Base['PokeLanceSyncClient']):
+class Machine(SyncCacheGroup):
     """Cache aggregate for machine endpoints."""
     max_size: int = 100
     machine: SyncBaseCache[Route, models.Machine] = attrs.field(factory=lambda: SyncBaseCache(model=models.Machine, name='machine', endpoint_key_is_id=True))
 
-    def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        for cache in self._walk_caches():
-            cache.wait_until_ready()
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Move(Base['PokeLanceSyncClient']):
+class Move(SyncCacheGroup):
     """Cache aggregate for move endpoints."""
     max_size: int = 100
     move: SyncBaseCache[Route, models.Move] = attrs.field(factory=lambda: SyncBaseCache(model=models.Move, name='move'))
@@ -148,15 +107,10 @@ class Move(Base['PokeLanceSyncClient']):
     move_learn_method: SyncBaseCache[Route, models.MoveLearnMethod] = attrs.field(factory=lambda: SyncBaseCache(model=models.MoveLearnMethod, name='move_learn_method'))
     move_target: SyncBaseCache[Route, models.MoveTarget] = attrs.field(factory=lambda: SyncBaseCache(model=models.MoveTarget, name='move_target'))
 
-    def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        for cache in self._walk_caches():
-            cache.wait_until_ready()
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Pokemon(Base['PokeLanceSyncClient']):
+class Pokemon(SyncCacheGroup):
     """Cache aggregate for pokemon endpoints."""
     max_size: int = 100
     ability: SyncBaseCache[Route, models.Ability] = attrs.field(factory=lambda: SyncBaseCache(model=models.Ability, name='ability'))
@@ -176,24 +130,14 @@ class Pokemon(Base['PokeLanceSyncClient']):
     type: SyncBaseCache[Route, models.Type] = attrs.field(factory=lambda: SyncBaseCache(model=models.Type, name='type'))
     location_area_encounter: SyncBaseCache[Route, t.Sequence[models.LocationAreaEncounter]] = attrs.field(factory=lambda: SyncBaseCache(model=models.LocationAreaEncounter, name='location_area_encounter', url_suffix='/encounters', is_list=True))
 
-    def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        for cache in self._walk_caches():
-            cache.wait_until_ready()
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Utility(Base['PokeLanceSyncClient']):
+class Utility(SyncCacheGroup):
     """Cache aggregate for utility endpoints."""
     max_size: int = 100
     language: SyncBaseCache[Route, models.Language] = attrs.field(factory=lambda: SyncBaseCache(model=models.Language, name='language', endpoint_key_is_id=True))
     api_metadata: SyncBaseCache[Route, models.APIMetadata] = attrs.field(factory=lambda: SyncBaseCache(model=models.APIMetadata, name='api_metadata', endpoint_key_is_id=True))
-
-    def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        for cache in self._walk_caches():
-            cache.wait_until_ready()
 
 
 
@@ -213,14 +157,12 @@ class SyncCacheManager:
     move: Move = attrs.field(factory=Move)
     pokemon: Pokemon = attrs.field(factory=Pokemon)
     utility: Utility = attrs.field(factory=Utility)
-    if t.TYPE_CHECKING:
-        __attrs_attrs__: t.Tuple[attrs.Attribute[t.Any], ...]
 
-    def _walk_aggregates(self) -> t.Iterator[Base['PokeLanceSyncClient']]:
+    def _walk_aggregates(self) -> t.Iterator[SyncCacheGroup]:
         """Yield all child cache aggregates."""
-        for obj in self.__attrs_attrs__:
-            val = getattr(self, obj.name)
-            if isinstance(val, Base):
+        for field in attrs.fields(self.__class__):
+            val = getattr(self, field.name)
+            if isinstance(val, SyncCacheGroup):
                 yield val
 
     def __attrs_post_init__(self) -> None:

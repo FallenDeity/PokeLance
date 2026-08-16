@@ -7,18 +7,23 @@ import attrs
 from pokelance.http.endpoints import Route
 
 if t.TYPE_CHECKING:
+    from pokelance.cache._async import AsyncBaseCache
+    from pokelance.cache.sync import SyncBaseCache
     from pokelance.client._base import _ClientBase
     from pokelance.models import BaseModel
 
+    AnyCache = t.Union[AsyncBaseCache[Route, t.Any], SyncBaseCache[Route, t.Any]]
+
 __all__: t.Tuple[str, ...] = (
     "CacheEndpoint",
-    "CacheStateMixin",
-    "Base",
+    "BaseCacheState",
+    "BaseCacheGroup",
 )
 
 _KT = t.TypeVar("_KT", bound="Route")
 _VT = t.TypeVar("_VT", bound="t.Union[BaseModel, t.Sequence[BaseModel]]")
 _ClientT = t.TypeVar("_ClientT", bound="_ClientBase")
+_CacheT = t.TypeVar("_CacheT", bound="AnyCache")
 _T = t.TypeVar("_T")
 
 
@@ -41,7 +46,7 @@ class CacheEndpoint:
         return str(self.id)
 
 
-class CacheStateMixin(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
+class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
     """All in-memory operations. No I/O. No async. No events.
 
     Fully testable without an event loop or HTTP session.
@@ -166,7 +171,7 @@ class CacheStateMixin(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT])
         """Serialise the in-memory cache to a plain dict."""
         dummy: t.Dict[str, t.Any] = {}
         for k, v in self.items():
-            dummy[k.endpoint] = [i.raw for i in v] if self._is_list else v.raw  # type: ignore
+            dummy[k.endpoint] = [i.raw for i in v] if self._is_list and isinstance(v, list) else v.raw  # type: ignore
         return dummy
 
     def deserialize(self, data: t.Dict[str, t.Any]) -> None:
@@ -193,38 +198,35 @@ class CacheStateMixin(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT])
 
 
 @attrs.define(slots=True, kw_only=True)
-class Base(t.Generic[_ClientT]):
-    """Base class for all cache aggregates."""
+class BaseCacheGroup(t.Generic[_ClientT, _CacheT]):
+    """Base class for all cache groups / aggregates."""
 
     max_size: int
 
-    if t.TYPE_CHECKING:
-        __attrs_attrs__: t.Tuple[attrs.Attribute[t.Any], ...]
-
-    def _walk_caches(self) -> t.Iterator[CacheStateMixin[t.Any, t.Any, _ClientT]]:
-        """Yield all sub-caches belonging to this cache aggregate."""
-        for obj in self.__attrs_attrs__:
-            val = getattr(self, obj.name)
-            if isinstance(val, CacheStateMixin):
-                yield val
+    def _walk_caches(self) -> t.Iterator[_CacheT]:
+        """Yield all sub-caches belonging to this cache group."""
+        for field in attrs.fields(self.__class__):
+            val = getattr(self, field.name)
+            if isinstance(val, BaseCacheState):
+                yield t.cast(_CacheT, val)
 
     def set_client(self, client: _ClientT) -> None:
-        """Set the client for all sub-caches in this aggregate."""
+        """Set the client for all sub-caches in this group."""
         for cache in self._walk_caches():
             cache._client = client
 
     def set_size(self, max_size: int = 100) -> None:
-        """Set the maximum cache size for this aggregate and its sub-caches."""
+        """Set the maximum cache size for this group and its sub-caches."""
         self.max_size = max_size
         for cache in self._walk_caches():
             cache.set_size(max_size)
 
     def clear(self) -> None:
-        """Clear all data in this cache aggregate."""
+        """Clear all data in this cache group."""
         for cache in self._walk_caches():
             cache.clear()
 
     def reset(self) -> None:
-        """Reset all endpoint registries in this cache aggregate."""
+        """Reset all endpoint registries in this cache group."""
         for cache in self._walk_caches():
             cache.reset_endpoints()

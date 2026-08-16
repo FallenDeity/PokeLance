@@ -7,8 +7,9 @@ import pathlib
 import typing as t
 
 import aiofiles
+import attrs
 
-from pokelance.cache._base import Base, CacheEndpoint, CacheStateMixin
+from pokelance.cache._base import BaseCacheGroup, BaseCacheState, CacheEndpoint
 from pokelance.http.endpoints import Route
 
 if t.TYPE_CHECKING:
@@ -17,9 +18,9 @@ if t.TYPE_CHECKING:
 
 __all__: t.Tuple[str, ...] = (
     "CacheEndpoint",
-    "CacheStateMixin",
-    "Base",
-    "AsyncIOMixin",
+    "BaseCacheState",
+    "BaseCacheGroup",
+    "AsyncCacheGroup",
     "AsyncBaseCache",
 )
 
@@ -29,8 +30,42 @@ _KT = t.TypeVar("_KT", bound="Route")
 _VT = t.TypeVar("_VT", bound="t.Union[BaseModel, t.Sequence[BaseModel]]")
 
 
-class AsyncIOMixin(CacheStateMixin[_KT, _VT, "PokeLanceAsyncClient"], t.Generic[_KT, _VT]):
-    """Async file I/O (aiofiles) and async HTTP bulk loading."""
+class AsyncBaseCache(BaseCacheState[_KT, _VT, "PokeLanceAsyncClient"], t.Generic[_KT, _VT]):
+    """Async cache: asyncio.Event readiness, aiofiles I/O, and async HTTP bulk loading."""
+
+    _ready: asyncio.Event
+
+    def __init__(
+        self,
+        max_size: int = 100,
+        model: t.Optional[t.Type[BaseModel]] = None,
+        name: str = "",
+        endpoint_key_is_id: bool = False,
+        url_suffix: str = "",
+        is_list: bool = False,
+    ) -> None:
+        super().__init__(
+            max_size=max_size,
+            model=model,
+            name=name,
+            endpoint_key_is_id=endpoint_key_is_id,
+            url_suffix=url_suffix,
+            is_list=is_list,
+        )
+        self._ready = asyncio.Event()
+
+    @property
+    def is_ready(self) -> bool:
+        """Whether the cache is ready."""
+        return self._ready.is_set()
+
+    async def wait_until_ready(self) -> None:
+        """Wait until the cache is ready."""
+        await self._ready.wait()
+
+    def set_ready(self) -> None:
+        """Set the cache as ready."""
+        self._ready.set()
 
     async def save(self, path: str = ".") -> None:
         """Save the cache to a JSON file asynchronously."""
@@ -96,37 +131,11 @@ class AsyncIOMixin(CacheStateMixin[_KT, _VT, "PokeLanceAsyncClient"], t.Generic[
             logger.error(f"Failed to load {route}: {e}")
 
 
-class AsyncBaseCache(AsyncIOMixin[_KT, _VT], t.Generic[_KT, _VT]):
-    """Async cache: asyncio.Event readiness, aiofiles I/O."""
-
-    def __init__(
-        self,
-        max_size: int = 100,
-        model: t.Optional[t.Type[BaseModel]] = None,
-        name: str = "",
-        endpoint_key_is_id: bool = False,
-        url_suffix: str = "",
-        is_list: bool = False,
-    ) -> None:
-        super().__init__(
-            max_size=max_size,
-            model=model,
-            name=name,
-            endpoint_key_is_id=endpoint_key_is_id,
-            url_suffix=url_suffix,
-            is_list=is_list,
-        )
-        self._endpoints_ready: asyncio.Event = asyncio.Event()
-
-    def _mark_endpoints_cached(self) -> None:
-        super()._mark_endpoints_cached()
-        self._endpoints_ready.set()
-
-    def reset_endpoints(self) -> None:
-        super().reset_endpoints()
-        self._endpoints_ready.clear()
+@attrs.define(slots=True, kw_only=True)
+class AsyncCacheGroup(BaseCacheGroup["PokeLanceAsyncClient", AsyncBaseCache[Route, t.Any]]):
+    """Base class for async cache groups."""
 
     async def wait_until_ready(self) -> None:
-        """Wait until all endpoints are cached."""
-        if self._client.cache_endpoints:
-            await self._endpoints_ready.wait()
+        """Wait for all sub-caches in this group to be ready."""
+        tasks = [cache.wait_until_ready() for cache in self._walk_caches()]
+        await asyncio.gather(*tasks)

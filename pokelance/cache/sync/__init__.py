@@ -1,12 +1,14 @@
-from __future__ import annotations
-
 import typing as t
 
-from pokelance.cache.sync.base import SyncBaseCache, SyncIOMixin
+from pokelance.cache._base import BaseCacheGroup, BaseCacheState, CacheEndpoint
+from pokelance.cache.sync.base import SyncBaseCache, SyncCacheGroup
 from pokelance.cache.sync.manager import SyncCacheManager
 
 __all__: t.Tuple[str, ...] = (
-    "SyncIOMixin",
+    "CacheEndpoint",
+    "BaseCacheState",
+    "BaseCacheGroup",
+    "SyncCacheGroup",
     "SyncBaseCache",
     "SyncCacheManager",
 )

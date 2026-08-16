@@ -22,7 +22,7 @@ import sys
 from pathlib import Path
 
 # Import the single source of truth
-from _registry import EXTENSIONS
+from _registry import EXTENSIONS, CategorySpec, ExtensionSpec
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -40,33 +40,516 @@ SYNC_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # ---------------------------------------------------------------------------
+# AST Generation for Extensions
+# ---------------------------------------------------------------------------
+
+def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path) -> str:
+    """Generate a complete extension module using Python AST."""
+    client_type = "PokeLanceAsyncClient" if is_async else "PokeLanceSyncClient"
+    client_mod = "pokelance.client.async_client" if is_async else "pokelance.client.sync_client"
+    http_client_type = "AsyncHttpClient" if is_async else "SyncHttpClient"
+    http_client_mod = "pokelance.http._async" if is_async else "pokelance.http._sync"
+    cache_manager_mod = "pokelance.cache._async.manager" if is_async else "pokelance.cache.sync.manager"
+
+    model_names = sorted({cat.model.__name__ for cat in spec.categories})
+
+    # Module imports: from __future__ import annotations, typing, models, exceptions, etc.
+    body: list[ast.stmt] = [
+        # from __future__ import annotations
+        ast.ImportFrom(module="__future__", names=[ast.alias(name="annotations")], level=0),
+        # import typing as t
+        ast.Import(names=[ast.alias(name="typing", asname="t")]),
+        # from pokelance.models import <Models...>
+        ast.ImportFrom(
+            module="pokelance.models",
+            names=[ast.alias(name=m) for m in model_names],
+            level=0,
+        ),
+        # from pokelance.exceptions import ResourceNotFound
+        ast.ImportFrom(
+            module="pokelance.exceptions",
+            names=[ast.alias(name="ResourceNotFound")],
+            level=0,
+        ),
+        # from pokelance.ext._base import BaseExtension
+        ast.ImportFrom(
+            module="pokelance.ext._base",
+            names=[ast.alias(name="BaseExtension")],
+            level=0,
+        ),
+        # from pokelance.http.endpoints import Endpoint, Route
+        ast.ImportFrom(
+            module="pokelance.http.endpoints",
+            names=[ast.alias(name="Endpoint"), ast.alias(name="Route")],
+            level=0,
+        ),
+        # if t.TYPE_CHECKING: import cache aggregate, client, and http client
+        ast.If(
+            test=ast.Attribute(value=ast.Name(id="t", ctx=ast.Load()), attr="TYPE_CHECKING", ctx=ast.Load()),
+            body=[
+                ast.ImportFrom(
+                    module=cache_manager_mod,
+                    names=[ast.alias(name=spec.name, asname=f"{spec.name}Cache")],
+                    level=0,
+                ),
+                ast.ImportFrom(
+                    module=client_mod,
+                    names=[ast.alias(name=client_type)],
+                    level=0,
+                ),
+                ast.ImportFrom(
+                    module=http_client_mod,
+                    names=[ast.alias(name=http_client_type)],
+                    level=0,
+                ),
+            ],
+            orelse=[],
+        ),
+        # __all__ = ("setup", spec.name)
+        ast.Assign(
+            targets=[ast.Name(id="__all__", ctx=ast.Store())],
+            value=ast.Tuple(
+                elts=[ast.Constant(value="setup"), ast.Constant(value=spec.name)],
+                ctx=ast.Load(),
+            ),
+        ),
+    ]
+
+    # Extension class docstring and cache attribute annotation
+    class_body: list[ast.stmt] = [
+        # """Docstring"""
+        ast.Expr(value=ast.Constant(value=spec.doc)),
+        # cache: <SpecName>Cache
+        ast.AnnAssign(
+            target=ast.Name(id="cache", ctx=ast.Store()),
+            annotation=ast.Constant(value=f"{spec.name}Cache"),
+            simple=1,
+        ),
+    ]
+
+    # setup() method: pre-loads endpoint metadata into cache
+    setup_stmts: list[ast.stmt] = []
+    for cat in spec.categories:
+        if cat.endpoint_list is not None:
+            # Endpoint.get_<category>_endpoints()
+            list_call = ast.Call(
+                func=ast.Attribute(
+                    value=ast.Name(id="Endpoint", ctx=ast.Load()),
+                    attr=cat.endpoint_list.__name__,
+                    ctx=ast.Load(),
+                ),
+                args=[],
+                keywords=[],
+            )
+            # (await) self._client.request(Endpoint.get_<category>_endpoints())
+            req_call = ast.Call(
+                func=ast.Attribute(
+                    value=ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="_client", ctx=ast.Load()),
+                    attr="request",
+                    ctx=ast.Load(),
+                ),
+                args=[list_call],
+                keywords=[],
+            )
+            data_val = ast.Await(value=req_call) if is_async else req_call
+            # data = (await) self._client.request(...)
+            setup_stmts.append(
+                ast.Assign(
+                    targets=[ast.Name(id="data", ctx=ast.Store())],
+                    value=data_val,
+                )
+            )
+            # self._cache.load_documents(spec.name, cat.name, data["results"])
+            setup_stmts.append(
+                ast.Expr(
+                    value=ast.Call(
+                        func=ast.Attribute(
+                            value=ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="_cache", ctx=ast.Load()),
+                            attr="load_documents",
+                            ctx=ast.Load(),
+                        ),
+                        args=[
+                            ast.Constant(value=spec.name),
+                            ast.Constant(value=cat.name),
+                            ast.Subscript(
+                                value=ast.Name(id="data", ctx=ast.Load()),
+                                slice=ast.Constant(value="results"),
+                                ctx=ast.Load(),
+                            ),
+                        ],
+                        keywords=[],
+                    )
+                )
+            )
+
+    if not setup_stmts:
+        setup_stmts.append(ast.Pass())
+
+    # Attach setup() to class
+    if is_async:
+        class_body.append(
+            ast.AsyncFunctionDef(
+                name="setup",
+                args=ast.arguments(posonlyargs=[], args=[ast.arg(arg="self")], kwonlyargs=[], kw_defaults=[], defaults=[]),
+                returns=ast.Constant(value=None),
+                body=setup_stmts,
+                decorator_list=[],
+            )
+        )
+    else:
+        class_body.append(
+            ast.FunctionDef(
+                name="setup",
+                args=ast.arguments(posonlyargs=[], args=[ast.arg(arg="self")], kwonlyargs=[], kw_defaults=[], defaults=[]),
+                returns=ast.Constant(value=None),
+                body=setup_stmts,
+                decorator_list=[],
+            )
+        )
+
+    # Per-category get_* and fetch_* methods
+    for cat in spec.categories:
+        model_name = cat.model.__name__
+
+        # Return type: t.Optional[models.Model] or t.Optional[t.List[models.Model]]
+        ret_type_annot = (
+            ast.Subscript(
+                value=ast.Attribute(value=ast.Name(id="t", ctx=ast.Load()), attr="Optional", ctx=ast.Load()),
+                slice=(
+                    ast.Subscript(
+                        value=ast.Attribute(value=ast.Name(id="t", ctx=ast.Load()), attr="List", ctx=ast.Load()),
+                        slice=ast.Name(id=model_name, ctx=ast.Load()),
+                        ctx=ast.Load(),
+                    )
+                    if cat.is_list
+                    else ast.Name(id=model_name, ctx=ast.Load())
+                ),
+                ctx=ast.Load(),
+            )
+        )
+
+        # Parameter type: t.Union[str, int]
+        name_param_type = ast.Subscript(
+            value=ast.Attribute(value=ast.Name(id="t", ctx=ast.Load()), attr="Union", ctx=ast.Load()),
+            slice=ast.Tuple(
+                elts=[ast.Name(id="str", ctx=ast.Load()), ast.Name(id="int", ctx=ast.Load())],
+                ctx=ast.Load(),
+            ),
+            ctx=ast.Load(),
+        )
+
+        # Method body for get_<category>()
+        get_body: list[ast.stmt] = [
+            # Docstring
+            ast.Expr(
+                value=ast.Constant(
+                    value=f"Gets a {cat.name.replace('_', ' ')} from the cache.\n\nParameters\n----------\nname: t.Union[str, int]\n    The name or id.\n\nReturns\n-------\nt.Optional[{model_name}]\n    The cached model or None."
+                )
+            ),
+            # route = Endpoint.get_<category>(name)
+            ast.Assign(
+                targets=[ast.Name(id="route", ctx=ast.Store())],
+                value=ast.Call(
+                    func=ast.Attribute(
+                        value=ast.Name(id="Endpoint", ctx=ast.Load()),
+                        attr=cat.endpoint.__name__,
+                        ctx=ast.Load(),
+                    ),
+                    args=[ast.Name(id="name", ctx=ast.Load())],
+                    keywords=[],
+                ),
+            ),
+            # self._validate_resource(self.cache.<attr>, name, route)
+            ast.Expr(
+                value=ast.Call(
+                    func=ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="_validate_resource", ctx=ast.Load()),
+                    args=[
+                        ast.Attribute(
+                            value=ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="cache", ctx=ast.Load()),
+                            attr=cat.cache_attr,
+                            ctx=ast.Load(),
+                        ),
+                        ast.Name(id="name", ctx=ast.Load()),
+                        ast.Name(id="route", ctx=ast.Load()),
+                    ],
+                    keywords=[],
+                )
+            ),
+            # return self.cache.<attr>.get(route, None)
+            ast.Return(
+                value=ast.Call(
+                    func=ast.Attribute(
+                        value=ast.Attribute(
+                            value=ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="cache", ctx=ast.Load()),
+                            attr=cat.cache_attr,
+                            ctx=ast.Load(),
+                        ),
+                        attr="get",
+                        ctx=ast.Load(),
+                    ),
+                    args=[ast.Name(id="route", ctx=ast.Load()), ast.Constant(value=None)],
+                    keywords=[],
+                )
+            ),
+        ]
+
+        class_body.append(
+            ast.FunctionDef(
+                name=f"get_{cat.name}",
+                args=ast.arguments(
+                    posonlyargs=[],
+                    args=[ast.arg(arg="self"), ast.arg(arg="name", annotation=name_param_type)],
+                    kwonlyargs=[],
+                    kw_defaults=[],
+                    defaults=[],
+                ),
+                returns=ret_type_annot,
+                body=get_body,
+                decorator_list=[],
+            )
+        )
+
+        # Method body for fetch_<category>()
+        fetch_ret_type_annot = (
+            ast.Subscript(
+                value=ast.Attribute(value=ast.Name(id="t", ctx=ast.Load()), attr="List", ctx=ast.Load()),
+                slice=ast.Name(id=model_name, ctx=ast.Load()),
+                ctx=ast.Load(),
+            )
+            if cat.is_list
+            else ast.Name(id=model_name, ctx=ast.Load())
+        )
+
+        # (await) self._client.request(route)
+        req_call = ast.Call(
+            func=ast.Attribute(
+                value=ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="_client", ctx=ast.Load()),
+                attr="request",
+                ctx=ast.Load(),
+            ),
+            args=[ast.Name(id="route", ctx=ast.Load())],
+            keywords=[],
+        )
+        fetch_data_expr = ast.Await(value=req_call) if is_async else req_call
+
+        # self.cache.<attr>.from_payload(data)
+        from_payload_call = ast.Call(
+            func=ast.Attribute(
+                value=ast.Attribute(
+                    value=ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="cache", ctx=ast.Load()),
+                    attr=cat.cache_attr,
+                    ctx=ast.Load(),
+                ),
+                attr="from_payload",
+                ctx=ast.Load(),
+            ),
+            args=[ast.Name(id="data", ctx=ast.Load())],
+            keywords=[],
+        )
+
+        # self.cache.<attr>.setdefault(route, self.cache.<attr>.from_payload(data))
+        setdefault_call = ast.Call(
+            func=ast.Attribute(
+                value=ast.Attribute(
+                    value=ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="cache", ctx=ast.Load()),
+                    attr=cat.cache_attr,
+                    ctx=ast.Load(),
+                ),
+                attr="setdefault",
+                ctx=ast.Load(),
+            ),
+            args=[ast.Name(id="route", ctx=ast.Load()), from_payload_call],
+            keywords=[],
+        )
+
+        fetch_body: list[ast.stmt] = [
+            # Docstring
+            ast.Expr(
+                value=ast.Constant(
+                    value=f"Fetches a {cat.name.replace('_', ' ')} from the API.\n\nParameters\n----------\nname: t.Union[str, int]\n    The name or id.\n\nReturns\n-------\n{model_name}\n    The fetched model."
+                )
+            ),
+            # route = Endpoint.get_<category>(name)
+            ast.Assign(
+                targets=[ast.Name(id="route", ctx=ast.Store())],
+                value=ast.Call(
+                    func=ast.Attribute(
+                        value=ast.Name(id="Endpoint", ctx=ast.Load()),
+                        attr=cat.endpoint.__name__,
+                        ctx=ast.Load(),
+                    ),
+                    args=[ast.Name(id="name", ctx=ast.Load())],
+                    keywords=[],
+                ),
+            ),
+            # self._validate_resource(self.cache.<attr>, name, route)
+            ast.Expr(
+                value=ast.Call(
+                    func=ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="_validate_resource", ctx=ast.Load()),
+                    args=[
+                        ast.Attribute(
+                            value=ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="cache", ctx=ast.Load()),
+                            attr=cat.cache_attr,
+                            ctx=ast.Load(),
+                        ),
+                        ast.Name(id="name", ctx=ast.Load()),
+                        ast.Name(id="route", ctx=ast.Load()),
+                    ],
+                    keywords=[],
+                )
+            ),
+            # data = (await) self._client.request(route)
+            ast.Assign(
+                targets=[ast.Name(id="data", ctx=ast.Store())],
+                value=fetch_data_expr,
+            ),
+            # return self.cache.<attr>.setdefault(route, self.cache.<attr>.from_payload(data))
+            ast.Return(value=setdefault_call),
+        ]
+
+        if is_async:
+            class_body.append(
+                ast.AsyncFunctionDef(
+                    name=f"fetch_{cat.name}",
+                    args=ast.arguments(
+                        posonlyargs=[],
+                        args=[ast.arg(arg="self"), ast.arg(arg="name", annotation=name_param_type)],
+                        kwonlyargs=[],
+                        kw_defaults=[],
+                        defaults=[],
+                    ),
+                    returns=fetch_ret_type_annot,
+                    body=fetch_body,
+                    decorator_list=[],
+                )
+            )
+        else:
+            class_body.append(
+                ast.FunctionDef(
+                    name=f"fetch_{cat.name}",
+                    args=ast.arguments(
+                        posonlyargs=[],
+                        args=[ast.arg(arg="self"), ast.arg(arg="name", annotation=name_param_type)],
+                        kwonlyargs=[],
+                        kw_defaults=[],
+                        defaults=[],
+                    ),
+                    returns=fetch_ret_type_annot,
+                    body=fetch_body,
+                    decorator_list=[],
+                )
+            )
+
+    # Class definition: class <SpecName>(BaseExtension[AsyncHttpClient | SyncHttpClient]):
+    body.append(
+        ast.ClassDef(
+            name=spec.name,
+            bases=[
+                ast.Subscript(
+                    value=ast.Name(id="BaseExtension", ctx=ast.Load()),
+                    slice=ast.Constant(value=http_client_type),
+                    ctx=ast.Load(),
+                )
+            ],
+            keywords=[],
+            body=class_body,
+            decorator_list=[],
+        )
+    )
+
+    # Module-level setup(lance) function: lance.add_extension(spec.module_name, <SpecName>(lance.http))
+    module_setup_fn = ast.FunctionDef(
+        name="setup",
+        args=ast.arguments(
+            posonlyargs=[],
+            args=[ast.arg(arg="lance", annotation=ast.Constant(value=client_type))],
+            kwonlyargs=[],
+            kw_defaults=[],
+            defaults=[],
+        ),
+        returns=ast.Constant(value=None),
+        body=[
+            ast.Expr(value=ast.Constant(value=f"Sets up the {spec.module_name} extension.")),
+            ast.Expr(
+                value=ast.Call(
+                    func=ast.Attribute(value=ast.Name(id="lance", ctx=ast.Load()), attr="add_extension", ctx=ast.Load()),
+                    args=[
+                        ast.Constant(value=spec.module_name),
+                        ast.Call(
+                            func=ast.Name(id=spec.name, ctx=ast.Load()),
+                            args=[
+                                ast.Attribute(
+                                    value=ast.Name(id="lance", ctx=ast.Load()),
+                                    attr="http",
+                                    ctx=ast.Load(),
+                                )
+                            ],
+                            keywords=[],
+                        ),
+                    ],
+                    keywords=[],
+                )
+            ),
+        ],
+        decorator_list=[],
+    )
+    body.append(module_setup_fn)
+
+    # Fix AST locations and unparse into Python source code
+    module = ast.Module(body=body, type_ignores=[])
+    ast.fix_missing_locations(module)
+    unparsed = ast.unparse(module)
+
+    # Header and clean spacing formatting
+    header = (
+        "# AUTO-GENERATED by scripts/gen_scripts/generate_all.py\n"
+        "# DO NOT EDIT MANUALLY\n"
+        "# Edit scripts/gen_scripts/_registry.py instead.\n\n"
+    )
+    formatted = header + unparsed.replace("\nclass ", "\n\n\nclass ").replace("\ndef setup(lance", "\n\n\ndef setup(lance") + "\n"
+    output_path.write_text(formatted, encoding="utf-8")
+    return formatted
+
+
+# ---------------------------------------------------------------------------
 # AST Generation for Cache Managers
 # ---------------------------------------------------------------------------
 
 def generate_cache_manager(is_async: bool, output_path: Path) -> str:
     """Generate the full cache manager file using Python AST and ast.unparse()."""
     base_cache_cls = "AsyncBaseCache" if is_async else "SyncBaseCache"
+    base_agg_cls = "AsyncCacheGroup" if is_async else "SyncCacheGroup"
     manager_name = "AsyncCacheManager" if is_async else "SyncCacheManager"
     client_type = "PokeLanceAsyncClient" if is_async else "PokeLanceSyncClient"
     client_import_mod = "pokelance.client.async_client" if is_async else "pokelance.client.sync_client"
     base_cache_import_mod = "pokelance.cache._async.base" if is_async else "pokelance.cache.sync.base"
 
+    # Module imports
     body: list[ast.stmt] = [
         # from __future__ import annotations
         ast.ImportFrom(module="__future__", names=[ast.alias(name="annotations")], level=0),
     ]
 
     if is_async:
+        # import asyncio
         body.append(ast.Import(names=[ast.alias(name="asyncio")]))
 
     body.extend([
+        # import typing as t
         ast.Import(names=[ast.alias(name="typing", asname="t")]),
+        # import attrs
         ast.Import(names=[ast.alias(name="attrs")]),
+        # from pokelance import models
         ast.ImportFrom(module="pokelance", names=[ast.alias(name="models")], level=0),
-        ast.ImportFrom(module="pokelance.cache._base", names=[ast.alias(name="Base")], level=0),
-        ast.ImportFrom(module=base_cache_import_mod, names=[ast.alias(name=base_cache_cls)], level=0),
+        # from pokelance.cache.<_async/sync>.base import <AsyncBaseCache/SyncBaseCache>, <AsyncBase/SyncBase>
+        ast.ImportFrom(
+            module=base_cache_import_mod,
+            names=[ast.alias(name=base_cache_cls), ast.alias(name=base_agg_cls)],
+            level=0,
+        ),
+        # from pokelance.http.endpoints import Route
         ast.ImportFrom(module="pokelance.http.endpoints", names=[ast.alias(name="Route")], level=0),
-        # if t.TYPE_CHECKING:
+        # if t.TYPE_CHECKING: import client type
         ast.If(
             test=ast.Attribute(value=ast.Name(id="t", ctx=ast.Load()), attr="TYPE_CHECKING", ctx=ast.Load()),
             body=[
@@ -74,16 +557,17 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
             ],
             orelse=[],
         ),
-        # __all__ = (...)
+        # __all__ = (manager_name, base_agg_cls)
         ast.Assign(
             targets=[ast.Name(id="__all__", ctx=ast.Store())],
             value=ast.Tuple(
-                elts=[ast.Constant(value=manager_name), ast.Constant(value="Base")],
+                elts=[ast.Constant(value=manager_name), ast.Constant(value=base_agg_cls)],
                 ctx=ast.Load(),
             ),
         ),
     ])
 
+    # @attrs.define(slots=True, kw_only=True) decorator
     attrs_define = ast.Call(
         func=ast.Attribute(value=ast.Name(id="attrs", ctx=ast.Load()), attr="define", ctx=ast.Load()),
         args=[],
@@ -93,9 +577,10 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
         ],
     )
 
-    # Per-extension classes (Berry, Contest, etc.)
+    # Per-extension classes (Berry, Contest, Encounter, etc.) inheriting from AsyncBase / SyncBase
     for spec in EXTENSIONS:
         class_body: list[ast.stmt] = [
+            # Docstring
             ast.Expr(value=ast.Constant(value=f"Cache aggregate for {spec.name.lower()} endpoints.")),
             # max_size: int = 100
             ast.AnnAssign(
@@ -106,6 +591,7 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
             ),
         ]
 
+        # Field declarations for each endpoint category
         for cat in spec.categories:
             model_name = cat.model.__name__
             # Type annotation: base_cache_cls[Route, models.Model] or base_cache_cls[Route, t.Sequence[models.Model]]
@@ -131,7 +617,7 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
                 ctx=ast.Load(),
             )
 
-            # factory=lambda: base_cache_cls(...)
+            # Keyword arguments for base cache instantiation
             cache_call_keywords = [
                 ast.keyword(
                     arg="model",
@@ -146,6 +632,7 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
             if cat.is_list:
                 cache_call_keywords.append(ast.keyword(arg="is_list", value=ast.Constant(value=True)))
 
+            # factory=lambda: base_cache_cls(model=..., name=...)
             factory_lambda = ast.Lambda(
                 args=ast.arguments(posonlyargs=[], args=[], kwonlyargs=[], kw_defaults=[], defaults=[]),
                 body=ast.Call(
@@ -155,6 +642,7 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
                 ),
             )
 
+            # <cat.cache_attr>: <field_annotation> = attrs.field(factory=lambda: ...)
             class_body.append(
                 ast.AnnAssign(
                     target=ast.Name(id=cat.cache_attr, ctx=ast.Store()),
@@ -168,124 +656,11 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
                 )
             )
 
-        # wait_until_ready method
-        if is_async:
-            wait_fn = ast.AsyncFunctionDef(
-                name="wait_until_ready",
-                args=ast.arguments(
-                    posonlyargs=[],
-                    args=[ast.arg(arg="self")],
-                    kwonlyargs=[],
-                    kw_defaults=[],
-                    defaults=[],
-                ),
-                returns=ast.Constant(value=None),
-                body=[
-                    ast.Expr(value=ast.Constant(value="Wait for all sub-caches in this aggregate to be ready.")),
-                    # tasks = [cache.wait_until_ready() for cache in self._walk_caches()]
-                    ast.Assign(
-                        targets=[ast.Name(id="tasks", ctx=ast.Store())],
-                        value=ast.ListComp(
-                            elt=ast.Call(
-                                func=ast.Attribute(
-                                    value=ast.Name(id="cache", ctx=ast.Load()),
-                                    attr="wait_until_ready",
-                                    ctx=ast.Load(),
-                                ),
-                                args=[],
-                                keywords=[],
-                            ),
-                            generators=[
-                                ast.comprehension(
-                                    target=ast.Name(id="cache", ctx=ast.Store()),
-                                    iter=ast.Call(
-                                        func=ast.Attribute(
-                                            value=ast.Name(id="self", ctx=ast.Load()),
-                                            attr="_walk_caches",
-                                            ctx=ast.Load(),
-                                        ),
-                                        args=[],
-                                        keywords=[],
-                                    ),
-                                    ifs=[],
-                                    is_async=0,
-                                )
-                            ],
-                        ),
-                    ),
-                    # await asyncio.gather(*tasks)
-                    ast.Expr(
-                        value=ast.Await(
-                            value=ast.Call(
-                                func=ast.Attribute(
-                                    value=ast.Name(id="asyncio", ctx=ast.Load()),
-                                    attr="gather",
-                                    ctx=ast.Load(),
-                                ),
-                                args=[ast.Starred(value=ast.Name(id="tasks", ctx=ast.Load()), ctx=ast.Load())],
-                                keywords=[],
-                            )
-                        )
-                    ),
-                ],
-                decorator_list=[],
-            )
-        else:
-            wait_fn = ast.FunctionDef(
-                name="wait_until_ready",
-                args=ast.arguments(
-                    posonlyargs=[],
-                    args=[ast.arg(arg="self")],
-                    kwonlyargs=[],
-                    kw_defaults=[],
-                    defaults=[],
-                ),
-                returns=ast.Constant(value=None),
-                body=[
-                    ast.Expr(value=ast.Constant(value="Wait for all sub-caches in this aggregate to be ready.")),
-                    # for cache in self._walk_caches(): cache.wait_until_ready()
-                    ast.For(
-                        target=ast.Name(id="cache", ctx=ast.Store()),
-                        iter=ast.Call(
-                            func=ast.Attribute(
-                                value=ast.Name(id="self", ctx=ast.Load()),
-                                attr="_walk_caches",
-                                ctx=ast.Load(),
-                            ),
-                            args=[],
-                            keywords=[],
-                        ),
-                        body=[
-                            ast.Expr(
-                                value=ast.Call(
-                                    func=ast.Attribute(
-                                        value=ast.Name(id="cache", ctx=ast.Load()),
-                                        attr="wait_until_ready",
-                                        ctx=ast.Load(),
-                                    ),
-                                    args=[],
-                                    keywords=[],
-                                )
-                            )
-                        ],
-                        orelse=[],
-                    ),
-                ],
-                decorator_list=[],
-            )
-
-        class_body.append(wait_fn)
-
-        base_class_ref = ast.Subscript(
-            value=ast.Name(id="Base", ctx=ast.Load()),
-            slice=ast.Constant(value=client_type),
-            ctx=ast.Load(),
-        )
-
+        # Class definition: class <SpecName>(AsyncBase / SyncBase):
         body.append(
             ast.ClassDef(
                 name=spec.name,
-                bases=[base_class_ref],
+                bases=[ast.Name(id=base_agg_cls, ctx=ast.Load())],
                 keywords=[],
                 body=class_body,
                 decorator_list=[attrs_define],
@@ -294,6 +669,7 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
 
     # Top-level Manager Class
     manager_body: list[ast.stmt] = [
+        # Docstring
         ast.Expr(value=ast.Constant(value=f"Top-level {'async' if is_async else 'sync'} cache manager.")),
         # client: PokeLanceAsyncClient / PokeLanceSyncClient
         ast.AnnAssign(
@@ -310,6 +686,7 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
         ),
     ]
 
+    # Aggregate fields on top-level manager
     for spec in EXTENSIONS:
         manager_body.append(
             ast.AnnAssign(
@@ -324,40 +701,7 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
             )
         )
 
-    # if t.TYPE_CHECKING: __attrs_attrs__: t.Tuple[attrs.Attribute[t.Any], ...]
-    manager_body.append(
-        ast.If(
-            test=ast.Attribute(value=ast.Name(id="t", ctx=ast.Load()), attr="TYPE_CHECKING", ctx=ast.Load()),
-            body=[
-                ast.AnnAssign(
-                    target=ast.Name(id="__attrs_attrs__", ctx=ast.Store()),
-                    annotation=ast.Subscript(
-                        value=ast.Attribute(value=ast.Name(id="t", ctx=ast.Load()), attr="Tuple", ctx=ast.Load()),
-                        slice=ast.Tuple(
-                            elts=[
-                                ast.Subscript(
-                                    value=ast.Attribute(
-                                        value=ast.Name(id="attrs", ctx=ast.Load()), attr="Attribute", ctx=ast.Load()
-                                    ),
-                                    slice=ast.Attribute(
-                                        value=ast.Name(id="t", ctx=ast.Load()), attr="Any", ctx=ast.Load()
-                                    ),
-                                    ctx=ast.Load(),
-                                ),
-                                ast.Constant(value=Ellipsis),
-                            ],
-                            ctx=ast.Load(),
-                        ),
-                        ctx=ast.Load(),
-                    ),
-                    simple=1,
-                )
-            ],
-            orelse=[],
-        )
-    )
-
-    # _walk_aggregates
+    # _walk_aggregates using attrs.fields(self.__class__) -> t.Iterator[AsyncBase / SyncBase]
     manager_body.append(
         ast.FunctionDef(
             name="_walk_aggregates",
@@ -370,34 +714,38 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
             ),
             returns=ast.Subscript(
                 value=ast.Attribute(value=ast.Name(id="t", ctx=ast.Load()), attr="Iterator", ctx=ast.Load()),
-                slice=ast.Subscript(
-                    value=ast.Name(id="Base", ctx=ast.Load()),
-                    slice=ast.Constant(value=client_type),
-                    ctx=ast.Load(),
-                ),
+                slice=ast.Name(id=base_agg_cls, ctx=ast.Load()),
                 ctx=ast.Load(),
             ),
             body=[
+                # Docstring
                 ast.Expr(value=ast.Constant(value="Yield all child cache aggregates.")),
+                # for field in attrs.fields(self.__class__): ...
                 ast.For(
-                    target=ast.Name(id="obj", ctx=ast.Store()),
-                    iter=ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="__attrs_attrs__", ctx=ast.Load()),
+                    target=ast.Name(id="field", ctx=ast.Store()),
+                    iter=ast.Call(
+                        func=ast.Attribute(value=ast.Name(id="attrs", ctx=ast.Load()), attr="fields", ctx=ast.Load()),
+                        args=[ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="__class__", ctx=ast.Load())],
+                        keywords=[],
+                    ),
                     body=[
+                        # val = getattr(self, field.name)
                         ast.Assign(
                             targets=[ast.Name(id="val", ctx=ast.Store())],
                             value=ast.Call(
                                 func=ast.Name(id="getattr", ctx=ast.Load()),
                                 args=[
                                     ast.Name(id="self", ctx=ast.Load()),
-                                    ast.Attribute(value=ast.Name(id="obj", ctx=ast.Load()), attr="name", ctx=ast.Load()),
+                                    ast.Attribute(value=ast.Name(id="field", ctx=ast.Load()), attr="name", ctx=ast.Load()),
                                 ],
                                 keywords=[],
                             ),
                         ),
+                        # if isinstance(val, base_agg_cls): yield val
                         ast.If(
                             test=ast.Call(
                                 func=ast.Name(id="isinstance", ctx=ast.Load()),
-                                args=[ast.Name(id="val", ctx=ast.Load()), ast.Name(id="Base", ctx=ast.Load())],
+                                args=[ast.Name(id="val", ctx=ast.Load()), ast.Name(id=base_agg_cls, ctx=ast.Load())],
                                 keywords=[],
                             ),
                             body=[
@@ -420,6 +768,7 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
             args=ast.arguments(posonlyargs=[], args=[ast.arg(arg="self")], kwonlyargs=[], kw_defaults=[], defaults=[]),
             returns=ast.Constant(value=None),
             body=[
+                # for aggregate in self._walk_aggregates(): aggregate.set_size(...); aggregate.set_client(...)
                 ast.For(
                     target=ast.Name(id="aggregate", ctx=ast.Store()),
                     iter=ast.Call(
@@ -620,7 +969,7 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
         )
     )
 
-    # wait_until_ready
+    # wait_until_ready for top-level manager
     if is_async:
         manager_body.append(
             ast.AsyncFunctionDef(
@@ -628,7 +977,9 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
                 args=ast.arguments(posonlyargs=[], args=[ast.arg(arg="self")], kwonlyargs=[], kw_defaults=[], defaults=[]),
                 returns=ast.Constant(value=None),
                 body=[
+                    # Docstring
                     ast.Expr(value=ast.Constant(value="Wait for all sub-caches in all aggregates to be ready.")),
+                    # tasks = [aggregate.wait_until_ready() for aggregate in self._walk_aggregates()]
                     ast.Assign(
                         targets=[ast.Name(id="tasks", ctx=ast.Store())],
                         value=ast.ListComp(
@@ -659,6 +1010,7 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
                             ],
                         ),
                     ),
+                    # await asyncio.gather(*tasks)
                     ast.Expr(
                         value=ast.Await(
                             value=ast.Call(
@@ -683,7 +1035,9 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
                 args=ast.arguments(posonlyargs=[], args=[ast.arg(arg="self")], kwonlyargs=[], kw_defaults=[], defaults=[]),
                 returns=ast.Constant(value=None),
                 body=[
+                    # Docstring
                     ast.Expr(value=ast.Constant(value="Wait for all sub-caches in all aggregates to be ready.")),
+                    # for aggregate in self._walk_aggregates(): aggregate.wait_until_ready()
                     ast.For(
                         target=ast.Name(id="aggregate", ctx=ast.Store()),
                         iter=ast.Call(
@@ -715,6 +1069,7 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
             )
         )
 
+    # Top-level Manager Class definition
     body.append(
         ast.ClassDef(
             name=manager_name,
@@ -725,11 +1080,12 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
         )
     )
 
+    # Fix AST locations and unparse into Python source code
     module = ast.Module(body=body, type_ignores=[])
     ast.fix_missing_locations(module)
     unparsed = ast.unparse(module)
 
-    # Format header and ensure 2 blank lines before each top-level class
+    # Header and clean spacing formatting
     header = (
         "# AUTO-GENERATED by scripts/gen_scripts/generate_all.py\n"
         "# DO NOT EDIT MANUALLY\n"
@@ -754,6 +1110,7 @@ def main() -> int:
     args = parser.parse_args()
 
     generate_cache = not args.ext_only
+    generate_ext = not args.cache_only
     do_async = not args.sync_only
     do_sync = not args.async_only
 
@@ -780,6 +1137,29 @@ def main() -> int:
                     all_ok = False
             else:
                 print(f"Generated (AST): {sync_manager_path}")
+
+    # 2. Generate extensions
+    if generate_ext:
+        for spec in EXTENSIONS:
+            if do_async:
+                async_path = EXT_DIR / f"{spec.module_name}.py"
+                async_content = generate_extension(spec, is_async=True, output_path=async_path)
+                if args.check:
+                    if async_path.read_text(encoding="utf-8") != async_content:
+                        print(f"STALE: {async_path}", file=sys.stderr)
+                        all_ok = False
+                else:
+                    print(f"Generated (AST): {async_path}")
+
+            if do_sync:
+                sync_path = SYNC_EXT_DIR / f"{spec.module_name}.py"
+                sync_content = generate_extension(spec, is_async=False, output_path=sync_path)
+                if args.check:
+                    if sync_path.read_text(encoding="utf-8") != sync_content:
+                        print(f"STALE: {sync_path}", file=sys.stderr)
+                        all_ok = False
+                else:
+                    print(f"Generated (AST): {sync_path}")
 
     if args.check:
         if all_ok:

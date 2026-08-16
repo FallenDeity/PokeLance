@@ -7,76 +7,55 @@ import asyncio
 import typing as t
 import attrs
 from pokelance import models
-from pokelance.cache._base import Base
-from pokelance.cache._async.base import AsyncBaseCache
+from pokelance.cache._async.base import AsyncBaseCache, AsyncCacheGroup
 from pokelance.http.endpoints import Route
 if t.TYPE_CHECKING:
     from pokelance.client.async_client import PokeLanceAsyncClient
-__all__ = ('AsyncCacheManager', 'Base')
+__all__ = ('AsyncCacheManager', 'AsyncCacheGroup')
 
 
 
 @attrs.define(slots=True, kw_only=True)
-class Berry(Base['PokeLanceAsyncClient']):
+class Berry(AsyncCacheGroup):
     """Cache aggregate for berry endpoints."""
     max_size: int = 100
     berry: AsyncBaseCache[Route, models.Berry] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Berry, name='berry'))
     berry_firmness: AsyncBaseCache[Route, models.BerryFirmness] = attrs.field(factory=lambda: AsyncBaseCache(model=models.BerryFirmness, name='berry_firmness'))
     berry_flavor: AsyncBaseCache[Route, models.BerryFlavor] = attrs.field(factory=lambda: AsyncBaseCache(model=models.BerryFlavor, name='berry_flavor'))
 
-    async def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        tasks = [cache.wait_until_ready() for cache in self._walk_caches()]
-        await asyncio.gather(*tasks)
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Contest(Base['PokeLanceAsyncClient']):
+class Contest(AsyncCacheGroup):
     """Cache aggregate for contest endpoints."""
     max_size: int = 100
     contest_type: AsyncBaseCache[Route, models.ContestType] = attrs.field(factory=lambda: AsyncBaseCache(model=models.ContestType, name='contest_type'))
     contest_effect: AsyncBaseCache[Route, models.ContestEffect] = attrs.field(factory=lambda: AsyncBaseCache(model=models.ContestEffect, name='contest_effect', endpoint_key_is_id=True))
     super_contest_effect: AsyncBaseCache[Route, models.SuperContestEffect] = attrs.field(factory=lambda: AsyncBaseCache(model=models.SuperContestEffect, name='super_contest_effect', endpoint_key_is_id=True))
 
-    async def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        tasks = [cache.wait_until_ready() for cache in self._walk_caches()]
-        await asyncio.gather(*tasks)
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Encounter(Base['PokeLanceAsyncClient']):
+class Encounter(AsyncCacheGroup):
     """Cache aggregate for encounter endpoints."""
     max_size: int = 100
     encounter_method: AsyncBaseCache[Route, models.EncounterMethod] = attrs.field(factory=lambda: AsyncBaseCache(model=models.EncounterMethod, name='encounter_method'))
     encounter_condition: AsyncBaseCache[Route, models.EncounterCondition] = attrs.field(factory=lambda: AsyncBaseCache(model=models.EncounterCondition, name='encounter_condition'))
     encounter_condition_value: AsyncBaseCache[Route, models.EncounterConditionValue] = attrs.field(factory=lambda: AsyncBaseCache(model=models.EncounterConditionValue, name='encounter_condition_value'))
 
-    async def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        tasks = [cache.wait_until_ready() for cache in self._walk_caches()]
-        await asyncio.gather(*tasks)
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Evolution(Base['PokeLanceAsyncClient']):
+class Evolution(AsyncCacheGroup):
     """Cache aggregate for evolution endpoints."""
     max_size: int = 100
     evolution_chain: AsyncBaseCache[Route, models.EvolutionChain] = attrs.field(factory=lambda: AsyncBaseCache(model=models.EvolutionChain, name='evolution_chain', endpoint_key_is_id=True))
     evolution_trigger: AsyncBaseCache[Route, models.EvolutionTrigger] = attrs.field(factory=lambda: AsyncBaseCache(model=models.EvolutionTrigger, name='evolution_trigger'))
 
-    async def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        tasks = [cache.wait_until_ready() for cache in self._walk_caches()]
-        await asyncio.gather(*tasks)
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Game(Base['PokeLanceAsyncClient']):
+class Game(AsyncCacheGroup):
     """Cache aggregate for game endpoints."""
     max_size: int = 100
     generation: AsyncBaseCache[Route, models.Generation] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Generation, name='generation'))
@@ -84,15 +63,10 @@ class Game(Base['PokeLanceAsyncClient']):
     version: AsyncBaseCache[Route, models.Version] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Version, name='version'))
     version_group: AsyncBaseCache[Route, models.VersionGroup] = attrs.field(factory=lambda: AsyncBaseCache(model=models.VersionGroup, name='version_group'))
 
-    async def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        tasks = [cache.wait_until_ready() for cache in self._walk_caches()]
-        await asyncio.gather(*tasks)
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Item(Base['PokeLanceAsyncClient']):
+class Item(AsyncCacheGroup):
     """Cache aggregate for item endpoints."""
     max_size: int = 100
     item: AsyncBaseCache[Route, models.Item] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Item, name='item'))
@@ -101,15 +75,10 @@ class Item(Base['PokeLanceAsyncClient']):
     item_fling_effect: AsyncBaseCache[Route, models.ItemFlingEffect] = attrs.field(factory=lambda: AsyncBaseCache(model=models.ItemFlingEffect, name='item_fling_effect'))
     item_pocket: AsyncBaseCache[Route, models.ItemPocket] = attrs.field(factory=lambda: AsyncBaseCache(model=models.ItemPocket, name='item_pocket'))
 
-    async def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        tasks = [cache.wait_until_ready() for cache in self._walk_caches()]
-        await asyncio.gather(*tasks)
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Location(Base['PokeLanceAsyncClient']):
+class Location(AsyncCacheGroup):
     """Cache aggregate for location endpoints."""
     max_size: int = 100
     location: AsyncBaseCache[Route, models.Location] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Location, name='location'))
@@ -117,28 +86,18 @@ class Location(Base['PokeLanceAsyncClient']):
     pal_park_area: AsyncBaseCache[Route, models.PalParkArea] = attrs.field(factory=lambda: AsyncBaseCache(model=models.PalParkArea, name='pal_park_area'))
     region: AsyncBaseCache[Route, models.Region] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Region, name='region'))
 
-    async def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        tasks = [cache.wait_until_ready() for cache in self._walk_caches()]
-        await asyncio.gather(*tasks)
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Machine(Base['PokeLanceAsyncClient']):
+class Machine(AsyncCacheGroup):
     """Cache aggregate for machine endpoints."""
     max_size: int = 100
     machine: AsyncBaseCache[Route, models.Machine] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Machine, name='machine', endpoint_key_is_id=True))
 
-    async def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        tasks = [cache.wait_until_ready() for cache in self._walk_caches()]
-        await asyncio.gather(*tasks)
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Move(Base['PokeLanceAsyncClient']):
+class Move(AsyncCacheGroup):
     """Cache aggregate for move endpoints."""
     max_size: int = 100
     move: AsyncBaseCache[Route, models.Move] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Move, name='move'))
@@ -149,15 +108,10 @@ class Move(Base['PokeLanceAsyncClient']):
     move_learn_method: AsyncBaseCache[Route, models.MoveLearnMethod] = attrs.field(factory=lambda: AsyncBaseCache(model=models.MoveLearnMethod, name='move_learn_method'))
     move_target: AsyncBaseCache[Route, models.MoveTarget] = attrs.field(factory=lambda: AsyncBaseCache(model=models.MoveTarget, name='move_target'))
 
-    async def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        tasks = [cache.wait_until_ready() for cache in self._walk_caches()]
-        await asyncio.gather(*tasks)
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Pokemon(Base['PokeLanceAsyncClient']):
+class Pokemon(AsyncCacheGroup):
     """Cache aggregate for pokemon endpoints."""
     max_size: int = 100
     ability: AsyncBaseCache[Route, models.Ability] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Ability, name='ability'))
@@ -177,24 +131,14 @@ class Pokemon(Base['PokeLanceAsyncClient']):
     type: AsyncBaseCache[Route, models.Type] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Type, name='type'))
     location_area_encounter: AsyncBaseCache[Route, t.Sequence[models.LocationAreaEncounter]] = attrs.field(factory=lambda: AsyncBaseCache(model=models.LocationAreaEncounter, name='location_area_encounter', url_suffix='/encounters', is_list=True))
 
-    async def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        tasks = [cache.wait_until_ready() for cache in self._walk_caches()]
-        await asyncio.gather(*tasks)
-
 
 
 @attrs.define(slots=True, kw_only=True)
-class Utility(Base['PokeLanceAsyncClient']):
+class Utility(AsyncCacheGroup):
     """Cache aggregate for utility endpoints."""
     max_size: int = 100
     language: AsyncBaseCache[Route, models.Language] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Language, name='language', endpoint_key_is_id=True))
     api_metadata: AsyncBaseCache[Route, models.APIMetadata] = attrs.field(factory=lambda: AsyncBaseCache(model=models.APIMetadata, name='api_metadata', endpoint_key_is_id=True))
-
-    async def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in this aggregate to be ready."""
-        tasks = [cache.wait_until_ready() for cache in self._walk_caches()]
-        await asyncio.gather(*tasks)
 
 
 
@@ -214,14 +158,12 @@ class AsyncCacheManager:
     move: Move = attrs.field(factory=Move)
     pokemon: Pokemon = attrs.field(factory=Pokemon)
     utility: Utility = attrs.field(factory=Utility)
-    if t.TYPE_CHECKING:
-        __attrs_attrs__: t.Tuple[attrs.Attribute[t.Any], ...]
 
-    def _walk_aggregates(self) -> t.Iterator[Base['PokeLanceAsyncClient']]:
+    def _walk_aggregates(self) -> t.Iterator[AsyncCacheGroup]:
         """Yield all child cache aggregates."""
-        for obj in self.__attrs_attrs__:
-            val = getattr(self, obj.name)
-            if isinstance(val, Base):
+        for field in attrs.fields(self.__class__):
+            val = getattr(self, field.name)
+            if isinstance(val, AsyncCacheGroup):
                 yield val
 
     def __attrs_post_init__(self) -> None:
