@@ -7,8 +7,8 @@ from __future__ import annotations
 import asyncio
 import typing as t
 
+from pokelance.endpoints import Endpoint
 from pokelance.ext._async._base import AsyncBaseExtension
-from pokelance.http.endpoints import Endpoint
 
 if t.TYPE_CHECKING:
     from pokelance import models
@@ -30,6 +30,7 @@ class Utility(_Base):
         results = await asyncio.gather(*(self._client.request(r) for r in routes.values()))
         for category, data in zip(routes.keys(), results, strict=False):
             self._cache_manager.load_documents("Utility", category, data["results"])
+        self._cache_group.api_metadata.set_ready()
 
     def get_language(self, id: int) -> models.Language | None:
         """Gets a language from the cache.

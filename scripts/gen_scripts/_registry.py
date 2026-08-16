@@ -10,7 +10,7 @@ import typing as t
 from dataclasses import dataclass
 
 from pokelance import models
-from pokelance.http.endpoints import Endpoint, Route
+from pokelance.endpoints import Endpoint, Route
 
 
 @dataclass

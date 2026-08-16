@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing as t
 
 import attrs
@@ -44,7 +46,7 @@ class Route:
         return self._url.format(endpoint=self.endpoint)
 
     @classmethod
-    def from_raw_url(cls, url: str) -> "Route":
+    def from_raw_url(cls, url: str) -> Route:
         """Creates a Route object from a raw PokeAPI URL.
 
         Parameters

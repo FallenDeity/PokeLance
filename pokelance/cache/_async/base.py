@@ -10,7 +10,7 @@ import aiofiles
 import attrs
 
 from pokelance.cache._base import BaseCacheGroup, BaseCacheState, CacheEndpoint
-from pokelance.http.endpoints import Route
+from pokelance.endpoints import Route
 
 _KT = t.TypeVar("_KT", bound="Route")
 _VT = t.TypeVar("_VT", bound="BaseModel | t.Sequence[BaseModel]")

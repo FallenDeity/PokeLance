@@ -22,7 +22,7 @@ Coverage
 import pytest
 
 import pokelance
-from pokelance.http import Endpoint
+from pokelance.endpoints import Endpoint
 
 # ---------------------------------------------------------------------------
 # Size / attributes
@@ -191,3 +191,34 @@ async def test_audio_cache_clear(client: pokelance.PokeLanceAsyncClient) -> None
 def test_audio_cache_set_size(client: pokelance.PokeLanceAsyncClient) -> None:
     client.get_audio.set_size(10)
     assert client.get_audio.cache_info().maxsize == 10
+
+
+@pytest.mark.asyncio
+async def test_cache_statistics(client: pokelance.PokeLanceAsyncClient) -> None:
+    poke_cache = client.http.cache_manager.pokemon.pokemon
+    poke_cache.stats.reset()
+    poke_cache.set_size(2)
+
+    # 1. Miss on get
+    route1 = Endpoint.get_pokemon(1)
+    assert poke_cache.get(route1) is None
+    assert poke_cache.stats.misses == 1
+    assert poke_cache.stats.hits == 0
+
+    # 2. Fetch (sets=1)
+    await client.pokemon.fetch_pokemon(1)
+    assert poke_cache.stats.sets == 1
+
+    # 3. Hit on get
+    assert poke_cache.get(route1) is not None
+    assert poke_cache.stats.hits == 1
+    assert poke_cache.stats.hit_ratio == 0.5
+
+    # 4. Fill and trigger eviction
+    await client.pokemon.fetch_pokemon(2)
+    await client.pokemon.fetch_pokemon(3)
+    assert poke_cache.stats.evictions == 1
+
+    # 5. Group and Manager aggregate stats
+    assert client.pokemon.cache_group.stats.hits >= 1
+    assert client.http.cache_manager.stats.hits >= 1

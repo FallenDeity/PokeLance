@@ -3,12 +3,13 @@ from __future__ import annotations
 import json
 import logging
 import pathlib
+import threading
 import typing as t
 
 import attrs
 
 from pokelance.cache._base import BaseCacheGroup, BaseCacheState, CacheEndpoint
-from pokelance.http.endpoints import Route
+from pokelance.endpoints import Route
 
 _KT = t.TypeVar("_KT", bound="Route")
 _VT = t.TypeVar("_VT", bound="BaseModel | t.Sequence[BaseModel]")
@@ -38,7 +39,7 @@ logger = logging.getLogger(__name__)
 class SyncCache(_BaseCacheState[_KT, _VT], t.Generic[_KT, _VT]):
     """Sync cache: threading.Event readiness, synchronous file I/O, and sync HTTP bulk loading."""
 
-    _ready: bool
+    _ready: threading.Event
 
     def __init__(
         self,
@@ -57,25 +58,26 @@ class SyncCache(_BaseCacheState[_KT, _VT], t.Generic[_KT, _VT]):
             url_suffix=url_suffix,
             is_list=is_list,
         )
-        self._ready = False
+        self._ready = threading.Event()
 
     @property
     def is_ready(self) -> bool:
         """Whether the cache is ready."""
-        return self._ready
+        return self._ready.is_set()
 
     def wait_until_ready(self) -> None:
-        """Wait until the cache is ready (noop for sync unless populated)."""
+        """Wait until the cache is ready."""
+        self._ready.wait()
 
     def set_ready(self) -> None:
         """Set the cache as ready."""
         super().set_ready()
-        self._ready = True
+        self._ready.set()
 
     def reset_endpoints(self) -> None:
         """Reset endpoints and clear readiness."""
         super().reset_endpoints()
-        self._ready = False
+        self._ready.clear()
 
     def save(self, path: str = ".") -> None:
         """Save the cache to a JSON file synchronously."""

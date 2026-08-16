@@ -14,10 +14,10 @@ if t.TYPE_CHECKING:
     from pokelance.cache._base import BaseCacheState
     from pokelance.cache.sync.base import SyncCacheGroup
     from pokelance.cache.sync.manager import SyncCacheManager
+    from pokelance.endpoints import Route
     from pokelance.http._async import AsyncHttpClient
     from pokelance.http._base import BaseHttpClient
     from pokelance.http._sync import SyncHttpClient
-    from pokelance.http.endpoints import Route
 
     AnyHttpClient = AsyncHttpClient | SyncHttpClient
     AnyCacheManager = AsyncCacheManager | SyncCacheManager

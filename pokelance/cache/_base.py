@@ -4,13 +4,13 @@ import typing as t
 
 import attrs
 
-from pokelance.http.endpoints import Route
+from pokelance.endpoints import Route
+from pokelance.models import BaseModel
 
 if t.TYPE_CHECKING:
     from pokelance.cache._async import AsyncCache
     from pokelance.cache.sync import SyncCache
     from pokelance.client._base import _ClientBase
-    from pokelance.models import BaseModel
 
     AnyCache = AsyncCache[Route, t.Any] | SyncCache[Route, t.Any]
 
@@ -18,13 +18,13 @@ __all__: tuple[str, ...] = (
     "BaseCacheGroup",
     "BaseCacheState",
     "CacheEndpoint",
+    "CacheStats",
 )
 
 _KT = t.TypeVar("_KT", bound="Route")
 _VT = t.TypeVar("_VT", bound="BaseModel | t.Sequence[BaseModel]")
 _ClientT = t.TypeVar("_ClientT", bound="_ClientBase")
 _CacheT = t.TypeVar("_CacheT", bound="AnyCache")
-_T = t.TypeVar("_T")
 
 
 @attrs.define(kw_only=True, slots=True, frozen=True)
@@ -44,6 +44,34 @@ class CacheEndpoint:
 
     def __str__(self) -> str:
         return str(self.id)
+
+
+@attrs.define(slots=True, kw_only=True)
+class CacheStats:
+    """Statistics tracking cache hits, misses, insertions, and evictions."""
+
+    hits: int = 0
+    misses: int = 0
+    sets: int = 0
+    evictions: int = 0
+
+    @property
+    def total_lookups(self) -> int:
+        """Total number of cache lookup requests (hits + misses)."""
+        return self.hits + self.misses
+
+    @property
+    def hit_ratio(self) -> float:
+        """Ratio of cache hits to total lookups (0.0 - 1.0)."""
+        total = self.total_lookups
+        return (self.hits / total) if total > 0 else 0.0
+
+    def reset(self) -> None:
+        """Reset all statistical counters."""
+        self.hits = 0
+        self.misses = 0
+        self.sets = 0
+        self.evictions = 0
 
 
 class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
@@ -74,25 +102,39 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         self._endpoints_by_id: dict[str, str] = {}
         self._identifiers: set[str] = set()
         self._endpoints_cached: bool = False
+        self._stats: CacheStats = CacheStats()
 
-    def from_payload(self, payload: t.Any) -> _VT:
+    @property
+    def stats(self) -> CacheStats:
+        """Statistics for this specific cache."""
+        return self._stats
+
+    def from_payload(self, payload: dict[str, t.Any] | list[dict[str, t.Any]]) -> _VT:
         """Create a model instance or list of model instances from a raw payload."""
         if self._model is None:
             raise RuntimeError(f"Model class not configured for cache '{self._name}'")
-        if self._is_list:
+        if isinstance(payload, list):
             return t.cast("_VT", [self._model.from_payload(item) for item in payload])
         return t.cast("_VT", self._model.from_payload(payload))
 
     def __getitem__(self, key: _KT) -> _VT:
-        self._cache[key] = self._cache.pop(key)
-        return self._cache[key]
+        try:
+            val = self._cache.pop(key)
+            self._cache[key] = val
+            self._stats.hits += 1
+            return val
+        except KeyError:
+            self._stats.misses += 1
+            raise
 
     def __setitem__(self, key: _KT, value: _VT) -> None:
+        self._stats.sets += 1
         if key in self._cache:
             self._cache[key] = self._cache.pop(key)
         else:
             if len(self._cache) >= self._max_size:
                 self._cache.pop(next(iter(self._cache.keys())))
+                self._stats.evictions += 1
             self._cache[key] = value
 
     def __delitem__(self, key: _KT) -> None:
@@ -116,10 +158,14 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
     def items(self) -> t.ItemsView[_KT, _VT]:
         return self._cache.items()
 
-    def setdefault(self, __key: _KT, __default: t.Any = ...) -> _VT:
-        if __key not in self:
+    def setdefault(self, __key: _KT, /, __default: _VT | None = None) -> _VT:
+        if __key not in self._cache and __default is not None:
             self[__key] = __default
-        return self[__key]
+            return self._cache[__key]
+        self._stats.hits += 1
+        val = self._cache.pop(__key)
+        self._cache[__key] = val
+        return val
 
     def clear(self) -> None:
         """Clear the cached data only. The endpoint registry is left intact."""
@@ -140,16 +186,21 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         self._identifiers.clear()
         self._endpoints_cached = False
 
-    def get(self, key: _KT, default: _VT | _T | None = None) -> _VT | _T | None:  # type: ignore
+    def get(self, key: _KT, default: _VT | None = None) -> _VT | None:  # pyright: ignore[reportIncompatibleMethodOverride]
         """Get an item from the cache. If the exact key isn't found, attempt alias resolution."""
-        if key in self:
-            return self[key]
+        if key in self._cache:
+            self._stats.hits += 1
+            val = self._cache.pop(key)
+            self._cache[key] = val
+            return val
         requested = key.endpoint.split("/")[-1]
         alias = self._endpoints_by_id.get(requested) or self._endpoints.get(requested)
         if alias:
             for k, v in self.items():
                 if k.endpoint.split("/")[-1] == str(alias):
+                    self._stats.hits += 1
                     return v
+        self._stats.misses += 1
         return default
 
     def load_documents(self, data: list[dict[str, str]]) -> None:
@@ -175,7 +226,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         """Serialise the in-memory cache to a plain dict."""
         dummy: dict[str, t.Any] = {}
         for k, v in self.items():
-            dummy[k.endpoint] = [i.raw for i in v] if self._is_list and isinstance(v, list) else v.raw  # type: ignore
+            dummy[k.endpoint] = v.raw if isinstance(v, BaseModel) else [i.raw for i in v]
         return dummy
 
     def deserialize(self, data: dict[str, t.Any]) -> None:
@@ -206,6 +257,18 @@ class BaseCacheGroup(t.Generic[_ClientT, _CacheT]):
     """Base class for all cache groups / aggregates."""
 
     max_size: int
+
+    @property
+    def stats(self) -> CacheStats:
+        """Aggregated statistics across all sub-caches in this group."""
+        combined = CacheStats()
+        for cache in self._walk_caches():
+            sub = cache.stats
+            combined.hits += sub.hits
+            combined.misses += sub.misses
+            combined.sets += sub.sets
+            combined.evictions += sub.evictions
+        return combined
 
     def _walk_caches(self) -> t.Iterator[_CacheT]:
         """Yield all sub-caches belonging to this cache group."""

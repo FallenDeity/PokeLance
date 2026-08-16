@@ -9,13 +9,14 @@ import typing as t
 import attrs
 
 from pokelance import models
+from pokelance.cache._base import CacheStats
 from pokelance.cache.sync.base import SyncCache, SyncCacheGroup
 
 if t.TYPE_CHECKING:
     import collections.abc as cabc
 
     from pokelance.client.sync_client import PokeLanceSyncClient
-    from pokelance.http.endpoints import Route
+    from pokelance.endpoints import Route
 
 __all__: tuple[str, ...] = ("SyncCacheGroup", "SyncCacheManager")
 
@@ -286,3 +287,14 @@ class SyncCacheManager:
         """Wait for all sub-caches in all aggregates to be ready."""
         for aggregate in self._walk_aggregates():
             aggregate.wait_until_ready()
+
+    @property
+    def stats(self) -> CacheStats:
+        s = CacheStats()
+        for aggregate in self._walk_aggregates():
+            agg_stats = aggregate.stats
+            s.hits += agg_stats.hits
+            s.misses += agg_stats.misses
+            s.sets += agg_stats.sets
+            s.evictions += agg_stats.evictions
+        return s

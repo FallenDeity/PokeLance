@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 import typing as t
 
+from pokelance.endpoints import Route
 from pokelance.exceptions import AudioNotFound, HTTPException, ImageNotFound
-from pokelance.http.endpoints import Route
 
 if t.TYPE_CHECKING:
     import niquests

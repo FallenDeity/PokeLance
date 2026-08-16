@@ -1,3 +1,4 @@
+# pyright: reportUnknownMemberType=false
 from __future__ import annotations
 
 import asyncio
@@ -8,9 +9,9 @@ import typing as t
 import niquests
 
 from pokelance.cache._async.manager import AsyncCacheManager
+from pokelance.endpoints import Route
 from pokelance.exceptions import HTTPException
 from pokelance.http._base import BaseHttpClient
-from pokelance.http.endpoints import Route
 
 if t.TYPE_CHECKING:
     from pokelance.client.async_client import PokeLanceAsyncClient
@@ -33,6 +34,7 @@ class AsyncEndpointLoader:
         self._remaining: int = 0
         self._ready_event: asyncio.Event = asyncio.Event()
         self._ready_event.set()
+        self._scheduled: bool = False
 
     @property
     def is_ready(self) -> bool:
@@ -59,6 +61,9 @@ class AsyncEndpointLoader:
 
     async def schedule_tasks(self) -> None:
         """Schedules background endpoint-loading tasks using asyncio.create_task."""
+        if self._scheduled:
+            return
+        self._scheduled = True
         self._ready_event.clear()
         if not self._client.cache_endpoints:
             self._ready_event.set()
@@ -145,9 +150,9 @@ class AsyncHttpClient(_BaseHttpClient):
             self.session = niquests.AsyncSession(resolver="system://")
             self._session_owner = True
         if not self._is_ready:
+            self._is_ready = True
             if self._client.cache_endpoints:
                 await self._loader.schedule_tasks()
-            self._is_ready = True
 
     async def request(self, route: Route) -> dict[str, t.Any]:
         """Makes an asynchronous request to the PokeAPI.

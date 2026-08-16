@@ -11,12 +11,13 @@ import attrs
 
 from pokelance import models
 from pokelance.cache._async.base import AsyncCache, AsyncCacheGroup
+from pokelance.cache._base import CacheStats
 
 if t.TYPE_CHECKING:
     import collections.abc as cabc
 
     from pokelance.client.async_client import PokeLanceAsyncClient
-    from pokelance.http.endpoints import Route
+    from pokelance.endpoints import Route
 
 __all__: tuple[str, ...] = ("AsyncCacheGroup", "AsyncCacheManager")
 
@@ -295,3 +296,14 @@ class AsyncCacheManager:
         """Wait for all sub-caches in all aggregates to be ready."""
         tasks = [aggregate.wait_until_ready() for aggregate in self._walk_aggregates()]
         await asyncio.gather(*tasks)
+
+    @property
+    def stats(self) -> CacheStats:
+        s = CacheStats()
+        for aggregate in self._walk_aggregates():
+            agg_stats = aggregate.stats
+            s.hits += agg_stats.hits
+            s.misses += agg_stats.misses
+            s.sets += agg_stats.sets
+            s.evictions += agg_stats.evictions
+        return s

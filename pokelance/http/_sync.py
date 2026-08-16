@@ -9,9 +9,9 @@ import typing as t
 import niquests
 
 from pokelance.cache.sync.manager import SyncCacheManager
+from pokelance.endpoints import Route
 from pokelance.exceptions import HTTPException
 from pokelance.http._base import BaseHttpClient
-from pokelance.http.endpoints import Route
 
 if t.TYPE_CHECKING:
     from pokelance.client.sync_client import PokeLanceSyncClient
@@ -36,6 +36,7 @@ class SyncEndpointLoader:
         self._lock = threading.Lock()
         self._ready_event = threading.Event()
         self._ready_event.set()
+        self._scheduled: bool = False
 
     @property
     def is_ready(self) -> bool:
@@ -69,39 +70,44 @@ class SyncEndpointLoader:
 
     def schedule_tasks(self) -> None:
         """Schedules the background endpoint-loading tasks on a thread pool."""
-        self._ready_event.clear()
-        if not self._client.cache_endpoints:
-            self._ready_event.set()
+        with self._lock:
+            if self._scheduled:
+                return
+            self._scheduled = True
+            self._ready_event.clear()
+            if not self._client.cache_endpoints:
+                self._ready_event.set()
+                self._client.ext_tasks.clear()
+                return
+            total = len(self._client.ext_tasks)
+            self._remaining = total
+            logger.info(f"Scheduling {total} endpoint pre-population task(s)...")
+            if self._executor is None:
+                self._executor = concurrent.futures.ThreadPoolExecutor(
+                    max_workers=min(32, max(4, total)),
+                    thread_name_prefix="PokeLance-EndpointLoader",
+                )
+            for num, (fn, name) in enumerate(self._client.ext_tasks):
+                message = f"Extension {name} endpoints ({num + 1}/{total})"
+                future = self._executor.submit(self._load_ext, fn, message)
+                self._futures.add(future)
+                future.add_done_callback(self._futures.discard)
             self._client.ext_tasks.clear()
-            return
-        total = len(self._client.ext_tasks)
-        self._remaining = total
-        logger.info(f"Scheduling {total} endpoint pre-population task(s)...")
-        if self._executor is None:
-            self._executor = concurrent.futures.ThreadPoolExecutor(
-                max_workers=min(32, max(4, total)),
-                thread_name_prefix="PokeLance-EndpointLoader",
-            )
-        for num, (fn, name) in enumerate(self._client.ext_tasks):
-            message = f"Extension {name} endpoints ({num + 1}/{total})"
-            future = self._executor.submit(self._load_ext, fn, message)
-            self._futures.add(future)
-            future.add_done_callback(self._futures.discard)
-        self._client.ext_tasks.clear()
-        if self._remaining == 0:
-            self._ready_event.set()
+            if self._remaining == 0:
+                self._ready_event.set()
 
     def shutdown(self) -> None:
         """Cancels and shuts down the loader thread pool."""
-        count = sum(1 for f in self._futures if not f.done())
-        if count > 0:
-            logger.warning(f"Cancelling {count} in-flight endpoint loading tasks...")
-        for future in list(self._futures):
-            future.cancel()
-        if self._executor is not None:
-            logger.debug("Shutting down endpoint loader thread pool...")
-            self._executor.shutdown(wait=False, cancel_futures=True)
-            self._executor = None
+        with self._lock:
+            count = sum(1 for f in self._futures if not f.done())
+            if count > 0:
+                logger.warning(f"Cancelling {count} in-flight endpoint loading tasks...")
+            for future in list(self._futures):
+                future.cancel()
+            if self._executor is not None:
+                logger.debug("Shutting down endpoint loader thread pool...")
+                self._executor.shutdown(wait=False, cancel_futures=True)
+                self._executor = None
 
 
 @t.final
@@ -124,6 +130,7 @@ class SyncHttpClient(_BaseHttpClient):
         "_client",
         "_is_ready",
         "_loader",
+        "_lock",
         "_session_owner",
         "session",
     )
@@ -138,6 +145,7 @@ class SyncHttpClient(_BaseHttpClient):
         super().__init__(client=client, session=session)
         self._cache_manager = SyncCacheManager(max_size=cache_size, client=self._client)
         self._loader = SyncEndpointLoader(client=self._client)
+        self._lock = threading.Lock()
 
     @property
     def loader(self) -> SyncEndpointLoader:
@@ -155,14 +163,15 @@ class SyncHttpClient(_BaseHttpClient):
 
     def connect(self) -> None:
         """Connects the HTTP client and sets up the session."""
-        if self.session is None:
-            logger.debug("Initializing internal sync HTTP session (niquests)...")
-            self.session = niquests.Session(resolver="system://")
-            self._session_owner = True
-        if not self._is_ready:
-            if self._client.cache_endpoints:
-                self._loader.schedule_tasks()
-            self._is_ready = True
+        with self._lock:
+            if self.session is None:
+                logger.debug("Initializing internal sync HTTP session (niquests)...")
+                self.session = niquests.Session(resolver="system://")
+                self._session_owner = True
+            if not self._is_ready:
+                self._is_ready = True
+                if self._client.cache_endpoints:
+                    self._loader.schedule_tasks()
 
     def request(self, route: Route) -> dict[str, t.Any]:
         """Makes a synchronous request to the PokeAPI.

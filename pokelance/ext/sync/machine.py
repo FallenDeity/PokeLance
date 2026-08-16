@@ -6,8 +6,8 @@ from __future__ import annotations
 
 import typing as t
 
+from pokelance.endpoints import Endpoint
 from pokelance.ext.sync._base import SyncBaseExtension
-from pokelance.http.endpoints import Endpoint
 
 if t.TYPE_CHECKING:
     from pokelance import models

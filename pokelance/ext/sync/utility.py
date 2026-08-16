@@ -6,8 +6,8 @@ from __future__ import annotations
 
 import typing as t
 
+from pokelance.endpoints import Endpoint
 from pokelance.ext.sync._base import SyncBaseExtension
-from pokelance.http.endpoints import Endpoint
 
 if t.TYPE_CHECKING:
     from pokelance import models
@@ -29,6 +29,7 @@ class Utility(_Base):
         for category, route in routes.items():
             data = self._client.request(route)
             self._cache_manager.load_documents("Utility", category, data["results"])
+        self._cache_group.api_metadata.set_ready()
 
     def get_language(self, id: int) -> models.Language | None:
         """Gets a language from the cache.

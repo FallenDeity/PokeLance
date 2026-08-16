@@ -89,9 +89,9 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path) -
                 names=[ast.alias(name=base_ext_cls)],
                 level=0,
             ),
-            # from pokelance.http.endpoints import Endpoint
+            # from pokelance.endpoints import Endpoint
             ast.ImportFrom(
-                module="pokelance.http.endpoints",
+                module="pokelance.endpoints",
                 names=[ast.alias(name="Endpoint")],
                 level=0,
             ),
@@ -333,6 +333,34 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path) -
             )
             setup_stmts = [routes_assign, loop]
     else:
+        setup_stmts = []
+
+    # Mark non-list categories as ready since they have no list-endpoint to load
+    for cat in spec.categories:
+        if cat.endpoint_list is None:
+            setup_stmts.append(
+                ast.Expr(
+                    value=ast.Call(
+                        func=ast.Attribute(
+                            value=ast.Attribute(
+                                value=ast.Attribute(
+                                    value=ast.Name(id="self", ctx=ast.Load()),
+                                    attr="_cache_group",
+                                    ctx=ast.Load(),
+                                ),
+                                attr=cat.cache_attr,
+                                ctx=ast.Load(),
+                            ),
+                            attr="set_ready",
+                            ctx=ast.Load(),
+                        ),
+                        args=[],
+                        keywords=[],
+                    )
+                )
+            )
+
+    if not setup_stmts:
         setup_stmts = [ast.Pass()]
 
     # Attach setup() to class
@@ -759,8 +787,10 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
                 names=[ast.alias(name=base_cache_cls), ast.alias(name=base_agg_cls)],
                 level=0,
             ),
-            # from pokelance.http.endpoints import Route
-            ast.ImportFrom(module="pokelance.http.endpoints", names=[ast.alias(name="Route")], level=0),
+            # from pokelance.cache._base import CacheStats
+            ast.ImportFrom(module="pokelance.cache._base", names=[ast.alias(name="CacheStats")], level=0),
+            # from pokelance.endpoints import Route
+            ast.ImportFrom(module="pokelance.endpoints", names=[ast.alias(name="Route")], level=0),
             # if t.TYPE_CHECKING: import client type
             ast.If(
                 test=ast.Attribute(value=ast.Name(id="t", ctx=ast.Load()), attr="TYPE_CHECKING", ctx=ast.Load()),
@@ -1324,6 +1354,61 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
                 decorator_list=[],
             )
         )
+
+    # stats property for top-level manager
+    stats_body: list[ast.stmt] = [
+        ast.Assign(
+            targets=[ast.Name(id="s", ctx=ast.Store())],
+            value=ast.Call(func=ast.Name(id="CacheStats", ctx=ast.Load()), args=[], keywords=[]),
+        ),
+        ast.For(
+            target=ast.Name(id="aggregate", ctx=ast.Store()),
+            iter=ast.Call(
+                func=ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="_walk_aggregates", ctx=ast.Load()),
+                args=[],
+                keywords=[],
+            ),
+            body=[
+                ast.Assign(
+                    targets=[ast.Name(id="agg_stats", ctx=ast.Store())],
+                    value=ast.Attribute(value=ast.Name(id="aggregate", ctx=ast.Load()), attr="stats", ctx=ast.Load()),
+                ),
+                ast.AugAssign(
+                    target=ast.Attribute(value=ast.Name(id="s", ctx=ast.Load()), attr="hits", ctx=ast.Store()),
+                    op=ast.Add(),
+                    value=ast.Attribute(value=ast.Name(id="agg_stats", ctx=ast.Load()), attr="hits", ctx=ast.Load()),
+                ),
+                ast.AugAssign(
+                    target=ast.Attribute(value=ast.Name(id="s", ctx=ast.Load()), attr="misses", ctx=ast.Store()),
+                    op=ast.Add(),
+                    value=ast.Attribute(value=ast.Name(id="agg_stats", ctx=ast.Load()), attr="misses", ctx=ast.Load()),
+                ),
+                ast.AugAssign(
+                    target=ast.Attribute(value=ast.Name(id="s", ctx=ast.Load()), attr="sets", ctx=ast.Store()),
+                    op=ast.Add(),
+                    value=ast.Attribute(value=ast.Name(id="agg_stats", ctx=ast.Load()), attr="sets", ctx=ast.Load()),
+                ),
+                ast.AugAssign(
+                    target=ast.Attribute(value=ast.Name(id="s", ctx=ast.Load()), attr="evictions", ctx=ast.Store()),
+                    op=ast.Add(),
+                    value=ast.Attribute(
+                        value=ast.Name(id="agg_stats", ctx=ast.Load()), attr="evictions", ctx=ast.Load()
+                    ),
+                ),
+            ],
+            orelse=[],
+        ),
+        ast.Return(value=ast.Name(id="s", ctx=ast.Load())),
+    ]
+    manager_body.append(
+        ast.FunctionDef(
+            name="stats",
+            args=ast.arguments(posonlyargs=[], args=[ast.arg(arg="self")], kwonlyargs=[], kw_defaults=[], defaults=[]),
+            returns=ast.Name(id="CacheStats", ctx=ast.Load()),
+            body=stats_body,
+            decorator_list=[ast.Name(id="property", ctx=ast.Load())],
+        )
+    )
 
     # Top-level Manager Class definition
     body.append(

@@ -42,6 +42,32 @@ def test_wait_until_ready_with_cache(cached_client: pokelance.PokeLanceAsyncClie
     assert not cached_client.http.loader._tasks, "No background tasks should remain."
 
 
+@pytest.mark.asyncio
+async def test_cache_group_wait_until_ready(cached_client: pokelance.PokeLanceAsyncClient) -> None:
+    """Resetting a cache group, triggering setup, and waiting on cache_group ensures subcache readiness."""
+    group = cached_client.berry.cache_group
+    group.reset()
+    for cache in group._walk_caches():
+        assert not cache.is_ready
+
+    await cached_client.berry.setup()
+    await group.wait_until_ready()
+
+    for cache in group._walk_caches():
+        assert cache.is_ready
+    assert "cheri" in group.berry.endpoints
+
+
+@pytest.mark.asyncio
+async def test_cache_manager_wait_until_ready(cached_client: pokelance.PokeLanceAsyncClient) -> None:
+    """Awaiting cache_manager.wait_until_ready() waits for all sub-caches across all aggregates."""
+    await cached_client.http.cache_manager.wait_until_ready()
+
+    for agg in cached_client.http.cache_manager._walk_aggregates():
+        for cache in agg._walk_caches():
+            assert cache.is_ready
+
+
 # ---------------------------------------------------------------------------
 # Manual setup() per extension
 # ---------------------------------------------------------------------------
