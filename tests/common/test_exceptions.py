@@ -44,6 +44,7 @@ from pokelance.exceptions import (
 
 
 class _FakeRoute:
+    @t.override
     def __str__(self) -> str:
         return "/fake/route"
 

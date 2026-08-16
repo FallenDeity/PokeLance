@@ -46,3 +46,10 @@ repos:
         language: system
         types_or: [python, pyi]
         pass_filenames: false
+
+      - id: check-codegen
+        name: Check Code Generation
+        entry: uv run python scripts/gen_scripts/generate_all.py --check
+        language: system
+        types_or: [python, pyi]
+        pass_filenames: false

@@ -37,30 +37,30 @@ class _Color(enum.Enum):
 
 
 def test_serializer_unwraps_str_enum() -> None:
-    result = _serializer(None, None, _Color.RED)  # type: ignore[arg-type]
+    result = _serializer(None, t.cast("t.Any", None), _Color.RED)
     assert result == "red"
 
 
 def test_serializer_unwraps_int_enum() -> None:
-    result = _serializer(None, None, _Color.BLUE)  # type: ignore[arg-type]
+    result = _serializer(None, t.cast("t.Any", None), _Color.BLUE)
     assert result == 42
 
 
 def test_serializer_passthrough_str() -> None:
-    assert _serializer(None, None, "hello") == "hello"  # type: ignore[arg-type]
+    assert _serializer(None, t.cast("t.Any", None), "hello") == "hello"
 
 
 def test_serializer_passthrough_int() -> None:
-    assert _serializer(None, None, 99) == 99  # type: ignore[arg-type]
+    assert _serializer(None, t.cast("t.Any", None), 99) == 99
 
 
 def test_serializer_passthrough_none() -> None:
-    assert _serializer(None, None, None) is None  # type: ignore[arg-type]
+    assert _serializer(None, t.cast("t.Any", None), None) is None
 
 
 def test_serializer_passthrough_list() -> None:
     lst = [1, 2, 3]
-    assert _serializer(None, None, lst) is lst  # type: ignore[arg-type]
+    assert _serializer(None, t.cast("t.Any", None), lst) is lst
 
 
 # ---------------------------------------------------------------------------

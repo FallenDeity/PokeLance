@@ -6,6 +6,7 @@ on:
     paths: &paths
       - "**.py"
       - "pokelance/**"
+      - "scripts/**"
       - "tests/**"
       - "pyproject.toml"
       - "uv.lock"
@@ -39,6 +40,10 @@ jobs:
       - name: Install Dependencies
         run: |
           uv sync --locked --all-groups
+
+      - name: Verify generated files are up-to-date
+        run: |
+          uv run python scripts/gen_scripts/generate_all.py --check
 
       - name: Run ruff check
         run: |

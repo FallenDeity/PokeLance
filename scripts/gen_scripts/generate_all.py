@@ -19,8 +19,13 @@ from __future__ import annotations
 import argparse
 import ast
 import inspect
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
+
+# Add current script directory to sys.path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 # Import the single source of truth
 from _registry import EXTENSIONS, ExtensionSpec
@@ -30,21 +35,25 @@ from _registry import EXTENSIONS, ExtensionSpec
 # ---------------------------------------------------------------------------
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-EXT_DIR = PROJECT_ROOT / "pokelance" / "ext"
-ASYNC_EXT_DIR = EXT_DIR / "_async"
-SYNC_EXT_DIR = EXT_DIR / "sync"
-ASYNC_CACHE_DIR = PROJECT_ROOT / "pokelance" / "cache" / "_async"
-SYNC_CACHE_DIR = PROJECT_ROOT / "pokelance" / "cache" / "sync"
-
-ASYNC_EXT_DIR.mkdir(parents=True, exist_ok=True)
-SYNC_EXT_DIR.mkdir(parents=True, exist_ok=True)
-ASYNC_CACHE_DIR.mkdir(parents=True, exist_ok=True)
-SYNC_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # ---------------------------------------------------------------------------
 # Formatting helpers
 # ---------------------------------------------------------------------------
+
+
+def format_tree(root: Path) -> None:
+    """Run ruff check --fix and ruff format on the target tree."""
+    subprocess.run(
+        [sys.executable, "-m", "ruff", "check", str(root), "--fix", "--unsafe-fixes"],
+        capture_output=True,
+        text=True,
+    )
+    subprocess.run(
+        [sys.executable, "-m", "ruff", "format", str(root)],
+        capture_output=True,
+        text=True,
+    )
 
 
 def format_docstring(doc: str, indent_spaces: int = 4) -> str:
@@ -61,7 +70,7 @@ def format_docstring(doc: str, indent_spaces: int = 4) -> str:
 # ---------------------------------------------------------------------------
 
 
-def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path) -> str:
+def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path, write: bool = True) -> str:
     """Generate a complete extension module using Python AST."""
     client_type = "PokeLanceAsyncClient" if is_async else "PokeLanceSyncClient"
     client_mod = "pokelance.client.async_client" if is_async else "pokelance.client.sync_client"
@@ -742,9 +751,8 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path) -
         "# DO NOT EDIT MANUALLY\n"
         "# Edit scripts/gen_scripts/_registry.py instead.\n\n"
     )
-    formatted = header + unparsed + "\n"
-    output_path.write_text(formatted, encoding="utf-8")
-    return formatted
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(header + unparsed + "\n", encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------
@@ -752,7 +760,7 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path) -
 # ---------------------------------------------------------------------------
 
 
-def generate_cache_manager(is_async: bool, output_path: Path) -> str:
+def generate_cache_manager(is_async: bool, output_path: Path) -> None:
     """Generate the full cache manager file using Python AST and ast.unparse()."""
     base_cache_cls = "AsyncCache" if is_async else "SyncCache"
     base_agg_cls = "AsyncCacheGroup" if is_async else "SyncCacheGroup"
@@ -1104,9 +1112,59 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
         "# DO NOT EDIT MANUALLY\n"
         "# Edit scripts/gen_scripts/_registry.py instead.\n\n"
     )
-    formatted = header + unparsed + "\n"
-    output_path.write_text(formatted, encoding="utf-8")
-    return formatted
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(header + unparsed + "\n", encoding="utf-8")
+
+
+# ---------------------------------------------------------------------------
+# Generation & Comparison Orchestration
+# ---------------------------------------------------------------------------
+
+
+def generate_all_to_root(
+    root: Path,
+    generate_cache: bool,
+    generate_ext: bool,
+    do_async: bool,
+    do_sync: bool,
+) -> list[tuple[Path, Path]]:
+    """Generate targets into a root directory. Returns list of (generated_path, repo_path)."""
+    pairs: list[tuple[Path, Path]] = []
+
+    async_cache_dir = root / "pokelance" / "cache" / "_async"
+    sync_cache_dir = root / "pokelance" / "cache" / "sync"
+    async_ext_dir = root / "pokelance" / "ext" / "_async"
+    sync_ext_dir = root / "pokelance" / "ext" / "sync"
+
+    repo_async_cache = PROJECT_ROOT / "pokelance" / "cache" / "_async"
+    repo_sync_cache = PROJECT_ROOT / "pokelance" / "cache" / "sync"
+    repo_async_ext = PROJECT_ROOT / "pokelance" / "ext" / "_async"
+    repo_sync_ext = PROJECT_ROOT / "pokelance" / "ext" / "sync"
+
+    if generate_cache:
+        if do_async:
+            p = async_cache_dir / "manager.py"
+            generate_cache_manager(is_async=True, output_path=p)
+            pairs.append((p, repo_async_cache / "manager.py"))
+
+        if do_sync:
+            p = sync_cache_dir / "manager.py"
+            generate_cache_manager(is_async=False, output_path=p)
+            pairs.append((p, repo_sync_cache / "manager.py"))
+
+    if generate_ext:
+        for spec in EXTENSIONS:
+            if do_async:
+                p = async_ext_dir / f"{spec.module_name}.py"
+                generate_extension(spec, is_async=True, output_path=p)
+                pairs.append((p, repo_async_ext / f"{spec.module_name}.py"))
+
+            if do_sync:
+                p = sync_ext_dir / f"{spec.module_name}.py"
+                generate_extension(spec, is_async=False, output_path=p)
+                pairs.append((p, repo_sync_ext / f"{spec.module_name}.py"))
+
+    return pairs
 
 
 # ---------------------------------------------------------------------------
@@ -1128,62 +1186,32 @@ def main() -> int:
     do_async = not args.sync_only
     do_sync = not args.async_only
 
-    all_ok = True
-
-    # 1. Generate cache managers
-    if generate_cache:
-        if do_async:
-            async_manager_path = ASYNC_CACHE_DIR / "manager.py"
-            async_manager_content = generate_cache_manager(is_async=True, output_path=async_manager_path)
-            if args.check:
-                if async_manager_path.read_text(encoding="utf-8") != async_manager_content:
-                    print(f"STALE: {async_manager_path}", file=sys.stderr)
-                    all_ok = False
-            else:
-                print(f"Generated (AST): {async_manager_path}")
-
-        if do_sync:
-            sync_manager_path = SYNC_CACHE_DIR / "manager.py"
-            sync_manager_content = generate_cache_manager(is_async=False, output_path=sync_manager_path)
-            if args.check:
-                if sync_manager_path.read_text(encoding="utf-8") != sync_manager_content:
-                    print(f"STALE: {sync_manager_path}", file=sys.stderr)
-                    all_ok = False
-            else:
-                print(f"Generated (AST): {sync_manager_path}")
-
-    # 2. Generate extensions
-    if generate_ext:
-        for spec in EXTENSIONS:
-            if do_async:
-                async_path = ASYNC_EXT_DIR / f"{spec.module_name}.py"
-                async_content = generate_extension(spec, is_async=True, output_path=async_path)
-                if args.check:
-                    if async_path.read_text(encoding="utf-8") != async_content:
-                        print(f"STALE: {async_path}", file=sys.stderr)
-                        all_ok = False
-                else:
-                    print(f"Generated (AST): {async_path}")
-
-            if do_sync:
-                sync_path = SYNC_EXT_DIR / f"{spec.module_name}.py"
-                sync_content = generate_extension(spec, is_async=False, output_path=sync_path)
-                if args.check:
-                    if sync_path.read_text(encoding="utf-8") != sync_content:
-                        print(f"STALE: {sync_path}", file=sys.stderr)
-                        all_ok = False
-                else:
-                    print(f"Generated (AST): {sync_path}")
-
     if args.check:
-        if all_ok:
-            print("All generated files are up-to-date.")
-            return 0
-        else:
-            print("Some generated files are stale. Run without --check to regenerate.", file=sys.stderr)
-            return 1
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_root = Path(tmpdir)
+            pairs = generate_all_to_root(tmp_root, generate_cache, generate_ext, do_async, do_sync)
+            format_tree(tmp_root)
 
-    return 0
+            all_ok = True
+            for tmp_path, repo_path in pairs:
+                if not repo_path.exists() or repo_path.read_text(encoding="utf-8") != tmp_path.read_text(
+                    encoding="utf-8"
+                ):
+                    print(f"STALE: {repo_path}", file=sys.stderr)
+                    all_ok = False
+
+            if all_ok:
+                print("All generated files are up-to-date.")
+                return 0
+            else:
+                print("Some generated files are stale. Run without --check to regenerate.", file=sys.stderr)
+                return 1
+    else:
+        pairs = generate_all_to_root(PROJECT_ROOT, generate_cache, generate_ext, do_async, do_sync)
+        format_tree(PROJECT_ROOT / "pokelance")
+        for _, repo_path in pairs:
+            print(f"Generated (AST): {repo_path}")
+        return 0
 
 
 if __name__ == "__main__":
