@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing as t
+from collections import OrderedDict
 
 import attrs
 
@@ -112,7 +113,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         self._endpoint_key_is_id = endpoint_key_is_id
         self._url_suffix = url_suffix
         self._is_list = is_list
-        self._cache: dict[_KT, _VT] = {}
+        self._cache: OrderedDict[_KT, _VT] = OrderedDict()
         self._endpoints: dict[str, CacheEndpoint] = {}
         self._endpoints_by_id: dict[str, str] = {}
         self._identifiers: set[str] = set()
@@ -134,8 +135,8 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
 
     def __getitem__(self, key: _KT) -> _VT:
         try:
-            val = self._cache.pop(key)
-            self._cache[key] = val
+            val = self._cache[key]
+            self._cache.move_to_end(key)
             self._stats.hits += 1
             return val
         except KeyError:
@@ -145,10 +146,11 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
     def __setitem__(self, key: _KT, value: _VT) -> None:
         self._stats.sets += 1
         if key in self._cache:
-            self._cache[key] = self._cache.pop(key)
+            self._cache[key] = value
+            self._cache.move_to_end(key)
         else:
             if len(self._cache) >= self._max_size:
-                self._cache.pop(next(iter(self._cache.keys())))
+                self._cache.popitem(last=False)
                 self._stats.evictions += 1
             self._cache[key] = value
 
@@ -178,9 +180,8 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
             self[__key] = __default
             return self._cache[__key]
         self._stats.hits += 1
-        val = self._cache.pop(__key)
-        self._cache[__key] = val
-        return val
+        self._cache.move_to_end(__key)
+        return self._cache[__key]
 
     def clear(self) -> None:
         """Clear the cached data only. The endpoint registry is left intact."""
@@ -205,15 +206,15 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         """Get an item from the cache. If the exact key isn't found, attempt alias resolution."""
         if key in self._cache:
             self._stats.hits += 1
-            val = self._cache.pop(key)
-            self._cache[key] = val
-            return val
+            self._cache.move_to_end(key)
+            return self._cache[key]
         requested = key.endpoint.split("/")[-1]
         alias = self._endpoints_by_id.get(requested) or self._endpoints.get(requested)
         if alias:
             for k, v in self.items():
                 if k.endpoint.split("/")[-1] == str(alias):
                     self._stats.hits += 1
+                    self._cache.move_to_end(k)
                     return v
         self._stats.misses += 1
         return default
@@ -262,7 +263,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         return self._identifiers
 
     @property
-    def cache(self) -> dict[_KT, _VT]:
+    def cache(self) -> OrderedDict[_KT, _VT]:
         """The cache itself."""
         return self._cache
 
