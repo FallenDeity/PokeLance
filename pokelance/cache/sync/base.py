@@ -10,13 +10,14 @@ import attrs
 from pokelance.cache._base import BaseCacheGroup, BaseCacheState, CacheEndpoint
 from pokelance.http.endpoints import Route
 
+_KT = t.TypeVar("_KT", bound="Route")
+_VT = t.TypeVar("_VT", bound="BaseModel | t.Sequence[BaseModel]")
+
 if t.TYPE_CHECKING:
     from pokelance.cache.sync import SyncCache
     from pokelance.client.sync_client import PokeLanceSyncClient
     from pokelance.models import BaseModel
 
-    _KT = t.TypeVar("_KT", bound="Route")
-    _VT = t.TypeVar("_VT", bound="BaseModel | t.Sequence[BaseModel]")
     _BaseCacheState = BaseCacheState[_KT, _VT, PokeLanceSyncClient]
     _BaseCacheGroup = BaseCacheGroup[PokeLanceSyncClient, SyncCache[Route, t.Any]]
 else:

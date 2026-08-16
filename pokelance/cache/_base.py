@@ -33,7 +33,7 @@ class CacheEndpoint:
 
     Attributes
     ----------
-    id : t.Union[str, int]
+    id : str | int
         The ID of the endpoint.
     url : str
         The URL of the endpoint.

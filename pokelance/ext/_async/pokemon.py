@@ -7,7 +7,7 @@ from __future__ import annotations
 import asyncio
 import typing as t
 
-from pokelance.ext._base import AsyncBaseExtension
+from pokelance.ext._async._base import AsyncBaseExtension
 from pokelance.http.endpoints import Endpoint
 
 if t.TYPE_CHECKING:

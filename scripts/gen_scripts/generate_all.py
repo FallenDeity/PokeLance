@@ -66,6 +66,7 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path) -
     client_type = "PokeLanceAsyncClient" if is_async else "PokeLanceSyncClient"
     client_mod = "pokelance.client.async_client" if is_async else "pokelance.client.sync_client"
     base_ext_cls = "AsyncBaseExtension" if is_async else "SyncBaseExtension"
+    base_ext_mod = "pokelance.ext._async._base" if is_async else "pokelance.ext.sync._base"
     cache_manager_mod = "pokelance.cache._async.manager" if is_async else "pokelance.cache.sync.manager"
 
     # Module imports
@@ -82,9 +83,9 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path) -
         [
             # import typing as t
             ast.Import(names=[ast.alias(name="typing", asname="t")]),
-            # from pokelance.ext._base import <AsyncBaseExtension / SyncBaseExtension>
+            # from pokelance.ext.<_async/sync>._base import <AsyncBaseExtension / SyncBaseExtension>
             ast.ImportFrom(
-                module="pokelance.ext._base",
+                module=base_ext_mod,
                 names=[ast.alias(name=base_ext_cls)],
                 level=0,
             ),

@@ -23,11 +23,7 @@ if t.TYPE_CHECKING:
     AnyCacheManager = AsyncCacheManager | SyncCacheManager
     AnyCacheGroup = AsyncCacheGroup | SyncCacheGroup
 
-__all__: tuple[str, ...] = (
-    "AsyncBaseExtension",
-    "BaseExtension",
-    "SyncBaseExtension",
-)
+__all__: tuple[str, ...] = ("BaseExtension",)
 
 _CacheManagerT_co = TypeVar(
     "_CacheManagerT_co",
@@ -45,18 +41,6 @@ _CacheGroupT_co = TypeVar(
     "_CacheGroupT_co",
     bound="AsyncCacheGroup | SyncCacheGroup",
     default="AsyncCacheGroup | SyncCacheGroup",
-    covariant=True,
-)
-_AsyncCacheGroupT_co = TypeVar(
-    "_AsyncCacheGroupT_co",
-    bound="AsyncCacheGroup",
-    default="AsyncCacheGroup",
-    covariant=True,
-)
-_SyncCacheGroupT_co = TypeVar(
-    "_SyncCacheGroupT_co",
-    bound="SyncCacheGroup",
-    default="SyncCacheGroup",
     covariant=True,
 )
 
@@ -134,35 +118,3 @@ class BaseExtension(abc.ABC, t.Generic[_HTTPClientT_co, _CacheManagerT_co, _Cach
                 status=404,
                 suggestions=suggestions,
             )
-
-
-if t.TYPE_CHECKING:
-    _BaseAsyncExt = BaseExtension[AsyncHttpClient, AsyncCacheManager, _AsyncCacheGroupT_co]
-    _BaseSyncExt = BaseExtension[SyncHttpClient, SyncCacheManager, _SyncCacheGroupT_co]
-else:
-    _BaseAsyncExt = BaseExtension
-    _BaseSyncExt = BaseExtension
-
-
-class AsyncBaseExtension(
-    _BaseAsyncExt[_AsyncCacheGroupT_co],
-    t.Generic[_AsyncCacheGroupT_co],
-):
-    """Abstract base class for asynchronous extensions."""
-
-    @abc.abstractmethod
-    async def setup(self) -> None:
-        """Sets up the extension asynchronously."""
-        raise NotImplementedError
-
-
-class SyncBaseExtension(
-    _BaseSyncExt[_SyncCacheGroupT_co],
-    t.Generic[_SyncCacheGroupT_co],
-):
-    """Abstract base class for synchronous extensions."""
-
-    @abc.abstractmethod
-    def setup(self) -> None:
-        """Sets up the extension synchronously."""
-        raise NotImplementedError

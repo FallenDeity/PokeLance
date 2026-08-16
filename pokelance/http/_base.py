@@ -13,7 +13,7 @@ if t.TYPE_CHECKING:
     from pokelance.cache.sync.manager import SyncCacheManager
     from pokelance.client._base import _ClientBase
 
-    AnyCacheManager = t.Union[AsyncCacheManager, SyncCacheManager]
+    AnyCacheManager = AsyncCacheManager | SyncCacheManager
 
 __all__: tuple[str, ...] = ("BaseHttpClient",)
 
