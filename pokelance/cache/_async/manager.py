@@ -11,13 +11,15 @@ import attrs
 
 from pokelance import models
 from pokelance.cache._async.base import AsyncCache, AsyncCacheGroup
-from pokelance.cache._base import CacheStats
+from pokelance.cache._base import BaseCacheManager
 
 if t.TYPE_CHECKING:
-    import collections.abc as cabc
-
     from pokelance.client.async_client import PokeLanceAsyncClient
     from pokelance.endpoints import Route
+
+    _BaseCacheManager = BaseCacheManager[PokeLanceAsyncClient, AsyncCacheGroup]
+else:
+    _BaseCacheManager = BaseCacheManager
 
 __all__: tuple[str, ...] = ("AsyncCacheGroup", "AsyncCacheManager")
 
@@ -247,7 +249,7 @@ class Utility(AsyncCacheGroup):
 
 
 @attrs.define(slots=True, kw_only=True)
-class AsyncCacheManager:
+class AsyncCacheManager(_BaseCacheManager):
     """Top-level async cache manager."""
 
     client: PokeLanceAsyncClient
@@ -264,46 +266,7 @@ class AsyncCacheManager:
     pokemon: Pokemon = attrs.field(factory=Pokemon)
     utility: Utility = attrs.field(factory=Utility)
 
-    def _walk_aggregates(self) -> cabc.Iterator[AsyncCacheGroup]:
-        """Yield all child cache aggregates."""
-        for field in attrs.fields(self.__class__):
-            val = getattr(self, field.name)
-            if isinstance(val, AsyncCacheGroup):
-                yield val
-
-    def __attrs_post_init__(self) -> None:
-        for aggregate in self._walk_aggregates():
-            aggregate.set_size(self.max_size)
-            aggregate.set_client(self.client)
-
-    def set_size(self, max_size: int = 100) -> None:
-        self.max_size = max_size
-        for aggregate in self._walk_aggregates():
-            aggregate.set_size(max_size)
-
-    def load_documents(self, category: str, _type: str, data: list[dict[str, str]]) -> None:
-        getattr(getattr(self, category.lower()), _type).load_documents(data)
-
-    def clear(self) -> None:
-        for aggregate in self._walk_aggregates():
-            aggregate.clear()
-
-    def reset(self) -> None:
-        for aggregate in self._walk_aggregates():
-            aggregate.reset()
-
     async def wait_until_ready(self) -> None:
         """Wait for all sub-caches in all aggregates to be ready."""
         tasks = [aggregate.wait_until_ready() for aggregate in self._walk_aggregates()]
         await asyncio.gather(*tasks)
-
-    @property
-    def stats(self) -> CacheStats:
-        s = CacheStats()
-        for aggregate in self._walk_aggregates():
-            agg_stats = aggregate.stats
-            s.hits += agg_stats.hits
-            s.misses += agg_stats.misses
-            s.sets += agg_stats.sets
-            s.evictions += agg_stats.evictions
-        return s

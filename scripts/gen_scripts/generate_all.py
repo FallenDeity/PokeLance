@@ -787,17 +787,40 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
                 names=[ast.alias(name=base_cache_cls), ast.alias(name=base_agg_cls)],
                 level=0,
             ),
-            # from pokelance.cache._base import CacheStats
-            ast.ImportFrom(module="pokelance.cache._base", names=[ast.alias(name="CacheStats")], level=0),
+            # from pokelance.cache._base import BaseCacheManager, CacheStats
+            ast.ImportFrom(
+                module="pokelance.cache._base",
+                names=[ast.alias(name="BaseCacheManager"), ast.alias(name="CacheStats")],
+                level=0,
+            ),
             # from pokelance.endpoints import Route
             ast.ImportFrom(module="pokelance.endpoints", names=[ast.alias(name="Route")], level=0),
-            # if t.TYPE_CHECKING: import client type
+            # if t.TYPE_CHECKING: import client type and type _BaseCacheManager
             ast.If(
                 test=ast.Attribute(value=ast.Name(id="t", ctx=ast.Load()), attr="TYPE_CHECKING", ctx=ast.Load()),
                 body=[
                     ast.ImportFrom(module=client_import_mod, names=[ast.alias(name=client_type)], level=0),
+                    ast.Assign(
+                        targets=[ast.Name(id="_BaseCacheManager", ctx=ast.Store())],
+                        value=ast.Subscript(
+                            value=ast.Name(id="BaseCacheManager", ctx=ast.Load()),
+                            slice=ast.Tuple(
+                                elts=[
+                                    ast.Name(id=client_type, ctx=ast.Load()),
+                                    ast.Name(id=base_agg_cls, ctx=ast.Load()),
+                                ],
+                                ctx=ast.Load(),
+                            ),
+                            ctx=ast.Load(),
+                        ),
+                    ),
                 ],
-                orelse=[],
+                orelse=[
+                    ast.Assign(
+                        targets=[ast.Name(id="_BaseCacheManager", ctx=ast.Store())],
+                        value=ast.Name(id="BaseCacheManager", ctx=ast.Load()),
+                    ),
+                ],
             ),
             # __all__: tuple[str, ...] = (manager_name, base_agg_cls)
             ast.AnnAssign(
@@ -953,304 +976,6 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
         for spec in EXTENSIONS
     )
 
-    # _walk_aggregates using attrs.fields(self.__class__) -> cabc.Iterator[AsyncCacheGroup / SyncCacheGroup]
-    manager_body.append(
-        ast.FunctionDef(
-            name="_walk_aggregates",
-            args=ast.arguments(
-                posonlyargs=[],
-                args=[ast.arg(arg="self")],
-                kwonlyargs=[],
-                kw_defaults=[],
-                defaults=[],
-            ),
-            returns=ast.Subscript(
-                value=ast.Attribute(value=ast.Name(id="cabc", ctx=ast.Load()), attr="Iterator", ctx=ast.Load()),
-                slice=ast.Name(id=base_agg_cls, ctx=ast.Load()),
-                ctx=ast.Load(),
-            ),
-            body=[
-                # Docstring
-                ast.Expr(value=ast.Constant(value="Yield all child cache aggregates.")),
-                # for field in attrs.fields(self.__class__): ...
-                ast.For(
-                    target=ast.Name(id="field", ctx=ast.Store()),
-                    iter=ast.Call(
-                        func=ast.Attribute(value=ast.Name(id="attrs", ctx=ast.Load()), attr="fields", ctx=ast.Load()),
-                        args=[
-                            ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="__class__", ctx=ast.Load())
-                        ],
-                        keywords=[],
-                    ),
-                    body=[
-                        # val = getattr(self, field.name)
-                        ast.Assign(
-                            targets=[ast.Name(id="val", ctx=ast.Store())],
-                            value=ast.Call(
-                                func=ast.Name(id="getattr", ctx=ast.Load()),
-                                args=[
-                                    ast.Name(id="self", ctx=ast.Load()),
-                                    ast.Attribute(
-                                        value=ast.Name(id="field", ctx=ast.Load()), attr="name", ctx=ast.Load()
-                                    ),
-                                ],
-                                keywords=[],
-                            ),
-                        ),
-                        # if isinstance(val, base_agg_cls): yield val
-                        ast.If(
-                            test=ast.Call(
-                                func=ast.Name(id="isinstance", ctx=ast.Load()),
-                                args=[ast.Name(id="val", ctx=ast.Load()), ast.Name(id=base_agg_cls, ctx=ast.Load())],
-                                keywords=[],
-                            ),
-                            body=[ast.Expr(value=ast.Yield(value=ast.Name(id="val", ctx=ast.Load())))],
-                            orelse=[],
-                        ),
-                    ],
-                    orelse=[],
-                ),
-            ],
-            decorator_list=[],
-        )
-    )
-
-    # __attrs_post_init__
-    manager_body.append(
-        ast.FunctionDef(
-            name="__attrs_post_init__",
-            args=ast.arguments(posonlyargs=[], args=[ast.arg(arg="self")], kwonlyargs=[], kw_defaults=[], defaults=[]),
-            returns=ast.Constant(value=None),
-            body=[
-                # for aggregate in self._walk_aggregates(): aggregate.set_size(...); aggregate.set_client(...)
-                ast.For(
-                    target=ast.Name(id="aggregate", ctx=ast.Store()),
-                    iter=ast.Call(
-                        func=ast.Attribute(
-                            value=ast.Name(id="self", ctx=ast.Load()), attr="_walk_aggregates", ctx=ast.Load()
-                        ),
-                        args=[],
-                        keywords=[],
-                    ),
-                    body=[
-                        ast.Expr(
-                            value=ast.Call(
-                                func=ast.Attribute(
-                                    value=ast.Name(id="aggregate", ctx=ast.Load()), attr="set_size", ctx=ast.Load()
-                                ),
-                                args=[
-                                    ast.Attribute(
-                                        value=ast.Name(id="self", ctx=ast.Load()), attr="max_size", ctx=ast.Load()
-                                    )
-                                ],
-                                keywords=[],
-                            )
-                        ),
-                        ast.Expr(
-                            value=ast.Call(
-                                func=ast.Attribute(
-                                    value=ast.Name(id="aggregate", ctx=ast.Load()), attr="set_client", ctx=ast.Load()
-                                ),
-                                args=[
-                                    ast.Attribute(
-                                        value=ast.Name(id="self", ctx=ast.Load()), attr="client", ctx=ast.Load()
-                                    )
-                                ],
-                                keywords=[],
-                            )
-                        ),
-                    ],
-                    orelse=[],
-                )
-            ],
-            decorator_list=[],
-        )
-    )
-
-    # set_size
-    manager_body.append(
-        ast.FunctionDef(
-            name="set_size",
-            args=ast.arguments(
-                posonlyargs=[],
-                args=[ast.arg(arg="self"), ast.arg(arg="max_size", annotation=ast.Name(id="int", ctx=ast.Load()))],
-                kwonlyargs=[],
-                kw_defaults=[],
-                defaults=[ast.Constant(value=100)],
-            ),
-            returns=ast.Constant(value=None),
-            body=[
-                ast.Assign(
-                    targets=[
-                        ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="max_size", ctx=ast.Store())
-                    ],
-                    value=ast.Name(id="max_size", ctx=ast.Load()),
-                ),
-                ast.For(
-                    target=ast.Name(id="aggregate", ctx=ast.Store()),
-                    iter=ast.Call(
-                        func=ast.Attribute(
-                            value=ast.Name(id="self", ctx=ast.Load()), attr="_walk_aggregates", ctx=ast.Load()
-                        ),
-                        args=[],
-                        keywords=[],
-                    ),
-                    body=[
-                        ast.Expr(
-                            value=ast.Call(
-                                func=ast.Attribute(
-                                    value=ast.Name(id="aggregate", ctx=ast.Load()), attr="set_size", ctx=ast.Load()
-                                ),
-                                args=[ast.Name(id="max_size", ctx=ast.Load())],
-                                keywords=[],
-                            )
-                        )
-                    ],
-                    orelse=[],
-                ),
-            ],
-            decorator_list=[],
-        )
-    )
-
-    # load_documents
-    manager_body.append(
-        ast.FunctionDef(
-            name="load_documents",
-            args=ast.arguments(
-                posonlyargs=[],
-                args=[
-                    ast.arg(arg="self"),
-                    ast.arg(arg="category", annotation=ast.Name(id="str", ctx=ast.Load())),
-                    ast.arg(arg="_type", annotation=ast.Name(id="str", ctx=ast.Load())),
-                    ast.arg(
-                        arg="data",
-                        annotation=ast.Subscript(
-                            value=ast.Name(id="list", ctx=ast.Load()),
-                            slice=ast.Subscript(
-                                value=ast.Name(id="dict", ctx=ast.Load()),
-                                slice=ast.Tuple(
-                                    elts=[ast.Name(id="str", ctx=ast.Load()), ast.Name(id="str", ctx=ast.Load())],
-                                    ctx=ast.Load(),
-                                ),
-                                ctx=ast.Load(),
-                            ),
-                            ctx=ast.Load(),
-                        ),
-                    ),
-                ],
-                kwonlyargs=[],
-                kw_defaults=[],
-                defaults=[],
-            ),
-            returns=ast.Constant(value=None),
-            body=[
-                ast.Expr(
-                    value=ast.Call(
-                        func=ast.Attribute(
-                            value=ast.Call(
-                                func=ast.Name(id="getattr", ctx=ast.Load()),
-                                args=[
-                                    ast.Call(
-                                        func=ast.Name(id="getattr", ctx=ast.Load()),
-                                        args=[
-                                            ast.Name(id="self", ctx=ast.Load()),
-                                            ast.Call(
-                                                func=ast.Attribute(
-                                                    value=ast.Name(id="category", ctx=ast.Load()),
-                                                    attr="lower",
-                                                    ctx=ast.Load(),
-                                                ),
-                                                args=[],
-                                                keywords=[],
-                                            ),
-                                        ],
-                                        keywords=[],
-                                    ),
-                                    ast.Name(id="_type", ctx=ast.Load()),
-                                ],
-                                keywords=[],
-                            ),
-                            attr="load_documents",
-                            ctx=ast.Load(),
-                        ),
-                        args=[ast.Name(id="data", ctx=ast.Load())],
-                        keywords=[],
-                    )
-                )
-            ],
-            decorator_list=[],
-        )
-    )
-
-    # clear
-    manager_body.append(
-        ast.FunctionDef(
-            name="clear",
-            args=ast.arguments(posonlyargs=[], args=[ast.arg(arg="self")], kwonlyargs=[], kw_defaults=[], defaults=[]),
-            returns=ast.Constant(value=None),
-            body=[
-                ast.For(
-                    target=ast.Name(id="aggregate", ctx=ast.Store()),
-                    iter=ast.Call(
-                        func=ast.Attribute(
-                            value=ast.Name(id="self", ctx=ast.Load()), attr="_walk_aggregates", ctx=ast.Load()
-                        ),
-                        args=[],
-                        keywords=[],
-                    ),
-                    body=[
-                        ast.Expr(
-                            value=ast.Call(
-                                func=ast.Attribute(
-                                    value=ast.Name(id="aggregate", ctx=ast.Load()), attr="clear", ctx=ast.Load()
-                                ),
-                                args=[],
-                                keywords=[],
-                            )
-                        )
-                    ],
-                    orelse=[],
-                )
-            ],
-            decorator_list=[],
-        )
-    )
-
-    # reset
-    manager_body.append(
-        ast.FunctionDef(
-            name="reset",
-            args=ast.arguments(posonlyargs=[], args=[ast.arg(arg="self")], kwonlyargs=[], kw_defaults=[], defaults=[]),
-            returns=ast.Constant(value=None),
-            body=[
-                ast.For(
-                    target=ast.Name(id="aggregate", ctx=ast.Store()),
-                    iter=ast.Call(
-                        func=ast.Attribute(
-                            value=ast.Name(id="self", ctx=ast.Load()), attr="_walk_aggregates", ctx=ast.Load()
-                        ),
-                        args=[],
-                        keywords=[],
-                    ),
-                    body=[
-                        ast.Expr(
-                            value=ast.Call(
-                                func=ast.Attribute(
-                                    value=ast.Name(id="aggregate", ctx=ast.Load()), attr="reset", ctx=ast.Load()
-                                ),
-                                args=[],
-                                keywords=[],
-                            )
-                        )
-                    ],
-                    orelse=[],
-                )
-            ],
-            decorator_list=[],
-        )
-    )
-
     # wait_until_ready for top-level manager
     if is_async:
         manager_body.append(
@@ -1355,66 +1080,11 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> str:
             )
         )
 
-    # stats property for top-level manager
-    stats_body: list[ast.stmt] = [
-        ast.Assign(
-            targets=[ast.Name(id="s", ctx=ast.Store())],
-            value=ast.Call(func=ast.Name(id="CacheStats", ctx=ast.Load()), args=[], keywords=[]),
-        ),
-        ast.For(
-            target=ast.Name(id="aggregate", ctx=ast.Store()),
-            iter=ast.Call(
-                func=ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="_walk_aggregates", ctx=ast.Load()),
-                args=[],
-                keywords=[],
-            ),
-            body=[
-                ast.Assign(
-                    targets=[ast.Name(id="agg_stats", ctx=ast.Store())],
-                    value=ast.Attribute(value=ast.Name(id="aggregate", ctx=ast.Load()), attr="stats", ctx=ast.Load()),
-                ),
-                ast.AugAssign(
-                    target=ast.Attribute(value=ast.Name(id="s", ctx=ast.Load()), attr="hits", ctx=ast.Store()),
-                    op=ast.Add(),
-                    value=ast.Attribute(value=ast.Name(id="agg_stats", ctx=ast.Load()), attr="hits", ctx=ast.Load()),
-                ),
-                ast.AugAssign(
-                    target=ast.Attribute(value=ast.Name(id="s", ctx=ast.Load()), attr="misses", ctx=ast.Store()),
-                    op=ast.Add(),
-                    value=ast.Attribute(value=ast.Name(id="agg_stats", ctx=ast.Load()), attr="misses", ctx=ast.Load()),
-                ),
-                ast.AugAssign(
-                    target=ast.Attribute(value=ast.Name(id="s", ctx=ast.Load()), attr="sets", ctx=ast.Store()),
-                    op=ast.Add(),
-                    value=ast.Attribute(value=ast.Name(id="agg_stats", ctx=ast.Load()), attr="sets", ctx=ast.Load()),
-                ),
-                ast.AugAssign(
-                    target=ast.Attribute(value=ast.Name(id="s", ctx=ast.Load()), attr="evictions", ctx=ast.Store()),
-                    op=ast.Add(),
-                    value=ast.Attribute(
-                        value=ast.Name(id="agg_stats", ctx=ast.Load()), attr="evictions", ctx=ast.Load()
-                    ),
-                ),
-            ],
-            orelse=[],
-        ),
-        ast.Return(value=ast.Name(id="s", ctx=ast.Load())),
-    ]
-    manager_body.append(
-        ast.FunctionDef(
-            name="stats",
-            args=ast.arguments(posonlyargs=[], args=[ast.arg(arg="self")], kwonlyargs=[], kw_defaults=[], defaults=[]),
-            returns=ast.Name(id="CacheStats", ctx=ast.Load()),
-            body=stats_body,
-            decorator_list=[ast.Name(id="property", ctx=ast.Load())],
-        )
-    )
-
     # Top-level Manager Class definition
     body.append(
         ast.ClassDef(
             name=manager_name,
-            bases=[],
+            bases=[ast.Name(id="_BaseCacheManager", ctx=ast.Load())],
             keywords=[],
             body=manager_body,
             decorator_list=[attrs_define],

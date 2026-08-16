@@ -16,6 +16,7 @@ if t.TYPE_CHECKING:
 
 __all__: tuple[str, ...] = (
     "BaseCacheGroup",
+    "BaseCacheManager",
     "BaseCacheState",
     "CacheEndpoint",
     "CacheStats",
@@ -25,6 +26,7 @@ _KT = t.TypeVar("_KT", bound="Route")
 _VT = t.TypeVar("_VT", bound="BaseModel | t.Sequence[BaseModel]")
 _ClientT = t.TypeVar("_ClientT", bound="_ClientBase")
 _CacheT = t.TypeVar("_CacheT", bound="AnyCache")
+_GroupT = t.TypeVar("_GroupT", bound="BaseCacheGroup[t.Any, t.Any]")
 
 
 @attrs.define(kw_only=True, slots=True, frozen=True)
@@ -72,6 +74,19 @@ class CacheStats:
         self.misses = 0
         self.sets = 0
         self.evictions = 0
+
+    def __add__(self, other: object) -> CacheStats:
+        if not isinstance(other, CacheStats):
+            raise TypeError(f"Cannot add CacheStats with {type(other).__name__}")
+        return CacheStats(
+            hits=self.hits + other.hits,
+            misses=self.misses + other.misses,
+            sets=self.sets + other.sets,
+            evictions=self.evictions + other.evictions,
+        )
+
+    def __radd__(self, other: object) -> CacheStats:
+        return self.__add__(other)
 
 
 class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
@@ -261,14 +276,7 @@ class BaseCacheGroup(t.Generic[_ClientT, _CacheT]):
     @property
     def stats(self) -> CacheStats:
         """Aggregated statistics across all sub-caches in this group."""
-        combined = CacheStats()
-        for cache in self._walk_caches():
-            sub = cache.stats
-            combined.hits += sub.hits
-            combined.misses += sub.misses
-            combined.sets += sub.sets
-            combined.evictions += sub.evictions
-        return combined
+        return sum((cache.stats for cache in self._walk_caches()), CacheStats())
 
     def _walk_caches(self) -> t.Iterator[_CacheT]:
         """Yield all sub-caches belonging to this cache group."""
@@ -297,3 +305,48 @@ class BaseCacheGroup(t.Generic[_ClientT, _CacheT]):
         """Reset all endpoint registries in this cache group."""
         for cache in self._walk_caches():
             cache.reset_endpoints()
+
+
+@attrs.define(slots=True, kw_only=True)
+class BaseCacheManager(t.Generic[_ClientT, _GroupT]):
+    """Base class for cache managers (sync and async)."""
+
+    client: _ClientT
+    max_size: int = 100
+
+    def _walk_aggregates(self) -> t.Iterator[_GroupT]:
+        """Yield all child cache aggregates."""
+        for field in attrs.fields(self.__class__):
+            val = getattr(self, field.name)
+            if isinstance(val, BaseCacheGroup):
+                yield t.cast("_GroupT", val)
+
+    def __attrs_post_init__(self) -> None:
+        for aggregate in self._walk_aggregates():
+            aggregate.set_size(self.max_size)
+            aggregate.set_client(self.client)
+
+    def set_size(self, max_size: int = 100) -> None:
+        """Set max cache size across all aggregates."""
+        self.max_size = max_size
+        for aggregate in self._walk_aggregates():
+            aggregate.set_size(max_size)
+
+    def load_documents(self, category: str, _type: str, data: list[dict[str, str]]) -> None:
+        """Load endpoint documents into the specified category subcache."""
+        getattr(getattr(self, category.lower()), _type).load_documents(data)
+
+    def clear(self) -> None:
+        """Clear all cached data in all aggregates."""
+        for aggregate in self._walk_aggregates():
+            aggregate.clear()
+
+    def reset(self) -> None:
+        """Reset all endpoint registries in all aggregates."""
+        for aggregate in self._walk_aggregates():
+            aggregate.reset()
+
+    @property
+    def stats(self) -> CacheStats:
+        """Aggregate statistics across all sub-caches in all aggregates."""
+        return sum((aggregate.stats for aggregate in self._walk_aggregates()), CacheStats())

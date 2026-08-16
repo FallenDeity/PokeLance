@@ -222,3 +222,18 @@ async def test_cache_statistics(client: pokelance.PokeLanceAsyncClient) -> None:
     # 5. Group and Manager aggregate stats
     assert client.pokemon.cache_group.stats.hits >= 1
     assert client.http.cache_manager.stats.hits >= 1
+
+    # 6. CacheStats __add__, sum(), and ValueError validation
+    s1 = pokelance.CacheStats(hits=2, misses=1, sets=3, evictions=0)
+    s2 = pokelance.CacheStats(hits=3, misses=2, sets=1, evictions=1)
+    combined = s1 + s2
+    assert combined.hits == 5
+    assert combined.misses == 3
+    assert combined.sets == 4
+    assert combined.evictions == 1
+
+    total_sum = sum([s1, s2], pokelance.CacheStats())
+    assert total_sum.hits == 5
+
+    with pytest.raises(ValueError, match="Cannot add CacheStats with"):
+        _ = s1 + "invalid"  # type: ignore[operator]
