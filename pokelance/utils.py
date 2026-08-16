@@ -14,7 +14,6 @@ from typing import (
     Generic,
     TypedDict,
     TypeVar,
-    Union,
     cast,
     final,
     overload,
@@ -33,7 +32,7 @@ _T = TypeVar("_T")
 _R = TypeVar("_R")
 _Coro = Coroutine[Any, Any, _R]
 _CB = Callable[_P, _Coro[_R]]
-_CBP = Union[_CB[_P, _R], "partial[_Coro[_R]]", "partialmethod[_Coro[_R]]"]
+_CBP = _CB[_P, _R] | partial[_Coro[_R]] | partialmethod[_Coro[_R]]
 
 
 @final
@@ -90,14 +89,14 @@ class _LRUCacheWrapper(Generic[_P, _R]):
         self.__misses = 0
         self.__tasks: set[asyncio.Task[_R]] = set()
 
-    def __contains__(self, /, *args: Hashable, **kwargs: Any) -> bool:
+    def __contains__(self, /, *args: Hashable, **kwargs: Any) -> bool:  # ruff: ignore[any-type]
         key = _make_key(args, kwargs, self.__typed)
         return key in self.__cache
 
     def set_size(self, maxsize: int) -> None:
         self.__maxsize = maxsize
 
-    def cache_invalidate(self, /, *args: Hashable, **kwargs: Any) -> bool:
+    def cache_invalidate(self, /, *args: Hashable, **kwargs: Any) -> bool:  # ruff: ignore[any-type]
         key = _make_key(args, kwargs, self.__typed)
 
         cache_item = self.__cache.pop(key, None)
@@ -260,13 +259,13 @@ class _LRUCacheWrapperInstanceMethod(Generic[_P, _R, _T]):
         self.__instance = instance
         self.__wrapper = wrapper
 
-    def __contains__(self, *args: Hashable, **kwargs: Any) -> bool:
+    def __contains__(self, *args: Hashable, **kwargs: Any) -> bool:  # ruff: ignore[any-type]
         return self.__wrapper.__contains__(*args, **kwargs)
 
     def set_size(self, maxsize: int) -> None:
         self.__wrapper.set_size(maxsize)
 
-    def cache_invalidate(self, /, *args: Hashable, **kwargs: Any) -> bool:
+    def cache_invalidate(self, /, *args: Hashable, **kwargs: Any) -> bool:  # ruff: ignore[any-type]
         return self.__wrapper.cache_invalidate(self.__instance, *args, **kwargs)
 
     def cache_clear(self) -> None:
