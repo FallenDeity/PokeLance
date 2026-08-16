@@ -12,7 +12,7 @@ from pokelance.cache._base import Base, CacheEndpoint, CacheStateMixin
 from pokelance.http.endpoints import Route
 
 if t.TYPE_CHECKING:
-    from pokelance.client.async_client import PokeLance
+    from pokelance.client.async_client import PokeLanceAsyncClient
     from pokelance.models import BaseModel
 
 __all__: t.Tuple[str, ...] = (
@@ -26,10 +26,10 @@ __all__: t.Tuple[str, ...] = (
 logger = logging.getLogger(__name__)
 
 _KT = t.TypeVar("_KT", bound="Route")
-_VT = t.TypeVar("_VT", bound="t.Union[BaseModel, t.List[t.Any]]")
+_VT = t.TypeVar("_VT", bound="t.Union[BaseModel, t.Sequence[BaseModel]]")
 
 
-class AsyncIOMixin(CacheStateMixin[_KT, _VT, "PokeLance"], t.Generic[_KT, _VT]):
+class AsyncIOMixin(CacheStateMixin[_KT, _VT, "PokeLanceAsyncClient"], t.Generic[_KT, _VT]):
     """Async file I/O (aiofiles) and async HTTP bulk loading."""
 
     async def save(self, path: str = ".") -> None:
@@ -60,8 +60,7 @@ class AsyncIOMixin(CacheStateMixin[_KT, _VT, "PokeLance"], t.Generic[_KT, _VT]):
             data = self.get(t.cast(_KT, route), None)
             if not data:
                 res = await self._client.http.request(route)
-                val = [self._model.from_payload(i) for i in res] if isinstance(res, list) else self._model.from_payload(res)  # type: ignore
-                self.setdefault(t.cast(_KT, route), val)
+                self.setdefault(t.cast(_KT, route), self.from_payload(res))
         logger.info(f"Loaded {self._name}.")
 
     async def load_all_batch(self, batch_size: int = 20) -> None:
@@ -92,8 +91,7 @@ class AsyncIOMixin(CacheStateMixin[_KT, _VT, "PokeLance"], t.Generic[_KT, _VT]):
             return
         try:
             data = await self._client.http.request(route)
-            val = [self._model.from_payload(i) for i in data] if isinstance(data, list) else self._model.from_payload(data)  # type: ignore
-            self.setdefault(route, val)
+            self.setdefault(route, self.from_payload(data))
         except Exception as e:
             logger.error(f"Failed to load {route}: {e}")
 
@@ -104,10 +102,11 @@ class AsyncBaseCache(AsyncIOMixin[_KT, _VT], t.Generic[_KT, _VT]):
     def __init__(
         self,
         max_size: int = 100,
-        model: t.Optional[t.Type[_VT]] = None,
+        model: t.Optional[t.Type[BaseModel]] = None,
         name: str = "",
         endpoint_key_is_id: bool = False,
         url_suffix: str = "",
+        is_list: bool = False,
     ) -> None:
         super().__init__(
             max_size=max_size,
@@ -115,6 +114,7 @@ class AsyncBaseCache(AsyncIOMixin[_KT, _VT], t.Generic[_KT, _VT]):
             name=name,
             endpoint_key_is_id=endpoint_key_is_id,
             url_suffix=url_suffix,
+            is_list=is_list,
         )
         self._endpoints_ready: asyncio.Event = asyncio.Event()
 

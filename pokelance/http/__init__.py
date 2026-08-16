@@ -4,9 +4,9 @@ import asyncio
 import time
 import typing as t
 
-import aiohttp
-
-from pokelance.cache import Cache
+import niquests
+# Legacy compatibility until Stage 3 refactors http layer
+from pokelance.cache._async.manager import AsyncCacheManager as Cache
 from pokelance.exceptions import AudioNotFound, HTTPException, ImageNotFound
 
 from .endpoints import Endpoint, Route

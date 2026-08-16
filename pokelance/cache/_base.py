@@ -17,7 +17,7 @@ __all__: t.Tuple[str, ...] = (
 )
 
 _KT = t.TypeVar("_KT", bound="Route")
-_VT = t.TypeVar("_VT", bound="t.Union[BaseModel, t.List[t.Any]]")
+_VT = t.TypeVar("_VT", bound="t.Union[BaseModel, t.Sequence[BaseModel]]")
 _ClientT = t.TypeVar("_ClientT", bound="_ClientBase")
 _T = t.TypeVar("_T")
 
@@ -52,21 +52,31 @@ class CacheStateMixin(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT])
     def __init__(
         self,
         max_size: int = 100,
-        model: t.Optional[t.Type[_VT]] = None,
+        model: t.Optional[t.Type[BaseModel]] = None,
         name: str = "",
         endpoint_key_is_id: bool = False,
         url_suffix: str = "",
+        is_list: bool = False,
     ) -> None:
         self._max_size = max_size
         self._model = model
         self._name = name or self.__class__.__name__
         self._endpoint_key_is_id = endpoint_key_is_id
         self._url_suffix = url_suffix
+        self._is_list = is_list
         self._cache: t.Dict[_KT, _VT] = {}
         self._endpoints: t.Dict[str, CacheEndpoint] = {}
         self._endpoints_by_id: t.Dict[str, str] = {}
         self._identifiers: t.Set[str] = set()
         self._endpoints_cached: bool = False
+
+    def from_payload(self, payload: t.Any) -> _VT:
+        """Create a model instance or list of model instances from a raw payload."""
+        if self._model is None:
+            raise RuntimeError(f"Model class not configured for cache '{self._name}'")
+        if self._is_list:
+            return t.cast(_VT, [self._model.from_payload(item) for item in payload])
+        return t.cast(_VT, self._model.from_payload(payload))
 
     def __getitem__(self, key: _KT) -> _VT:
         self._cache[key] = self._cache.pop(key)
@@ -156,26 +166,15 @@ class CacheStateMixin(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT])
         """Serialise the in-memory cache to a plain dict."""
         dummy: t.Dict[str, t.Any] = {}
         for k, v in self.items():
-            dummy[k.endpoint] = [i.raw for i in v] if isinstance(v, list) else v.raw  # type: ignore
+            dummy[k.endpoint] = [i.raw for i in v] if self._is_list else v.raw  # type: ignore
         return dummy
 
     def deserialize(self, data: t.Dict[str, t.Any]) -> None:
         """Populate the in-memory cache from a plain dict (output of serialize)."""
-        if self._model is None:
-            raise RuntimeError("model= not set on this cache; cannot deserialize")
         self._max_size = max(self._max_size, len(data))
         for endpoint, info in data.items():
             route = Route(endpoint=endpoint)
-            val: t.Any
-            if isinstance(info, list):
-                val = [self._model.from_payload(i) for i in info]  # type: ignore
-            else:
-                val = self._model.from_payload(info)  # type: ignore
-            self.setdefault(t.cast(_KT, route), val)
-
-    def wait_until_ready(self) -> t.Any:
-        """Stub for IDE autocomplete. Overridden in concrete BaseCache / AsyncBaseCache."""
-        raise NotImplementedError
+            self.setdefault(t.cast(_KT, route), self.from_payload(info))
 
     @property
     def endpoints(self) -> t.Dict[str, CacheEndpoint]:
