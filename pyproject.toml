@@ -19,30 +19,31 @@ dependencies = [
     "aiofiles>=25.1.0",
     "types-aiofiles>=25.1.0.20260518",
     "niquests>=3.21.0",
+    "typing-extensions>=4.16.0",
 ]
 
 [dependency-groups]
 dev = [
-    "pygments>=2.20.0,<3",
-    "mkdocs>=1.6.1,<2",
-    "typing-extensions>=4.16.0,<5",
     "pre-commit>=2.21.0,<3",
-    "CairoSVG>=2.5.2,<3",
-    "pipwin>=0.5.2,<0.6",
-    "pytest>=7.4.4,<8",
-    "pytest-asyncio>=0.23.8,<0.24",
     "auto-changelog>=0.6.0,<0.7",
-    "deepdiff>=6.7.1,<7",
-    "pytkdocs[numpy-style]>=0.16.5",
-    "mkdocstrings[python]>=1.0.6",
-    "mkdocs-material>=9.7.7,<10",
-    "pytest-coverage>=0.0",
-    "markdown-exec[ansi]>=1.12.3",
-    "mkdocs-jupyter>=0.26.3",
-    "pillow>=12.3.0",
-    "pytest-rerunfailures>=16.1",
     "ty>=0.0.72",
     "ruff>=0.16.3",
+    "pytest>=9.1.1",
+    "pytest-coverage>=0.0",
+    "pytest-rerunfailures>=16.5",
+    "pytest-asyncio>=1.4.0",
+]
+docs = [
+    "cairosvg>=2.9.0",
+    "markdown-exec[ansi]>=1.12.3",
+    "mkdocs>=1.6.1",
+    "mkdocs-jupyter>=0.26.3",
+    "mkdocs-material>=9.7.7",
+    "mkdocstrings>=1.0.6",
+    "pillow>=12.3.0",
+    "pipwin>=0.5.2",
+    "pygments>=2.20.0",
+    "pytkdocs[numpy-style]>=0.16.5",
 ]
 
 [tool.uv.build-backend]

@@ -1,17 +1,17 @@
 from __future__ import annotations
 
 import functools
+import logging
 import typing as t
 from pathlib import Path
 
-from typing_extensions import Self
+from typing_extensions import Self, Unpack
 
-from pokelance.client._base import _ClientBase
+from pokelance.client._base import ClientConfig, _ClientBase
 from pokelance.constants import ExtensionEnum, ExtensionsL
 from pokelance.http._sync import SyncHttpClient
 
 if t.TYPE_CHECKING:
-    import logging
     from types import TracebackType
 
     import niquests
@@ -33,6 +33,8 @@ if t.TYPE_CHECKING:
 
 __all__: tuple[str, ...] = ("PokeLanceSyncClient",)
 
+logger = logging.getLogger(__name__)
+
 BaseModelT = t.TypeVar("BaseModelT", bound="BaseModel")
 
 
@@ -43,8 +45,6 @@ class PokeLanceSyncClient(_ClientBase[SyncHttpClient]):
     ----------
     http : SyncHttpClient
         The HTTP client used to make requests to the PokeAPI.
-    logger : logging.Logger
-        The logger used to log information about the client.
     cache_endpoints : bool
         Whether to pre-populate endpoint caches. Defaults to True.
     berry : Berry
@@ -89,23 +89,16 @@ class PokeLanceSyncClient(_ClientBase[SyncHttpClient]):
     def __init__(
         self,
         *,
-        audio_cache_size: int = 128,
-        image_cache_size: int = 128,
         cache_size: int = 100,
-        logger: logging.Logger | None = None,
-        cache_endpoints: bool = True,
         session: niquests.Session | None = None,
+        **kwargs: Unpack[ClientConfig],
     ) -> None:
-        http = SyncHttpClient(client=self, session=session, cache_size=cache_size)
-        self._setup_common(
-            http=http,
-            audio_cache_size=audio_cache_size,
-            image_cache_size=image_cache_size,
-            logger=logger,
-            cache_endpoints=cache_endpoints,
+        super().__init__(
+            http=SyncHttpClient(client=self, session=session, cache_size=cache_size),
+            **kwargs,
         )
-        self._cached_get_image = functools.lru_cache(maxsize=image_cache_size)(self._http.load_image)
-        self._cached_get_audio = functools.lru_cache(maxsize=audio_cache_size)(self._http.load_audio)
+        self._cached_get_image = functools.lru_cache(maxsize=self._image_cache_size)(self._http.load_image)
+        self._cached_get_audio = functools.lru_cache(maxsize=self._audio_cache_size)(self._http.load_audio)
         self.setup_hook("pokelance.ext.sync")
 
     def __enter__(self) -> Self:
@@ -117,7 +110,7 @@ class PokeLanceSyncClient(_ClientBase[SyncHttpClient]):
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None:
-        self._logger.warning("Closing session!")
+        logger.warning("Closing session!")
         self._http.close()
 
     def ping(self) -> float:
@@ -126,7 +119,7 @@ class PokeLanceSyncClient(_ClientBase[SyncHttpClient]):
 
     def close(self) -> None:
         """Closes the client session."""
-        self._logger.warning("Closing session!")
+        logger.warning("Closing session!")
         self._http.close()
 
     def getch_data(
@@ -159,6 +152,6 @@ class PokeLanceSyncClient(_ClientBase[SyncHttpClient]):
     def wait_until_ready(self) -> None:
         """Waits until all background endpoint caches are pre-populated."""
         self._http.connect()
-        self._logger.info("Waiting until ready...")
+        logger.info("Waiting until ready...")
         self._http.loader.wait_until_ready()
-        self._logger.info("Ready!")
+        logger.info("Ready!")

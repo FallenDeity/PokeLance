@@ -45,14 +45,17 @@ class AsyncEndpointLoader:
 
     async def _load_ext(self, coroutine: t.Callable[[], t.Coroutine[t.Any, t.Any, None]], message: str) -> None:
         """Load an extension's resources asynchronously."""
-        logger.debug(f"Loading {message}")
+        logger.debug(f"Loading {message}...")
         try:
             await coroutine()
+        except Exception:
+            logger.exception(f"Failed loading {message}")
+            raise
         finally:
             self._remaining -= 1
             if self._remaining <= 0:
                 self._ready_event.set()
-        logger.info(f"Loaded {message}")
+        logger.info(f"Loaded {message} ({self._remaining} remaining)")
 
     async def schedule_tasks(self) -> None:
         """Schedules background endpoint-loading tasks using asyncio.create_task."""
@@ -63,6 +66,7 @@ class AsyncEndpointLoader:
             return
         total = len(self._client.ext_tasks)
         self._remaining = total
+        logger.info(f"Scheduling {total} endpoint pre-population task(s)...")
         for num, (coroutine, name) in enumerate(self._client.ext_tasks):
             message = f"Extension {name} endpoints ({num + 1}/{total})"
             task = asyncio.create_task(coro=self._load_ext(coroutine, message), name=name)
@@ -74,6 +78,9 @@ class AsyncEndpointLoader:
 
     async def cancel_tasks(self) -> None:
         """Cancels and awaits all in-flight endpoint loading tasks."""
+        count = sum(1 for task in self._tasks if not task.done())
+        if count > 0:
+            logger.warning(f"Cancelling {count} in-flight endpoint loading task(s)...")
         for task in list(self._tasks):
             if not task.done():
                 task.cancel()
@@ -126,6 +133,7 @@ class AsyncHttpClient(_BaseHttpClient):
         """Closes the HTTP client and cancels pending endpoint loaders."""
         await self._loader.cancel_tasks()
         if self.session and self._session_owner:
+            logger.debug("Closing internal async HTTP session...")
             await self.session.close()
         elif self.session:
             logger.debug("Session was provided externally, not closing it.")
@@ -133,6 +141,7 @@ class AsyncHttpClient(_BaseHttpClient):
     async def connect(self) -> None:
         """Connects the HTTP client and sets up the session."""
         if self.session is None:
+            logger.debug("Initializing internal async HTTP session (niquests)...")
             self.session = niquests.AsyncSession(resolver="system://")
             self._session_owner = True
         if not self._is_ready:
@@ -140,7 +149,7 @@ class AsyncHttpClient(_BaseHttpClient):
                 await self._loader.schedule_tasks()
             self._is_ready = True
 
-    async def request(self, route: Route) -> t.Any:
+    async def request(self, route: Route) -> dict[str, t.Any]:
         """Makes an asynchronous request to the PokeAPI.
 
         Parameters
@@ -150,7 +159,7 @@ class AsyncHttpClient(_BaseHttpClient):
 
         Returns
         -------
-        t.Any
+        dict[str, t.Any]
             The response from the PokeAPI parsed as JSON.
 
         Raises
@@ -160,6 +169,7 @@ class AsyncHttpClient(_BaseHttpClient):
         """
         await self.connect()
         if self.session is not None:
+            logger.debug(f"Sending {route.method} request to {route.url}")
             response = await self.session.request(route.method, route.url, params=route.payload)
             return self._validate_response(response, route)
         raise HTTPException("No session was provided.", route, -1).create()
@@ -179,6 +189,7 @@ class AsyncHttpClient(_BaseHttpClient):
         """
         await self.connect()
         if self.session is not None:
+            logger.debug(f"Fetching image from {url}")
             response = await self.session.get(url)
             return self._validate_image(response, url)
         return b""
@@ -198,6 +209,7 @@ class AsyncHttpClient(_BaseHttpClient):
         """
         await self.connect()
         if self.session is not None:
+            logger.debug(f"Fetching audio from {url}")
             response = await self.session.get(url)
             return self._validate_audio(response, url)
         return b""
@@ -206,4 +218,6 @@ class AsyncHttpClient(_BaseHttpClient):
         """Pings the PokeAPI and returns the latency."""
         start = time.perf_counter()
         await self.request(Route())
-        return time.perf_counter() - start
+        latency = time.perf_counter() - start
+        logger.debug(f"PokeAPI async ping latency: {latency:.4f}s")
+        return latency

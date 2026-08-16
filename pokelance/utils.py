@@ -1,6 +1,7 @@
 import asyncio
 import contextlib
 import dataclasses
+import inspect
 import sys
 from asyncio.coroutines import _is_coroutine  # type: ignore[attr-defined]
 from collections import OrderedDict
@@ -281,7 +282,7 @@ def _make_wrapper(
         while isinstance(origin, (partial, partialmethod)):
             origin = origin.func
 
-        if not asyncio.iscoroutinefunction(origin):
+        if not inspect.iscoroutinefunction(origin):
             raise RuntimeError(f"Coroutine function is required, got {fn!r}")
 
         # functools.partialmethod support

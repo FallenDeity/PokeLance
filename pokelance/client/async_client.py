@@ -1,17 +1,17 @@
 from __future__ import annotations
 
+import logging
 import typing as t
 from pathlib import Path
 
-from typing_extensions import Self
+from typing_extensions import Self, Unpack
 
-from pokelance.client._base import _ClientBase
+from pokelance.client._base import ClientConfig, _ClientBase
 from pokelance.constants import ExtensionEnum, ExtensionsL
 from pokelance.http._async import AsyncHttpClient
 from pokelance.utils import alru_cache
 
 if t.TYPE_CHECKING:
-    import logging
     from types import TracebackType
 
     import niquests
@@ -33,6 +33,8 @@ if t.TYPE_CHECKING:
 
 __all__: tuple[str, ...] = ("PokeLanceAsyncClient",)
 
+logger = logging.getLogger(__name__)
+
 BaseModelT = t.TypeVar("BaseModelT", bound="BaseModel")
 
 
@@ -43,8 +45,6 @@ class PokeLanceAsyncClient(_ClientBase[AsyncHttpClient]):
     ----------
     http : AsyncHttpClient
         The HTTP client used to make requests to the PokeAPI.
-    logger : logging.Logger
-        The logger used to log information about the client.
     cache_endpoints : bool
         Whether to pre-populate endpoint caches. Defaults to True.
     berry : Berry
@@ -89,23 +89,16 @@ class PokeLanceAsyncClient(_ClientBase[AsyncHttpClient]):
     def __init__(
         self,
         *,
-        audio_cache_size: int = 128,
-        image_cache_size: int = 128,
         cache_size: int = 100,
-        logger: logging.Logger | None = None,
-        cache_endpoints: bool = True,
         session: niquests.AsyncSession | None = None,
+        **kwargs: Unpack[ClientConfig],
     ) -> None:
-        http = AsyncHttpClient(client=self, session=session, cache_size=cache_size)
-        self._setup_common(
-            http=http,
-            audio_cache_size=audio_cache_size,
-            image_cache_size=image_cache_size,
-            logger=logger,
-            cache_endpoints=cache_endpoints,
+        super().__init__(
+            http=AsyncHttpClient(client=self, session=session, cache_size=cache_size),
+            **kwargs,
         )
-        self.get_image.set_size(image_cache_size)
-        self.get_audio.set_size(audio_cache_size)
+        self.get_image.set_size(self._image_cache_size)
+        self.get_audio.set_size(self._audio_cache_size)
         self.setup_hook("pokelance.ext._async")
 
     async def __aenter__(self) -> Self:
@@ -117,7 +110,7 @@ class PokeLanceAsyncClient(_ClientBase[AsyncHttpClient]):
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None:
-        self._logger.warning("Closing session!")
+        logger.warning("Closing session!")
         await self._http.close()
 
     async def ping(self) -> float:
@@ -126,7 +119,7 @@ class PokeLanceAsyncClient(_ClientBase[AsyncHttpClient]):
 
     async def close(self) -> None:
         """Closes the client session."""
-        self._logger.warning("Closing session!")
+        logger.warning("Closing session!")
         await self._http.close()
 
     async def getch_data(
@@ -161,6 +154,6 @@ class PokeLanceAsyncClient(_ClientBase[AsyncHttpClient]):
     async def wait_until_ready(self) -> None:
         """Waits until all background endpoint caches are pre-populated."""
         await self._http.connect()
-        self._logger.info("Waiting until ready...")
+        logger.info("Waiting until ready...")
         await self._http.loader.wait_until_ready()
-        self._logger.info("Ready!")
+        logger.info("Ready!")

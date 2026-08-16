@@ -44,19 +44,28 @@ class SyncEndpointLoader:
 
     def wait_until_ready(self) -> None:
         """Wait until all background endpoint tasks have completed."""
+        awaiting = not self._ready_event.is_set()
+        if awaiting:
+            logger.info("Waiting for endpoint loading to complete...")
         self._ready_event.wait()
+        if awaiting:
+            logger.info("Endpoint loading complete.")
 
     def _load_ext(self, fn: t.Callable[[], None], message: str) -> None:
         """Load an extension's resources synchronously in a thread."""
-        logger.debug(f"Loading {message}")
+        logger.debug(f"Loading {message}...")
         try:
             fn()
+        except Exception:
+            logger.exception(f"Failed loading {message}")
+            raise
         finally:
             with self._lock:
                 self._remaining -= 1
-                if self._remaining <= 0:
+                remaining = self._remaining
+                if remaining <= 0:
                     self._ready_event.set()
-        logger.info(f"Loaded {message}")
+        logger.info(f"Loaded {message} ({remaining} remaining)")
 
     def schedule_tasks(self) -> None:
         """Schedules the background endpoint-loading tasks on a thread pool."""
@@ -67,6 +76,7 @@ class SyncEndpointLoader:
             return
         total = len(self._client.ext_tasks)
         self._remaining = total
+        logger.info(f"Scheduling {total} endpoint pre-population task(s)...")
         if self._executor is None:
             self._executor = concurrent.futures.ThreadPoolExecutor(
                 max_workers=min(32, max(4, total)),
@@ -83,9 +93,13 @@ class SyncEndpointLoader:
 
     def shutdown(self) -> None:
         """Cancels and shuts down the loader thread pool."""
+        count = sum(1 for f in self._futures if not f.done())
+        if count > 0:
+            logger.warning(f"Cancelling {count} in-flight endpoint loading tasks...")
         for future in list(self._futures):
             future.cancel()
         if self._executor is not None:
+            logger.debug("Shutting down endpoint loader thread pool...")
             self._executor.shutdown(wait=False, cancel_futures=True)
             self._executor = None
 
@@ -134,6 +148,7 @@ class SyncHttpClient(_BaseHttpClient):
         """Closes the HTTP client and shuts down the endpoint loader thread pool."""
         self._loader.shutdown()
         if self.session and self._session_owner:
+            logger.debug("Closing internal sync HTTP session...")
             self.session.close()
         elif self.session:
             logger.debug("Session was provided externally, not closing it.")
@@ -141,6 +156,7 @@ class SyncHttpClient(_BaseHttpClient):
     def connect(self) -> None:
         """Connects the HTTP client and sets up the session."""
         if self.session is None:
+            logger.debug("Initializing internal sync HTTP session (niquests)...")
             self.session = niquests.Session(resolver="system://")
             self._session_owner = True
         if not self._is_ready:
@@ -148,7 +164,7 @@ class SyncHttpClient(_BaseHttpClient):
                 self._loader.schedule_tasks()
             self._is_ready = True
 
-    def request(self, route: Route) -> t.Any:
+    def request(self, route: Route) -> dict[str, t.Any]:
         """Makes a synchronous request to the PokeAPI.
 
         Parameters
@@ -158,7 +174,7 @@ class SyncHttpClient(_BaseHttpClient):
 
         Returns
         -------
-        t.Any
+        dict[str, t.Any]
             The response from the PokeAPI parsed as JSON.
 
         Raises
@@ -168,6 +184,7 @@ class SyncHttpClient(_BaseHttpClient):
         """
         self.connect()
         if self.session is not None:
+            logger.debug(f"Sending {route.method} request to {route.url}")
             response = self.session.request(route.method, route.url, params=route.payload)
             return self._validate_response(response, route)
         raise HTTPException("No session was provided.", route, -1).create()
@@ -187,6 +204,7 @@ class SyncHttpClient(_BaseHttpClient):
         """
         self.connect()
         if self.session is not None:
+            logger.debug(f"Fetching image from {url}")
             response = self.session.get(url)
             return self._validate_image(response, url)
         return b""
@@ -206,6 +224,7 @@ class SyncHttpClient(_BaseHttpClient):
         """
         self.connect()
         if self.session is not None:
+            logger.debug(f"Fetching audio from {url}")
             response = self.session.get(url)
             return self._validate_audio(response, url)
         return b""
@@ -214,4 +233,6 @@ class SyncHttpClient(_BaseHttpClient):
         """Pings the PokeAPI and returns the latency."""
         start = time.perf_counter()
         self.request(Route())
-        return time.perf_counter() - start
+        latency = time.perf_counter() - start
+        logger.debug(f"PokeAPI sync ping latency: {latency:.4f}s")
+        return latency

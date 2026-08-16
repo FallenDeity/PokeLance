@@ -5,7 +5,7 @@ import attrs
 from typing_extensions import Self
 
 
-def _serializer(_instance: t.Any, _field: attrs.Attribute, value: t.Any) -> t.Any:  # type: ignore
+def _serializer(_instance: t.Any, _field: attrs.Attribute[t.Any], value: t.Any) -> t.Any:  # ruff: ignore[any-type]
     if isinstance(value, enum.Enum):
         return value.value
     return value

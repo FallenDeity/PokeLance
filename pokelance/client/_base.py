@@ -6,6 +6,7 @@ import typing as t
 from typing_extensions import TypeVar
 
 from pokelance.constants import Extension, ExtensionEnum, ExtensionsL
+from pokelance.logger import setup_logging
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -14,7 +15,9 @@ if t.TYPE_CHECKING:
     from pokelance.http._async import AsyncHttpClient
     from pokelance.http._sync import SyncHttpClient
 
-__all__: tuple[str, ...] = ("_ClientBase",)
+__all__: tuple[str, ...] = ("ClientConfig", "_ClientBase")
+
+logger = logging.getLogger(__name__)
 
 _HTTPClientT_co = TypeVar(
     "_HTTPClientT_co",
@@ -24,48 +27,68 @@ _HTTPClientT_co = TypeVar(
 )
 
 
+class ClientConfig(t.TypedDict, total=False):
+    """Configuration options for PokeLance clients."""
+
+    audio_cache_size: int
+    image_cache_size: int
+    cache_endpoints: bool
+    setup_logging: bool
+    log_level: int
+    structured_logging: bool
+    file_logging: bool
+    log_dir: str | Path
+    set_excepthook: bool
+
+
 class _ClientBase(t.Generic[_HTTPClientT_co]):
     """Shared base logic for PokeLanceAsyncClient and PokeLanceSyncClient."""
 
     EXTENSIONS: Path
-    _logger: logging.Logger
     _http: _HTTPClientT_co
     cache_endpoints: bool
     _ext_tasks: list[tuple[t.Callable[..., t.Any], str]]
     _image_cache_size: int
     _audio_cache_size: int
 
-    def _setup_common(
+    def __init__(
         self,
         *,
         http: _HTTPClientT_co,  # pyright: ignore[reportGeneralTypeIssues]
-        audio_cache_size: int = 128,
-        image_cache_size: int = 128,
-        logger: logging.Logger | None = None,
-        cache_endpoints: bool = True,
+        **kwargs: t.Unpack[ClientConfig],
     ) -> None:
-        self._logger = logger or logging.getLogger("pokelance")
+        if kwargs.get("setup_logging", True):
+            setup_logging(
+                log_level=kwargs.get("log_level", logging.INFO),
+                structured=kwargs.get("structured_logging", False),
+                file_logging=kwargs.get("file_logging", False),
+                log_dir=kwargs.get("log_dir", "logs"),
+                set_excepthook=kwargs.get("set_excepthook", True),
+            )
         self._http = http
-        self.cache_endpoints = cache_endpoints
+        self.cache_endpoints = kwargs.get("cache_endpoints", True)
         self._ext_tasks = []
-        self._image_cache_size = image_cache_size
-        self._audio_cache_size = audio_cache_size
+        self._image_cache_size = kwargs.get("image_cache_size", 128)
+        self._audio_cache_size = kwargs.get("audio_cache_size", 128)
 
     def setup_hook(self, ext_pkg: str) -> None:
         """Dynamically loads extensions from the specified package directory."""
-        self._logger.info(f"Using cache size: {self._http.cache_manager.max_size}")
+        logger.info(f"Using cache size: {self._http.cache_manager.max_size}")
         if not self.EXTENSIONS.exists():
+            logger.warning(f"Extensions directory '{self.EXTENSIONS}' does not exist.")
             return
         for extension in self.EXTENSIONS.iterdir():
             if extension.is_file() and extension.suffix == ".py" and "_" not in extension.stem:
                 module = __import__(f"{ext_pkg}.{extension.stem}", fromlist=["setup"])
                 module.setup(self)
-        self._logger.info("Setup complete")
+                logger.debug(f"Loaded extension module: {extension.stem}")
+        logger.info("Setup complete")
 
     def add_extension(self, name: str, extension: BaseExtension[_HTTPClientT_co]) -> None:
         """Adds an extension to the client."""
         self._ext_tasks.append((extension.setup, name))
         setattr(self, name, extension)
+        logger.debug(f"Registered extension '{name}'")
 
     def _resolve_extension_category(self, ext: ExtensionEnum | ExtensionsL | str, category: str) -> tuple[t.Any, str]:
         """Validates extension and category inputs and returns the extension instance and resolved category."""
@@ -84,12 +107,8 @@ class _ClientBase(t.Generic[_HTTPClientT_co]):
             raise ValueError(f"Invalid category: {category}, valid categories: {categories}")
 
         resolved_category = normalized_category.replace("-", "_")
+        logger.debug(f"Resolved extension '{extension.name}' category '{category}' -> {resolved_category}")
         return ext_instance, resolved_category
-
-    @property
-    def logger(self) -> logging.Logger:
-        """The logger used to log information about the client."""
-        return self._logger
 
     @property
     def http(self) -> _HTTPClientT_co:

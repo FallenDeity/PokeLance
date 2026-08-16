@@ -72,7 +72,13 @@ class AsyncCache(_BaseCacheState[_KT, _VT], t.Generic[_KT, _VT]):
 
     def set_ready(self) -> None:
         """Set the cache as ready."""
+        super().set_ready()
         self._ready.set()
+
+    def reset_endpoints(self) -> None:
+        """Reset endpoints and clear readiness event."""
+        super().reset_endpoints()
+        self._ready.clear()
 
     async def save(self, path: str = ".") -> None:
         """Save the cache to a JSON file asynchronously."""

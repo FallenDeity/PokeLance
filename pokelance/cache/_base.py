@@ -127,6 +127,10 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
 
     def _mark_endpoints_cached(self) -> None:
         self._identifiers = set(self._endpoints) | set(self._endpoints_by_id)
+        self.set_ready()
+
+    def set_ready(self) -> None:
+        """Set the cache endpoint state as ready."""
         self._endpoints_cached = True
 
     def reset_endpoints(self) -> None:
