@@ -3,7 +3,6 @@ from pathlib import Path
 
 from .constants import Extension, ExtensionEnum, ExtensionsL
 from .http import HttpClient
-from .logger import Logger
 from .utils import alru_cache
 
 if t.TYPE_CHECKING:
@@ -88,7 +87,7 @@ class PokeLance:
     """
 
     EXTENSIONS: Path = Path(__file__).parent / "ext"
-    _logger: t.Union["logging.Logger", Logger]
+    _logger: "logging.Logger"
     berry: "Berry"
     contest: "Contest"
     evolution: "Evolution"
@@ -130,7 +129,8 @@ class PokeLance:
             If a session is provided, the caller owns its lifecycle: ``close()`` will not
             close it, so the caller is responsible for closing it themselves.
         """
-        self._logger = logger or Logger(name="pokelance", file_logging=file_logging)
+        import logging
+        self._logger = logger or logging.getLogger("pokelance")
         self._http = HttpClient(client=self, session=session, cache_size=cache_size)
         self.cache_endpoints = cache_endpoints
         self._ext_tasks: t.List[t.Tuple[t.Callable[[], t.Coroutine[t.Any, t.Any, None]], str]] = []
@@ -339,7 +339,7 @@ class PokeLance:
         return self._ext_tasks
 
     @property
-    def logger(self) -> t.Union["logging.Logger", Logger]:
+    def logger(self) -> "logging.Logger":
         """
         The logger used to log information about the client.
 

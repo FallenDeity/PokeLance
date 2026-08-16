@@ -4,18 +4,11 @@ import typing as t
 
 from pokelance.cache._async.base import AsyncBaseCache, AsyncIOMixin
 from pokelance.cache._base import Base, CacheEndpoint, CacheStateMixin
-from pokelance.cache.sync.base import BaseCache, SyncIOMixin
-
-# Temporary alias until Stage 2 generates CacheManager
-Cache: t.Any = None
 
 __all__: t.Tuple[str, ...] = (
     "Base",
     "CacheEndpoint",
     "CacheStateMixin",
-    "SyncIOMixin",
     "AsyncIOMixin",
-    "BaseCache",
     "AsyncBaseCache",
-    "Cache",
 )

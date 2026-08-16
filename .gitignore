@@ -153,5 +153,5 @@ poetry.lock
 # Mkdocs
 site/
 
-# Scripts
-scripts/
+# Playgrounds
+playground/
