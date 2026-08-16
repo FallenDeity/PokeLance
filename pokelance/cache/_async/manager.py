@@ -119,6 +119,9 @@ class Item(AsyncCacheGroup):
     item_pocket: AsyncCache[Route, models.ItemPocket] = attrs.field(
         factory=lambda: AsyncCache(model=models.ItemPocket, name="item_pocket")
     )
+    currency: AsyncCache[Route, models.Currency] = attrs.field(
+        factory=lambda: AsyncCache(model=models.Currency, name="currency")
+    )
 
 
 @attrs.define(slots=True, kw_only=True)

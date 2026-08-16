@@ -32,6 +32,7 @@ class Item(_Base):
             "item_category": Endpoint.get_item_category_endpoints(),
             "item_fling_effect": Endpoint.get_item_fling_effect_endpoints(),
             "item_pocket": Endpoint.get_item_pocket_endpoints(),
+            "currency": Endpoint.get_currency_endpoints(),
         }
         results = await asyncio.gather(*(self._client.request(r) for r in routes.values()))
         for category, data in zip(routes.keys(), results, strict=False):
@@ -203,6 +204,39 @@ class Item(_Base):
         self._validate_resource(self._cache_group.item_pocket, name, route)
         data = await self._client.request(route)
         return self._cache_group.item_pocket.setdefault(route, self._cache_group.item_pocket.from_payload(data))
+
+    def get_currency(self, name: str | int) -> models.Currency | None:
+        """Gets a currency from the cache.
+
+        Parameters
+        ----------
+        name : str | int
+            The name or id.
+
+        Returns
+        -------
+        models.Currency | None
+            The cached model or None."""
+        route = Endpoint.get_currency(name)
+        self._validate_resource(self._cache_group.currency, name, route)
+        return self._cache_group.currency.get(route, None)
+
+    async def fetch_currency(self, name: str | int) -> models.Currency:
+        """Fetches a currency from the API.
+
+        Parameters
+        ----------
+        name : str | int
+            The name or id.
+
+        Returns
+        -------
+        models.Currency
+            The fetched model."""
+        route = Endpoint.get_currency(name)
+        self._validate_resource(self._cache_group.currency, name, route)
+        data = await self._client.request(route)
+        return self._cache_group.currency.setdefault(route, self._cache_group.currency.from_payload(data))
 
 
 def setup(lance: PokeLanceAsyncClient) -> None:

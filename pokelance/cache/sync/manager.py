@@ -116,6 +116,9 @@ class Item(SyncCacheGroup):
     item_pocket: SyncCache[Route, models.ItemPocket] = attrs.field(
         factory=lambda: SyncCache(model=models.ItemPocket, name="item_pocket")
     )
+    currency: SyncCache[Route, models.Currency] = attrs.field(
+        factory=lambda: SyncCache(model=models.Currency, name="currency")
+    )
 
 
 @attrs.define(slots=True, kw_only=True)

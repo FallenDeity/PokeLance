@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pokelance.ext._base import BaseExtension, SyncBaseExtension
+from pokelance.ext.sync._base import SyncBaseExtension
 from pokelance.ext.sync.berry import Berry
 from pokelance.ext.sync.contest import Contest
 from pokelance.ext.sync.encounter import Encounter
@@ -14,7 +14,6 @@ from pokelance.ext.sync.pokemon import Pokemon
 from pokelance.ext.sync.utility import Utility
 
 __all__: tuple[str, ...] = (
-    "BaseExtension",
     "Berry",
     "Contest",
     "Encounter",

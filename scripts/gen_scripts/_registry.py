@@ -225,6 +225,13 @@ EXTENSIONS: list[ExtensionSpec] = [
                 model=models.ItemPocket,
                 cache_attr="item_pocket",
             ),
+            CategorySpec(
+                name="currency",
+                endpoint=Endpoint.get_currency,
+                endpoint_list=Endpoint.get_currency_endpoints,
+                model=models.Currency,
+                cache_attr="currency",
+            ),
         ],
     ),
     ExtensionSpec(

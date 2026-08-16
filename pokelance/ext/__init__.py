@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pokelance.ext._async import (
+    AsyncBaseExtension,
     Berry,
     Contest,
     Encounter,
@@ -13,7 +14,8 @@ from pokelance.ext._async import (
     Pokemon,
     Utility,
 )
-from pokelance.ext._base import AsyncBaseExtension, BaseExtension, SyncBaseExtension
+from pokelance.ext._base import BaseExtension
+from pokelance.ext.sync import SyncBaseExtension
 
 __all__: tuple[str, ...] = (
     "AsyncBaseExtension",
