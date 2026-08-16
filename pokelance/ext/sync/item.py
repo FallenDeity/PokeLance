@@ -11,11 +11,17 @@ from pokelance.http.endpoints import Endpoint
 
 if t.TYPE_CHECKING:
     from pokelance import models
+    from pokelance.cache.sync.manager import Item as ItemCache
     from pokelance.client.sync_client import PokeLanceSyncClient
+
+    _Base = SyncBaseExtension[ItemCache]
+else:
+    _Base = SyncBaseExtension
+
 __all__: tuple[str, ...] = ("Item", "setup")
 
 
-class Item(SyncBaseExtension["ItemCache"]):
+class Item(_Base):
     """Extension for item related endpoints."""
 
     def setup(self) -> None:

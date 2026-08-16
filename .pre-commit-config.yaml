@@ -28,7 +28,7 @@ repos:
     hooks:
       - id: ruff-check
         name: Ruff Check
-        entry: uv run ruff check . --fix --output-format=concise
+        entry: uv run ruff check . --fix --unsafe-fixes --output-format=concise
         language: system
         types_or: [python, pyi]
         pass_filenames: false

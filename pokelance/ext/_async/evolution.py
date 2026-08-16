@@ -12,11 +12,17 @@ from pokelance.http.endpoints import Endpoint
 
 if t.TYPE_CHECKING:
     from pokelance import models
+    from pokelance.cache._async.manager import Evolution as EvolutionCache
     from pokelance.client.async_client import PokeLanceAsyncClient
+
+    _Base = AsyncBaseExtension[EvolutionCache]
+else:
+    _Base = AsyncBaseExtension
+
 __all__: tuple[str, ...] = ("Evolution", "setup")
 
 
-class Evolution(AsyncBaseExtension["EvolutionCache"]):
+class Evolution(_Base):
     """Extension for evolution related endpoints."""
 
     async def setup(self) -> None:

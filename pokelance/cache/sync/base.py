@@ -11,7 +11,17 @@ from pokelance.cache._base import BaseCacheGroup, BaseCacheState, CacheEndpoint
 from pokelance.http.endpoints import Route
 
 if t.TYPE_CHECKING:
+    from pokelance.cache.sync import SyncCache
+    from pokelance.client.sync_client import PokeLanceSyncClient
     from pokelance.models import BaseModel
+
+    _KT = t.TypeVar("_KT", bound="Route")
+    _VT = t.TypeVar("_VT", bound="BaseModel | t.Sequence[BaseModel]")
+    _BaseCacheState = BaseCacheState[_KT, _VT, PokeLanceSyncClient]
+    _BaseCacheGroup = BaseCacheGroup[PokeLanceSyncClient, SyncCache[Route, t.Any]]
+else:
+    _BaseCacheState = BaseCacheState
+    _BaseCacheGroup = BaseCacheGroup
 
 __all__: tuple[str, ...] = (
     "BaseCacheGroup",
@@ -23,11 +33,8 @@ __all__: tuple[str, ...] = (
 
 logger = logging.getLogger(__name__)
 
-_KT = t.TypeVar("_KT", bound="Route")
-_VT = t.TypeVar("_VT", bound="BaseModel | t.Sequence[BaseModel]")
 
-
-class SyncCache(BaseCacheState[_KT, _VT, "PokeLanceSyncClient"], t.Generic[_KT, _VT]):
+class SyncCache(_BaseCacheState[_KT, _VT], t.Generic[_KT, _VT]):
     """Sync cache: threading.Event readiness, synchronous file I/O, and sync HTTP bulk loading."""
 
     _ready: bool
@@ -125,7 +132,7 @@ class SyncCache(BaseCacheState[_KT, _VT, "PokeLanceSyncClient"], t.Generic[_KT, 
 
 
 @attrs.define(slots=True, kw_only=True)
-class SyncCacheGroup(BaseCacheGroup["PokeLanceSyncClient", SyncCache[Route, t.Any]]):
+class SyncCacheGroup(_BaseCacheGroup):
     """Base class for sync cache groups."""
 
     def wait_until_ready(self) -> None:

@@ -33,7 +33,7 @@ if t.TYPE_CHECKING:
 
 __all__: tuple[str, ...] = ("PokeLanceSyncClient",)
 
-BaseType = t.TypeVar("BaseType", bound="BaseModel")
+BaseModelT = t.TypeVar("BaseModelT", bound="BaseModel")
 
 
 class PokeLanceSyncClient(_ClientBase[SyncHttpClient]):
@@ -134,15 +134,15 @@ class PokeLanceSyncClient(_ClientBase[SyncHttpClient]):
         ext: ExtensionEnum | ExtensionsL | str,
         category: str,
         id_: int | str | None = None,
-    ) -> BaseType:
+    ) -> BaseModelT:  # pyright: ignore[reportInvalidTypeVarUse]
         """A getch method that looks up the cache first, then fetches from the API if not cached."""
         ext_instance, resolved_category = self._resolve_extension_category(ext, category)
         get_ = getattr(ext_instance, f"get_{resolved_category}")
         fetch_ = getattr(ext_instance, f"fetch_{resolved_category}")
         params = (id_,) if id_ is not None else ()
-        return t.cast("BaseType", get_(*params) or fetch_(*params))
+        return t.cast("BaseModelT", get_(*params) or fetch_(*params))
 
-    def from_url(self, url: str) -> BaseType:
+    def from_url(self, url: str) -> BaseModelT:  # pyright: ignore[reportInvalidTypeVarUse]
         """Constructs a request from URLs present in API data."""
         if params := ExtensionEnum.validate_url(url):
             return self.getch_data(params.extension, params.category, params.value)

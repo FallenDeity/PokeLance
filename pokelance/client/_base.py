@@ -16,20 +16,20 @@ if t.TYPE_CHECKING:
 
 __all__: tuple[str, ...] = ("_ClientBase",)
 
-_HTTPClientT = TypeVar(
-    "_HTTPClientT",
+_HTTPClientT_co = TypeVar(
+    "_HTTPClientT_co",
     bound="AsyncHttpClient | SyncHttpClient",
     covariant=True,
     default="AsyncHttpClient | SyncHttpClient",
 )
 
 
-class _ClientBase(t.Generic[_HTTPClientT]):
+class _ClientBase(t.Generic[_HTTPClientT_co]):
     """Shared base logic for PokeLanceAsyncClient and PokeLanceSyncClient."""
 
     EXTENSIONS: Path
     _logger: logging.Logger
-    _http: _HTTPClientT
+    _http: _HTTPClientT_co
     cache_endpoints: bool
     _ext_tasks: list[tuple[t.Callable[..., t.Any], str]]
     _image_cache_size: int
@@ -38,7 +38,7 @@ class _ClientBase(t.Generic[_HTTPClientT]):
     def _setup_common(
         self,
         *,
-        http: _HTTPClientT,
+        http: _HTTPClientT_co,  # pyright: ignore[reportGeneralTypeIssues]
         audio_cache_size: int = 128,
         image_cache_size: int = 128,
         logger: logging.Logger | None = None,
@@ -62,7 +62,7 @@ class _ClientBase(t.Generic[_HTTPClientT]):
                 module.setup(self)
         self._logger.info("Setup complete")
 
-    def add_extension(self, name: str, extension: BaseExtension[_HTTPClientT]) -> None:
+    def add_extension(self, name: str, extension: BaseExtension[_HTTPClientT_co]) -> None:
         """Adds an extension to the client."""
         self._ext_tasks.append((extension.setup, name))
         setattr(self, name, extension)
@@ -92,7 +92,7 @@ class _ClientBase(t.Generic[_HTTPClientT]):
         return self._logger
 
     @property
-    def http(self) -> _HTTPClientT:
+    def http(self) -> _HTTPClientT_co:
         """The HTTP client used to make requests to the PokeAPI."""
         return self._http
 

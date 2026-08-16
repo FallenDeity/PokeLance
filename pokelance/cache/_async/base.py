@@ -13,7 +13,17 @@ from pokelance.cache._base import BaseCacheGroup, BaseCacheState, CacheEndpoint
 from pokelance.http.endpoints import Route
 
 if t.TYPE_CHECKING:
+    from pokelance.cache._async import AsyncCache
+    from pokelance.client.async_client import PokeLanceAsyncClient
     from pokelance.models import BaseModel
+
+    _KT = t.TypeVar("_KT", bound="Route")
+    _VT = t.TypeVar("_VT", bound="BaseModel | t.Sequence[BaseModel]")
+    _BaseCacheState = BaseCacheState[_KT, _VT, PokeLanceAsyncClient]
+    _BaseCacheGroup = BaseCacheGroup[PokeLanceAsyncClient, AsyncCache[Route, t.Any]]
+else:
+    _BaseCacheState = BaseCacheState
+    _BaseCacheGroup = BaseCacheGroup
 
 __all__: tuple[str, ...] = (
     "AsyncCache",
@@ -25,11 +35,8 @@ __all__: tuple[str, ...] = (
 
 logger = logging.getLogger(__name__)
 
-_KT = t.TypeVar("_KT", bound="Route")
-_VT = t.TypeVar("_VT", bound="BaseModel | t.Sequence[BaseModel]")
 
-
-class AsyncCache(BaseCacheState[_KT, _VT, "PokeLanceAsyncClient"], t.Generic[_KT, _VT]):
+class AsyncCache(_BaseCacheState[_KT, _VT], t.Generic[_KT, _VT]):
     """Async cache: asyncio.Event readiness, aiofiles I/O, and async HTTP bulk loading."""
 
     _ready: asyncio.Event
@@ -131,7 +138,7 @@ class AsyncCache(BaseCacheState[_KT, _VT, "PokeLanceAsyncClient"], t.Generic[_KT
 
 
 @attrs.define(slots=True, kw_only=True)
-class AsyncCacheGroup(BaseCacheGroup["PokeLanceAsyncClient", AsyncCache[Route, t.Any]]):
+class AsyncCacheGroup(_BaseCacheGroup):
     """Base class for async cache groups."""
 
     async def wait_until_ready(self) -> None:

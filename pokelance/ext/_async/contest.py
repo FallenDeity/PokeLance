@@ -12,11 +12,17 @@ from pokelance.http.endpoints import Endpoint
 
 if t.TYPE_CHECKING:
     from pokelance import models
+    from pokelance.cache._async.manager import Contest as ContestCache
     from pokelance.client.async_client import PokeLanceAsyncClient
+
+    _Base = AsyncBaseExtension[ContestCache]
+else:
+    _Base = AsyncBaseExtension
+
 __all__: tuple[str, ...] = ("Contest", "setup")
 
 
-class Contest(AsyncBaseExtension["ContestCache"]):
+class Contest(_Base):
     """Extension for contest related endpoints."""
 
     async def setup(self) -> None:

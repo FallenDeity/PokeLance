@@ -19,9 +19,9 @@ if t.TYPE_CHECKING:
     from pokelance.http._sync import SyncHttpClient
     from pokelance.http.endpoints import Route
 
-    AnyHttpClient = t.Union[AsyncHttpClient, SyncHttpClient]
-    AnyCacheManager = t.Union[AsyncCacheManager, SyncCacheManager]
-    AnyCacheGroup = t.Union[AsyncCacheGroup, SyncCacheGroup]
+    AnyHttpClient = AsyncHttpClient | SyncHttpClient
+    AnyCacheManager = AsyncCacheManager | SyncCacheManager
+    AnyCacheGroup = AsyncCacheGroup | SyncCacheGroup
 
 __all__: tuple[str, ...] = (
     "AsyncBaseExtension",
@@ -29,72 +29,72 @@ __all__: tuple[str, ...] = (
     "SyncBaseExtension",
 )
 
-_CacheManagerT = TypeVar(
-    "_CacheManagerT",
+_CacheManagerT_co = TypeVar(
+    "_CacheManagerT_co",
     bound="AsyncCacheManager | SyncCacheManager",
     default="AsyncCacheManager | SyncCacheManager",
     covariant=True,
 )
-_HTTPClientT = TypeVar(
-    "_HTTPClientT",
+_HTTPClientT_co = TypeVar(
+    "_HTTPClientT_co",
     bound="BaseHttpClient[t.Any, t.Any, t.Any]",
     default="BaseHttpClient[t.Any, t.Any, t.Any]",
     covariant=True,
 )
-_CacheGroupT = TypeVar(
-    "_CacheGroupT",
+_CacheGroupT_co = TypeVar(
+    "_CacheGroupT_co",
     bound="AsyncCacheGroup | SyncCacheGroup",
     default="AsyncCacheGroup | SyncCacheGroup",
     covariant=True,
 )
-_AsyncCacheGroupT = TypeVar(
-    "_AsyncCacheGroupT",
+_AsyncCacheGroupT_co = TypeVar(
+    "_AsyncCacheGroupT_co",
     bound="AsyncCacheGroup",
     default="AsyncCacheGroup",
     covariant=True,
 )
-_SyncCacheGroupT = TypeVar(
-    "_SyncCacheGroupT",
+_SyncCacheGroupT_co = TypeVar(
+    "_SyncCacheGroupT_co",
     bound="SyncCacheGroup",
     default="SyncCacheGroup",
     covariant=True,
 )
 
 
-class BaseExtension(abc.ABC, t.Generic[_HTTPClientT, _CacheManagerT, _CacheGroupT]):
+class BaseExtension(abc.ABC, t.Generic[_HTTPClientT_co, _CacheManagerT_co, _CacheGroupT_co]):
     """The base extension class.
 
     Parameters
     ----------
-    client : _HTTPClientT
+    client : _HTTPClientT_co
         The HTTP client to use for requests.
 
     Attributes
     ----------
-    _client : _HTTPClientT
+    _client : _HTTPClientT_co
         The HTTP client to use for requests.
-    _cache_manager : _CacheManagerT
+    _cache_manager : _CacheManagerT_co
         The top-level cache manager.
-    _cache_group : _CacheGroupT
+    _cache_group : _CacheGroupT_co
         The category-specific cache group.
     """
 
-    _client: _HTTPClientT
-    _cache_manager: _CacheManagerT
-    _cache_group: _CacheGroupT
+    _client: _HTTPClientT_co
+    _cache_manager: _CacheManagerT_co
+    _cache_group: _CacheGroupT_co
 
-    def __init__(self, client: _HTTPClientT) -> None:
+    def __init__(self, client: _HTTPClientT_co) -> None:
         self._client = client
         self._cache_manager = client.cache_manager
         self._cache_group = getattr(self._cache_manager, self.__class__.__name__.lower())
 
     @property
-    def cache_group(self) -> _CacheGroupT:
+    def cache_group(self) -> _CacheGroupT_co:
         """The cache group for this extension."""
         return self._cache_group
 
     @property
-    def cache_manager(self) -> _CacheManagerT:
+    def cache_manager(self) -> _CacheManagerT_co:
         """The top-level cache manager."""
         return self._cache_manager
 
@@ -136,9 +136,17 @@ class BaseExtension(abc.ABC, t.Generic[_HTTPClientT, _CacheManagerT, _CacheGroup
             )
 
 
+if t.TYPE_CHECKING:
+    _BaseAsyncExt = BaseExtension[AsyncHttpClient, AsyncCacheManager, _AsyncCacheGroupT_co]
+    _BaseSyncExt = BaseExtension[SyncHttpClient, SyncCacheManager, _SyncCacheGroupT_co]
+else:
+    _BaseAsyncExt = BaseExtension
+    _BaseSyncExt = BaseExtension
+
+
 class AsyncBaseExtension(
-    BaseExtension["AsyncHttpClient", "AsyncCacheManager", _AsyncCacheGroupT],
-    t.Generic[_AsyncCacheGroupT],
+    _BaseAsyncExt[_AsyncCacheGroupT_co],
+    t.Generic[_AsyncCacheGroupT_co],
 ):
     """Abstract base class for asynchronous extensions."""
 
@@ -149,8 +157,8 @@ class AsyncBaseExtension(
 
 
 class SyncBaseExtension(
-    BaseExtension["SyncHttpClient", "SyncCacheManager", _SyncCacheGroupT],
-    t.Generic[_SyncCacheGroupT],
+    _BaseSyncExt[_SyncCacheGroupT_co],
+    t.Generic[_SyncCacheGroupT_co],
 ):
     """Abstract base class for synchronous extensions."""
 

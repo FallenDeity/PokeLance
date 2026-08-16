@@ -16,6 +16,7 @@ if t.TYPE_CHECKING:
 
     from pokelance.client.sync_client import PokeLanceSyncClient
     from pokelance.http.endpoints import Route
+
 __all__: tuple[str, ...] = ("SyncCacheGroup", "SyncCacheManager")
 
 

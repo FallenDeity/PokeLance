@@ -12,11 +12,17 @@ from pokelance.http.endpoints import Endpoint
 
 if t.TYPE_CHECKING:
     from pokelance import models
+    from pokelance.cache._async.manager import Move as MoveCache
     from pokelance.client.async_client import PokeLanceAsyncClient
+
+    _Base = AsyncBaseExtension[MoveCache]
+else:
+    _Base = AsyncBaseExtension
+
 __all__: tuple[str, ...] = ("Move", "setup")
 
 
-class Move(AsyncBaseExtension["MoveCache"]):
+class Move(_Base):
     """Extension for move related endpoints."""
 
     async def setup(self) -> None:

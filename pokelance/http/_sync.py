@@ -16,6 +16,10 @@ from pokelance.http.endpoints import Route
 if t.TYPE_CHECKING:
     from pokelance.client.sync_client import PokeLanceSyncClient
 
+    _BaseHttpClient = BaseHttpClient[PokeLanceSyncClient, niquests.Session, SyncCacheManager]
+else:
+    _BaseHttpClient = BaseHttpClient
+
 __all__: tuple[str, ...] = ("SyncEndpointLoader", "SyncHttpClient")
 
 logger = logging.getLogger(__name__)
@@ -87,7 +91,7 @@ class SyncEndpointLoader:
 
 
 @t.final
-class SyncHttpClient(BaseHttpClient["PokeLanceSyncClient", niquests.Session, SyncCacheManager]):
+class SyncHttpClient(_BaseHttpClient):
     """The synchronous HTTP client for PokeLance.
 
     Parameters

@@ -15,6 +15,10 @@ from pokelance.http.endpoints import Route
 if t.TYPE_CHECKING:
     from pokelance.client.async_client import PokeLanceAsyncClient
 
+    _BaseHttpClient = BaseHttpClient[PokeLanceAsyncClient, niquests.AsyncSession, AsyncCacheManager]
+else:
+    _BaseHttpClient = BaseHttpClient
+
 __all__: tuple[str, ...] = ("AsyncEndpointLoader", "AsyncHttpClient")
 
 logger = logging.getLogger(__name__)
@@ -79,7 +83,7 @@ class AsyncEndpointLoader:
 
 
 @t.final
-class AsyncHttpClient(BaseHttpClient["PokeLanceAsyncClient", niquests.AsyncSession, AsyncCacheManager]):
+class AsyncHttpClient(_BaseHttpClient):
     """The asynchronous HTTP client for PokeLance.
 
     Parameters

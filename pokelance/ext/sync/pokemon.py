@@ -11,11 +11,17 @@ from pokelance.http.endpoints import Endpoint
 
 if t.TYPE_CHECKING:
     from pokelance import models
+    from pokelance.cache.sync.manager import Pokemon as PokemonCache
     from pokelance.client.sync_client import PokeLanceSyncClient
+
+    _Base = SyncBaseExtension[PokemonCache]
+else:
+    _Base = SyncBaseExtension
+
 __all__: tuple[str, ...] = ("Pokemon", "setup")
 
 
-class Pokemon(SyncBaseExtension["PokemonCache"]):
+class Pokemon(_Base):
     """Extension for pokemon related endpoints."""
 
     def setup(self) -> None:

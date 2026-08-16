@@ -12,11 +12,17 @@ from pokelance.http.endpoints import Endpoint
 
 if t.TYPE_CHECKING:
     from pokelance import models
+    from pokelance.cache._async.manager import Berry as BerryCache
     from pokelance.client.async_client import PokeLanceAsyncClient
+
+    _Base = AsyncBaseExtension[BerryCache]
+else:
+    _Base = AsyncBaseExtension
+
 __all__: tuple[str, ...] = ("Berry", "setup")
 
 
-class Berry(AsyncBaseExtension["BerryCache"]):
+class Berry(_Base):
     """Extension for berry related endpoints."""
 
     async def setup(self) -> None:

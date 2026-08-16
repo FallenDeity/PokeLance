@@ -12,7 +12,7 @@ if t.TYPE_CHECKING:
     from pokelance.client._base import _ClientBase
     from pokelance.models import BaseModel
 
-    AnyCache = t.Union[AsyncCache[Route, t.Any], SyncCache[Route, t.Any]]
+    AnyCache = AsyncCache[Route, t.Any] | SyncCache[Route, t.Any]
 
 __all__: tuple[str, ...] = (
     "BaseCacheGroup",
@@ -213,7 +213,7 @@ class BaseCacheGroup(t.Generic[_ClientT, _CacheT]):
     def set_client(self, client: _ClientT) -> None:
         """Set the client for all sub-caches in this group."""
         for cache in self._walk_caches():
-            cache._client = client
+            cache._client = client  # pyright: ignore[reportPrivateUsage, reportAttributeAccessIssue]
 
     def set_size(self, max_size: int = 100) -> None:
         """Set the maximum cache size for this group and its sub-caches."""

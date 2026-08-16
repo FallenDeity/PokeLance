@@ -11,11 +11,17 @@ from pokelance.http.endpoints import Endpoint
 
 if t.TYPE_CHECKING:
     from pokelance import models
+    from pokelance.cache.sync.manager import Utility as UtilityCache
     from pokelance.client.sync_client import PokeLanceSyncClient
+
+    _Base = SyncBaseExtension[UtilityCache]
+else:
+    _Base = SyncBaseExtension
+
 __all__: tuple[str, ...] = ("Utility", "setup")
 
 
-class Utility(SyncBaseExtension["UtilityCache"]):
+class Utility(_Base):
     """Extension for utility related endpoints."""
 
     def setup(self) -> None:
