@@ -140,6 +140,7 @@ class AsyncHttpClient(_BaseHttpClient):
         if self.session and self._session_owner:
             logger.debug("Closing internal async HTTP session...")
             await self.session.close()
+            self.session = None
         elif self.session:
             logger.debug("Session was provided externally, not closing it.")
 

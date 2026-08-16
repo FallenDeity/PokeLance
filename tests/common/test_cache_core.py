@@ -19,6 +19,8 @@ Coverage
 - image and audio alru_cache: contains, cache_clear, set_size
 """
 
+import math
+
 import pytest
 
 import pokelance
@@ -212,7 +214,7 @@ async def test_cache_statistics(client: pokelance.PokeLanceAsyncClient) -> None:
     # 3. Hit on get
     assert poke_cache.get(route1) is not None
     assert poke_cache.stats.hits == 1
-    assert poke_cache.stats.hit_ratio == 0.5
+    assert math.isclose(poke_cache.stats.hit_ratio, 0.5, rel_tol=1e-9)
 
     # 4. Fill and trigger eviction
     await client.pokemon.fetch_pokemon(2)

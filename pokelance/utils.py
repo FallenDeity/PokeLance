@@ -1,14 +1,16 @@
+from __future__ import annotations
+
 import asyncio
 import contextlib
 import dataclasses
 import inspect
-import sys
 from asyncio.coroutines import _is_coroutine  # type: ignore[attr-defined]
 from collections import OrderedDict
 from collections.abc import Callable, Coroutine, Hashable
-from functools import _CacheInfo, _make_key, partial, partialmethod
+from functools import _CacheInfo, _make_key, partial, partialmethod  # pyright: ignore[reportPrivateUsage]
 from typing import (
     Any,
+    Concatenate,
     Generic,
     TypedDict,
     TypeVar,
@@ -18,22 +20,20 @@ from typing import (
     overload,
 )
 
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
-
+from typing_extensions import ParamSpec, Self
 
 __version__ = "2.0.4"
 
 __all__ = ("alru_cache",)
 
 
+_P = ParamSpec("_P")
+_P2 = ParamSpec("_P2")
 _T = TypeVar("_T")
 _R = TypeVar("_R")
 _Coro = Coroutine[Any, Any, _R]
-_CB = Callable[..., _Coro[_R]]
-_CBP = Union[_CB[_R], "partial[_Coro[_R]]", "partialmethod[_Coro[_R]]"]
+_CB = Callable[_P, _Coro[_R]]
+_CBP = Union[_CB[_P, _R], "partial[_Coro[_R]]", "partialmethod[_Coro[_R]]"]
 
 
 @final
@@ -47,7 +47,7 @@ class _CacheParameters(TypedDict):
 @final
 @dataclasses.dataclass
 class _CacheItem(Generic[_R]):
-    fut: "asyncio.Future[_R]"
+    fut: asyncio.Future[_R]
     later_call: asyncio.Handle | None
 
     def cancel(self) -> None:
@@ -57,10 +57,10 @@ class _CacheItem(Generic[_R]):
 
 
 @final
-class _LRUCacheWrapper(Generic[_R]):
+class _LRUCacheWrapper(Generic[_P, _R]):
     def __init__(
         self,
-        fn: _CB[_R],
+        fn: Callable[_P, _Coro[_R]],
         maxsize: int | None,
         typed: bool,
         ttl: float | None,
@@ -79,7 +79,7 @@ class _LRUCacheWrapper(Generic[_R]):
             self.__dict__.update(fn.__dict__)
         # set __wrapped__ last so we don't inadvertently copy it
         # from the wrapped function when updating __dict__
-        self._is_coroutine = _is_coroutine
+        self._is_coroutine = _is_coroutine  # pyright: ignore[reportUnknownMemberType]
         self.__wrapped__ = fn
         self.__maxsize = maxsize
         self.__typed = typed
@@ -154,7 +154,7 @@ class _LRUCacheWrapper(Generic[_R]):
     def _cache_miss(self, key: Hashable) -> None:
         self.__misses += 1
 
-    def _task_done_callback(self, fut: "asyncio.Future[_R]", key: Hashable, task: "asyncio.Task[_R]") -> None:
+    def _task_done_callback(self, fut: asyncio.Future[_R], key: Hashable, task: asyncio.Task[_R]) -> None:
         self.__tasks.discard(task)
 
         cache_item = self.__cache.get(key)
@@ -173,7 +173,7 @@ class _LRUCacheWrapper(Generic[_R]):
 
         fut.set_result(task.result())
 
-    async def __call__(self, /, *fn_args: Any, **fn_kwargs: Any) -> _R:
+    async def __call__(self, /, *fn_args: _P.args, **fn_kwargs: _P.kwargs) -> _R:
         if self.__closed:
             raise RuntimeError(f"alru_cache is closed for {self}")
 
@@ -213,18 +213,32 @@ class _LRUCacheWrapper(Generic[_R]):
         self._cache_miss(key)
         return await asyncio.shield(fut)
 
-    def __get__(self, instance: _T, owner: type[_T] | None) -> Union[Self, "_LRUCacheWrapperInstanceMethod[_R, _T]"]:
-        if owner is None:
+    @overload
+    def __get__(self, instance: None, owner: type[Any]) -> Self: ...
+
+    @overload
+    def __get__(
+        self: _LRUCacheWrapper[Concatenate[_T, _P2], _R],
+        instance: _T,
+        owner: type[Any] | None = None,
+    ) -> _LRUCacheWrapperInstanceMethod[_P2, _R, _T]: ...
+
+    def __get__(
+        self: Self,
+        instance: _T | None,
+        owner: type[Any] | None = None,
+    ) -> Self | _LRUCacheWrapperInstanceMethod[_P2, _R, _T]:
+        if instance is None:
             return self
         else:
             return _LRUCacheWrapperInstanceMethod(self, instance)
 
 
 @final
-class _LRUCacheWrapperInstanceMethod(Generic[_R, _T]):
+class _LRUCacheWrapperInstanceMethod(Generic[_P, _R, _T]):
     def __init__(
         self,
-        wrapper: _LRUCacheWrapper[_R],
+        wrapper: _LRUCacheWrapper[Any, _R],
         instance: _T,
     ) -> None:
         with contextlib.suppress(AttributeError):
@@ -241,7 +255,7 @@ class _LRUCacheWrapperInstanceMethod(Generic[_R, _T]):
             self.__dict__.update(wrapper.__dict__)
         # set __wrapped__ last so we don't inadvertently copy it
         # from the wrapped function when updating __dict__
-        self._is_coroutine = _is_coroutine
+        self._is_coroutine = _is_coroutine  # pyright: ignore[reportUnknownMemberType]
         self.__wrapped__ = wrapper.__wrapped__
         self.__instance = instance
         self.__wrapper = wrapper
@@ -267,7 +281,7 @@ class _LRUCacheWrapperInstanceMethod(Generic[_R, _T]):
     def cache_parameters(self) -> _CacheParameters:
         return self.__wrapper.cache_parameters()
 
-    async def __call__(self, /, *fn_args: Any, **fn_kwargs: Any) -> _R:
+    async def __call__(self, /, *fn_args: _P.args, **fn_kwargs: _P.kwargs) -> _R:
         return await self.__wrapper(self.__instance, *fn_args, **fn_kwargs)
 
 
@@ -275,8 +289,8 @@ def _make_wrapper(
     maxsize: int | None,
     typed: bool,
     ttl: float | None = None,
-) -> Callable[[_CBP[_R]], _LRUCacheWrapper[_R]]:
-    def wrapper(fn: _CBP[_R]) -> _LRUCacheWrapper[_R]:
+) -> Callable[[_CBP[_P, _R]], _LRUCacheWrapper[_P, _R]]:
+    def wrapper(fn: _CBP[_P, _R]) -> _LRUCacheWrapper[_P, _R]:
         origin = fn
 
         while isinstance(origin, (partial, partialmethod)):
@@ -287,9 +301,9 @@ def _make_wrapper(
 
         # functools.partialmethod support
         if hasattr(fn, "_make_unbound_method"):
-            fn = fn._make_unbound_method()
+            fn = fn._make_unbound_method()  # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType, reportAttributeAccessIssue, reportFunctionMemberAccess]
 
-        return _LRUCacheWrapper(cast("_CB[_R]", fn), maxsize, typed, ttl)
+        return _LRUCacheWrapper(cast("_CB[_P, _R]", fn), maxsize, typed, ttl)
 
     return wrapper
 
@@ -300,26 +314,26 @@ def alru_cache(
     typed: bool = False,
     *,
     ttl: float | None = None,
-) -> Callable[[_CBP[_R]], _LRUCacheWrapper[_R]]: ...
+) -> Callable[[_CBP[_P, _R]], _LRUCacheWrapper[_P, _R]]: ...
 
 
 @overload
 def alru_cache(
-    maxsize: _CBP[_R],
+    maxsize: _CBP[_P, _R],
     /,
-) -> _LRUCacheWrapper[_R]: ...
+) -> _LRUCacheWrapper[_P, _R]: ...
 
 
 def alru_cache(
-    maxsize: int | _CBP[_R] | None = 128,
+    maxsize: int | _CBP[_P, _R] | None = 128,
     typed: bool = False,
     *,
     ttl: float | None = None,
-) -> Callable[[_CBP[_R]], _LRUCacheWrapper[_R]] | _LRUCacheWrapper[_R]:
+) -> Callable[[_CBP[_P, _R]], _LRUCacheWrapper[_P, _R]] | _LRUCacheWrapper[_P, _R]:
     if maxsize is None or isinstance(maxsize, int):
         return _make_wrapper(maxsize, typed, ttl)
     else:
-        fn = cast("_CB[_R]", maxsize)
+        fn = cast("_CB[_P, _R]", maxsize)
 
         if callable(fn) or hasattr(fn, "_make_unbound_method"):
             return _make_wrapper(128, False, None)(fn)

@@ -28,7 +28,6 @@ import asyncio
 import json
 import os
 import tempfile
-import typing as t
 
 import pytest
 
@@ -225,15 +224,21 @@ async def test_round_trip_encounter_values_match(cached_client: pokelance.PokeLa
 
 @pytest.mark.asyncio
 async def test_getch_data_location_area_encounter(cached_client: pokelance.PokeLanceAsyncClient) -> None:
-    result: list[t.Any] = await cached_client.getch_data(ExtensionEnum.Pokemon, "location-area-encounter", 1)
+    result: list[LocationAreaEncounter] = await cached_client.getch_data(
+        ExtensionEnum.Pokemon, "location-area-encounter", 1
+    )
     assert isinstance(result, list)
     assert all(isinstance(e, LocationAreaEncounter) for e in result)
 
 
 @pytest.mark.asyncio
 async def test_getch_data_encounter_cache_hit(cached_client: pokelance.PokeLanceAsyncClient) -> None:
-    result1: t.Any = await cached_client.getch_data(ExtensionEnum.Pokemon, "location-area-encounter", 1)
-    result2: t.Any = await cached_client.getch_data(ExtensionEnum.Pokemon, "location-area-encounter", 1)
+    result1: list[LocationAreaEncounter] = await cached_client.getch_data(
+        ExtensionEnum.Pokemon, "location-area-encounter", 1
+    )
+    result2: list[LocationAreaEncounter] = await cached_client.getch_data(
+        ExtensionEnum.Pokemon, "location-area-encounter", 1
+    )
     assert len(result1) == len(result2)
 
 

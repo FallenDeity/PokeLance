@@ -133,6 +133,7 @@ async def test_from_url_invalid_category(cached_client: pokelance.PokeLanceAsync
 @pytest.mark.asyncio
 async def test_get_image_returns_bytes(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     pokemon = await cached_client.pokemon.fetch_pokemon(1)
+    assert pokemon.sprites.front_default is not None
     img = await cached_client.get_image(pokemon.sprites.front_default)
     assert img and isinstance(img, bytes)
 
@@ -141,6 +142,7 @@ async def test_get_image_returns_bytes(cached_client: pokelance.PokeLanceAsyncCl
 async def test_get_image_cache_hit_is_faster(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     pokemon = await cached_client.pokemon.fetch_pokemon(1)
     url = pokemon.sprites.front_default
+    assert url is not None
     t0 = time.perf_counter()
     await cached_client.get_image(url)
     first = time.perf_counter() - t0
@@ -159,6 +161,7 @@ async def test_get_image_invalid_url(cached_client: pokelance.PokeLanceAsyncClie
 @pytest.mark.asyncio
 async def test_get_audio_returns_bytes(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     pokemon = await cached_client.pokemon.fetch_pokemon(1)
+    assert pokemon.cries.latest is not None
     audio = await cached_client.get_audio(pokemon.cries.latest)
     assert audio and isinstance(audio, bytes)
 
@@ -167,6 +170,7 @@ async def test_get_audio_returns_bytes(cached_client: pokelance.PokeLanceAsyncCl
 async def test_get_audio_cache_hit_is_faster(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     pokemon = await cached_client.pokemon.fetch_pokemon(1)
     url = pokemon.cries.latest
+    assert url is not None
     t0 = time.perf_counter()
     await cached_client.get_audio(url)
     first = time.perf_counter() - t0
@@ -203,3 +207,25 @@ async def test_base_url_env_var(monkeypatch: pytest.MonkeyPatch) -> None:
 
         assert berry.item.url.startswith(staging_url)
         assert berry.name == "cheri"
+
+
+# ---------------------------------------------------------------------------
+# Lifecycle and State
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_async_client_context_manager() -> None:
+    client = pokelance.PokeLanceAsyncClient(cache_endpoints=False)
+    async with client as c:
+        assert c.http is not None
+        assert c.pokemon is not None
+
+
+@pytest.mark.asyncio
+async def test_async_client_manual_close() -> None:
+    client = pokelance.PokeLanceAsyncClient(cache_endpoints=False)
+    berry = await client.berry.fetch_berry(1)
+    assert berry.name == "cheri"
+    await client.close()
+    assert client.http.session is None

@@ -4,7 +4,7 @@ import logging
 import typing as t
 from pathlib import Path
 
-from typing_extensions import Self, Unpack
+from typing_extensions import Self, TypeVar, Unpack
 
 from pokelance.client._base import ClientConfig, _ClientBase
 from pokelance.constants import ExtensionEnum, ExtensionsL
@@ -35,7 +35,11 @@ __all__: tuple[str, ...] = ("PokeLanceAsyncClient",)
 
 logger = logging.getLogger(__name__)
 
-BaseModelT = t.TypeVar("BaseModelT", bound="BaseModel")
+BaseModelT = TypeVar(
+    "BaseModelT",
+    bound="BaseModel | t.Sequence[BaseModel]",
+    default="BaseModel | t.Sequence[BaseModel]",
+)
 
 
 class PokeLanceAsyncClient(_ClientBase[AsyncHttpClient]):

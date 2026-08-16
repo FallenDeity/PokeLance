@@ -1,3 +1,4 @@
+# pyright: reportUnknownMemberType=false
 from __future__ import annotations
 
 import concurrent.futures
@@ -158,6 +159,7 @@ class SyncHttpClient(_BaseHttpClient):
         if self.session and self._session_owner:
             logger.debug("Closing internal sync HTTP session...")
             self.session.close()
+            self.session = None
         elif self.session:
             logger.debug("Session was provided externally, not closing it.")
 
