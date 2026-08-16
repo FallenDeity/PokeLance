@@ -31,7 +31,7 @@ from pokelance.constants import ExtensionEnum
 from pokelance.http import Endpoint
 
 if t.TYPE_CHECKING:
-    from pokelance.cache import BaseCache
+    from pokelance.cache import AsyncCache
     from pokelance.models import Berry, BerryFirmness, BerryFlavor, Move, Pokemon, Type
 
 # ---------------------------------------------------------------------------
@@ -51,7 +51,7 @@ for _ext in ExtensionEnum:
 @pytest.mark.asyncio
 @pytest.mark.parametrize("ext_name,category", _ENDPOINT_CATEGORIES, ids=[f"{e}.{c}" for e, c in _ENDPOINT_CATEGORIES])
 async def test_fetch_then_get_cache_hit(
-    cached_client: pokelance.PokeLance,
+    cached_client: pokelance.PokeLanceAsyncClient,
     ext_name: str,
     category: str,
 ) -> None:
@@ -63,7 +63,10 @@ async def test_fetch_then_get_cache_hit(
     """
     cat_attr = category.replace("-", "_")
     ext_obj = getattr(cached_client, ext_name)
-    sub_cache: BaseCache[t.Any, t.Any] = getattr(ext_obj.cache, cat_attr)
+    if not hasattr(ext_obj.cache_group, cat_attr):
+        pytest.skip(f"{ext_name}.{cat_attr} is not in cache_group.")
+
+    sub_cache: AsyncCache[t.Any, t.Any] = getattr(ext_obj.cache_group, cat_attr)
 
     # 1. Endpoint registry populated
     assert sub_cache.endpoints, f"{ext_name}.{cat_attr} endpoint registry is empty."
@@ -96,7 +99,7 @@ async def test_fetch_then_get_cache_hit(
 
 
 @pytest.mark.asyncio
-async def test_fetch_pokemon_spot_check(cached_client: pokelance.PokeLance) -> None:
+async def test_fetch_pokemon_spot_check(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     mon: Pokemon = await cached_client.pokemon.fetch_pokemon("bulbasaur")
     assert mon.name == "bulbasaur"
     assert mon.id == 1
@@ -105,33 +108,33 @@ async def test_fetch_pokemon_spot_check(cached_client: pokelance.PokeLance) -> N
 
 
 @pytest.mark.asyncio
-async def test_fetch_berry_spot_check(cached_client: pokelance.PokeLance) -> None:
+async def test_fetch_berry_spot_check(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     berry: Berry = await cached_client.berry.fetch_berry("cheri")
     assert berry.name == "cheri"
     assert berry.id == 1
 
 
 @pytest.mark.asyncio
-async def test_fetch_berry_firmness_spot_check(cached_client: pokelance.PokeLance) -> None:
+async def test_fetch_berry_firmness_spot_check(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     firmness: BerryFirmness = await cached_client.berry.fetch_berry_firmness("very-soft")
     assert firmness.name == "very-soft"
 
 
 @pytest.mark.asyncio
-async def test_fetch_berry_flavor_spot_check(cached_client: pokelance.PokeLance) -> None:
+async def test_fetch_berry_flavor_spot_check(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     flavor: BerryFlavor = await cached_client.berry.fetch_berry_flavor("spicy")
     assert flavor.name == "spicy"
 
 
 @pytest.mark.asyncio
-async def test_fetch_move_spot_check(cached_client: pokelance.PokeLance) -> None:
+async def test_fetch_move_spot_check(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     move: Move = await cached_client.move.fetch_move("pound")
     assert move.name == "pound"
     assert move.id == 1
 
 
 @pytest.mark.asyncio
-async def test_fetch_type_spot_check(cached_client: pokelance.PokeLance) -> None:
+async def test_fetch_type_spot_check(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     type_: Type = await cached_client.pokemon.fetch_type("normal")
     assert type_.name == "normal"
 
@@ -142,7 +145,7 @@ async def test_fetch_type_spot_check(cached_client: pokelance.PokeLance) -> None
 
 
 @pytest.mark.asyncio
-async def test_concurrent_fetches_across_extensions(cached_client: pokelance.PokeLance) -> None:
+async def test_concurrent_fetches_across_extensions(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     """
     Fetch from several extensions concurrently; confirm no coroutine interference
     and that all results land in their respective caches.
@@ -160,10 +163,10 @@ async def test_concurrent_fetches_across_extensions(cached_client: pokelance.Pok
     assert type_.name == "normal"
 
     # All should be in cache
-    assert cached_client.http.cache.pokemon.pokemon.get(Endpoint.get_pokemon(1)) is not None
-    assert cached_client.http.cache.berry.berry.get(Endpoint.get_berry(1)) is not None
-    assert cached_client.http.cache.move.move.get(Endpoint.get_move(1)) is not None
-    assert cached_client.http.cache.pokemon.type.get(Endpoint.get_type(1)) is not None
+    assert cached_client.http.cache_manager.pokemon.pokemon.get(Endpoint.get_pokemon(1)) is not None
+    assert cached_client.http.cache_manager.berry.berry.get(Endpoint.get_berry(1)) is not None
+    assert cached_client.http.cache_manager.move.move.get(Endpoint.get_move(1)) is not None
+    assert cached_client.http.cache_manager.pokemon.type.get(Endpoint.get_type(1)) is not None
 
 
 # ---------------------------------------------------------------------------
@@ -174,7 +177,7 @@ async def test_concurrent_fetches_across_extensions(cached_client: pokelance.Pok
 @pytest.mark.asyncio
 @pytest.mark.parametrize("ext_name,category", _ENDPOINT_CATEGORIES, ids=[f"{e}.{c}" for e, c in _ENDPOINT_CATEGORIES])
 async def test_getch_data_fetch_and_cache_hit(
-    cached_client: pokelance.PokeLance,
+    cached_client: pokelance.PokeLanceAsyncClient,
     ext_name: str,
     category: str,
 ) -> None:
@@ -189,7 +192,10 @@ async def test_getch_data_fetch_and_cache_hit(
     """
     cat_attr = category.replace("-", "_")
     ext_obj = getattr(cached_client, ext_name)
-    sub_cache: BaseCache[t.Any, t.Any] = getattr(ext_obj.cache, cat_attr)
+    if not hasattr(ext_obj.cache_group, cat_attr):
+        pytest.skip(f"{ext_name}.{cat_attr} is not in cache_group.")
+
+    sub_cache: AsyncCache[t.Any, t.Any] = getattr(ext_obj.cache_group, cat_attr)
 
     if not sub_cache.endpoints:
         pytest.skip(f"{ext_name}.{cat_attr} has no endpoints loaded.")

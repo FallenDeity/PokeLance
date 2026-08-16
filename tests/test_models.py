@@ -15,12 +15,16 @@ Coverage
 """
 
 import enum
+import typing as t
 
 import attrs
 import pytest
 
 import pokelance
-from pokelance.models._base import BaseModel, _serializer
+from pokelance.models._base import (
+    BaseModel,
+    _serializer,  # pyright: ignore[reportUnknownVariableType, reportPrivateUsage]
+)
 
 # ---------------------------------------------------------------------------
 # _serializer unit tests (no network)
@@ -60,12 +64,12 @@ def test_serializer_passthrough_list() -> None:
 
 
 # ---------------------------------------------------------------------------
-# BaseModel.from_payload()
+# BaseModel.from_payload() raw inclusion
 # ---------------------------------------------------------------------------
 
 
 def test_from_payload_sets_raw() -> None:
-    payload = {"id": 1, "name": "bulbasaur"}
+    payload: dict[str, t.Any] = {"id": 1, "name": "bulbasaur"}
     model = BaseModel.from_payload(payload)
     assert model.raw == payload
 
@@ -123,7 +127,7 @@ def test_base_model_hash_is_consistent() -> None:
 
 
 @pytest.mark.asyncio
-async def test_pokemon_to_dict_excludes_raw(client: pokelance.PokeLance) -> None:
+async def test_pokemon_to_dict_excludes_raw(client: pokelance.PokeLanceAsyncClient) -> None:
     pokemon = await client.pokemon.fetch_pokemon(1)
     d = pokemon.to_dict()
     assert "raw" not in d
@@ -132,7 +136,7 @@ async def test_pokemon_to_dict_excludes_raw(client: pokelance.PokeLance) -> None
 
 
 @pytest.mark.asyncio
-async def test_pokemon_to_dict_has_expected_keys(client: pokelance.PokeLance) -> None:
+async def test_pokemon_to_dict_has_expected_keys(client: pokelance.PokeLanceAsyncClient) -> None:
     pokemon = await client.pokemon.fetch_pokemon(1)
     d = pokemon.to_dict()
     for key in ("name", "id", "base_experience", "height", "weight", "abilities", "types"):

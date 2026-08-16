@@ -43,19 +43,19 @@ from pokelance.models import LocationAreaEncounter
 
 
 @pytest.mark.asyncio
-async def test_fetch_returns_list(cached_client: pokelance.PokeLance) -> None:
+async def test_fetch_returns_list(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     result = await cached_client.pokemon.fetch_location_area_encounter(1)
     assert isinstance(result, list)
 
 
 @pytest.mark.asyncio
-async def test_fetch_returns_non_empty_list(cached_client: pokelance.PokeLance) -> None:
+async def test_fetch_returns_non_empty_list(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     result = await cached_client.pokemon.fetch_location_area_encounter(1)
     assert len(result) > 0, "Bulbasaur should have at least one encounter location."
 
 
 @pytest.mark.asyncio
-async def test_fetch_all_items_are_location_area_encounters(cached_client: pokelance.PokeLance) -> None:
+async def test_fetch_all_items_are_location_area_encounters(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     result = await cached_client.pokemon.fetch_location_area_encounter(1)
     assert all(isinstance(e, LocationAreaEncounter) for e in result)
 
@@ -65,8 +65,7 @@ async def test_fetch_all_items_are_location_area_encounters(cached_client: pokel
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.asyncio
-async def test_get_returns_none_before_fetch(cached_client: pokelance.PokeLance) -> None:
+def test_get_returns_none_before_fetch(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     # Use a pokemon we haven't fetched yet in this test
     result = cached_client.pokemon.get_location_area_encounter(999)
     # _validate_resource will raise ResourceNotFound if 999 isn't in endpoints,
@@ -76,7 +75,7 @@ async def test_get_returns_none_before_fetch(cached_client: pokelance.PokeLance)
 
 
 @pytest.mark.asyncio
-async def test_get_returns_list_after_fetch(cached_client: pokelance.PokeLance) -> None:
+async def test_get_returns_list_after_fetch(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     await cached_client.pokemon.fetch_location_area_encounter("bulbasaur")
     cached = cached_client.pokemon.get_location_area_encounter("bulbasaur")
     assert cached is not None
@@ -84,7 +83,7 @@ async def test_get_returns_list_after_fetch(cached_client: pokelance.PokeLance) 
 
 
 @pytest.mark.asyncio
-async def test_get_and_fetch_return_equal_results(cached_client: pokelance.PokeLance) -> None:
+async def test_get_and_fetch_return_equal_results(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     fetched = await cached_client.pokemon.fetch_location_area_encounter(1)
     cached = cached_client.pokemon.get_location_area_encounter(1)
     assert cached is not None
@@ -99,9 +98,9 @@ async def test_get_and_fetch_return_equal_results(cached_client: pokelance.PokeL
 
 
 @pytest.mark.asyncio
-async def test_cache_key_contains_encounters(cached_client: pokelance.PokeLance) -> None:
+async def test_cache_key_contains_encounters(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     await cached_client.pokemon.fetch_location_area_encounter(1)
-    lae_cache = cached_client.http.cache.pokemon.location_area_encounter
+    lae_cache = cached_client.http.cache_manager.pokemon.location_area_encounter
     stored_keys = [k.endpoint for k in lae_cache.cache]
     assert any("/encounters" in k for k in stored_keys), (
         "The cache key for location_area_encounter should contain '/encounters'."
@@ -109,10 +108,10 @@ async def test_cache_key_contains_encounters(cached_client: pokelance.PokeLance)
 
 
 @pytest.mark.asyncio
-async def test_cache_route_retrieval(cached_client: pokelance.PokeLance) -> None:
+async def test_cache_route_retrieval(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     await cached_client.pokemon.fetch_location_area_encounter(1)
     route = Endpoint.get_location_area_encounter(1)
-    result = cached_client.http.cache.pokemon.location_area_encounter.get(route)
+    result = cached_client.http.cache_manager.pokemon.location_area_encounter.get(route)
     assert result is not None
     assert isinstance(result, list)
 
@@ -123,7 +122,7 @@ async def test_cache_route_retrieval(cached_client: pokelance.PokeLance) -> None
 
 
 @pytest.mark.asyncio
-async def test_by_name_and_by_id_return_equal_results(cached_client: pokelance.PokeLance) -> None:
+async def test_by_name_and_by_id_return_equal_results(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     by_id = await cached_client.pokemon.fetch_location_area_encounter(1)
     by_name = await cached_client.pokemon.fetch_location_area_encounter("bulbasaur")
     # Both should be lists with the same encounters (possibly served from cache on second)
@@ -136,7 +135,7 @@ async def test_by_name_and_by_id_return_equal_results(cached_client: pokelance.P
 
 
 @pytest.mark.asyncio
-async def test_different_pokemon_have_different_encounters(cached_client: pokelance.PokeLance) -> None:
+async def test_different_pokemon_have_different_encounters(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     enc_bulbasaur = await cached_client.pokemon.fetch_location_area_encounter(1)
     enc_pikachu = await cached_client.pokemon.fetch_location_area_encounter(25)
     # Different Pokemon should encounter different areas (or at least differ in count)
@@ -153,7 +152,7 @@ async def test_different_pokemon_have_different_encounters(cached_client: pokela
 
 
 @pytest.mark.asyncio
-async def test_concurrent_encounter_fetches(cached_client: pokelance.PokeLance) -> None:
+async def test_concurrent_encounter_fetches(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     results = await asyncio.gather(
         cached_client.pokemon.fetch_location_area_encounter(1),
         cached_client.pokemon.fetch_location_area_encounter(25),
@@ -165,16 +164,17 @@ async def test_concurrent_encounter_fetches(cached_client: pokelance.PokeLance) 
 
 
 # ---------------------------------------------------------------------------
-# Persistence: save() and load()
+# Persistence methods: save() and load()
 # ---------------------------------------------------------------------------
 
 
 @pytest.mark.asyncio
-async def test_save_produces_json_array(cached_client: pokelance.PokeLance) -> None:
+async def test_save_produces_json_array(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     await cached_client.pokemon.fetch_location_area_encounter(1)
     with tempfile.TemporaryDirectory() as tmpdir:
-        await cached_client.http.cache.pokemon.location_area_encounter.save(tmpdir)
-        save_file = os.path.join(tmpdir, "PokemonLocationAreaCache.json")
+        await cached_client.http.cache_manager.pokemon.location_area_encounter.save(tmpdir)
+        filename = f"{cached_client.http.cache_manager.pokemon.location_area_encounter._name}.json"  # pyright: ignore[reportPrivateUsage]
+        save_file = os.path.join(tmpdir, filename)
         assert os.path.exists(save_file)
         with open(save_file, encoding="utf-8") as f:
             data = json.load(f)
@@ -185,16 +185,16 @@ async def test_save_produces_json_array(cached_client: pokelance.PokeLance) -> N
 
 
 @pytest.mark.asyncio
-async def test_load_restores_encounter_list(cached_client: pokelance.PokeLance) -> None:
+async def test_load_restores_encounter_list(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     original = await cached_client.pokemon.fetch_location_area_encounter(1)
     with tempfile.TemporaryDirectory() as tmpdir:
-        await cached_client.http.cache.pokemon.location_area_encounter.save(tmpdir)
+        await cached_client.http.cache_manager.pokemon.location_area_encounter.save(tmpdir)
 
-        async with pokelance.PokeLance(cache_endpoints=False) as new_client:
-            await new_client.http.cache.pokemon.location_area_encounter.load(tmpdir)
+        async with pokelance.PokeLanceAsyncClient(cache_endpoints=False) as new_client:
+            await new_client.http.cache_manager.pokemon.location_area_encounter.load(tmpdir)
 
             route = Endpoint.get_location_area_encounter(1)
-            loaded = new_client.http.cache.pokemon.location_area_encounter.get(route)
+            loaded = new_client.http.cache_manager.pokemon.location_area_encounter.get(route)
             assert loaded is not None
             assert isinstance(loaded, list)
             assert all(isinstance(e, LocationAreaEncounter) for e in loaded)
@@ -202,17 +202,17 @@ async def test_load_restores_encounter_list(cached_client: pokelance.PokeLance) 
 
 
 @pytest.mark.asyncio
-async def test_round_trip_encounter_values_match(cached_client: pokelance.PokeLance) -> None:
+async def test_round_trip_encounter_values_match(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     """Each encounter's location_area.name must survive the save/load round-trip."""
     original = await cached_client.pokemon.fetch_location_area_encounter(1)
     original_areas = {e.location_area.name for e in original if e.location_area}
     with tempfile.TemporaryDirectory() as tmpdir:
-        await cached_client.http.cache.pokemon.location_area_encounter.save(tmpdir)
+        await cached_client.http.cache_manager.pokemon.location_area_encounter.save(tmpdir)
 
-        async with pokelance.PokeLance(cache_endpoints=False) as new_client:
-            await new_client.http.cache.pokemon.location_area_encounter.load(tmpdir)
+        async with pokelance.PokeLanceAsyncClient(cache_endpoints=False) as new_client:
+            await new_client.http.cache_manager.pokemon.location_area_encounter.load(tmpdir)
             route = Endpoint.get_location_area_encounter(1)
-            loaded = new_client.http.cache.pokemon.location_area_encounter.get(route)
+            loaded = new_client.http.cache_manager.pokemon.location_area_encounter.get(route)
             assert loaded is not None
             loaded_areas = {e.location_area.name for e in loaded if e.location_area}
             assert original_areas == loaded_areas
@@ -224,14 +224,14 @@ async def test_round_trip_encounter_values_match(cached_client: pokelance.PokeLa
 
 
 @pytest.mark.asyncio
-async def test_getch_data_location_area_encounter(cached_client: pokelance.PokeLance) -> None:
-    result: t.Any = await cached_client.getch_data(ExtensionEnum.Pokemon, "location-area-encounter", 1)
+async def test_getch_data_location_area_encounter(cached_client: pokelance.PokeLanceAsyncClient) -> None:
+    result: list[t.Any] = await cached_client.getch_data(ExtensionEnum.Pokemon, "location-area-encounter", 1)
     assert isinstance(result, list)
     assert all(isinstance(e, LocationAreaEncounter) for e in result)
 
 
 @pytest.mark.asyncio
-async def test_getch_data_encounter_cache_hit(cached_client: pokelance.PokeLance) -> None:
+async def test_getch_data_encounter_cache_hit(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     result1: t.Any = await cached_client.getch_data(ExtensionEnum.Pokemon, "location-area-encounter", 1)
     result2: t.Any = await cached_client.getch_data(ExtensionEnum.Pokemon, "location-area-encounter", 1)
     assert len(result1) == len(result2)
@@ -243,7 +243,7 @@ async def test_getch_data_encounter_cache_hit(cached_client: pokelance.PokeLance
 
 
 @pytest.mark.asyncio
-async def test_pokemon_with_no_encounters_returns_empty_list(cached_client: pokelance.PokeLance) -> None:
+async def test_pokemon_with_no_encounters_returns_empty_list(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     """
     Some Pokemon (e.g. Mewtwo id=150, which can only be caught once in-game)
     may have encounters, but others like certain legendaries return [].

@@ -48,28 +48,28 @@ def test_api_metadata_has_direct_fetch_endpoint() -> None:
 
 
 @pytest.mark.asyncio
-async def test_utility_setup_does_not_raise(client: pokelance.PokeLance) -> None:
+async def test_utility_setup_does_not_raise(client: pokelance.PokeLanceAsyncClient) -> None:
     """utility.setup() must complete without error even though api-metadata
     has no list-endpoint. The hasattr guard in _base.py should skip it cleanly."""
     await client.utility.setup()  # must not raise
 
 
 @pytest.mark.asyncio
-async def test_utility_setup_still_loads_language(client: pokelance.PokeLance) -> None:
+async def test_utility_setup_still_loads_language(client: pokelance.PokeLanceAsyncClient) -> None:
     """After setup(), language endpoints should be present even though
     api-metadata was skipped."""
     await client.utility.setup()
-    assert len(client.http.cache.utility.language.endpoints) > 0
+    assert len(client.http.cache_manager.utility.language.endpoints) > 0
 
 
 @pytest.mark.asyncio
 async def test_api_metadata_endpoints_registry_stays_empty_after_setup(
-    client: pokelance.PokeLance,
+    client: pokelance.PokeLanceAsyncClient,
 ) -> None:
     """The api_metadata cache's endpoint registry should remain empty
     after setup() there is no list to load from."""
     await client.utility.setup()
-    assert len(client.http.cache.utility.api_metadata.endpoints) == 0
+    assert len(client.http.cache_manager.utility.api_metadata.endpoints) == 0
 
 
 # ---------------------------------------------------------------------------
@@ -77,27 +77,26 @@ async def test_api_metadata_endpoints_registry_stays_empty_after_setup(
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.asyncio
-async def test_get_api_metadata_returns_none_before_fetch(client: pokelance.PokeLance) -> None:
+def test_get_api_metadata_returns_none_before_fetch(client: pokelance.PokeLanceAsyncClient) -> None:
     result = client.utility.get_api_metadata()
     assert result is None, "Cache should be cold before any fetch."
 
 
 @pytest.mark.asyncio
-async def test_fetch_api_metadata_returns_model(client: pokelance.PokeLance) -> None:
+async def test_fetch_api_metadata_returns_model(client: pokelance.PokeLanceAsyncClient) -> None:
     metadata = await client.utility.fetch_api_metadata()
     assert isinstance(metadata, APIMetadata)
 
 
 @pytest.mark.asyncio
-async def test_fetch_api_metadata_has_expected_fields(client: pokelance.PokeLance) -> None:
+async def test_fetch_api_metadata_has_expected_fields(client: pokelance.PokeLanceAsyncClient) -> None:
     metadata = await client.utility.fetch_api_metadata()
     assert hasattr(metadata, "hash"), "APIMetadata should have a 'hash' field."
     assert hasattr(metadata, "deploy_date"), "APIMetadata should have a 'deploy_date' field."
 
 
 @pytest.mark.asyncio
-async def test_get_api_metadata_returns_model_after_fetch(client: pokelance.PokeLance) -> None:
+async def test_get_api_metadata_returns_model_after_fetch(client: pokelance.PokeLanceAsyncClient) -> None:
     await client.utility.fetch_api_metadata()
     result = client.utility.get_api_metadata()
     assert result is not None, "Cache should be warm after fetch."
@@ -105,7 +104,7 @@ async def test_get_api_metadata_returns_model_after_fetch(client: pokelance.Poke
 
 
 @pytest.mark.asyncio
-async def test_fetch_api_metadata_twice_returns_equal_models(client: pokelance.PokeLance) -> None:
+async def test_fetch_api_metadata_twice_returns_equal_models(client: pokelance.PokeLanceAsyncClient) -> None:
     meta1 = await client.utility.fetch_api_metadata()
     meta2 = await client.utility.fetch_api_metadata()
     assert meta1 == meta2, "Two consecutive fetches should return equal models."
@@ -117,12 +116,12 @@ async def test_fetch_api_metadata_twice_returns_equal_models(client: pokelance.P
 
 
 @pytest.mark.asyncio
-async def test_api_metadata_cache_key_is_meta_route(client: pokelance.PokeLance) -> None:
+async def test_api_metadata_cache_key_is_meta_route(client: pokelance.PokeLanceAsyncClient) -> None:
     """The data must be stored under the /meta route, not under a
     /api-metadata/<id> style key."""
     await client.utility.fetch_api_metadata()
     route = Endpoint.get_api_metadata()
-    result = client.http.cache.utility.api_metadata.get(route)
+    result = client.http.cache_manager.utility.api_metadata.get(route)
     assert result is not None, "APIMetadata should be retrievable via the /meta route."
 
 
@@ -132,7 +131,7 @@ async def test_api_metadata_cache_key_is_meta_route(client: pokelance.PokeLance)
 
 
 @pytest.mark.asyncio
-async def test_api_metadata_works_alongside_cached_client(cached_client: pokelance.PokeLance) -> None:
+async def test_api_metadata_works_alongside_cached_client(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     """Even after wait_until_ready() (which triggers all setup tasks), fetching
     api-metadata should work normally."""
     metadata = await cached_client.utility.fetch_api_metadata()
