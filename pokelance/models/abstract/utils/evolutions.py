@@ -8,7 +8,7 @@ from pokelance.constants import GenderEnum
 from pokelance.models import BaseModel
 from pokelance.models.common import NamedResource
 
-__all__: t.Tuple[str, ...] = (
+__all__: tuple[str, ...] = (
     "ChainLink",
     "EvolutionDetail",
 )
@@ -82,55 +82,56 @@ class EvolutionDetail(BaseModel):
 
     version_group: NamedResource = attrs.field(factory=NamedResource)
     is_default: bool = attrs.field(factory=bool)
-    item: t.Optional[NamedResource] = attrs.field(default=None)
+    item: NamedResource | None = attrs.field(default=None)
     trigger: NamedResource = attrs.field(factory=NamedResource)
-    gender: t.Optional[GenderEnum] = attrs.field(converter=GenderEnum.from_int)  # type: ignore[misc]
-    held_item: t.Optional[NamedResource] = attrs.field(default=None)
-    known_move: t.Optional[NamedResource] = attrs.field(default=None)
-    known_move_type: t.Optional[NamedResource] = attrs.field(default=None)
-    location: t.Optional[NamedResource] = attrs.field(default=None)
-    min_level: t.Optional[int] = attrs.field(default=None)
-    min_happiness: t.Optional[int] = attrs.field(default=None)
-    min_beauty: t.Optional[int] = attrs.field(default=None)
-    min_affection: t.Optional[int] = attrs.field(default=None)
+    gender: GenderEnum | None = attrs.field(converter=GenderEnum.from_int)  # type: ignore[misc]
+    held_item: NamedResource | None = attrs.field(default=None)
+    known_move: NamedResource | None = attrs.field(default=None)
+    known_move_type: NamedResource | None = attrs.field(default=None)
+    location: NamedResource | None = attrs.field(default=None)
+    min_level: int | None = attrs.field(default=None)
+    min_happiness: int | None = attrs.field(default=None)
+    min_beauty: int | None = attrs.field(default=None)
+    min_affection: int | None = attrs.field(default=None)
     near_special_rock: bool = attrs.field(factory=bool)
     needs_overworld_rain: bool = attrs.field(factory=bool)
     needs_multiplayer: bool = attrs.field(factory=bool)
-    party_species: t.Optional[NamedResource] = attrs.field(default=None)
-    party_type: t.Optional[NamedResource] = attrs.field(default=None)
-    relative_physical_stats: t.Optional[int] = attrs.field(default=None)
+    party_species: NamedResource | None = attrs.field(default=None)
+    party_type: NamedResource | None = attrs.field(default=None)
+    relative_physical_stats: int | None = attrs.field(default=None)
     time_of_day: str = attrs.field(factory=str)
-    trade_species: t.Optional[NamedResource] = attrs.field(default=None)
+    trade_species: NamedResource | None = attrs.field(default=None)
     turn_upside_down: bool = attrs.field(factory=bool)
-    region: t.Optional[NamedResource] = attrs.field(default=None)
-    base_form: t.Optional[NamedResource] = attrs.field(default=None)
-    evolved_form: t.Optional[NamedResource] = attrs.field(default=None)
-    used_move: t.Optional[NamedResource] = attrs.field(default=None)
-    min_move_count: t.Optional[int] = attrs.field(default=None)
-    min_steps: t.Optional[int] = attrs.field(default=None)
-    min_damage_taken: t.Optional[int] = attrs.field(default=None)
+    region: NamedResource | None = attrs.field(default=None)
+    base_form: NamedResource | None = attrs.field(default=None)
+    evolved_form: NamedResource | None = attrs.field(default=None)
+    used_move: NamedResource | None = attrs.field(default=None)
+    min_move_count: int | None = attrs.field(default=None)
+    min_steps: int | None = attrs.field(default=None)
+    min_damage_taken: int | None = attrs.field(default=None)
 
     @property
-    def simplified_details(self) -> t.Dict[str, t.Any]:
+    def simplified_details(self) -> dict[str, t.Any]:
         """Return a simplified dictionary of the evolution details.
 
         Prunes out any empty or None values, and only includes concrete or non-empty values.
         """
-        simplified_details: t.Dict[str, t.Any] = {}
-        for k, v in self.to_dict().items():
-            if ((is_dict := isinstance(v, dict)) and v.get("name") and v.get("url")) or (not is_dict and v):
-                simplified_details[k] = v
+        simplified_details: dict[str, t.Any] = {
+            k: v
+            for k, v in self.to_dict().items()
+            if ((is_dict := isinstance(v, dict)) and v.get("name") and v.get("url")) or (not is_dict and v)
+        }
         return simplified_details
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EvolutionDetail":
+    def from_payload(cls, payload: dict[str, t.Any]) -> EvolutionDetail:
         return cls(
             raw=payload,
             version_group=NamedResource.from_payload(payload.get("version_group", {})),
             is_default=payload.get("is_default", False),
             item=NamedResource.optional_from_payload(payload.get("item")),
             trigger=NamedResource.from_payload(payload.get("trigger", {})),
-            gender=payload.get("gender", None),
+            gender=payload.get("gender"),
             held_item=NamedResource.optional_from_payload(payload.get("held_item")),
             known_move=NamedResource.optional_from_payload(payload.get("known_move")),
             known_move_type=NamedResource.optional_from_payload(payload.get("known_move_type")),
@@ -176,11 +177,11 @@ class ChainLink(BaseModel):
 
     is_baby: bool = attrs.field(factory=bool)
     species: NamedResource = attrs.field(factory=NamedResource)
-    evolution_details: t.List[EvolutionDetail] = attrs.field(factory=list)
-    evolves_to: t.List[ChainLink] = attrs.field(factory=list)
+    evolution_details: list[EvolutionDetail] = attrs.field(factory=list)
+    evolves_to: list[ChainLink] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ChainLink":
+    def from_payload(cls, payload: dict[str, t.Any]) -> ChainLink:
         return cls(
             raw=payload,
             is_baby=payload.get("is_baby", False),

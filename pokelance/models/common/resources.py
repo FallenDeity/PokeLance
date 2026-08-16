@@ -4,9 +4,9 @@ import attrs
 
 from pokelance.models import BaseModel
 
-__all__: t.Tuple[str, ...] = (
-    "Resource",
+__all__: tuple[str, ...] = (
     "NamedResource",
+    "Resource",
 )
 
 
@@ -23,7 +23,7 @@ class Resource(BaseModel):
     url: str = attrs.field(factory=str)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Resource":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Resource":
         return cls(
             raw=payload,
             url=payload.get("url", ""),
@@ -46,5 +46,5 @@ class NamedResource(BaseModel):
     url: str = attrs.field(factory=str)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, str]) -> "NamedResource":
+    def from_payload(cls, payload: dict[str, str]) -> "NamedResource":
         return cls(raw=payload, name=payload.get("name", ""), url=payload.get("url", ""))

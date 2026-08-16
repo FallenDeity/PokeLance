@@ -12,14 +12,17 @@ Coverage
 - Extension.cache.<category>.endpoints is non-empty after cached_client is ready
 - All extensions' categories with list-endpoints are populated after wait_until_ready()
 """
+
 import typing as t
 
 import pytest
 
 import pokelance
-from pokelance.cache import BaseCache
 from pokelance.constants import ExtensionEnum
 from pokelance.http import Endpoint
+
+if t.TYPE_CHECKING:
+    from pokelance.cache import BaseCache
 
 # ---------------------------------------------------------------------------
 # wait_until_ready behaviour
@@ -82,7 +85,7 @@ async def test_all_list_endpoint_categories_populated(cached_client: pokelance.P
     the backing BaseCache should have at least one endpoint registered.
     """
     exts = [e.value for e in ExtensionEnum]
-    missing: t.List[str] = []
+    missing: list[str] = []
     for ext in exts:
         for category in ext.categories:
             list_endpoint_name = f"get_{category.replace('-', '_')}_endpoints"
@@ -242,6 +245,6 @@ async def test_load_all_fills_cache_after_setup(client: pokelance.PokeLance) -> 
     await client.berry.setup()
     berry_cache = client.http.cache.berry.berry_flavor
     await berry_cache.load_all()
-    assert len(berry_cache) == len(
-        berry_cache.endpoints
-    ), "After load_all(), every endpoint should have a cached entry."
+    assert len(berry_cache) == len(berry_cache.endpoints), (
+        "After load_all(), every endpoint should have a cached entry."
+    )

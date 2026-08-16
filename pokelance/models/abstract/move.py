@@ -14,7 +14,7 @@ from .utils import (
     PastMoveStatValues,
 )
 
-__all__: t.Tuple[str, ...] = (
+__all__: tuple[str, ...] = (
     "Move",
     "MoveAilment",
     "MoveBattleStyle",
@@ -84,31 +84,31 @@ class Move(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    accuracy: t.Optional[int] = attrs.field(default=None)
-    effect_chance: t.Optional[int] = attrs.field(default=None)
-    pp: t.Optional[int] = attrs.field(default=None)
+    accuracy: int | None = attrs.field(default=None)
+    effect_chance: int | None = attrs.field(default=None)
+    pp: int | None = attrs.field(default=None)
     priority: int = attrs.field(factory=int)
-    power: t.Optional[int] = attrs.field(default=None)
-    contest_combos: t.Optional[ContestComboSet] = attrs.field(default=None)
-    contest_type: t.Optional[NamedResource] = attrs.field(default=None)
-    contest_effect: t.Optional[Resource] = attrs.field(default=None)
+    power: int | None = attrs.field(default=None)
+    contest_combos: ContestComboSet | None = attrs.field(default=None)
+    contest_type: NamedResource | None = attrs.field(default=None)
+    contest_effect: Resource | None = attrs.field(default=None)
     damage_class: NamedResource = attrs.field(factory=NamedResource)
-    effect_entries: t.List[VerboseEffect] = attrs.field(factory=list)
-    effect_changes: t.List[AbilityEffectChange] = attrs.field(factory=list)
-    learned_by_pokemon: t.List[NamedResource] = attrs.field(factory=list)
-    flavor_text_entries: t.List[MoveFlavorText] = attrs.field(factory=list)
+    effect_entries: list[VerboseEffect] = attrs.field(factory=list)
+    effect_changes: list[AbilityEffectChange] = attrs.field(factory=list)
+    learned_by_pokemon: list[NamedResource] = attrs.field(factory=list)
+    flavor_text_entries: list[MoveFlavorText] = attrs.field(factory=list)
     generation: NamedResource = attrs.field(factory=NamedResource)
-    machines: t.List[MachineVersionDetail] = attrs.field(factory=list)
-    meta: t.Optional[MoveMetaData] = attrs.field(default=None)
-    names: t.List[Name] = attrs.field(factory=list)
-    past_values: t.List[PastMoveStatValues] = attrs.field(factory=list)
-    stat_changes: t.List[MoveStatChange] = attrs.field(factory=list)
-    super_contest_effect: t.Optional[Resource] = attrs.field(default=None)
+    machines: list[MachineVersionDetail] = attrs.field(factory=list)
+    meta: MoveMetaData | None = attrs.field(default=None)
+    names: list[Name] = attrs.field(factory=list)
+    past_values: list[PastMoveStatValues] = attrs.field(factory=list)
+    stat_changes: list[MoveStatChange] = attrs.field(factory=list)
+    super_contest_effect: Resource | None = attrs.field(default=None)
     target: NamedResource = attrs.field(factory=NamedResource)
     type: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Move":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Move":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -157,11 +157,11 @@ class MoveAilment(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    moves: t.List[NamedResource] = attrs.field(factory=list)
-    names: t.List[Name] = attrs.field(factory=list)
+    moves: list[NamedResource] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveAilment":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "MoveAilment":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -188,10 +188,10 @@ class MoveBattleStyle(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    names: t.List[Name] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveBattleStyle":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "MoveBattleStyle":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -219,11 +219,11 @@ class MoveCategory(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    moves: t.List[NamedResource] = attrs.field(factory=list)
-    descriptions: t.List[Description] = attrs.field(factory=list)
+    moves: list[NamedResource] = attrs.field(factory=list)
+    descriptions: list[Description] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveCategory":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "MoveCategory":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -254,12 +254,12 @@ class MoveDamageClass(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    descriptions: t.List[Description] = attrs.field(factory=list)
-    moves: t.List[NamedResource] = attrs.field(factory=list)
-    names: t.List[Name] = attrs.field(factory=list)
+    descriptions: list[Description] = attrs.field(factory=list)
+    moves: list[NamedResource] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveDamageClass":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "MoveDamageClass":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -291,12 +291,12 @@ class MoveLearnMethod(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    descriptions: t.List[Description] = attrs.field(factory=list)
-    names: t.List[Name] = attrs.field(factory=list)
-    version_groups: t.List[NamedResource] = attrs.field(factory=list)
+    descriptions: list[Description] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
+    version_groups: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveLearnMethod":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "MoveLearnMethod":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -328,12 +328,12 @@ class MoveTarget(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    descriptions: t.List[Description] = attrs.field(factory=list)
-    moves: t.List[NamedResource] = attrs.field(factory=list)
-    names: t.List[Name] = attrs.field(factory=list)
+    descriptions: list[Description] = attrs.field(factory=list)
+    moves: list[NamedResource] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveTarget":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "MoveTarget":
         return cls(
             raw=payload,
             id=payload.get("id", 0),

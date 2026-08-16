@@ -120,10 +120,7 @@ async def main() -> str:
     sprite = await client.get_image_async(pokemon.sprites.front_default)
     await client.close()
     encoded = base64.b64encode(sprite).decode("ascii")
-    return (
-        f'<img src="data:image/png;base64,{encoded}" '
-        f'alt="{pokemon.name} sprite" width="96" height="96"/>'
-    )
+    return f'<img src="data:image/png;base64,{encoded}" alt="{pokemon.name} sprite" width="96" height="96"/>'
 
 
 print(asyncio.run(main()))
@@ -164,9 +161,9 @@ Every resource has a synchronous `get_*` (cache-only) and an asynchronous `fetch
 (cache-or-network) counterpart. This is the idiom used throughout the whole library:
 
 ```python
-print(client.berry.get_berry("cheri"))          # None on a cold cache
+print(client.berry.get_berry("cheri"))  # None on a cold cache
 print(await client.berry.fetch_berry("cheri"))  # hits network, populates cache
-print(client.berry.get_berry("cheri"))          # now cached, instant
+print(client.berry.get_berry("cheri"))  # now cached, instant
 ```
 
 See [Fetching Data](fetching_data.md) for the full rationale, and
@@ -193,6 +190,7 @@ os.environ["POKEAPI_BASE_URL"] = "https://staging.pokeapi.co/api/v2"
 
 
 client = PokeLance()
+
 
 async def main() -> None:
     berry = await client.berry.fetch_berry("cheri")

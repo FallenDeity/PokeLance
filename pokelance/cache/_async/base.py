@@ -13,24 +13,23 @@ from pokelance.cache._base import BaseCacheGroup, BaseCacheState, CacheEndpoint
 from pokelance.http.endpoints import Route
 
 if t.TYPE_CHECKING:
-    from pokelance.client.async_client import PokeLanceAsyncClient
     from pokelance.models import BaseModel
 
-__all__: t.Tuple[str, ...] = (
-    "CacheEndpoint",
-    "BaseCacheState",
-    "BaseCacheGroup",
+__all__: tuple[str, ...] = (
+    "AsyncCache",
     "AsyncCacheGroup",
-    "AsyncBaseCache",
+    "BaseCacheGroup",
+    "BaseCacheState",
+    "CacheEndpoint",
 )
 
 logger = logging.getLogger(__name__)
 
 _KT = t.TypeVar("_KT", bound="Route")
-_VT = t.TypeVar("_VT", bound="t.Union[BaseModel, t.Sequence[BaseModel]]")
+_VT = t.TypeVar("_VT", bound="BaseModel | t.Sequence[BaseModel]")
 
 
-class AsyncBaseCache(BaseCacheState[_KT, _VT, "PokeLanceAsyncClient"], t.Generic[_KT, _VT]):
+class AsyncCache(BaseCacheState[_KT, _VT, "PokeLanceAsyncClient"], t.Generic[_KT, _VT]):
     """Async cache: asyncio.Event readiness, aiofiles I/O, and async HTTP bulk loading."""
 
     _ready: asyncio.Event
@@ -38,7 +37,7 @@ class AsyncBaseCache(BaseCacheState[_KT, _VT, "PokeLanceAsyncClient"], t.Generic
     def __init__(
         self,
         max_size: int = 100,
-        model: t.Optional[t.Type[BaseModel]] = None,
+        model: type[BaseModel] | None = None,
         name: str = "",
         endpoint_key_is_id: bool = False,
         url_suffix: str = "",
@@ -81,7 +80,7 @@ class AsyncBaseCache(BaseCacheState[_KT, _VT, "PokeLanceAsyncClient"], t.Generic
 
     async def load(self, path: str = ".") -> None:
         """Load the cache from a JSON file asynchronously."""
-        async with aiofiles.open(pathlib.Path(f"{path}/{self._name}.json"), "r", encoding="utf-8") as f:
+        async with aiofiles.open(pathlib.Path(f"{path}/{self._name}.json"), encoding="utf-8") as f:
             self.deserialize(json.loads(await f.read()))
 
     async def load_all(self) -> None:
@@ -92,10 +91,10 @@ class AsyncBaseCache(BaseCacheState[_KT, _VT, "PokeLanceAsyncClient"], t.Generic
         self._max_size = len(self._endpoints)
         for endpoint in self._endpoints.values():
             route = Route.from_raw_url(endpoint.url)
-            data = self.get(t.cast(_KT, route), None)
+            data = self.get(t.cast("_KT", route), None)
             if not data:
                 res = await self._client.http.request(route)
-                self.setdefault(t.cast(_KT, route), self.from_payload(res))
+                self.setdefault(t.cast("_KT", route), self.from_payload(res))
         logger.info(f"Loaded {self._name}.")
 
     async def load_all_batch(self, batch_size: int = 20) -> None:
@@ -109,9 +108,9 @@ class AsyncBaseCache(BaseCacheState[_KT, _VT, "PokeLanceAsyncClient"], t.Generic
         for i in range(0, total_endpoints, batch_size):
             batch = endpoints[i : i + batch_size]
             tasks = [
-                self._fetch_and_cache(t.cast(_KT, Route.from_raw_url(ep.url)))
+                self._fetch_and_cache(t.cast("_KT", Route.from_raw_url(ep.url)))
                 for ep in batch
-                if not self.get(t.cast(_KT, Route.from_raw_url(ep.url)))
+                if not self.get(t.cast("_KT", Route.from_raw_url(ep.url)))
             ]
             if tasks:
                 await asyncio.gather(*tasks)
@@ -132,7 +131,7 @@ class AsyncBaseCache(BaseCacheState[_KT, _VT, "PokeLanceAsyncClient"], t.Generic
 
 
 @attrs.define(slots=True, kw_only=True)
-class AsyncCacheGroup(BaseCacheGroup["PokeLanceAsyncClient", AsyncBaseCache[Route, t.Any]]):
+class AsyncCacheGroup(BaseCacheGroup["PokeLanceAsyncClient", AsyncCache[Route, t.Any]]):
     """Base class for async cache groups."""
 
     async def wait_until_ready(self) -> None:

@@ -17,7 +17,7 @@ from pokelance.models.common import (
 
 from .utils import ItemHolderPokemon, ItemPrice, ItemSprites
 
-__all__: t.Tuple[str, ...] = ("Currency", "Item", "ItemAttribute", "ItemCategory", "ItemFlingEffect", "ItemPocket")
+__all__: tuple[str, ...] = ("Currency", "Item", "ItemAttribute", "ItemCategory", "ItemFlingEffect", "ItemPocket")
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -60,22 +60,22 @@ class Item(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    prices: t.List[ItemPrice] = attrs.field(factory=list)
-    fling_power: t.Optional[int] = attrs.field(default=None)
-    fling_effect: t.Optional[NamedResource] = attrs.field(default=None)
-    attributes: t.List[NamedResource] = attrs.field(factory=list)
+    prices: list[ItemPrice] = attrs.field(factory=list)
+    fling_power: int | None = attrs.field(default=None)
+    fling_effect: NamedResource | None = attrs.field(default=None)
+    attributes: list[NamedResource] = attrs.field(factory=list)
     category: NamedResource = attrs.field(factory=NamedResource)
-    effect_entries: t.List[VerboseEffect] = attrs.field(factory=list)
-    flavor_text_entries: t.List[VersionGroupFlavorText] = attrs.field(factory=list)
-    game_indices: t.List[GenerationGameIndex] = attrs.field(factory=list)
-    names: t.List[Name] = attrs.field(factory=list)
+    effect_entries: list[VerboseEffect] = attrs.field(factory=list)
+    flavor_text_entries: list[VersionGroupFlavorText] = attrs.field(factory=list)
+    game_indices: list[GenerationGameIndex] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
     sprites: ItemSprites = attrs.field(factory=ItemSprites)
-    held_by_pokemon: t.List[ItemHolderPokemon] = attrs.field(factory=list)
-    baby_trigger_for: t.Optional[Resource] = attrs.field(default=None)
-    machines: t.List[MachineVersionDetail] = attrs.field(factory=list)
+    held_by_pokemon: list[ItemHolderPokemon] = attrs.field(factory=list)
+    baby_trigger_for: Resource | None = attrs.field(default=None)
+    machines: list[MachineVersionDetail] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Item":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Item":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -124,12 +124,12 @@ class ItemAttribute(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    items: t.List[NamedResource] = attrs.field(factory=list)
-    names: t.List[Name] = attrs.field(factory=list)
-    descriptions: t.List[Description] = attrs.field(factory=list)
+    items: list[NamedResource] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
+    descriptions: list[Description] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemAttribute":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "ItemAttribute":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -160,12 +160,12 @@ class ItemCategory(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    items: t.List[NamedResource] = attrs.field(factory=list)
-    names: t.List[Name] = attrs.field(factory=list)
+    items: list[NamedResource] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
     pocket: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemCategory":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "ItemCategory":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -194,11 +194,11 @@ class ItemFlingEffect(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    effect_entries: t.List[Effect] = attrs.field(factory=list)
-    items: t.List[NamedResource] = attrs.field(factory=list)
+    effect_entries: list[Effect] = attrs.field(factory=list)
+    items: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemFlingEffect":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "ItemFlingEffect":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -226,11 +226,11 @@ class ItemPocket(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    categories: t.List[NamedResource] = attrs.field(factory=list)
-    names: t.List[Name] = attrs.field(factory=list)
+    categories: list[NamedResource] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemPocket":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "ItemPocket":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -256,10 +256,10 @@ class Currency(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    names: t.List[Name] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Currency":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Currency":
         return cls(
             raw=payload,
             id=payload.get("id", 0),

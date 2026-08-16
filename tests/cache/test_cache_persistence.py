@@ -18,6 +18,7 @@ Coverage
 - Multiple categories saved and loaded independently
 - List-valued (encounter) round-trip preserves field values
 """
+
 import json
 import os
 import tempfile
@@ -35,7 +36,7 @@ from pokelance.models import LocationAreaEncounter, Pokemon
 
 
 def _read_json(path: str) -> t.Any:
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -105,7 +106,7 @@ async def test_load_restores_single_objects(client: pokelance.PokeLance) -> None
         assert len(client.http.cache.pokemon.pokemon) == 2
 
         route1 = Endpoint.get_pokemon(1)
-        cached: t.Optional[Pokemon] = client.http.cache.pokemon.pokemon.get(route1)
+        cached: Pokemon | None = client.http.cache.pokemon.pokemon.get(route1)
         assert cached is not None
         assert cached.name == "bulbasaur"
 

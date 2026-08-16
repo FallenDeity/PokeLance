@@ -7,21 +7,21 @@ import attrs
 from pokelance.http.endpoints import Route
 
 if t.TYPE_CHECKING:
-    from pokelance.cache._async import AsyncBaseCache
-    from pokelance.cache.sync import SyncBaseCache
+    from pokelance.cache._async import AsyncCache
+    from pokelance.cache.sync import SyncCache
     from pokelance.client._base import _ClientBase
     from pokelance.models import BaseModel
 
-    AnyCache = t.Union[AsyncBaseCache[Route, t.Any], SyncBaseCache[Route, t.Any]]
+    AnyCache = t.Union[AsyncCache[Route, t.Any], SyncCache[Route, t.Any]]
 
-__all__: t.Tuple[str, ...] = (
-    "CacheEndpoint",
-    "BaseCacheState",
+__all__: tuple[str, ...] = (
     "BaseCacheGroup",
+    "BaseCacheState",
+    "CacheEndpoint",
 )
 
 _KT = t.TypeVar("_KT", bound="Route")
-_VT = t.TypeVar("_VT", bound="t.Union[BaseModel, t.Sequence[BaseModel]]")
+_VT = t.TypeVar("_VT", bound="BaseModel | t.Sequence[BaseModel]")
 _ClientT = t.TypeVar("_ClientT", bound="_ClientBase")
 _CacheT = t.TypeVar("_CacheT", bound="AnyCache")
 _T = t.TypeVar("_T")
@@ -39,7 +39,7 @@ class CacheEndpoint:
         The URL of the endpoint.
     """
 
-    id: t.Union[str, int] = attrs.field(factory=str)
+    id: str | int = attrs.field(factory=str)
     url: str = attrs.field(factory=str)
 
     def __str__(self) -> str:
@@ -57,7 +57,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
     def __init__(
         self,
         max_size: int = 100,
-        model: t.Optional[t.Type[BaseModel]] = None,
+        model: type[BaseModel] | None = None,
         name: str = "",
         endpoint_key_is_id: bool = False,
         url_suffix: str = "",
@@ -69,10 +69,10 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         self._endpoint_key_is_id = endpoint_key_is_id
         self._url_suffix = url_suffix
         self._is_list = is_list
-        self._cache: t.Dict[_KT, _VT] = {}
-        self._endpoints: t.Dict[str, CacheEndpoint] = {}
-        self._endpoints_by_id: t.Dict[str, str] = {}
-        self._identifiers: t.Set[str] = set()
+        self._cache: dict[_KT, _VT] = {}
+        self._endpoints: dict[str, CacheEndpoint] = {}
+        self._endpoints_by_id: dict[str, str] = {}
+        self._identifiers: set[str] = set()
         self._endpoints_cached: bool = False
 
     def from_payload(self, payload: t.Any) -> _VT:
@@ -80,8 +80,8 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         if self._model is None:
             raise RuntimeError(f"Model class not configured for cache '{self._name}'")
         if self._is_list:
-            return t.cast(_VT, [self._model.from_payload(item) for item in payload])
-        return t.cast(_VT, self._model.from_payload(payload))
+            return t.cast("_VT", [self._model.from_payload(item) for item in payload])
+        return t.cast("_VT", self._model.from_payload(payload))
 
     def __getitem__(self, key: _KT) -> _VT:
         self._cache[key] = self._cache.pop(key)
@@ -92,7 +92,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
             self._cache[key] = self._cache.pop(key)
         else:
             if len(self._cache) >= self._max_size:
-                self._cache.pop(list(self._cache.keys())[0])
+                self._cache.pop(next(iter(self._cache.keys())))
             self._cache[key] = value
 
     def __delitem__(self, key: _KT) -> None:
@@ -136,7 +136,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         self._identifiers.clear()
         self._endpoints_cached = False
 
-    def get(self, key: _KT, default: t.Union[_VT, _T, None] = None) -> t.Union[_VT, _T, None]:  # type: ignore
+    def get(self, key: _KT, default: _VT | _T | None = None) -> _VT | _T | None:  # type: ignore
         """Get an item from the cache. If the exact key isn't found, attempt alias resolution."""
         if key in self:
             return self[key]
@@ -148,7 +148,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
                     return v
         return default
 
-    def load_documents(self, data: t.List[t.Dict[str, str]]) -> None:
+    def load_documents(self, data: list[dict[str, str]]) -> None:
         """Abstracted to handle standard, secondary, and location area endpoints."""
         self.reset_endpoints()
         for document in data:
@@ -167,32 +167,32 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         """Set the max size of the cache."""
         self._max_size = size
 
-    def serialize(self) -> t.Dict[str, t.Any]:
+    def serialize(self) -> dict[str, t.Any]:
         """Serialise the in-memory cache to a plain dict."""
-        dummy: t.Dict[str, t.Any] = {}
+        dummy: dict[str, t.Any] = {}
         for k, v in self.items():
             dummy[k.endpoint] = [i.raw for i in v] if self._is_list and isinstance(v, list) else v.raw  # type: ignore
         return dummy
 
-    def deserialize(self, data: t.Dict[str, t.Any]) -> None:
+    def deserialize(self, data: dict[str, t.Any]) -> None:
         """Populate the in-memory cache from a plain dict (output of serialize)."""
         self._max_size = max(self._max_size, len(data))
         for endpoint, info in data.items():
             route = Route(endpoint=endpoint)
-            self.setdefault(t.cast(_KT, route), self.from_payload(info))
+            self.setdefault(t.cast("_KT", route), self.from_payload(info))
 
     @property
-    def endpoints(self) -> t.Dict[str, CacheEndpoint]:
+    def endpoints(self) -> dict[str, CacheEndpoint]:
         """The endpoints that are cached."""
         return self._endpoints
 
     @property
-    def identifiers(self) -> t.Set[str]:
+    def identifiers(self) -> set[str]:
         """Every valid name and id (as strings) for this category."""
         return self._identifiers
 
     @property
-    def cache(self) -> t.Dict[_KT, _VT]:
+    def cache(self) -> dict[_KT, _VT]:
         """The cache itself."""
         return self._cache
 
@@ -208,7 +208,7 @@ class BaseCacheGroup(t.Generic[_ClientT, _CacheT]):
         for field in attrs.fields(self.__class__):
             val = getattr(self, field.name)
             if isinstance(val, BaseCacheState):
-                yield t.cast(_CacheT, val)
+                yield t.cast("_CacheT", val)
 
     def set_client(self, client: _ClientT) -> None:
         """Set the client for all sub-caches in this group."""

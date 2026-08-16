@@ -13,6 +13,7 @@ Coverage
 - BaseModel hash (__hash__ from attrs)
 - Concrete model to_dict() round-trip (Pokemon)
 """
+
 import enum
 
 import attrs

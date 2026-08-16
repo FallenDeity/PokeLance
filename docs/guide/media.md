@@ -92,10 +92,7 @@ async def main() -> str:
     audio = await client.get_audio_async(pokemon.cries.latest)
     await client.close()
     encoded = base64.b64encode(audio).decode("ascii")
-    return (
-        f'<audio controls preload="none">'
-        f'<source src="data:audio/ogg;base64,{encoded}" type="audio/ogg"></audio>'
-    )
+    return f'<audio controls preload="none"><source src="data:audio/ogg;base64,{encoded}" type="audio/ogg"></audio>'
 
 
 print(asyncio.run(main()))
@@ -165,6 +162,7 @@ async def main() -> None:
         print(exc)  # e.g. "... was unsuccessful or the URL is not an image. (...) | ... | 404"
     finally:
         await client.close()
+
 
 asyncio.run(main())
 ```

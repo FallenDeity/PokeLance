@@ -5,7 +5,7 @@ import attrs
 from pokelance.models import BaseModel
 from pokelance.models.common import NamedResource
 
-__all__: t.Tuple[str, ...] = (
+__all__: tuple[str, ...] = (
     "BerryFlavorMap",
     "FlavorBerryMap",
 )
@@ -27,7 +27,7 @@ class BerryFlavorMap(BaseModel):
     flavor: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "BerryFlavorMap":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "BerryFlavorMap":
         return cls(
             raw=payload,
             potency=payload.get("potency", 0),
@@ -51,7 +51,7 @@ class FlavorBerryMap(BaseModel):
     berry: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "FlavorBerryMap":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "FlavorBerryMap":
         return cls(
             raw=payload,
             potency=payload.get("potency", 0),

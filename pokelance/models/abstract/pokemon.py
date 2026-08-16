@@ -50,23 +50,23 @@ from .utils import (
     TypeRelationsPast,
 )
 
-__all__: t.Tuple[str, ...] = (
+__all__: tuple[str, ...] = (
     "Ability",
     "Characteristic",
-    "Pokemon",
-    "PokemonSpecies",
-    "PokemonForm",
-    "Nature",
-    "Type",
+    "EggGroup",
     "Gender",
     "GrowthRate",
-    "EggGroup",
     "LocationAreaEncounter",
-    "PokemonColor",
+    "Nature",
     "PokeathlonStat",
+    "Pokemon",
+    "PokemonColor",
+    "PokemonForm",
     "PokemonHabitats",
     "PokemonShape",
+    "PokemonSpecies",
     "Stat",
+    "Type",
 )
 
 
@@ -100,14 +100,14 @@ class Ability(BaseModel):
     name: str = attrs.field(factory=str)
     is_main_series: bool = attrs.field(factory=bool)
     generation: NamedResource = attrs.field(factory=NamedResource)
-    names: t.List[Name] = attrs.field(factory=list)
-    effect_entries: t.List[VerboseEffect] = attrs.field(factory=list)
-    effect_changes: t.List[AbilityEffectChange] = attrs.field(factory=list)
-    flavor_text_entries: t.List[AbilityFlavorText] = attrs.field(factory=list)
-    pokemon: t.List[AbilityPokemon] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
+    effect_entries: list[VerboseEffect] = attrs.field(factory=list)
+    effect_changes: list[AbilityEffectChange] = attrs.field(factory=list)
+    flavor_text_entries: list[AbilityFlavorText] = attrs.field(factory=list)
+    pokemon: list[AbilityPokemon] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Ability":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Ability":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -143,12 +143,12 @@ class Characteristic(BaseModel):
 
     id: int = attrs.field(factory=int)
     gene_modulo: int = attrs.field(factory=int)
-    possible_values: t.List[int] = attrs.field(factory=list)
+    possible_values: list[int] = attrs.field(factory=list)
     highest_stat: NamedResource = attrs.field(factory=NamedResource)
-    descriptions: t.List[Description] = attrs.field(factory=list)
+    descriptions: list[Description] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Characteristic":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Characteristic":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -177,11 +177,11 @@ class EggGroup(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    names: t.List[Name] = attrs.field(factory=list)
-    pokemon_species: t.List[NamedResource] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
+    pokemon_species: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EggGroup":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "EggGroup":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -209,11 +209,11 @@ class Gender(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    pokemon_species_details: t.List[PokemonSpeciesGender] = attrs.field(factory=list)
-    required_for_evolution: t.List[NamedResource] = attrs.field(factory=list)
+    pokemon_species_details: list[PokemonSpeciesGender] = attrs.field(factory=list)
+    required_for_evolution: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Gender":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Gender":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -248,12 +248,12 @@ class GrowthRate(BaseModel):
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
     formula: str = attrs.field(factory=str)
-    descriptions: t.List[Description] = attrs.field(factory=list)
-    levels: t.List[GrowthRateExperienceLevel] = attrs.field(factory=list)
-    pokemon_species: t.List[NamedResource] = attrs.field(factory=list)
+    descriptions: list[Description] = attrs.field(factory=list)
+    levels: list[GrowthRateExperienceLevel] = attrs.field(factory=list)
+    pokemon_species: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GrowthRate":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "GrowthRate":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -294,16 +294,16 @@ class Nature(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    decreased_stat: t.Optional[NamedResource] = attrs.field(default=None)
-    increased_stat: t.Optional[NamedResource] = attrs.field(default=None)
-    hates_flavor: t.Optional[NamedResource] = attrs.field(default=None)
-    likes_flavor: t.Optional[NamedResource] = attrs.field(default=None)
-    pokeathlon_stat_changes: t.List[NatureStatChange] = attrs.field(factory=list)
-    move_battle_style_preferences: t.List[MoveBattleStylePreference] = attrs.field(factory=list)
-    names: t.List[Name] = attrs.field(factory=list)
+    decreased_stat: NamedResource | None = attrs.field(default=None)
+    increased_stat: NamedResource | None = attrs.field(default=None)
+    hates_flavor: NamedResource | None = attrs.field(default=None)
+    likes_flavor: NamedResource | None = attrs.field(default=None)
+    pokeathlon_stat_changes: list[NatureStatChange] = attrs.field(factory=list)
+    move_battle_style_preferences: list[MoveBattleStylePreference] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Nature":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Nature":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -340,11 +340,11 @@ class PokeathlonStat(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    names: t.List[Name] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
     affecting_natures: NaturePokeathlonStatAffectSet = attrs.field(factory=NaturePokeathlonStatAffectSet)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokeathlonStat":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokeathlonStat":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -406,28 +406,28 @@ class Pokemon(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    base_experience: t.Optional[int] = attrs.field(default=None)
+    base_experience: int | None = attrs.field(default=None)
     height: int = attrs.field(factory=int)
     is_default: bool = attrs.field(factory=bool)
     order: int = attrs.field(factory=int)
     weight: int = attrs.field(factory=int)
-    abilities: t.List[PokemonAbility] = attrs.field(factory=list)
-    forms: t.List[NamedResource] = attrs.field(factory=list)
-    game_indices: t.List[VersionGameIndex] = attrs.field(factory=list)
-    held_items: t.List[PokemonHeldItem] = attrs.field(factory=list)
+    abilities: list[PokemonAbility] = attrs.field(factory=list)
+    forms: list[NamedResource] = attrs.field(factory=list)
+    game_indices: list[VersionGameIndex] = attrs.field(factory=list)
+    held_items: list[PokemonHeldItem] = attrs.field(factory=list)
     location_area_encounters: str = attrs.field(factory=str)
-    moves: t.List[PokemonMove] = attrs.field(factory=list)
-    past_types: t.List[PokemonTypePast] = attrs.field(factory=list)
-    past_abilities: t.List[PokemonAbilityPast] = attrs.field(factory=list)
-    past_stats: t.List[PokemonStatPast] = attrs.field(factory=list)
+    moves: list[PokemonMove] = attrs.field(factory=list)
+    past_types: list[PokemonTypePast] = attrs.field(factory=list)
+    past_abilities: list[PokemonAbilityPast] = attrs.field(factory=list)
+    past_stats: list[PokemonStatPast] = attrs.field(factory=list)
     sprites: PokemonSprite = attrs.field(factory=PokemonSprite)
     cries: PokemonCries = attrs.field(factory=PokemonCries)
     species: NamedResource = attrs.field(factory=NamedResource)
-    stats: t.List[PokemonStat] = attrs.field(factory=list)
-    types: t.List[PokemonType] = attrs.field(factory=list)
+    stats: list[PokemonStat] = attrs.field(factory=list)
+    types: list[PokemonType] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Pokemon":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Pokemon":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -467,10 +467,10 @@ class LocationAreaEncounter(BaseModel):
     """
 
     location_area: NamedResource = attrs.field(factory=NamedResource)
-    version_details: t.List[VersionEncounterDetail] = attrs.field(factory=list)
+    version_details: list[VersionEncounterDetail] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "LocationAreaEncounter":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "LocationAreaEncounter":
         return cls(
             raw=payload,
             location_area=NamedResource.from_payload(payload.get("location_area", {})),
@@ -496,11 +496,11 @@ class PokemonColor(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    names: t.List[Name] = attrs.field(factory=list)
-    pokemon_species: t.List[NamedResource] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
+    pokemon_species: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonColor":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonColor":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -558,15 +558,15 @@ class PokemonForm(BaseModel):
     is_mega: bool = attrs.field(factory=bool)
     form_name: str = attrs.field(factory=str)
     pokemon: NamedResource = attrs.field(factory=NamedResource)
-    trigger_conditions: t.List[PokemonFormTriggerCondition] = attrs.field(factory=list)
-    types: t.List[PokemonFormType] = attrs.field(factory=list)
+    trigger_conditions: list[PokemonFormTriggerCondition] = attrs.field(factory=list)
+    types: list[PokemonFormType] = attrs.field(factory=list)
     sprites: PokemonFormSprites = attrs.field(factory=PokemonFormSprites)
     version_group: NamedResource = attrs.field(factory=NamedResource)
-    names: t.List[Name] = attrs.field(factory=list)
-    form_names: t.List[Name] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
+    form_names: list[Name] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonForm":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonForm":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -607,11 +607,11 @@ class PokemonHabitats(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    names: t.List[Name] = attrs.field(factory=list)
-    pokemon_species: t.List[NamedResource] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
+    pokemon_species: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonHabitats":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonHabitats":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -641,12 +641,12 @@ class PokemonShape(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    awesome_names: t.List[AwesomeName] = attrs.field(factory=list)
-    names: t.List[Name] = attrs.field(factory=list)
-    pokemon_species: t.List[NamedResource] = attrs.field(factory=list)
+    awesome_names: list[AwesomeName] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
+    pokemon_species: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonShape":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonShape":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -734,23 +734,23 @@ class PokemonSpecies(BaseModel):
     has_gender_differences: bool = attrs.field(factory=bool)
     forms_switchable: bool = attrs.field(factory=bool)
     growth_rate: NamedResource = attrs.field(factory=NamedResource)
-    pokedex_numbers: t.List[PokemonSpeciesDexEntry] = attrs.field(factory=list)
-    egg_groups: t.List[NamedResource] = attrs.field(factory=list)
+    pokedex_numbers: list[PokemonSpeciesDexEntry] = attrs.field(factory=list)
+    egg_groups: list[NamedResource] = attrs.field(factory=list)
     color: NamedResource = attrs.field(factory=NamedResource)
     shape: NamedResource = attrs.field(factory=NamedResource)
-    evolves_from_species: t.Optional[NamedResource] = attrs.field(default=None)
+    evolves_from_species: NamedResource | None = attrs.field(default=None)
     evolution_chain: Resource = attrs.field(factory=Resource)
-    habitat: t.Optional[NamedResource] = attrs.field(default=None)
+    habitat: NamedResource | None = attrs.field(default=None)
     generation: NamedResource = attrs.field(factory=NamedResource)
-    names: t.List[Name] = attrs.field(factory=list)
-    pal_park_encounters: t.List[PalParkEncounterArea] = attrs.field(factory=list)
-    flavor_text_entries: t.List[FlavorText] = attrs.field(factory=list)
-    form_descriptions: t.List[Description] = attrs.field(factory=list)
-    genera: t.List[Genus] = attrs.field(factory=list)
-    varieties: t.List[PokemonSpeciesVariety] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
+    pal_park_encounters: list[PalParkEncounterArea] = attrs.field(factory=list)
+    flavor_text_entries: list[FlavorText] = attrs.field(factory=list)
+    form_descriptions: list[Description] = attrs.field(factory=list)
+    genera: list[Genus] = attrs.field(factory=list)
+    varieties: list[PokemonSpeciesVariety] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonSpecies":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonSpecies":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -816,15 +816,15 @@ class Stat(BaseModel):
     name: str = attrs.field(factory=str)
     game_index: int = attrs.field(factory=int)
     is_battle_only: bool = attrs.field(factory=bool)
-    affecting_items: t.List[NamedResource] = attrs.field(factory=list)
+    affecting_items: list[NamedResource] = attrs.field(factory=list)
     affecting_moves: MoveStatAffectSets = attrs.field(factory=MoveStatAffectSets)
     affecting_natures: NatureStatAffectSets = attrs.field(factory=NatureStatAffectSets)
-    characteristics: t.List[Resource] = attrs.field(factory=list)
-    move_damage_class: t.Optional[NamedResource] = attrs.field(default=None)
-    names: t.List[Name] = attrs.field(factory=list)
+    characteristics: list[Resource] = attrs.field(factory=list)
+    move_damage_class: NamedResource | None = attrs.field(default=None)
+    names: list[Name] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Stat":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Stat":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -874,17 +874,17 @@ class Type(BaseModel):
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
     damage_relations: TypeRelations = attrs.field(factory=TypeRelations)
-    past_damage_relations: t.List[TypeRelationsPast] = attrs.field(factory=list)
-    game_indices: t.List[GenerationGameIndex] = attrs.field(factory=list)
+    past_damage_relations: list[TypeRelationsPast] = attrs.field(factory=list)
+    game_indices: list[GenerationGameIndex] = attrs.field(factory=list)
     generation: NamedResource = attrs.field(factory=NamedResource)
-    move_damage_class: t.Optional[NamedResource] = attrs.field(default=None)
-    names: t.List[Name] = attrs.field(factory=list)
-    pokemon: t.List[TypePokemon] = attrs.field(factory=list)
-    moves: t.List[NamedResource] = attrs.field(factory=list)
+    move_damage_class: NamedResource | None = attrs.field(default=None)
+    names: list[Name] = attrs.field(factory=list)
+    pokemon: list[TypePokemon] = attrs.field(factory=list)
+    moves: list[NamedResource] = attrs.field(factory=list)
     sprites: TypeIcons = attrs.field(factory=TypeIcons)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Type":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Type":
         return cls(
             raw=payload,
             id=payload.get("id", 0),

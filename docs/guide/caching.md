@@ -100,10 +100,10 @@ like a `dict` with two extra properties: accessing a key moves it to the "most r
 used" end, and inserting past `max_size` evicts the oldest entry:
 
 ```python
-client.berry.cache.berry.set_size(2)          # keep at most 2 berries in memory
-await client.berry.fetch_berry("cheri")        # cache: [cheri]
-await client.berry.fetch_berry("chesto")       # cache: [cheri, chesto]
-await client.berry.fetch_berry("pecha")        # cache: [chesto, pecha] - cheri evicted
+client.berry.cache.berry.set_size(2)  # keep at most 2 berries in memory
+await client.berry.fetch_berry("cheri")  # cache: [cheri]
+await client.berry.fetch_berry("chesto")  # cache: [cheri, chesto]
+await client.berry.fetch_berry("pecha")  # cache: [chesto, pecha] - cheri evicted
 ```
 
 !!! note "LRU eviction is per-category"
@@ -148,6 +148,7 @@ from pokelance import PokeLance
 
 client = PokeLance()
 
+
 async def main() -> None:
     # 1. Wait for initial global load
     await client.wait_until_ready()
@@ -167,6 +168,7 @@ async def main() -> None:
     finally:
         await client.close()
 
+
 asyncio.run(main())
 ```
 
@@ -181,7 +183,7 @@ it, not just the ones you've explicitly requested, with
 
 ```python
 await client.berry.cache.berry_flavor.wait_until_ready()
-await client.berry.cache.berry_flavor.load_all()          # one request at a time
+await client.berry.cache.berry_flavor.load_all()  # one request at a time
 # or, faster, with controlled concurrency:
 await client.berry.cache.berry_flavor.load_all_batch(batch_size=20)
 ```
@@ -240,9 +242,9 @@ asyncio.run(main())
 Clear everything at once:
 
 ```python
-client.http.cache.clear()          # every extension, every category
-client.berry.cache.clear()         # just the berry extension
-client.berry.cache.berry.clear()   # just one category
+client.http.cache.clear()  # every extension, every category
+client.berry.cache.clear()  # just the berry extension
+client.berry.cache.berry.clear()  # just one category
 ```
 
 !!! info "Caches are shared across client instances"

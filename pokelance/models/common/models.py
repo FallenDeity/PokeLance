@@ -6,20 +6,20 @@ from pokelance.models import BaseModel
 
 from .resources import NamedResource, Resource
 
-__all__: t.Tuple[str, ...] = (
+__all__: tuple[str, ...] = (
+    "APIMetadata",
     "Description",
     "Effect",
     "Encounter",
     "FlavorText",
     "GenerationGameIndex",
+    "Language",
     "MachineVersionDetail",
     "Name",
     "VerboseEffect",
     "VersionEncounterDetail",
     "VersionGameIndex",
     "VersionGroupFlavorText",
-    "Language",
-    "APIMetadata",
 )
 
 
@@ -39,7 +39,7 @@ class Description(BaseModel):
     language: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Description":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Description":
         return cls(
             raw=payload,
             description=payload.get("description", ""),
@@ -63,7 +63,7 @@ class Effect(BaseModel):
     language: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Effect":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Effect":
         return cls(
             raw=payload,
             effect=payload.get("effect", ""),
@@ -87,16 +87,16 @@ class EncounterPokemonDetail(BaseModel):
         Whether or not the Pokémon is an alpha Pokémon. Relevant to Pokémon Legends: Arceus.
     """
 
-    min_perfect_ivs: t.Optional[int] = attrs.field(default=None)
+    min_perfect_ivs: int | None = attrs.field(default=None)
     always_shiny: bool = attrs.field(factory=bool)
     never_shiny: bool = attrs.field(factory=bool)
     is_alpha: bool = attrs.field(factory=bool)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EncounterPokemonDetail":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "EncounterPokemonDetail":
         return cls(
             raw=payload,
-            min_perfect_ivs=payload.get("min_perfect_ivs", None),
+            min_perfect_ivs=payload.get("min_perfect_ivs"),
             always_shiny=payload.get("always_shiny", False),
             never_shiny=payload.get("never_shiny", False),
             is_alpha=payload.get("is_alpha", False),
@@ -125,13 +125,13 @@ class Encounter(BaseModel):
 
     min_level: int = attrs.field(factory=int)
     max_level: int = attrs.field(factory=int)
-    condition_values: t.List[NamedResource] = attrs.field(factory=list)
+    condition_values: list[NamedResource] = attrs.field(factory=list)
     chance: int = attrs.field(factory=int)
     method: NamedResource = attrs.field(factory=NamedResource)
-    pokemon_details: t.Optional[EncounterPokemonDetail] = attrs.field(default=None)
+    pokemon_details: EncounterPokemonDetail | None = attrs.field(default=None)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Encounter":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Encounter":
         return cls(
             raw=payload,
             min_level=payload.get("min_level", 0),
@@ -162,7 +162,7 @@ class FlavorText(BaseModel):
     version: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "FlavorText":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "FlavorText":
         return cls(
             raw=payload,
             flavor_text=payload.get("flavor_text", ""),
@@ -187,7 +187,7 @@ class GenerationGameIndex(BaseModel):
     generation: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationGameIndex":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationGameIndex":
         return cls(
             raw=payload,
             game_index=payload.get("game_index", 0),
@@ -211,7 +211,7 @@ class MachineVersionDetail(BaseModel):
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MachineVersionDetail":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "MachineVersionDetail":
         return cls(
             raw=payload,
             machine=Resource.from_payload(payload.get("machine", {})),
@@ -235,7 +235,7 @@ class Name(BaseModel):
     language: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Name":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Name":
         return cls(
             raw=payload,
             name=payload.get("name", ""),
@@ -262,7 +262,7 @@ class VerboseEffect(BaseModel):
     language: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "VerboseEffect":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "VerboseEffect":
         return cls(
             raw=payload,
             effect=payload.get("effect", ""),
@@ -287,10 +287,10 @@ class VersionEncounterDetail(BaseModel):
 
     version: NamedResource = attrs.field(factory=NamedResource)
     max_chance: int = attrs.field(factory=int)
-    encounter_details: t.List[Encounter] = attrs.field(factory=list)
+    encounter_details: list[Encounter] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "VersionEncounterDetail":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "VersionEncounterDetail":
         return cls(
             raw=payload,
             version=NamedResource.from_payload(payload.get("version", {})),
@@ -315,7 +315,7 @@ class VersionGameIndex(BaseModel):
     version: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "VersionGameIndex":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "VersionGameIndex":
         return cls(
             raw=payload,
             game_index=payload.get("game_index", 0),
@@ -342,7 +342,7 @@ class VersionGroupFlavorText(BaseModel):
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "VersionGroupFlavorText":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "VersionGroupFlavorText":
         return cls(
             raw=payload,
             text=payload.get("text", ""),
@@ -376,10 +376,10 @@ class Language(BaseModel):
     official: bool = attrs.field(factory=bool)
     iso639: str = attrs.field(factory=str)
     iso3166: str = attrs.field(factory=str)
-    names: t.List[Name] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Language":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Language":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -407,13 +407,13 @@ class APIMetadata(BaseModel):
 
     hash: str = attrs.field(factory=str)
     deploy_date: str = attrs.field(factory=str)
-    tag: t.Optional[str] = attrs.field(default=None)
+    tag: str | None = attrs.field(default=None)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "APIMetadata":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "APIMetadata":
         return cls(
             raw=payload,
             hash=payload.get("hash", ""),
             deploy_date=payload.get("deploy_date", ""),
-            tag=payload.get("tag", None),
+            tag=payload.get("tag"),
         )

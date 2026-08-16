@@ -5,11 +5,11 @@ import attrs
 from pokelance.models import BaseModel
 from pokelance.models.common import NamedResource
 
-__all__: t.Tuple[str, ...] = (
-    "ItemSprites",
+__all__: tuple[str, ...] = (
     "ItemHolderPokemon",
     "ItemHolderPokemonVersionDetail",
     "ItemPrice",
+    "ItemSprites",
 )
 
 
@@ -23,10 +23,10 @@ class ItemSprites(BaseModel):
         The default depiction of this item.
     """
 
-    default: t.Optional[str] = attrs.field(default=None)
+    default: str | None = attrs.field(default=None)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemSprites":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "ItemSprites":
         return cls(raw=payload, default=payload.get("default"))
 
 
@@ -46,7 +46,7 @@ class ItemHolderPokemonVersionDetail(BaseModel):
     version: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemHolderPokemonVersionDetail":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "ItemHolderPokemonVersionDetail":
         return cls(
             raw=payload,
             rarity=payload.get("rarity", 0),
@@ -67,10 +67,10 @@ class ItemHolderPokemon(BaseModel):
     """
 
     pokemon: NamedResource = attrs.field(factory=NamedResource)
-    version_details: t.List[ItemHolderPokemonVersionDetail] = attrs.field(factory=list)
+    version_details: list[ItemHolderPokemonVersionDetail] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemHolderPokemon":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "ItemHolderPokemon":
         return cls(
             raw=payload,
             pokemon=NamedResource.from_payload(payload.get("pokemon", {})),
@@ -98,12 +98,12 @@ class ItemPrice(BaseModel):
     """
 
     currency: NamedResource = attrs.field(factory=NamedResource)
-    purchase_price: t.Optional[int] = attrs.field(default=None)
-    sell_price: t.Optional[int] = attrs.field(default=None)
+    purchase_price: int | None = attrs.field(default=None)
+    sell_price: int | None = attrs.field(default=None)
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ItemPrice":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "ItemPrice":
         return cls(
             raw=payload,
             currency=NamedResource.from_payload(payload.get("currency", {})),

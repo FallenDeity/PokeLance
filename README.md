@@ -84,6 +84,7 @@ async def main() -> None:
         # The client will be closed automatically when the async context manager exits
     return None
 
+
 asyncio.run(main())
 ```
 

@@ -2,8 +2,7 @@ import enum
 import typing as t
 
 import attrs
-
-_T = t.TypeVar("_T", bound="BaseModel")
+from typing_extensions import Self
 
 
 def _serializer(_instance: t.Any, _field: attrs.Attribute, value: t.Any) -> t.Any:  # type: ignore
@@ -16,9 +15,9 @@ def _serializer(_instance: t.Any, _field: attrs.Attribute, value: t.Any) -> t.An
 class BaseModel:
     """Base model for all models"""
 
-    raw: t.Dict[str, t.Any] = attrs.field(factory=dict, repr=False, eq=False, order=False)
+    raw: dict[str, t.Any] = attrs.field(factory=dict, repr=False, eq=False, order=False)
 
-    def to_dict(self) -> t.Dict[str, t.Any]:
+    def to_dict(self) -> dict[str, t.Any]:
         """Convert the model to a dict
 
         Returns
@@ -31,11 +30,11 @@ class BaseModel:
         )
 
     @classmethod
-    def optional_from_payload(cls: t.Type[_T], data: t.Optional[t.Dict[str, t.Any]]) -> t.Optional[_T]:
+    def optional_from_payload(cls, data: dict[str, t.Any] | None) -> Self | None:
         return cls.from_payload(data) if data else None
 
     @classmethod
-    def from_payload(cls: t.Type[_T], payload: t.Dict[str, t.Any]) -> _T:
+    def from_payload(cls, payload: dict[str, t.Any]) -> Self:
         """Create a model from a payload
 
         Parameters

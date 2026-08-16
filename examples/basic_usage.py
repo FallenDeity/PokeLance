@@ -11,7 +11,6 @@ async def main() -> None:
     await client.berry.setup()
     await client.berry.cache.wait_until_ready()
     print(await client.berry.fetch_berry("chery"))
-    return None
 
 
 asyncio.run(main())

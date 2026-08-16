@@ -6,44 +6,43 @@ from pokelance.constants import PokemonFormTriggerEnum
 from pokelance.models import BaseModel
 from pokelance.models.common import Effect, NamedResource
 
-__all__: t.Tuple[str, ...] = (
+__all__: tuple[str, ...] = (
     "AbilityEffectChange",
     "AbilityFlavorText",
     "AbilityPokemon",
-    "PokemonSpeciesGender",
+    "AwesomeName",
+    "Genus",
     "GrowthRateExperienceLevel",
-    "NatureStatChange",
     "MoveBattleStylePreference",
+    "MoveStatAffect",
+    "MoveStatAffectSets",
     "NaturePokeathlonStatAffect",
     "NaturePokeathlonStatAffectSet",
+    "NatureStatAffectSets",
+    "NatureStatChange",
+    "PalParkEncounterArea",
+    "PokemonAbility",
+    "PokemonAbilityPast",
+    "PokemonCries",
+    "PokemonFormSprites",
+    "PokemonFormTriggerCondition",
+    "PokemonFormType",
+    "PokemonHeldItem",
+    "PokemonHeldItemVersion",
+    "PokemonMove",
     "PokemonMoveVersion",
+    "PokemonSpeciesDexEntry",
+    "PokemonSpeciesGender",
+    "PokemonSpeciesVariety",
+    "PokemonSprite",
     "PokemonStat",
     "PokemonStatPast",
     "PokemonType",
-    "PokemonHeldItemVersion",
-    "PokemonHeldItem",
-    "PokemonSprite",
-    "PokemonCries",
-    "PokemonAbility",
-    "PokemonAbilityPast",
-    "PokemonMove",
     "PokemonTypePast",
-    "PokemonAbilityPast",
-    "PokemonFormType",
-    "PokemonFormSprites",
-    "PokemonFormTriggerCondition",
-    "AwesomeName",
-    "PokemonSpeciesVariety",
-    "PokemonSpeciesDexEntry",
-    "PalParkEncounterArea",
-    "Genus",
-    "MoveStatAffectSets",
-    "NatureStatAffectSets",
-    "MoveStatAffect",
-    "TypeRelations",
-    "TypePokemon",
-    "TypeRelationsPast",
     "TypeIcons",
+    "TypePokemon",
+    "TypeRelations",
+    "TypeRelationsPast",
 )
 
 
@@ -71,14 +70,14 @@ class BaseSprite(BaseModel):
         The shiny depiction of female gender of this pokemon from the back in battle.
     """
 
-    back_default: t.Optional[str] = attrs.field(default=None)
-    back_shiny: t.Optional[str] = attrs.field(default=None)
-    back_female: t.Optional[str] = attrs.field(default=None)
-    back_shiny_female: t.Optional[str] = attrs.field(default=None)
-    front_default: t.Optional[str] = attrs.field(default=None)
-    front_shiny: t.Optional[str] = attrs.field(default=None)
-    front_female: t.Optional[str] = attrs.field(default=None)
-    front_shiny_female: t.Optional[str] = attrs.field(default=None)
+    back_default: str | None = attrs.field(default=None)
+    back_shiny: str | None = attrs.field(default=None)
+    back_female: str | None = attrs.field(default=None)
+    back_shiny_female: str | None = attrs.field(default=None)
+    front_default: str | None = attrs.field(default=None)
+    front_shiny: str | None = attrs.field(default=None)
+    front_female: str | None = attrs.field(default=None)
+    front_shiny_female: str | None = attrs.field(default=None)
 
 
 @attrs.define(kw_only=True, slots=True)
@@ -93,7 +92,7 @@ class Animated(BaseSprite):
     """
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Animated":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Animated":
         return cls(
             raw=payload,
             back_default=payload.get("back_default"),
@@ -117,7 +116,7 @@ class ShowdownSprites(BaseSprite):
     """
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ShowdownSprites":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "ShowdownSprites":
         return cls(
             raw=payload,
             back_default=payload.get("back_default"),
@@ -153,16 +152,16 @@ class VersionSprite(BaseSprite):
         The animated depiction of this pokemon.
     """
 
-    back_gray: t.Optional[str] = attrs.field(default=None)
-    back_transparent: t.Optional[str] = attrs.field(default=None)
-    back_shiny_transparent: t.Optional[str] = attrs.field(default=None)
-    front_gray: t.Optional[str] = attrs.field(default=None)
-    front_transparent: t.Optional[str] = attrs.field(default=None)
-    front_shiny_transparent: t.Optional[str] = attrs.field(default=None)
+    back_gray: str | None = attrs.field(default=None)
+    back_transparent: str | None = attrs.field(default=None)
+    back_shiny_transparent: str | None = attrs.field(default=None)
+    front_gray: str | None = attrs.field(default=None)
+    front_transparent: str | None = attrs.field(default=None)
+    front_shiny_transparent: str | None = attrs.field(default=None)
     animated: Animated = attrs.field(factory=Animated)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "VersionSprite":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "VersionSprite":
         return cls(
             raw=payload,
             back_default=payload.get("back_default"),
@@ -199,7 +198,7 @@ class GenerationI(Generation):
     yellow: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationI":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationI":
         return cls(
             raw=payload,
             red_blue=VersionSprite.from_payload(payload.get("red-blue", {})),
@@ -226,7 +225,7 @@ class GenerationII(Generation):
     silver: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationII":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationII":
         return cls(
             raw=payload,
             crystal=VersionSprite.from_payload(payload.get("crystal", {})),
@@ -254,7 +253,7 @@ class GenerationIII(Generation):
     ruby_sapphire: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationIII":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationIII":
         return cls(
             raw=payload,
             emerald=VersionSprite.from_payload(payload.get("emerald", {})),
@@ -282,7 +281,7 @@ class GenerationIV(Generation):
     platinum: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationIV":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationIV":
         return cls(
             raw=payload,
             diamond_pearl=VersionSprite.from_payload(payload.get("diamond-pearl", {})),
@@ -304,7 +303,7 @@ class GenerationV(Generation):
     black_white: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationV":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationV":
         return cls(
             raw=payload,
             black_white=VersionSprite.from_payload(payload.get("black-white", {})),
@@ -327,7 +326,7 @@ class GenerationVI(Generation):
     x_y: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationVI":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationVI":
         return cls(
             raw=payload,
             omegaruby_alphasapphire=VersionSprite.from_payload(payload.get("omegaruby-alphasapphire", {})),
@@ -351,7 +350,7 @@ class GenerationVII(Generation):
     ultra_sun_ultra_moon: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationVII":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationVII":
         return cls(
             raw=payload,
             icons=VersionSprite.from_payload(payload.get("icons", {})),
@@ -372,7 +371,7 @@ class GenerationVIII(Generation):
     icons: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GenerationVIII":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationVIII":
         return cls(
             raw=payload,
             icons=VersionSprite.from_payload(payload.get("icons", {})),
@@ -413,7 +412,7 @@ class Versions(BaseModel):
     generation_viii: GenerationVIII = attrs.field(factory=GenerationVIII)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Versions":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Versions":
         return cls(
             raw=payload,
             generation_i=GenerationI.from_payload(payload.get("generation-i", {})),
@@ -439,11 +438,11 @@ class DreamWorld(BaseModel):
         The female depiction of this pokemon.
     """
 
-    front_default: t.Optional[str] = attrs.field(default=None)
-    front_female: t.Optional[str] = attrs.field(default=None)
+    front_default: str | None = attrs.field(default=None)
+    front_female: str | None = attrs.field(default=None)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "DreamWorld":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "DreamWorld":
         return cls(
             raw=payload,
             front_default=payload.get("front_default"),
@@ -467,13 +466,13 @@ class Home(BaseModel):
         The shiny female depiction of this pokemon.
     """
 
-    front_default: t.Optional[str] = attrs.field(default=None)
-    front_female: t.Optional[str] = attrs.field(default=None)
-    front_shiny: t.Optional[str] = attrs.field(default=None)
-    front_shiny_female: t.Optional[str] = attrs.field(default=None)
+    front_default: str | None = attrs.field(default=None)
+    front_female: str | None = attrs.field(default=None)
+    front_shiny: str | None = attrs.field(default=None)
+    front_shiny_female: str | None = attrs.field(default=None)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Home":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Home":
         return cls(
             raw=payload,
             front_default=payload.get("front_default"),
@@ -495,11 +494,11 @@ class OfficialArtwork(BaseModel):
         The shiny depiction of this Pokémon from the official artwork.
     """
 
-    front_default: t.Optional[str] = attrs.field(default=None)
-    front_shiny: t.Optional[str] = attrs.field(default=None)
+    front_default: str | None = attrs.field(default=None)
+    front_shiny: str | None = attrs.field(default=None)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "OfficialArtwork":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "OfficialArtwork":
         return cls(
             raw=payload,
             front_default=payload.get("front_default"),
@@ -529,7 +528,7 @@ class Other(BaseModel):
     showdown: ShowdownSprites = attrs.field(factory=ShowdownSprites)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Other":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Other":
         return cls(
             raw=payload,
             dream_world=DreamWorld.from_payload(payload.get("dream_world", {})),
@@ -552,11 +551,11 @@ class PokemonCries(BaseModel):
         The legacy cry of this pokemon based on older games. Usually from Gen 1 - 5.
     """
 
-    latest: t.Optional[str] = attrs.field(default=None)
-    legacy: t.Optional[str] = attrs.field(default=None)
+    latest: str | None = attrs.field(default=None)
+    legacy: str | None = attrs.field(default=None)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonCries":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonCries":
         return cls(
             raw=payload,
             latest=payload.get("latest"),
@@ -576,11 +575,11 @@ class TypeIcon(BaseModel):
         The symbol icon of this type.
     """
 
-    name_icon: t.Optional[str] = attrs.field(default=None)
-    symbol_icon: t.Optional[str] = attrs.field(default=None)
+    name_icon: str | None = attrs.field(default=None)
+    symbol_icon: str | None = attrs.field(default=None)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIcon":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIcon":
         return cls(
             raw=payload,
             name_icon=payload.get("name_icon"),
@@ -618,7 +617,7 @@ class TypeIconGenerationIII(TypeIconGeneration):
     xd: TypeIcon = attrs.field(factory=TypeIcon)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIconGenerationIII":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIconGenerationIII":
         return cls(
             raw=payload,
             colosseum=TypeIcon.from_payload(payload.get("colosseum", {})),
@@ -648,7 +647,7 @@ class TypeIconGenerationIV(TypeIconGeneration):
     platinum: TypeIcon = attrs.field(factory=TypeIcon)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIconGenerationIV":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIconGenerationIV":
         return cls(
             raw=payload,
             diamond_pearl=TypeIcon.from_payload(payload.get("diamond-pearl", {})),
@@ -673,7 +672,7 @@ class TypeIconGenerationV(TypeIconGeneration):
     black_2_white_2: TypeIcon = attrs.field(factory=TypeIcon)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIconGenerationV":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIconGenerationV":
         return cls(
             raw=payload,
             black_white=TypeIcon.from_payload(payload.get("black-white", {})),
@@ -697,7 +696,7 @@ class TypeIconGenerationVI(TypeIconGeneration):
     omega_ruby_alpha_sapphire: TypeIcon = attrs.field(factory=TypeIcon)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIconGenerationVI":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIconGenerationVI":
         return cls(
             raw=payload,
             x_y=TypeIcon.from_payload(payload.get("x-y", {})),
@@ -724,7 +723,7 @@ class TypeIconGenerationVII(TypeIconGeneration):
     lets_go_pikachu_lets_go_eevee: TypeIcon = attrs.field(factory=TypeIcon)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIconGenerationVII":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIconGenerationVII":
         return cls(
             raw=payload,
             sun_moon=TypeIcon.from_payload(payload.get("sun-moon", {})),
@@ -752,7 +751,7 @@ class TypeIconGenerationVIII(TypeIconGeneration):
     legends_arceus: TypeIcon = attrs.field(factory=TypeIcon)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIconGenerationVIII":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIconGenerationVIII":
         return cls(
             raw=payload,
             sword_shield=TypeIcon.from_payload(payload.get("sword-shield", {})),
@@ -772,7 +771,7 @@ class TypeIconGenerationIX(TypeIconGeneration):
     scarlet_violet: TypeIcon = attrs.field(factory=TypeIcon)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIconGenerationIX":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIconGenerationIX":
         return cls(
             raw=payload,
             scarlet_violet=TypeIcon.from_payload(payload.get("scarlet-violet", {})),
@@ -810,7 +809,7 @@ class TypeIcons(BaseModel):
     generation_ix: TypeIconGenerationIX = attrs.field(factory=TypeIconGenerationIX)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeIcons":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIcons":
         return cls(
             raw=payload,
             generation_iii=TypeIconGenerationIII.from_payload(payload.get("generation-iii", {})),
@@ -835,11 +834,11 @@ class AbilityEffectChange(BaseModel):
         The version group in which the previous effect of this ability originated.
     """
 
-    effect_entries: t.List[Effect] = attrs.field(factory=list)
+    effect_entries: list[Effect] = attrs.field(factory=list)
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "AbilityEffectChange":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "AbilityEffectChange":
         return cls(
             raw=payload,
             effect_entries=[Effect.from_payload(i) for i in payload.get("effect_entries", [])],
@@ -866,7 +865,7 @@ class AbilityFlavorText(BaseModel):
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "AbilityFlavorText":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "AbilityFlavorText":
         return cls(
             raw=payload,
             flavor_text=payload.get("flavor_text", ""),
@@ -894,7 +893,7 @@ class AbilityPokemon(BaseModel):
     pokemon: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "AbilityPokemon":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "AbilityPokemon":
         return cls(
             raw=payload,
             is_hidden=payload.get("is_hidden", False),
@@ -919,7 +918,7 @@ class PokemonSpeciesGender(BaseModel):
     pokemon_species: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonSpeciesGender":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonSpeciesGender":
         return cls(
             raw=payload,
             rate=payload.get("rate", 0),
@@ -943,7 +942,7 @@ class GrowthRateExperienceLevel(BaseModel):
     experience: int = attrs.field(factory=int)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "GrowthRateExperienceLevel":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "GrowthRateExperienceLevel":
         return cls(
             raw=payload,
             level=payload.get("level", 0),
@@ -967,7 +966,7 @@ class NatureStatChange(BaseModel):
     pokeathlon_stat: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "NatureStatChange":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "NatureStatChange":
         return cls(
             raw=payload,
             max_change=payload.get("max_change", 0),
@@ -994,7 +993,7 @@ class MoveBattleStylePreference(BaseModel):
     move_battle_style: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveBattleStylePreference":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "MoveBattleStylePreference":
         return cls(
             raw=payload,
             low_hp_preference=payload.get("low_hp_preference", 0),
@@ -1019,7 +1018,7 @@ class NaturePokeathlonStatAffect(BaseModel):
     nature: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "NaturePokeathlonStatAffect":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "NaturePokeathlonStatAffect":
         return cls(
             raw=payload,
             max_change=payload.get("max_change", 0),
@@ -1039,11 +1038,11 @@ class NaturePokeathlonStatAffectSet(BaseModel):
         A list of natures and how they change the referenced pokeathlon stat.
     """
 
-    increase: t.List[NaturePokeathlonStatAffect] = attrs.field(factory=list)
-    decrease: t.List[NaturePokeathlonStatAffect] = attrs.field(factory=list)
+    increase: list[NaturePokeathlonStatAffect] = attrs.field(factory=list)
+    decrease: list[NaturePokeathlonStatAffect] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "NaturePokeathlonStatAffectSet":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "NaturePokeathlonStatAffectSet":
         return cls(
             raw=payload,
             increase=[NaturePokeathlonStatAffect.from_payload(i) for i in payload.get("increase", [])],
@@ -1070,7 +1069,7 @@ class PokemonAbility(BaseModel):
     ability: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonAbility":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonAbility":
         return cls(
             raw=payload,
             is_hidden=payload.get("is_hidden", False),
@@ -1095,10 +1094,10 @@ class PokemonPastAbility(BaseModel):
 
     is_hidden: bool = attrs.field(factory=bool)
     slot: int = attrs.field(factory=int)
-    ability: t.Optional[NamedResource] = attrs.field(default=None)
+    ability: NamedResource | None = attrs.field(default=None)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonPastAbility":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonPastAbility":
         return cls(
             raw=payload,
             is_hidden=payload.get("is_hidden", False),
@@ -1123,7 +1122,7 @@ class PokemonType(BaseModel):
     type: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonType":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonType":
         return cls(
             raw=payload,
             slot=payload.get("slot", 0),
@@ -1147,7 +1146,7 @@ class PokemonFormType(BaseModel):
     type: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonFormType":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonFormType":
         return cls(
             raw=payload,
             slot=payload.get("slot", 0),
@@ -1168,10 +1167,10 @@ class PokemonTypePast(BaseModel):
     """
 
     generation: NamedResource = attrs.field(factory=NamedResource)
-    types: t.List[PokemonType] = attrs.field(factory=list)
+    types: list[PokemonType] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonTypePast":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonTypePast":
         return cls(
             raw=payload,
             generation=NamedResource.from_payload(payload.get("generation", {})),
@@ -1192,10 +1191,10 @@ class PokemonAbilityPast(BaseModel):
     """
 
     generation: NamedResource = attrs.field(factory=NamedResource)
-    abilities: t.List[PokemonPastAbility] = attrs.field(factory=list)
+    abilities: list[PokemonPastAbility] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonAbilityPast":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonAbilityPast":
         return cls(
             raw=payload,
             generation=NamedResource.from_payload(payload.get("generation", {})),
@@ -1219,7 +1218,7 @@ class PokemonHeldItemVersion(BaseModel):
     rarity: int = attrs.field(factory=int)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonHeldItemVersion":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonHeldItemVersion":
         return cls(
             raw=payload,
             version=NamedResource.from_payload(payload.get("version", {})),
@@ -1240,10 +1239,10 @@ class PokemonHeldItem(BaseModel):
     """
 
     item: NamedResource = attrs.field(factory=NamedResource)
-    version_details: t.List[PokemonHeldItemVersion] = attrs.field(factory=list)
+    version_details: list[PokemonHeldItemVersion] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonHeldItem":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonHeldItem":
         return cls(
             raw=payload,
             item=NamedResource.from_payload(payload.get("item", {})),
@@ -1270,10 +1269,10 @@ class PokemonMoveVersion(BaseModel):
     move_learn_method: NamedResource = attrs.field(factory=NamedResource)
     version_group: NamedResource = attrs.field(factory=NamedResource)
     level_learned_at: int = attrs.field(factory=int)
-    order: t.Optional[int] = attrs.field(default=None)
+    order: int | None = attrs.field(default=None)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonMoveVersion":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonMoveVersion":
         return cls(
             raw=payload,
             move_learn_method=NamedResource.from_payload(payload.get("move_learn_method", {})),
@@ -1296,10 +1295,10 @@ class PokemonMove(BaseModel):
     """
 
     move: NamedResource = attrs.field(factory=NamedResource)
-    version_group_details: t.List[PokemonMoveVersion] = attrs.field(factory=list)
+    version_group_details: list[PokemonMoveVersion] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonMove":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonMove":
         return cls(
             raw=payload,
             move=NamedResource.from_payload(payload.get("move", {})),
@@ -1328,7 +1327,7 @@ class PokemonStat(BaseModel):
     base_stat: int = attrs.field(factory=int)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonStat":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonStat":
         return cls(
             raw=payload,
             stat=NamedResource.from_payload(payload.get("stat", {})),
@@ -1350,10 +1349,10 @@ class PokemonStatPast(BaseModel):
     """
 
     generation: NamedResource = attrs.field(factory=NamedResource)
-    stats: t.List[PokemonStat] = attrs.field(factory=list)
+    stats: list[PokemonStat] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonStatPast":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonStatPast":
         return cls(
             raw=payload,
             generation=NamedResource.from_payload(payload.get("generation", {})),
@@ -1377,7 +1376,7 @@ class PokemonSprite(BaseSprite):
     versions: Versions = attrs.field(factory=Versions)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonSprite":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonSprite":
         return cls(
             raw=payload,
             front_default=payload.get("front_default", ""),
@@ -1419,18 +1418,18 @@ class PokemonFormSprites(BaseModel):
         A set of sprites used to depict this Pokémon form in the game.
     """
 
-    front_default: t.Optional[str] = attrs.field(default=None)
-    front_shiny: t.Optional[str] = attrs.field(default=None)
-    front_female: t.Optional[str] = attrs.field(default=None)
-    front_shiny_female: t.Optional[str] = attrs.field(default=None)
-    back_default: t.Optional[str] = attrs.field(default=None)
-    back_shiny: t.Optional[str] = attrs.field(default=None)
-    back_female: t.Optional[str] = attrs.field(default=None)
-    back_shiny_female: t.Optional[str] = attrs.field(default=None)
+    front_default: str | None = attrs.field(default=None)
+    front_shiny: str | None = attrs.field(default=None)
+    front_female: str | None = attrs.field(default=None)
+    front_shiny_female: str | None = attrs.field(default=None)
+    back_default: str | None = attrs.field(default=None)
+    back_shiny: str | None = attrs.field(default=None)
+    back_female: str | None = attrs.field(default=None)
+    back_shiny_female: str | None = attrs.field(default=None)
     versions: Versions = attrs.field(factory=Versions)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonFormSprites":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonFormSprites":
         return cls(
             raw=payload,
             front_default=payload.get("front_default"),
@@ -1464,11 +1463,11 @@ class PokemonFormTriggerCondition(BaseModel):
     url: str = attrs.field(factory=str)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonFormTriggerCondition":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonFormTriggerCondition":
         return cls(
             raw=payload,
             name=payload.get("name", ""),
-            trigger=payload.get("trigger", None),
+            trigger=payload.get("trigger"),
             url=payload.get("url", ""),
         )
 
@@ -1489,7 +1488,7 @@ class AwesomeName(BaseModel):
     language: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "AwesomeName":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "AwesomeName":
         return cls(
             raw=payload,
             awesome_name=payload.get("awesome_name", ""),
@@ -1513,7 +1512,7 @@ class Genus(BaseModel):
     language: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Genus":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Genus":
         return cls(
             raw=payload,
             genus=payload.get("genus", ""),
@@ -1537,7 +1536,7 @@ class PokemonSpeciesDexEntry(BaseModel):
     pokedex: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonSpeciesDexEntry":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonSpeciesDexEntry":
         return cls(
             raw=payload,
             entry_number=payload.get("entry_number", 0),
@@ -1564,7 +1563,7 @@ class PalParkEncounterArea(BaseModel):
     area: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PalParkEncounterArea":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PalParkEncounterArea":
         return cls(
             raw=payload,
             base_score=payload.get("base_score", 0),
@@ -1589,7 +1588,7 @@ class PokemonSpeciesVariety(BaseModel):
     pokemon: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonSpeciesVariety":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonSpeciesVariety":
         return cls(
             raw=payload,
             is_default=payload.get("is_default", False),
@@ -1613,7 +1612,7 @@ class MoveStatAffect(BaseModel):
     move: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveStatAffect":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "MoveStatAffect":
         return cls(
             raw=payload,
             change=payload.get("change", 0),
@@ -1633,11 +1632,11 @@ class MoveStatAffectSets(BaseModel):
         A list of move stat affects.
     """
 
-    increase: t.List[MoveStatAffect] = attrs.field(factory=list)
-    decrease: t.List[MoveStatAffect] = attrs.field(factory=list)
+    increase: list[MoveStatAffect] = attrs.field(factory=list)
+    decrease: list[MoveStatAffect] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveStatAffectSets":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "MoveStatAffectSets":
         return cls(
             raw=payload,
             increase=[MoveStatAffect.from_payload(i) for i in payload.get("increase", [])],
@@ -1657,11 +1656,11 @@ class NatureStatAffectSets(BaseModel):
         A list of nature stat affects.
     """
 
-    increase: t.List[NamedResource] = attrs.field(factory=list)
-    decrease: t.List[NamedResource] = attrs.field(factory=list)
+    increase: list[NamedResource] = attrs.field(factory=list)
+    decrease: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "NatureStatAffectSets":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "NatureStatAffectSets":
         return cls(
             raw=payload,
             increase=[NamedResource.from_payload(i) for i in payload.get("increase", [])],
@@ -1685,7 +1684,7 @@ class TypePokemon(BaseModel):
     pokemon: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypePokemon":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "TypePokemon":
         return cls(
             raw=payload,
             slot=payload.get("slot", 0),
@@ -1713,15 +1712,15 @@ class TypeRelations(BaseModel):
         A list of types that have double damage to this type.
     """
 
-    no_damage_to: t.List[NamedResource] = attrs.field(factory=list)
-    half_damage_to: t.List[NamedResource] = attrs.field(factory=list)
-    double_damage_to: t.List[NamedResource] = attrs.field(factory=list)
-    no_damage_from: t.List[NamedResource] = attrs.field(factory=list)
-    half_damage_from: t.List[NamedResource] = attrs.field(factory=list)
-    double_damage_from: t.List[NamedResource] = attrs.field(factory=list)
+    no_damage_to: list[NamedResource] = attrs.field(factory=list)
+    half_damage_to: list[NamedResource] = attrs.field(factory=list)
+    double_damage_to: list[NamedResource] = attrs.field(factory=list)
+    no_damage_from: list[NamedResource] = attrs.field(factory=list)
+    half_damage_from: list[NamedResource] = attrs.field(factory=list)
+    double_damage_from: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeRelations":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "TypeRelations":
         return cls(
             raw=payload,
             no_damage_to=[NamedResource.from_payload(i) for i in payload.get("no_damage_to", [])],
@@ -1749,7 +1748,7 @@ class TypeRelationsPast(BaseModel):
     damage_relations: TypeRelations = attrs.field(factory=TypeRelations)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "TypeRelationsPast":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "TypeRelationsPast":
         return cls(
             raw=payload,
             generation=NamedResource.from_payload(payload.get("generation", {})),

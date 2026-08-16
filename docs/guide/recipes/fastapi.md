@@ -38,7 +38,9 @@ class App(FastAPI):
         self.add_route(self.ping, "/ping", methods=["GET"], response_model=dict[str, float])
         self.add_route(self.berry, "/berry/{name}", methods=["GET"], response_model=models.Berry)
         self.add_route(self.berry_flavor, "/berry-flavor/{name}", methods=["GET"], response_model=models.BerryFlavor)
-        self.add_route(self.berry_firmness, "/berry-firmness/{name}", methods=["GET"], response_model=models.BerryFirmness)
+        self.add_route(
+            self.berry_firmness, "/berry-firmness/{name}", methods=["GET"], response_model=models.BerryFirmness
+        )
 
     def run(self) -> None:
         uvicorn.run(self, debug=True)

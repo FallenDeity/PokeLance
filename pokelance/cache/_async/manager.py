@@ -3,149 +3,249 @@
 # Edit scripts/gen_scripts/_registry.py instead.
 
 from __future__ import annotations
+
 import asyncio
 import typing as t
-import attrs
-from pokelance import models
-from pokelance.cache._async.base import AsyncBaseCache, AsyncCacheGroup
-from pokelance.http.endpoints import Route
-if t.TYPE_CHECKING:
-    from pokelance.client.async_client import PokeLanceAsyncClient
-__all__ = ('AsyncCacheManager', 'AsyncCacheGroup')
 
+import attrs
+
+from pokelance import models
+from pokelance.cache._async.base import AsyncCache, AsyncCacheGroup
+
+if t.TYPE_CHECKING:
+    import collections.abc as cabc
+
+    from pokelance.client.async_client import PokeLanceAsyncClient
+    from pokelance.http.endpoints import Route
+__all__: tuple[str, ...] = ("AsyncCacheGroup", "AsyncCacheManager")
 
 
 @attrs.define(slots=True, kw_only=True)
 class Berry(AsyncCacheGroup):
     """Cache aggregate for berry endpoints."""
-    max_size: int = 100
-    berry: AsyncBaseCache[Route, models.Berry] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Berry, name='berry'))
-    berry_firmness: AsyncBaseCache[Route, models.BerryFirmness] = attrs.field(factory=lambda: AsyncBaseCache(model=models.BerryFirmness, name='berry_firmness'))
-    berry_flavor: AsyncBaseCache[Route, models.BerryFlavor] = attrs.field(factory=lambda: AsyncBaseCache(model=models.BerryFlavor, name='berry_flavor'))
 
+    max_size: int = 100
+    berry: AsyncCache[Route, models.Berry] = attrs.field(factory=lambda: AsyncCache(model=models.Berry, name="berry"))
+    berry_firmness: AsyncCache[Route, models.BerryFirmness] = attrs.field(
+        factory=lambda: AsyncCache(model=models.BerryFirmness, name="berry_firmness")
+    )
+    berry_flavor: AsyncCache[Route, models.BerryFlavor] = attrs.field(
+        factory=lambda: AsyncCache(model=models.BerryFlavor, name="berry_flavor")
+    )
 
 
 @attrs.define(slots=True, kw_only=True)
 class Contest(AsyncCacheGroup):
     """Cache aggregate for contest endpoints."""
-    max_size: int = 100
-    contest_type: AsyncBaseCache[Route, models.ContestType] = attrs.field(factory=lambda: AsyncBaseCache(model=models.ContestType, name='contest_type'))
-    contest_effect: AsyncBaseCache[Route, models.ContestEffect] = attrs.field(factory=lambda: AsyncBaseCache(model=models.ContestEffect, name='contest_effect', endpoint_key_is_id=True))
-    super_contest_effect: AsyncBaseCache[Route, models.SuperContestEffect] = attrs.field(factory=lambda: AsyncBaseCache(model=models.SuperContestEffect, name='super_contest_effect', endpoint_key_is_id=True))
 
+    max_size: int = 100
+    contest_type: AsyncCache[Route, models.ContestType] = attrs.field(
+        factory=lambda: AsyncCache(model=models.ContestType, name="contest_type")
+    )
+    contest_effect: AsyncCache[Route, models.ContestEffect] = attrs.field(
+        factory=lambda: AsyncCache(model=models.ContestEffect, name="contest_effect", endpoint_key_is_id=True)
+    )
+    super_contest_effect: AsyncCache[Route, models.SuperContestEffect] = attrs.field(
+        factory=lambda: AsyncCache(
+            model=models.SuperContestEffect, name="super_contest_effect", endpoint_key_is_id=True
+        )
+    )
 
 
 @attrs.define(slots=True, kw_only=True)
 class Encounter(AsyncCacheGroup):
     """Cache aggregate for encounter endpoints."""
-    max_size: int = 100
-    encounter_method: AsyncBaseCache[Route, models.EncounterMethod] = attrs.field(factory=lambda: AsyncBaseCache(model=models.EncounterMethod, name='encounter_method'))
-    encounter_condition: AsyncBaseCache[Route, models.EncounterCondition] = attrs.field(factory=lambda: AsyncBaseCache(model=models.EncounterCondition, name='encounter_condition'))
-    encounter_condition_value: AsyncBaseCache[Route, models.EncounterConditionValue] = attrs.field(factory=lambda: AsyncBaseCache(model=models.EncounterConditionValue, name='encounter_condition_value'))
 
+    max_size: int = 100
+    encounter_method: AsyncCache[Route, models.EncounterMethod] = attrs.field(
+        factory=lambda: AsyncCache(model=models.EncounterMethod, name="encounter_method")
+    )
+    encounter_condition: AsyncCache[Route, models.EncounterCondition] = attrs.field(
+        factory=lambda: AsyncCache(model=models.EncounterCondition, name="encounter_condition")
+    )
+    encounter_condition_value: AsyncCache[Route, models.EncounterConditionValue] = attrs.field(
+        factory=lambda: AsyncCache(model=models.EncounterConditionValue, name="encounter_condition_value")
+    )
 
 
 @attrs.define(slots=True, kw_only=True)
 class Evolution(AsyncCacheGroup):
     """Cache aggregate for evolution endpoints."""
-    max_size: int = 100
-    evolution_chain: AsyncBaseCache[Route, models.EvolutionChain] = attrs.field(factory=lambda: AsyncBaseCache(model=models.EvolutionChain, name='evolution_chain', endpoint_key_is_id=True))
-    evolution_trigger: AsyncBaseCache[Route, models.EvolutionTrigger] = attrs.field(factory=lambda: AsyncBaseCache(model=models.EvolutionTrigger, name='evolution_trigger'))
 
+    max_size: int = 100
+    evolution_chain: AsyncCache[Route, models.EvolutionChain] = attrs.field(
+        factory=lambda: AsyncCache(model=models.EvolutionChain, name="evolution_chain", endpoint_key_is_id=True)
+    )
+    evolution_trigger: AsyncCache[Route, models.EvolutionTrigger] = attrs.field(
+        factory=lambda: AsyncCache(model=models.EvolutionTrigger, name="evolution_trigger")
+    )
 
 
 @attrs.define(slots=True, kw_only=True)
 class Game(AsyncCacheGroup):
     """Cache aggregate for game endpoints."""
-    max_size: int = 100
-    generation: AsyncBaseCache[Route, models.Generation] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Generation, name='generation'))
-    pokedex: AsyncBaseCache[Route, models.Pokedex] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Pokedex, name='pokedex'))
-    version: AsyncBaseCache[Route, models.Version] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Version, name='version'))
-    version_group: AsyncBaseCache[Route, models.VersionGroup] = attrs.field(factory=lambda: AsyncBaseCache(model=models.VersionGroup, name='version_group'))
 
+    max_size: int = 100
+    generation: AsyncCache[Route, models.Generation] = attrs.field(
+        factory=lambda: AsyncCache(model=models.Generation, name="generation")
+    )
+    pokedex: AsyncCache[Route, models.Pokedex] = attrs.field(
+        factory=lambda: AsyncCache(model=models.Pokedex, name="pokedex")
+    )
+    version: AsyncCache[Route, models.Version] = attrs.field(
+        factory=lambda: AsyncCache(model=models.Version, name="version")
+    )
+    version_group: AsyncCache[Route, models.VersionGroup] = attrs.field(
+        factory=lambda: AsyncCache(model=models.VersionGroup, name="version_group")
+    )
 
 
 @attrs.define(slots=True, kw_only=True)
 class Item(AsyncCacheGroup):
     """Cache aggregate for item endpoints."""
-    max_size: int = 100
-    item: AsyncBaseCache[Route, models.Item] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Item, name='item'))
-    item_attribute: AsyncBaseCache[Route, models.ItemAttribute] = attrs.field(factory=lambda: AsyncBaseCache(model=models.ItemAttribute, name='item_attribute'))
-    item_category: AsyncBaseCache[Route, models.ItemCategory] = attrs.field(factory=lambda: AsyncBaseCache(model=models.ItemCategory, name='item_category'))
-    item_fling_effect: AsyncBaseCache[Route, models.ItemFlingEffect] = attrs.field(factory=lambda: AsyncBaseCache(model=models.ItemFlingEffect, name='item_fling_effect'))
-    item_pocket: AsyncBaseCache[Route, models.ItemPocket] = attrs.field(factory=lambda: AsyncBaseCache(model=models.ItemPocket, name='item_pocket'))
 
+    max_size: int = 100
+    item: AsyncCache[Route, models.Item] = attrs.field(factory=lambda: AsyncCache(model=models.Item, name="item"))
+    item_attribute: AsyncCache[Route, models.ItemAttribute] = attrs.field(
+        factory=lambda: AsyncCache(model=models.ItemAttribute, name="item_attribute")
+    )
+    item_category: AsyncCache[Route, models.ItemCategory] = attrs.field(
+        factory=lambda: AsyncCache(model=models.ItemCategory, name="item_category")
+    )
+    item_fling_effect: AsyncCache[Route, models.ItemFlingEffect] = attrs.field(
+        factory=lambda: AsyncCache(model=models.ItemFlingEffect, name="item_fling_effect")
+    )
+    item_pocket: AsyncCache[Route, models.ItemPocket] = attrs.field(
+        factory=lambda: AsyncCache(model=models.ItemPocket, name="item_pocket")
+    )
 
 
 @attrs.define(slots=True, kw_only=True)
 class Location(AsyncCacheGroup):
     """Cache aggregate for location endpoints."""
-    max_size: int = 100
-    location: AsyncBaseCache[Route, models.Location] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Location, name='location'))
-    location_area: AsyncBaseCache[Route, models.LocationArea] = attrs.field(factory=lambda: AsyncBaseCache(model=models.LocationArea, name='location_area'))
-    pal_park_area: AsyncBaseCache[Route, models.PalParkArea] = attrs.field(factory=lambda: AsyncBaseCache(model=models.PalParkArea, name='pal_park_area'))
-    region: AsyncBaseCache[Route, models.Region] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Region, name='region'))
 
+    max_size: int = 100
+    location: AsyncCache[Route, models.Location] = attrs.field(
+        factory=lambda: AsyncCache(model=models.Location, name="location")
+    )
+    location_area: AsyncCache[Route, models.LocationArea] = attrs.field(
+        factory=lambda: AsyncCache(model=models.LocationArea, name="location_area")
+    )
+    pal_park_area: AsyncCache[Route, models.PalParkArea] = attrs.field(
+        factory=lambda: AsyncCache(model=models.PalParkArea, name="pal_park_area")
+    )
+    region: AsyncCache[Route, models.Region] = attrs.field(
+        factory=lambda: AsyncCache(model=models.Region, name="region")
+    )
 
 
 @attrs.define(slots=True, kw_only=True)
 class Machine(AsyncCacheGroup):
     """Cache aggregate for machine endpoints."""
-    max_size: int = 100
-    machine: AsyncBaseCache[Route, models.Machine] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Machine, name='machine', endpoint_key_is_id=True))
 
+    max_size: int = 100
+    machine: AsyncCache[Route, models.Machine] = attrs.field(
+        factory=lambda: AsyncCache(model=models.Machine, name="machine", endpoint_key_is_id=True)
+    )
 
 
 @attrs.define(slots=True, kw_only=True)
 class Move(AsyncCacheGroup):
     """Cache aggregate for move endpoints."""
-    max_size: int = 100
-    move: AsyncBaseCache[Route, models.Move] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Move, name='move'))
-    move_ailment: AsyncBaseCache[Route, models.MoveAilment] = attrs.field(factory=lambda: AsyncBaseCache(model=models.MoveAilment, name='move_ailment'))
-    move_battle_style: AsyncBaseCache[Route, models.MoveBattleStyle] = attrs.field(factory=lambda: AsyncBaseCache(model=models.MoveBattleStyle, name='move_battle_style'))
-    move_category: AsyncBaseCache[Route, models.MoveCategory] = attrs.field(factory=lambda: AsyncBaseCache(model=models.MoveCategory, name='move_category'))
-    move_damage_class: AsyncBaseCache[Route, models.MoveDamageClass] = attrs.field(factory=lambda: AsyncBaseCache(model=models.MoveDamageClass, name='move_damage_class'))
-    move_learn_method: AsyncBaseCache[Route, models.MoveLearnMethod] = attrs.field(factory=lambda: AsyncBaseCache(model=models.MoveLearnMethod, name='move_learn_method'))
-    move_target: AsyncBaseCache[Route, models.MoveTarget] = attrs.field(factory=lambda: AsyncBaseCache(model=models.MoveTarget, name='move_target'))
 
+    max_size: int = 100
+    move: AsyncCache[Route, models.Move] = attrs.field(factory=lambda: AsyncCache(model=models.Move, name="move"))
+    move_ailment: AsyncCache[Route, models.MoveAilment] = attrs.field(
+        factory=lambda: AsyncCache(model=models.MoveAilment, name="move_ailment")
+    )
+    move_battle_style: AsyncCache[Route, models.MoveBattleStyle] = attrs.field(
+        factory=lambda: AsyncCache(model=models.MoveBattleStyle, name="move_battle_style")
+    )
+    move_category: AsyncCache[Route, models.MoveCategory] = attrs.field(
+        factory=lambda: AsyncCache(model=models.MoveCategory, name="move_category")
+    )
+    move_damage_class: AsyncCache[Route, models.MoveDamageClass] = attrs.field(
+        factory=lambda: AsyncCache(model=models.MoveDamageClass, name="move_damage_class")
+    )
+    move_learn_method: AsyncCache[Route, models.MoveLearnMethod] = attrs.field(
+        factory=lambda: AsyncCache(model=models.MoveLearnMethod, name="move_learn_method")
+    )
+    move_target: AsyncCache[Route, models.MoveTarget] = attrs.field(
+        factory=lambda: AsyncCache(model=models.MoveTarget, name="move_target")
+    )
 
 
 @attrs.define(slots=True, kw_only=True)
 class Pokemon(AsyncCacheGroup):
     """Cache aggregate for pokemon endpoints."""
-    max_size: int = 100
-    ability: AsyncBaseCache[Route, models.Ability] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Ability, name='ability'))
-    characteristic: AsyncBaseCache[Route, models.Characteristic] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Characteristic, name='characteristic', endpoint_key_is_id=True))
-    egg_group: AsyncBaseCache[Route, models.EggGroup] = attrs.field(factory=lambda: AsyncBaseCache(model=models.EggGroup, name='egg_group'))
-    gender: AsyncBaseCache[Route, models.Gender] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Gender, name='gender'))
-    growth_rate: AsyncBaseCache[Route, models.GrowthRate] = attrs.field(factory=lambda: AsyncBaseCache(model=models.GrowthRate, name='growth_rate'))
-    nature: AsyncBaseCache[Route, models.Nature] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Nature, name='nature'))
-    pokeathlon_stat: AsyncBaseCache[Route, models.PokeathlonStat] = attrs.field(factory=lambda: AsyncBaseCache(model=models.PokeathlonStat, name='pokeathlon_stat'))
-    pokemon: AsyncBaseCache[Route, models.Pokemon] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Pokemon, name='pokemon'))
-    pokemon_color: AsyncBaseCache[Route, models.PokemonColor] = attrs.field(factory=lambda: AsyncBaseCache(model=models.PokemonColor, name='pokemon_color'))
-    pokemon_form: AsyncBaseCache[Route, models.PokemonForm] = attrs.field(factory=lambda: AsyncBaseCache(model=models.PokemonForm, name='pokemon_form'))
-    pokemon_habitat: AsyncBaseCache[Route, models.PokemonHabitats] = attrs.field(factory=lambda: AsyncBaseCache(model=models.PokemonHabitats, name='pokemon_habitat'))
-    pokemon_shape: AsyncBaseCache[Route, models.PokemonShape] = attrs.field(factory=lambda: AsyncBaseCache(model=models.PokemonShape, name='pokemon_shape'))
-    pokemon_species: AsyncBaseCache[Route, models.PokemonSpecies] = attrs.field(factory=lambda: AsyncBaseCache(model=models.PokemonSpecies, name='pokemon_species'))
-    stat: AsyncBaseCache[Route, models.Stat] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Stat, name='stat'))
-    type: AsyncBaseCache[Route, models.Type] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Type, name='type'))
-    location_area_encounter: AsyncBaseCache[Route, t.Sequence[models.LocationAreaEncounter]] = attrs.field(factory=lambda: AsyncBaseCache(model=models.LocationAreaEncounter, name='location_area_encounter', url_suffix='/encounters', is_list=True))
 
+    max_size: int = 100
+    ability: AsyncCache[Route, models.Ability] = attrs.field(
+        factory=lambda: AsyncCache(model=models.Ability, name="ability")
+    )
+    characteristic: AsyncCache[Route, models.Characteristic] = attrs.field(
+        factory=lambda: AsyncCache(model=models.Characteristic, name="characteristic", endpoint_key_is_id=True)
+    )
+    egg_group: AsyncCache[Route, models.EggGroup] = attrs.field(
+        factory=lambda: AsyncCache(model=models.EggGroup, name="egg_group")
+    )
+    gender: AsyncCache[Route, models.Gender] = attrs.field(
+        factory=lambda: AsyncCache(model=models.Gender, name="gender")
+    )
+    growth_rate: AsyncCache[Route, models.GrowthRate] = attrs.field(
+        factory=lambda: AsyncCache(model=models.GrowthRate, name="growth_rate")
+    )
+    nature: AsyncCache[Route, models.Nature] = attrs.field(
+        factory=lambda: AsyncCache(model=models.Nature, name="nature")
+    )
+    pokeathlon_stat: AsyncCache[Route, models.PokeathlonStat] = attrs.field(
+        factory=lambda: AsyncCache(model=models.PokeathlonStat, name="pokeathlon_stat")
+    )
+    pokemon: AsyncCache[Route, models.Pokemon] = attrs.field(
+        factory=lambda: AsyncCache(model=models.Pokemon, name="pokemon")
+    )
+    pokemon_color: AsyncCache[Route, models.PokemonColor] = attrs.field(
+        factory=lambda: AsyncCache(model=models.PokemonColor, name="pokemon_color")
+    )
+    pokemon_form: AsyncCache[Route, models.PokemonForm] = attrs.field(
+        factory=lambda: AsyncCache(model=models.PokemonForm, name="pokemon_form")
+    )
+    pokemon_habitat: AsyncCache[Route, models.PokemonHabitats] = attrs.field(
+        factory=lambda: AsyncCache(model=models.PokemonHabitats, name="pokemon_habitat")
+    )
+    pokemon_shape: AsyncCache[Route, models.PokemonShape] = attrs.field(
+        factory=lambda: AsyncCache(model=models.PokemonShape, name="pokemon_shape")
+    )
+    pokemon_species: AsyncCache[Route, models.PokemonSpecies] = attrs.field(
+        factory=lambda: AsyncCache(model=models.PokemonSpecies, name="pokemon_species")
+    )
+    stat: AsyncCache[Route, models.Stat] = attrs.field(factory=lambda: AsyncCache(model=models.Stat, name="stat"))
+    type: AsyncCache[Route, models.Type] = attrs.field(factory=lambda: AsyncCache(model=models.Type, name="type"))
+    location_area_encounter: AsyncCache[Route, list[models.LocationAreaEncounter]] = attrs.field(
+        factory=lambda: AsyncCache(
+            model=models.LocationAreaEncounter, name="location_area_encounter", url_suffix="/encounters", is_list=True
+        )
+    )
 
 
 @attrs.define(slots=True, kw_only=True)
 class Utility(AsyncCacheGroup):
     """Cache aggregate for utility endpoints."""
-    max_size: int = 100
-    language: AsyncBaseCache[Route, models.Language] = attrs.field(factory=lambda: AsyncBaseCache(model=models.Language, name='language', endpoint_key_is_id=True))
-    api_metadata: AsyncBaseCache[Route, models.APIMetadata] = attrs.field(factory=lambda: AsyncBaseCache(model=models.APIMetadata, name='api_metadata', endpoint_key_is_id=True))
 
+    max_size: int = 100
+    language: AsyncCache[Route, models.Language] = attrs.field(
+        factory=lambda: AsyncCache(model=models.Language, name="language", endpoint_key_is_id=True)
+    )
+    api_metadata: AsyncCache[Route, models.APIMetadata] = attrs.field(
+        factory=lambda: AsyncCache(model=models.APIMetadata, name="api_metadata", endpoint_key_is_id=True)
+    )
 
 
 @attrs.define(slots=True, kw_only=True)
 class AsyncCacheManager:
     """Top-level async cache manager."""
-    client: 'PokeLanceAsyncClient'
+
+    client: PokeLanceAsyncClient
     max_size: int = 100
     berry: Berry = attrs.field(factory=Berry)
     contest: Contest = attrs.field(factory=Contest)
@@ -159,7 +259,7 @@ class AsyncCacheManager:
     pokemon: Pokemon = attrs.field(factory=Pokemon)
     utility: Utility = attrs.field(factory=Utility)
 
-    def _walk_aggregates(self) -> t.Iterator[AsyncCacheGroup]:
+    def _walk_aggregates(self) -> cabc.Iterator[AsyncCacheGroup]:
         """Yield all child cache aggregates."""
         for field in attrs.fields(self.__class__):
             val = getattr(self, field.name)
@@ -171,12 +271,12 @@ class AsyncCacheManager:
             aggregate.set_size(self.max_size)
             aggregate.set_client(self.client)
 
-    def set_size(self, max_size: int=100) -> None:
+    def set_size(self, max_size: int = 100) -> None:
         self.max_size = max_size
         for aggregate in self._walk_aggregates():
             aggregate.set_size(max_size)
 
-    def load_documents(self, category: str, _type: str, data: t.List[t.Dict[str, str]]) -> None:
+    def load_documents(self, category: str, _type: str, data: list[dict[str, str]]) -> None:
         getattr(getattr(self, category.lower()), _type).load_documents(data)
 
     def clear(self) -> None:

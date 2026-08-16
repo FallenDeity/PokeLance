@@ -5,9 +5,9 @@ import attrs
 from pokelance.models import BaseModel
 from pokelance.models.common import NamedResource
 
-__all__: t.Tuple[str, ...] = (
-    "ContestName",
+__all__: tuple[str, ...] = (
     "ContestEffectFlavorText",
+    "ContestName",
     "SuperContestEffectFlavorText",
 )
 
@@ -31,7 +31,7 @@ class ContestName(BaseModel):
     language: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ContestName":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "ContestName":
         return cls(
             raw=payload,
             name=payload.get("name", ""),
@@ -56,7 +56,7 @@ class ContestEffectFlavorText(BaseModel):
     language: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ContestEffectFlavorText":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "ContestEffectFlavorText":
         return cls(
             raw=payload,
             flavor_text=payload.get("flavor_text", ""),
@@ -80,7 +80,7 @@ class SuperContestEffectFlavorText(BaseModel):
     language: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "SuperContestEffectFlavorText":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "SuperContestEffectFlavorText":
         return cls(
             raw=payload,
             flavor_text=payload.get("flavor_text", ""),

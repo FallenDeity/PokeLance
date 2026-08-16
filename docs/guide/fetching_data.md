@@ -22,9 +22,9 @@ flowchart LR
   otherwise makes a request, caches the parsed model, and returns it.
 
 ```python
-berry = client.berry.get_berry("cheri")          # None the first time
+berry = client.berry.get_berry("cheri")  # None the first time
 berry = await client.berry.fetch_berry("cheri")  # network + cache
-berry = client.berry.get_berry("cheri")          # now cached, instant
+berry = client.berry.get_berry("cheri")  # now cached, instant
 ```
 
 Both accept either the resource's **name** (`str`) or **id** (`int`) interchangeably:

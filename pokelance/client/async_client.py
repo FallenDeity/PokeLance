@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import logging
 import typing as t
 from pathlib import Path
 
-import niquests
+from typing_extensions import Self
 
 from pokelance.client._base import _ClientBase
 from pokelance.constants import ExtensionEnum, ExtensionsL
@@ -12,9 +11,12 @@ from pokelance.http._async import AsyncHttpClient
 from pokelance.utils import alru_cache
 
 if t.TYPE_CHECKING:
+    import logging
     from types import TracebackType
 
-    from pokelance.ext import (
+    import niquests
+
+    from pokelance.ext._async import (
         Berry,
         Contest,
         Encounter,
@@ -29,9 +31,9 @@ if t.TYPE_CHECKING:
     )
     from pokelance.models import BaseModel
 
-__all__: t.Tuple[str, ...] = ("PokeLanceAsyncClient",)
+__all__: tuple[str, ...] = ("PokeLanceAsyncClient",)
 
-BaseType = t.TypeVar("BaseType", bound="BaseModel")
+BaseModelT = t.TypeVar("BaseModelT", bound="BaseModel")
 
 
 class PokeLanceAsyncClient(_ClientBase[AsyncHttpClient]):
@@ -69,7 +71,7 @@ class PokeLanceAsyncClient(_ClientBase[AsyncHttpClient]):
         The utility extension.
     """
 
-    EXTENSIONS: Path = Path(__file__).parent.parent / "ext"
+    EXTENSIONS: Path = Path(__file__).parent.parent / "ext" / "_async"
 
     if t.TYPE_CHECKING:
         berry: Berry
@@ -90,9 +92,9 @@ class PokeLanceAsyncClient(_ClientBase[AsyncHttpClient]):
         audio_cache_size: int = 128,
         image_cache_size: int = 128,
         cache_size: int = 100,
-        logger: t.Optional[logging.Logger] = None,
+        logger: logging.Logger | None = None,
         cache_endpoints: bool = True,
-        session: t.Optional[niquests.AsyncSession] = None,
+        session: niquests.AsyncSession | None = None,
     ) -> None:
         http = AsyncHttpClient(client=self, session=session, cache_size=cache_size)
         self._setup_common(
@@ -104,16 +106,16 @@ class PokeLanceAsyncClient(_ClientBase[AsyncHttpClient]):
         )
         self.get_image.set_size(image_cache_size)
         self.get_audio.set_size(audio_cache_size)
-        self.setup_hook("pokelance.ext")
+        self.setup_hook("pokelance.ext._async")
 
-    async def __aenter__(self) -> PokeLanceAsyncClient:
+    async def __aenter__(self) -> Self:
         return self
 
     async def __aexit__(
         self,
-        exc_type: t.Optional[t.Type[BaseException]],
-        exc_val: t.Optional[BaseException],
-        exc_tb: t.Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         self._logger.warning("Closing session!")
         await self._http.close()
@@ -129,18 +131,18 @@ class PokeLanceAsyncClient(_ClientBase[AsyncHttpClient]):
 
     async def getch_data(
         self,
-        ext: t.Union[ExtensionEnum, ExtensionsL, str],
+        ext: ExtensionEnum | ExtensionsL | str,
         category: str,
-        id_: t.Optional[t.Union[int, str]] = None,
-    ) -> BaseType:
+        id_: int | str | None = None,
+    ) -> BaseModelT:  # pyright: ignore[reportInvalidTypeVarUse]
         """A getch method that looks up the cache first, then fetches from the API if not cached."""
         ext_instance, resolved_category = self._resolve_extension_category(ext, category)
         get_ = getattr(ext_instance, f"get_{resolved_category}")
         fetch_ = getattr(ext_instance, f"fetch_{resolved_category}")
         params = (id_,) if id_ is not None else ()
-        return t.cast(BaseType, get_(*params) or await fetch_(*params))
+        return t.cast("BaseModelT", get_(*params) or await fetch_(*params))
 
-    async def from_url(self, url: str) -> BaseType:
+    async def from_url(self, url: str) -> BaseModelT:  # pyright: ignore[reportInvalidTypeVarUse]
         """Constructs a request from URLs present in API data."""
         if params := ExtensionEnum.validate_url(url):
             return await self.getch_data(params.extension, params.category, params.value)

@@ -40,18 +40,17 @@ jobs:
         run: |
           uv sync --locked --all-groups
 
-      - name: Format with isort and black
+      - name: Run ruff check
         run: |
-          uv run isort .
-          uv run black .
+          uv run ruff check . --output-format=concise
 
-      - name: Linting with ruff
+      - name: Run ruff format
         run: |
-          uv run ruff .
+          uv run ruff format . --check
 
-      - name: Type checking with mypy
+      - name: Run ty check
         run: |
-          uv run mypy .
+          uv run ty check --output-format=concise
 
       - name: Run tests with pytest
         run: |

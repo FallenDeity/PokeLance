@@ -11,24 +11,23 @@ from pokelance.cache._base import BaseCacheGroup, BaseCacheState, CacheEndpoint
 from pokelance.http.endpoints import Route
 
 if t.TYPE_CHECKING:
-    from pokelance.client.sync_client import PokeLanceSyncClient
     from pokelance.models import BaseModel
 
-__all__: t.Tuple[str, ...] = (
-    "CacheEndpoint",
-    "BaseCacheState",
+__all__: tuple[str, ...] = (
     "BaseCacheGroup",
+    "BaseCacheState",
+    "CacheEndpoint",
+    "SyncCache",
     "SyncCacheGroup",
-    "SyncBaseCache",
 )
 
 logger = logging.getLogger(__name__)
 
 _KT = t.TypeVar("_KT", bound="Route")
-_VT = t.TypeVar("_VT", bound="t.Union[BaseModel, t.Sequence[BaseModel]]")
+_VT = t.TypeVar("_VT", bound="BaseModel | t.Sequence[BaseModel]")
 
 
-class SyncBaseCache(BaseCacheState[_KT, _VT, "PokeLanceSyncClient"], t.Generic[_KT, _VT]):
+class SyncCache(BaseCacheState[_KT, _VT, "PokeLanceSyncClient"], t.Generic[_KT, _VT]):
     """Sync cache: threading.Event readiness, synchronous file I/O, and sync HTTP bulk loading."""
 
     _ready: bool
@@ -36,7 +35,7 @@ class SyncBaseCache(BaseCacheState[_KT, _VT, "PokeLanceSyncClient"], t.Generic[_
     def __init__(
         self,
         max_size: int = 100,
-        model: t.Optional[t.Type[BaseModel]] = None,
+        model: type[BaseModel] | None = None,
         name: str = "",
         endpoint_key_is_id: bool = False,
         url_suffix: str = "",
@@ -59,7 +58,6 @@ class SyncBaseCache(BaseCacheState[_KT, _VT, "PokeLanceSyncClient"], t.Generic[_
 
     def wait_until_ready(self) -> None:
         """Wait until the cache is ready (noop for sync unless populated)."""
-        pass
 
     def set_ready(self) -> None:
         """Set the cache as ready."""
@@ -79,7 +77,7 @@ class SyncBaseCache(BaseCacheState[_KT, _VT, "PokeLanceSyncClient"], t.Generic[_
 
     def load(self, path: str = ".") -> None:
         """Load the cache from a JSON file synchronously."""
-        with open(pathlib.Path(f"{path}/{self._name}.json"), "r", encoding="utf-8") as f:
+        with open(pathlib.Path(f"{path}/{self._name}.json"), encoding="utf-8") as f:
             self.deserialize(json.loads(f.read()))
 
     def load_all(self) -> None:
@@ -90,10 +88,10 @@ class SyncBaseCache(BaseCacheState[_KT, _VT, "PokeLanceSyncClient"], t.Generic[_
         self._max_size = len(self._endpoints)
         for endpoint in self._endpoints.values():
             route = Route.from_raw_url(endpoint.url)
-            data = self.get(t.cast(_KT, route), None)
+            data = self.get(t.cast("_KT", route), None)
             if not data:
                 res = self._client.http.request(route)
-                self.setdefault(t.cast(_KT, route), self.from_payload(res))
+                self.setdefault(t.cast("_KT", route), self.from_payload(res))
         logger.info(f"Loaded {self._name}.")
 
     def load_all_batch(self, batch_size: int = 20) -> None:
@@ -107,7 +105,7 @@ class SyncBaseCache(BaseCacheState[_KT, _VT, "PokeLanceSyncClient"], t.Generic[_
         for i in range(0, total_endpoints, batch_size):
             batch = endpoints[i : i + batch_size]
             for ep in batch:
-                route = t.cast(_KT, Route.from_raw_url(ep.url))
+                route = t.cast("_KT", Route.from_raw_url(ep.url))
                 if not self.get(route):
                     self._fetch_and_cache(route)
             logger.debug(
@@ -127,7 +125,7 @@ class SyncBaseCache(BaseCacheState[_KT, _VT, "PokeLanceSyncClient"], t.Generic[_
 
 
 @attrs.define(slots=True, kw_only=True)
-class SyncCacheGroup(BaseCacheGroup["PokeLanceSyncClient", SyncBaseCache[Route, t.Any]]):
+class SyncCacheGroup(BaseCacheGroup["PokeLanceSyncClient", SyncCache[Route, t.Any]]):
     """Base class for sync cache groups."""
 
     def wait_until_ready(self) -> None:

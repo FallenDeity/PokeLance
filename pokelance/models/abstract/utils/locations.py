@@ -5,11 +5,11 @@ import attrs
 from pokelance.models import BaseModel
 from pokelance.models.common import NamedResource, VersionEncounterDetail
 
-__all__: t.Tuple[str, ...] = (
-    "EncounterVersionDetails",
+__all__: tuple[str, ...] = (
     "EncounterMethodRate",
-    "PokemonEncounter",
+    "EncounterVersionDetails",
     "PalParkEncounterSpecies",
+    "PokemonEncounter",
 )
 
 
@@ -29,7 +29,7 @@ class EncounterVersionDetails(BaseModel):
     version: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EncounterVersionDetails":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "EncounterVersionDetails":
         return cls(
             raw=payload,
             rate=payload.get("rate", 0),
@@ -50,10 +50,10 @@ class EncounterMethodRate(BaseModel):
     """
 
     encounter_method: NamedResource = attrs.field(factory=NamedResource)
-    version_details: t.List[EncounterVersionDetails] = attrs.field(factory=list)
+    version_details: list[EncounterVersionDetails] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EncounterMethodRate":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "EncounterMethodRate":
         return cls(
             raw=payload,
             encounter_method=NamedResource.from_payload(payload.get("encounter_method", {})),
@@ -74,10 +74,10 @@ class PokemonEncounter(BaseModel):
     """
 
     pokemon: NamedResource = attrs.field(factory=NamedResource)
-    version_details: t.List[VersionEncounterDetail] = attrs.field(factory=list)
+    version_details: list[VersionEncounterDetail] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonEncounter":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonEncounter":
         return cls(
             raw=payload,
             pokemon=NamedResource.from_payload(payload.get("pokemon", {})),
@@ -104,7 +104,7 @@ class PalParkEncounterSpecies(BaseModel):
     pokemon_species: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PalParkEncounterSpecies":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PalParkEncounterSpecies":
         return cls(
             raw=payload,
             base_score=payload.get("base_score", 0),

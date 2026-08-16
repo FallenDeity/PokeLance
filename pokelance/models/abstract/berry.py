@@ -7,7 +7,7 @@ from pokelance.models.common import Name, NamedResource
 
 from .utils import BerryFlavorMap, FlavorBerryMap
 
-__all__: t.Tuple[str, ...] = (
+__all__: tuple[str, ...] = (
     "Berry",
     "BerryFirmness",
     "BerryFlavor",
@@ -52,19 +52,19 @@ class Berry(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    growth_time: t.Optional[int] = attrs.field(default=None)
-    max_harvest: t.Optional[int] = attrs.field(default=None)
-    natural_gift_power: t.Optional[int] = attrs.field(default=None)
-    size: t.Optional[int] = attrs.field(default=None)
-    smoothness: t.Optional[int] = attrs.field(default=None)
-    soil_dryness: t.Optional[int] = attrs.field(default=None)
-    firmness: t.Optional[NamedResource] = attrs.field(default=None)
-    flavors: t.List[BerryFlavorMap] = attrs.field(factory=list)
+    growth_time: int | None = attrs.field(default=None)
+    max_harvest: int | None = attrs.field(default=None)
+    natural_gift_power: int | None = attrs.field(default=None)
+    size: int | None = attrs.field(default=None)
+    smoothness: int | None = attrs.field(default=None)
+    soil_dryness: int | None = attrs.field(default=None)
+    firmness: NamedResource | None = attrs.field(default=None)
+    flavors: list[BerryFlavorMap] = attrs.field(factory=list)
     item: NamedResource = attrs.field(factory=NamedResource)
-    natural_gift_type: t.Optional[NamedResource] = attrs.field(default=None)
+    natural_gift_type: NamedResource | None = attrs.field(default=None)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Berry":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Berry":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -100,11 +100,11 @@ class BerryFirmness(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    berries: t.List[NamedResource] = attrs.field(factory=list)
-    names: t.List[Name] = attrs.field(factory=list)
+    berries: list[NamedResource] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "BerryFirmness":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "BerryFirmness":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -134,12 +134,12 @@ class BerryFlavor(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    berries: t.List[FlavorBerryMap] = attrs.field(factory=list)
+    berries: list[FlavorBerryMap] = attrs.field(factory=list)
     contest_type: NamedResource = attrs.field(factory=NamedResource)
-    names: t.List[Name] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "BerryFlavor":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "BerryFlavor":
         return cls(
             raw=payload,
             id=payload.get("id", 0),

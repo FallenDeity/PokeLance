@@ -15,7 +15,7 @@ from pokelance.http.endpoints import Route
 if t.TYPE_CHECKING:
     from pokelance.client.async_client import PokeLanceAsyncClient
 
-__all__: t.Tuple[str, ...] = ("AsyncHttpClient", "AsyncEndpointLoader")
+__all__: tuple[str, ...] = ("AsyncEndpointLoader", "AsyncHttpClient")
 
 logger = logging.getLogger(__name__)
 
@@ -23,9 +23,9 @@ logger = logging.getLogger(__name__)
 class AsyncEndpointLoader:
     """Composition helper for scheduling and tracking async endpoint pre-population tasks."""
 
-    def __init__(self, client: "PokeLanceAsyncClient") -> None:
+    def __init__(self, client: PokeLanceAsyncClient) -> None:
         self._client = client
-        self._tasks: t.Set[asyncio.Task[None]] = set()
+        self._tasks: set[asyncio.Task[None]] = set()
         self._remaining: int = 0
         self._ready_event: asyncio.Event = asyncio.Event()
         self._ready_event.set()
@@ -93,24 +93,24 @@ class AsyncHttpClient(BaseHttpClient["PokeLanceAsyncClient", niquests.AsyncSessi
         internally on the first request and owned by this client.
     """
 
-    __slots__: t.Tuple[str, ...] = (
+    __slots__: tuple[str, ...] = (
+        "_cache_manager",
         "_client",
-        "session",
-        "_cache",
         "_is_ready",
         "_loader",
         "_session_owner",
+        "session",
     )
 
     def __init__(
         self,
         *,
         cache_size: int,
-        client: "PokeLanceAsyncClient",
-        session: t.Optional[niquests.AsyncSession] = None,
+        client: PokeLanceAsyncClient,
+        session: niquests.AsyncSession | None = None,
     ) -> None:
         super().__init__(client=client, session=session)
-        self._cache = AsyncCacheManager(max_size=cache_size, client=self._client)
+        self._cache_manager = AsyncCacheManager(max_size=cache_size, client=self._client)
         self._loader = AsyncEndpointLoader(client=self._client)
 
     @property

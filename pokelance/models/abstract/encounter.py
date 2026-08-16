@@ -5,10 +5,10 @@ import attrs
 from pokelance.models import BaseModel
 from pokelance.models.common import Name, NamedResource
 
-__all__: t.Tuple[str, ...] = (
-    "EncounterMethod",
+__all__: tuple[str, ...] = (
     "EncounterCondition",
     "EncounterConditionValue",
+    "EncounterMethod",
 )
 
 
@@ -31,10 +31,10 @@ class EncounterMethod(BaseModel):
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
     order: int = attrs.field(factory=int)
-    names: t.List[Name] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EncounterMethod":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "EncounterMethod":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -62,11 +62,11 @@ class EncounterCondition(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    names: t.List[Name] = attrs.field(factory=list)
-    values: t.List[NamedResource] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
+    values: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EncounterCondition":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "EncounterCondition":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -95,10 +95,10 @@ class EncounterConditionValue(BaseModel):
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
     condition: NamedResource = attrs.field(factory=NamedResource)
-    names: t.List[Name] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EncounterConditionValue":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "EncounterConditionValue":
         return cls(
             raw=payload,
             id=payload.get("id", 0),

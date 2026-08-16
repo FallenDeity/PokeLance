@@ -17,6 +17,7 @@ Coverage
   (asserted here explicitly)
 - hasattr guard in _base.py setup() is the correct mechanism (not try/except)
 """
+
 import pytest
 
 import pokelance
@@ -30,9 +31,9 @@ from pokelance.models import APIMetadata
 
 def test_api_metadata_has_no_list_endpoint() -> None:
     """There must be no get_api_metadata_endpoints classmethod on Endpoint."""
-    assert not hasattr(
-        Endpoint, "get_api_metadata_endpoints"
-    ), "api-metadata must not have a list-endpoint; it is a singleton resource."
+    assert not hasattr(Endpoint, "get_api_metadata_endpoints"), (
+        "api-metadata must not have a list-endpoint; it is a singleton resource."
+    )
 
 
 def test_api_metadata_has_direct_fetch_endpoint() -> None:

@@ -5,9 +5,9 @@ import attrs
 from pokelance.models import BaseModel
 from pokelance.models.common import NamedResource, VerboseEffect
 
-__all__: t.Tuple[str, ...] = (
-    "ContestComboSet",
+__all__: tuple[str, ...] = (
     "ContestComboDetail",
+    "ContestComboSet",
     "MoveFlavorText",
     "MoveMetaData",
     "MoveStatChange",
@@ -27,11 +27,11 @@ class ContestComboDetail(BaseModel):
         A detail of moves this move can be used after, i.e. result in this move being used.
     """
 
-    use_before: t.Optional[t.List[NamedResource]] = attrs.field(default=None)
-    use_after: t.Optional[t.List[NamedResource]] = attrs.field(default=None)
+    use_before: list[NamedResource] | None = attrs.field(default=None)
+    use_after: list[NamedResource] | None = attrs.field(default=None)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ContestComboDetail":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "ContestComboDetail":
         return cls(
             raw=payload,
             use_before=[NamedResource.from_payload(i) for i in ub] if (ub := payload.get("use_before")) else None,
@@ -55,7 +55,7 @@ class ContestComboSet(BaseModel):
     super: ContestComboDetail = attrs.field(factory=ContestComboDetail)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ContestComboSet":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "ContestComboSet":
         return cls(
             raw=payload,
             normal=ContestComboDetail.from_payload(payload.get("normal", {})),
@@ -82,7 +82,7 @@ class MoveFlavorText(BaseModel):
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveFlavorText":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "MoveFlavorText":
         return cls(
             raw=payload,
             flavor_text=payload.get("flavor_text", ""),
@@ -125,10 +125,10 @@ class MoveMetaData(BaseModel):
 
     ailment: NamedResource = attrs.field(factory=NamedResource)
     category: NamedResource = attrs.field(factory=NamedResource)
-    min_hits: t.Optional[int] = attrs.field(default=None)
-    max_hits: t.Optional[int] = attrs.field(default=None)
-    min_turns: t.Optional[int] = attrs.field(default=None)
-    max_turns: t.Optional[int] = attrs.field(default=None)
+    min_hits: int | None = attrs.field(default=None)
+    max_hits: int | None = attrs.field(default=None)
+    min_turns: int | None = attrs.field(default=None)
+    max_turns: int | None = attrs.field(default=None)
     drain: int = attrs.field(factory=int)
     healing: int = attrs.field(factory=int)
     crit_rate: int = attrs.field(factory=int)
@@ -137,7 +137,7 @@ class MoveMetaData(BaseModel):
     stat_chance: int = attrs.field(factory=int)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveMetaData":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "MoveMetaData":
         return cls(
             raw=payload,
             ailment=NamedResource.from_payload(payload.get("ailment", {})),
@@ -171,7 +171,7 @@ class MoveStatChange(BaseModel):
     stat: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "MoveStatChange":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "MoveStatChange":
         return cls(
             raw=payload,
             change=payload.get("change", 0),
@@ -201,16 +201,16 @@ class PastMoveStatValues(BaseModel):
         The version group in which these move stat values were in effect.
     """
 
-    accuracy: t.Optional[int] = attrs.field(default=None)
-    effect_chance: t.Optional[int] = attrs.field(default=None)
-    power: t.Optional[int] = attrs.field(default=None)
-    pp: t.Optional[int] = attrs.field(default=None)
-    effect_entries: t.List[VerboseEffect] = attrs.field(factory=list)
-    type: t.Optional[NamedResource] = attrs.field(default=None)
+    accuracy: int | None = attrs.field(default=None)
+    effect_chance: int | None = attrs.field(default=None)
+    power: int | None = attrs.field(default=None)
+    pp: int | None = attrs.field(default=None)
+    effect_entries: list[VerboseEffect] = attrs.field(factory=list)
+    type: NamedResource | None = attrs.field(default=None)
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PastMoveStatValues":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PastMoveStatValues":
         return cls(
             raw=payload,
             accuracy=payload.get("accuracy"),

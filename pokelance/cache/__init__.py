@@ -1,17 +1,15 @@
-import typing as t
-
-from pokelance.cache._async import AsyncBaseCache, AsyncCacheGroup, AsyncCacheManager
+from pokelance.cache._async import AsyncCache, AsyncCacheGroup, AsyncCacheManager
 from pokelance.cache._base import BaseCacheGroup, BaseCacheState, CacheEndpoint
-from pokelance.cache.sync import SyncBaseCache, SyncCacheGroup, SyncCacheManager
+from pokelance.cache.sync import SyncCache, SyncCacheGroup, SyncCacheManager
 
-__all__: t.Tuple[str, ...] = (
+__all__: tuple[str, ...] = (
+    "AsyncCache",
     "AsyncCacheGroup",
-    "AsyncBaseCache",
     "AsyncCacheManager",
-    "SyncCacheGroup",
-    "SyncBaseCache",
-    "SyncCacheManager",
-    "CacheEndpoint",
-    "BaseCacheState",
     "BaseCacheGroup",
+    "BaseCacheState",
+    "CacheEndpoint",
+    "SyncCache",
+    "SyncCacheGroup",
+    "SyncCacheManager",
 )

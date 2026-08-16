@@ -23,6 +23,7 @@ Coverage
 - getch_data() handles the location-area-encounter category correctly
 - fetch for a Pokemon with no encounters returns an empty list (not an error)
 """
+
 import asyncio
 import json
 import os
@@ -88,7 +89,7 @@ async def test_get_and_fetch_return_equal_results(cached_client: pokelance.PokeL
     cached = cached_client.pokemon.get_location_area_encounter(1)
     assert cached is not None
     assert len(fetched) == len(cached)
-    for f_enc, c_enc in zip(fetched, cached):
+    for f_enc, c_enc in zip(fetched, cached, strict=False):
         assert f_enc == c_enc
 
 
@@ -101,10 +102,10 @@ async def test_get_and_fetch_return_equal_results(cached_client: pokelance.PokeL
 async def test_cache_key_contains_encounters(cached_client: pokelance.PokeLance) -> None:
     await cached_client.pokemon.fetch_location_area_encounter(1)
     lae_cache = cached_client.http.cache.pokemon.location_area_encounter
-    stored_keys = [k.endpoint for k in lae_cache.cache.keys()]
-    assert any(
-        "/encounters" in k for k in stored_keys
-    ), "The cache key for location_area_encounter should contain '/encounters'."
+    stored_keys = [k.endpoint for k in lae_cache.cache]
+    assert any("/encounters" in k for k in stored_keys), (
+        "The cache key for location_area_encounter should contain '/encounters'."
+    )
 
 
 @pytest.mark.asyncio
@@ -141,9 +142,9 @@ async def test_different_pokemon_have_different_encounters(cached_client: pokela
     # Different Pokemon should encounter different areas (or at least differ in count)
     areas_bulba = {e.location_area.name for e in enc_bulbasaur if e.location_area}
     areas_pika = {e.location_area.name for e in enc_pikachu if e.location_area}
-    assert areas_bulba != areas_pika or len(enc_bulbasaur) != len(
-        enc_pikachu
-    ), "Bulbasaur and Pikachu should have different encounter area lists."
+    assert areas_bulba != areas_pika or len(enc_bulbasaur) != len(enc_pikachu), (
+        "Bulbasaur and Pikachu should have different encounter area lists."
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -175,7 +176,7 @@ async def test_save_produces_json_array(cached_client: pokelance.PokeLance) -> N
         await cached_client.http.cache.pokemon.location_area_encounter.save(tmpdir)
         save_file = os.path.join(tmpdir, "PokemonLocationAreaCache.json")
         assert os.path.exists(save_file)
-        with open(save_file, "r", encoding="utf-8") as f:
+        with open(save_file, encoding="utf-8") as f:
             data = json.load(f)
         key = next(iter(data))
         assert "/encounters" in key

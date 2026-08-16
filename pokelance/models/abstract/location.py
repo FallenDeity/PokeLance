@@ -7,7 +7,7 @@ from pokelance.models.common import GenerationGameIndex, Name, NamedResource
 
 from .utils import EncounterMethodRate, PalParkEncounterSpecies, PokemonEncounter
 
-__all__: t.Tuple[str, ...] = (
+__all__: tuple[str, ...] = (
     "Location",
     "LocationArea",
     "PalParkArea",
@@ -38,13 +38,13 @@ class Location(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    region: t.Optional[NamedResource] = attrs.field(default=None)
-    names: t.List[Name] = attrs.field(factory=list)
-    game_indices: t.List[GenerationGameIndex] = attrs.field(factory=list)
-    areas: t.List[NamedResource] = attrs.field(factory=list)
+    region: NamedResource | None = attrs.field(default=None)
+    names: list[Name] = attrs.field(factory=list)
+    game_indices: list[GenerationGameIndex] = attrs.field(factory=list)
+    areas: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Location":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Location":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -84,13 +84,13 @@ class LocationArea(BaseModel):
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
     game_index: int = attrs.field(factory=int)
-    names: t.List[Name] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
     location: NamedResource = attrs.field(factory=NamedResource)
-    encounter_method_rates: t.List[EncounterMethodRate] = attrs.field(factory=list)
-    pokemon_encounters: t.List[PokemonEncounter] = attrs.field(factory=list)
+    encounter_method_rates: list[EncounterMethodRate] = attrs.field(factory=list)
+    pokemon_encounters: list[PokemonEncounter] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "LocationArea":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "LocationArea":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -124,11 +124,11 @@ class PalParkArea(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    names: t.List[Name] = attrs.field(factory=list)
-    pokemon_encounters: t.List[PalParkEncounterSpecies] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
+    pokemon_encounters: list[PalParkEncounterSpecies] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PalParkArea":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PalParkArea":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -162,14 +162,14 @@ class Region(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    locations: t.List[NamedResource] = attrs.field(factory=list)
-    main_generation: t.Optional[NamedResource] = attrs.field(default=None)
-    names: t.List[Name] = attrs.field(factory=list)
-    pokedexes: t.List[NamedResource] = attrs.field(factory=list)
-    version_groups: t.List[NamedResource] = attrs.field(factory=list)
+    locations: list[NamedResource] = attrs.field(factory=list)
+    main_generation: NamedResource | None = attrs.field(default=None)
+    names: list[Name] = attrs.field(factory=list)
+    pokedexes: list[NamedResource] = attrs.field(factory=list)
+    version_groups: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Region":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Region":
         return cls(
             raw=payload,
             id=payload.get("id", 0),

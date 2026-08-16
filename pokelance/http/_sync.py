@@ -16,7 +16,7 @@ from pokelance.http.endpoints import Route
 if t.TYPE_CHECKING:
     from pokelance.client.sync_client import PokeLanceSyncClient
 
-__all__: t.Tuple[str, ...] = ("SyncHttpClient", "SyncEndpointLoader")
+__all__: tuple[str, ...] = ("SyncEndpointLoader", "SyncHttpClient")
 
 logger = logging.getLogger(__name__)
 
@@ -24,10 +24,10 @@ logger = logging.getLogger(__name__)
 class SyncEndpointLoader:
     """Composition helper for scheduling and tracking sync endpoint pre-population tasks via thread pool."""
 
-    def __init__(self, client: "PokeLanceSyncClient") -> None:
+    def __init__(self, client: PokeLanceSyncClient) -> None:
         self._client = client
-        self._executor: t.Optional[concurrent.futures.ThreadPoolExecutor] = None
-        self._futures: t.Set[concurrent.futures.Future[None]] = set()
+        self._executor: concurrent.futures.ThreadPoolExecutor | None = None
+        self._futures: set[concurrent.futures.Future[None]] = set()
         self._remaining: int = 0
         self._lock = threading.Lock()
         self._ready_event = threading.Event()
@@ -101,24 +101,24 @@ class SyncHttpClient(BaseHttpClient["PokeLanceSyncClient", niquests.Session, Syn
         internally on the first request and owned by this client.
     """
 
-    __slots__: t.Tuple[str, ...] = (
+    __slots__: tuple[str, ...] = (
+        "_cache_manager",
         "_client",
-        "session",
-        "_cache",
         "_is_ready",
         "_loader",
         "_session_owner",
+        "session",
     )
 
     def __init__(
         self,
         *,
         cache_size: int,
-        client: "PokeLanceSyncClient",
-        session: t.Optional[niquests.Session] = None,
+        client: PokeLanceSyncClient,
+        session: niquests.Session | None = None,
     ) -> None:
         super().__init__(client=client, session=session)
-        self._cache = SyncCacheManager(max_size=cache_size, client=self._client)
+        self._cache_manager = SyncCacheManager(max_size=cache_size, client=self._client)
         self._loader = SyncEndpointLoader(client=self._client)
 
     @property

@@ -9,7 +9,7 @@ from __future__ import annotations
 import typing as t
 from dataclasses import dataclass
 
-import pokelance.models as models
+from pokelance import models
 from pokelance.http.endpoints import Endpoint, Route
 
 
@@ -19,8 +19,8 @@ class CategorySpec:
 
     name: str
     endpoint: t.Callable[..., Route]
-    endpoint_list: t.Optional[t.Callable[[], Route]]
-    model: t.Type[models.BaseModel]
+    endpoint_list: t.Callable[[], Route] | None
+    model: type[models.BaseModel]
     cache_attr: str
     endpoint_key_is_id: bool = False
     url_suffix: str = ""
@@ -31,8 +31,8 @@ class CategorySpec:
 class ExtensionSpec:
     """One extension (e.g. Berry, Pokemon, etc.)."""
 
-    name: str              # Class name: "Berry"
-    module_name: str       # File stem: "berry"
+    name: str  # Class name: "Berry"
+    module_name: str  # File stem: "berry"
     doc: str
     categories: list[CategorySpec]
 

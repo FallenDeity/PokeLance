@@ -4,7 +4,7 @@ import attrs
 
 from pokelance.constants import get_base_url, validate_url
 
-__all__: t.Tuple[str, ...] = ("Endpoint", "Route")
+__all__: tuple[str, ...] = ("Endpoint", "Route")
 
 
 @attrs.define(repr=True, slots=True, kw_only=True, hash=True)
@@ -34,7 +34,7 @@ class Route:
     endpoint: str = attrs.field(factory=str)
     _url: str = attrs.field(factory=lambda: f"{get_base_url()}{{endpoint}}")
     method: str = "GET"
-    payload: t.Optional[t.Dict[str, t.Any]] = None
+    payload: dict[str, t.Any] | None = None
 
     def __str__(self) -> str:
         return f"<Route endpoint={self.endpoint} method={self.method}>"
@@ -73,7 +73,7 @@ class Endpoint:
         return Route(endpoint="/language", payload={"limit": 10000})
 
     @classmethod
-    def get_language(cls, language: t.Union[str, int]) -> Route:
+    def get_language(cls, language: str | int) -> Route:
         """Gets a language."""
         return Route(endpoint=f"/language/{language}")
 
@@ -88,7 +88,7 @@ class Endpoint:
         return Route(endpoint="/berry", payload={"limit": 10000})
 
     @classmethod
-    def get_berry(cls, berry: t.Union[int, str]) -> Route:
+    def get_berry(cls, berry: int | str) -> Route:
         """Get a berry by its ID or name."""
         return Route(endpoint=f"/berry/{berry}")
 
@@ -98,7 +98,7 @@ class Endpoint:
         return Route(endpoint="/berry-firmness", payload={"limit": 10000})
 
     @classmethod
-    def get_berry_firmness(cls, berry_firmness: t.Union[int, str]) -> Route:
+    def get_berry_firmness(cls, berry_firmness: int | str) -> Route:
         """Get a berry firmness by its ID or name."""
         return Route(endpoint=f"/berry-firmness/{berry_firmness}")
 
@@ -108,7 +108,7 @@ class Endpoint:
         return Route(endpoint="/berry-flavor", payload={"limit": 10000})
 
     @classmethod
-    def get_berry_flavor(cls, berry_flavor: t.Union[int, str]) -> Route:
+    def get_berry_flavor(cls, berry_flavor: int | str) -> Route:
         """Get a berry flavor by its ID or name."""
         return Route(endpoint=f"/berry-flavor/{berry_flavor}")
 
@@ -118,7 +118,7 @@ class Endpoint:
         return Route(endpoint="/contest-type", payload={"limit": 10000})
 
     @classmethod
-    def get_contest_type(cls, contest_type: t.Union[int, str]) -> Route:
+    def get_contest_type(cls, contest_type: int | str) -> Route:
         """Get a contest type by its ID or name."""
         return Route(endpoint=f"/contest-type/{contest_type}")
 
@@ -148,7 +148,7 @@ class Endpoint:
         return Route(endpoint="/encounter-method", payload={"limit": 10000})
 
     @classmethod
-    def get_encounter_method(cls, encounter_method: t.Union[int, str]) -> Route:
+    def get_encounter_method(cls, encounter_method: int | str) -> Route:
         """Get an encounter method by its ID or name."""
         return Route(endpoint=f"/encounter-method/{encounter_method}")
 
@@ -158,7 +158,7 @@ class Endpoint:
         return Route(endpoint="/encounter-condition", payload={"limit": 10000})
 
     @classmethod
-    def get_encounter_condition(cls, encounter_condition: t.Union[int, str]) -> Route:
+    def get_encounter_condition(cls, encounter_condition: int | str) -> Route:
         """Get an encounter condition by its ID or name."""
         return Route(endpoint=f"/encounter-condition/{encounter_condition}")
 
@@ -168,7 +168,7 @@ class Endpoint:
         return Route(endpoint="/encounter-condition-value", payload={"limit": 10000})
 
     @classmethod
-    def get_encounter_condition_value(cls, encounter_condition_value: t.Union[int, str]) -> Route:
+    def get_encounter_condition_value(cls, encounter_condition_value: int | str) -> Route:
         """Get an encounter condition value by its ID or name."""
         return Route(endpoint=f"/encounter-condition-value/{encounter_condition_value}")
 
@@ -188,7 +188,7 @@ class Endpoint:
         return Route(endpoint="/evolution-trigger", payload={"limit": 10000})
 
     @classmethod
-    def get_evolution_trigger(cls, evolution_trigger: t.Union[int, str]) -> Route:
+    def get_evolution_trigger(cls, evolution_trigger: int | str) -> Route:
         """Get an evolution trigger by its ID or name."""
         return Route(endpoint=f"/evolution-trigger/{evolution_trigger}")
 
@@ -198,7 +198,7 @@ class Endpoint:
         return Route(endpoint="/generation", payload={"limit": 10000})
 
     @classmethod
-    def get_generation(cls, generation: t.Union[int, str]) -> Route:
+    def get_generation(cls, generation: int | str) -> Route:
         """Get a generation by its ID or name."""
         return Route(endpoint=f"/generation/{generation}")
 
@@ -208,7 +208,7 @@ class Endpoint:
         return Route(endpoint="/pokedex", payload={"limit": 10000})
 
     @classmethod
-    def get_pokedex(cls, pokedex: t.Union[int, str]) -> Route:
+    def get_pokedex(cls, pokedex: int | str) -> Route:
         """Get a pokedex by its ID or name."""
         return Route(endpoint=f"/pokedex/{pokedex}")
 
@@ -218,7 +218,7 @@ class Endpoint:
         return Route(endpoint="/version", payload={"limit": 10000})
 
     @classmethod
-    def get_version(cls, version: t.Union[int, str]) -> Route:
+    def get_version(cls, version: int | str) -> Route:
         """Get a version by its ID or name."""
         return Route(endpoint=f"/version/{version}")
 
@@ -228,7 +228,7 @@ class Endpoint:
         return Route(endpoint="/version-group", payload={"limit": 10000})
 
     @classmethod
-    def get_version_group(cls, version_group: t.Union[int, str]) -> Route:
+    def get_version_group(cls, version_group: int | str) -> Route:
         """Get a version group by its ID or name."""
         return Route(endpoint=f"/version-group/{version_group}")
 
@@ -238,7 +238,7 @@ class Endpoint:
         return Route(endpoint="/currency", payload={"limit": 10000})
 
     @classmethod
-    def get_currency(cls, currency: t.Union[int, str]) -> Route:
+    def get_currency(cls, currency: int | str) -> Route:
         """Get a currency by its ID or name."""
         return Route(endpoint=f"/currency/{currency}")
 
@@ -248,7 +248,7 @@ class Endpoint:
         return Route(endpoint="/item", payload={"limit": 10000})
 
     @classmethod
-    def get_item(cls, item: t.Union[int, str]) -> Route:
+    def get_item(cls, item: int | str) -> Route:
         """Get an item by its ID or name."""
         return Route(endpoint=f"/item/{item}")
 
@@ -258,7 +258,7 @@ class Endpoint:
         return Route(endpoint="/item-attribute", payload={"limit": 10000})
 
     @classmethod
-    def get_item_attribute(cls, item_attribute: t.Union[int, str]) -> Route:
+    def get_item_attribute(cls, item_attribute: int | str) -> Route:
         """Get an item attribute by its ID or name."""
         return Route(endpoint=f"/item-attribute/{item_attribute}")
 
@@ -268,7 +268,7 @@ class Endpoint:
         return Route(endpoint="/item-category", payload={"limit": 10000})
 
     @classmethod
-    def get_item_category(cls, item_category: t.Union[int, str]) -> Route:
+    def get_item_category(cls, item_category: int | str) -> Route:
         """Get an item category by its ID or name."""
         return Route(endpoint=f"/item-category/{item_category}")
 
@@ -278,7 +278,7 @@ class Endpoint:
         return Route(endpoint="/item-fling-effect", payload={"limit": 10000})
 
     @classmethod
-    def get_item_fling_effect(cls, item_fling_effect: t.Union[int, str]) -> Route:
+    def get_item_fling_effect(cls, item_fling_effect: int | str) -> Route:
         """Get an item fling effect by its ID or name."""
         return Route(endpoint=f"/item-fling-effect/{item_fling_effect}")
 
@@ -288,7 +288,7 @@ class Endpoint:
         return Route(endpoint="/item-pocket", payload={"limit": 10000})
 
     @classmethod
-    def get_item_pocket(cls, item_pocket: t.Union[int, str]) -> Route:
+    def get_item_pocket(cls, item_pocket: int | str) -> Route:
         """Get an item pocket by its ID or name."""
         return Route(endpoint=f"/item-pocket/{item_pocket}")
 
@@ -298,7 +298,7 @@ class Endpoint:
         return Route(endpoint="/location", payload={"limit": 10000})
 
     @classmethod
-    def get_location(cls, location: t.Union[int, str]) -> Route:
+    def get_location(cls, location: int | str) -> Route:
         """Get a location by its ID or name."""
         return Route(endpoint=f"/location/{location}")
 
@@ -308,7 +308,7 @@ class Endpoint:
         return Route(endpoint="/location-area", payload={"limit": 10000})
 
     @classmethod
-    def get_location_area(cls, location_area: t.Union[int, str]) -> Route:
+    def get_location_area(cls, location_area: int | str) -> Route:
         """Get a location area by its ID or name."""
         return Route(endpoint=f"/location-area/{location_area}")
 
@@ -318,7 +318,7 @@ class Endpoint:
         return Route(endpoint="/pal-park-area", payload={"limit": 10000})
 
     @classmethod
-    def get_pal_park_area(cls, pal_park_area: t.Union[int, str]) -> Route:
+    def get_pal_park_area(cls, pal_park_area: int | str) -> Route:
         """Get a pal park area by its ID or name."""
         return Route(endpoint=f"/pal-park-area/{pal_park_area}")
 
@@ -328,7 +328,7 @@ class Endpoint:
         return Route(endpoint="/region", payload={"limit": 10000})
 
     @classmethod
-    def get_region(cls, region: t.Union[int, str]) -> Route:
+    def get_region(cls, region: int | str) -> Route:
         """Get a region by its ID or name."""
         return Route(endpoint=f"/region/{region}")
 
@@ -348,7 +348,7 @@ class Endpoint:
         return Route(endpoint="/move", payload={"limit": 10000})
 
     @classmethod
-    def get_move(cls, move: t.Union[int, str]) -> Route:
+    def get_move(cls, move: int | str) -> Route:
         """Get a move by its ID or name."""
         return Route(endpoint=f"/move/{move}")
 
@@ -358,7 +358,7 @@ class Endpoint:
         return Route(endpoint="/move-ailment", payload={"limit": 10000})
 
     @classmethod
-    def get_move_ailment(cls, move_ailment: t.Union[int, str]) -> Route:
+    def get_move_ailment(cls, move_ailment: int | str) -> Route:
         """Get a move ailment by its ID or name."""
         return Route(endpoint=f"/move-ailment/{move_ailment}")
 
@@ -368,7 +368,7 @@ class Endpoint:
         return Route(endpoint="/move-battle-style", payload={"limit": 10000})
 
     @classmethod
-    def get_move_battle_style(cls, move_battle_style: t.Union[int, str]) -> Route:
+    def get_move_battle_style(cls, move_battle_style: int | str) -> Route:
         """Get a move battle style by its ID or name."""
         return Route(endpoint=f"/move-battle-style/{move_battle_style}")
 
@@ -378,7 +378,7 @@ class Endpoint:
         return Route(endpoint="/move-category", payload={"limit": 10000})
 
     @classmethod
-    def get_move_category(cls, move_category: t.Union[int, str]) -> Route:
+    def get_move_category(cls, move_category: int | str) -> Route:
         """Get a move category by its ID or name."""
         return Route(endpoint=f"/move-category/{move_category}")
 
@@ -388,7 +388,7 @@ class Endpoint:
         return Route(endpoint="/move-damage-class", payload={"limit": 10000})
 
     @classmethod
-    def get_move_damage_class(cls, move_damage_class: t.Union[int, str]) -> Route:
+    def get_move_damage_class(cls, move_damage_class: int | str) -> Route:
         """Get a move damage class by its ID or name."""
         return Route(endpoint=f"/move-damage-class/{move_damage_class}")
 
@@ -398,7 +398,7 @@ class Endpoint:
         return Route(endpoint="/move-learn-method", payload={"limit": 10000})
 
     @classmethod
-    def get_move_learn_method(cls, move_learn_method: t.Union[int, str]) -> Route:
+    def get_move_learn_method(cls, move_learn_method: int | str) -> Route:
         """Get a move learn method by its ID or name."""
         return Route(endpoint=f"/move-learn-method/{move_learn_method}")
 
@@ -408,7 +408,7 @@ class Endpoint:
         return Route(endpoint="/move-target", payload={"limit": 10000})
 
     @classmethod
-    def get_move_target(cls, move_target: t.Union[int, str]) -> Route:
+    def get_move_target(cls, move_target: int | str) -> Route:
         """Get a move target by its ID or name."""
         return Route(endpoint=f"/move-target/{move_target}")
 
@@ -418,7 +418,7 @@ class Endpoint:
         return Route(endpoint="/ability", payload={"limit": 10000})
 
     @classmethod
-    def get_ability(cls, ability: t.Union[int, str]) -> Route:
+    def get_ability(cls, ability: int | str) -> Route:
         """Get an ability by its ID or name."""
         return Route(endpoint=f"/ability/{ability}")
 
@@ -438,7 +438,7 @@ class Endpoint:
         return Route(endpoint="/egg-group", payload={"limit": 10000})
 
     @classmethod
-    def get_egg_group(cls, egg_group: t.Union[int, str]) -> Route:
+    def get_egg_group(cls, egg_group: int | str) -> Route:
         """Get an egg group by its ID or name."""
         return Route(endpoint=f"/egg-group/{egg_group}")
 
@@ -448,7 +448,7 @@ class Endpoint:
         return Route(endpoint="/gender", payload={"limit": 10000})
 
     @classmethod
-    def get_gender(cls, gender: t.Union[int, str]) -> Route:
+    def get_gender(cls, gender: int | str) -> Route:
         """Get a gender by its ID or name."""
         return Route(endpoint=f"/gender/{gender}")
 
@@ -458,7 +458,7 @@ class Endpoint:
         return Route(endpoint="/growth-rate", payload={"limit": 10000})
 
     @classmethod
-    def get_growth_rate(cls, growth_rate: t.Union[int, str]) -> Route:
+    def get_growth_rate(cls, growth_rate: int | str) -> Route:
         """Get a growth rate by its ID or name."""
         return Route(endpoint=f"/growth-rate/{growth_rate}")
 
@@ -468,7 +468,7 @@ class Endpoint:
         return Route(endpoint="/nature", payload={"limit": 10000})
 
     @classmethod
-    def get_nature(cls, nature: t.Union[int, str]) -> Route:
+    def get_nature(cls, nature: int | str) -> Route:
         """Get a nature by its ID or name."""
         return Route(endpoint=f"/nature/{nature}")
 
@@ -478,7 +478,7 @@ class Endpoint:
         return Route(endpoint="/pokemon", payload={"limit": 10000})
 
     @classmethod
-    def get_location_area_encounter(cls, name: t.Union[int, str]) -> Route:
+    def get_location_area_encounter(cls, name: int | str) -> Route:
         """Get a location area encounter by its ID or name."""
         return Route(endpoint=f"/pokemon/{name}/encounters")
 
@@ -488,7 +488,7 @@ class Endpoint:
         return Route(endpoint="/pokeathlon-stat", payload={"limit": 10000})
 
     @classmethod
-    def get_pokeathlon_stat(cls, pokeathlon_stat: t.Union[int, str]) -> Route:
+    def get_pokeathlon_stat(cls, pokeathlon_stat: int | str) -> Route:
         """Get a pokeathlon stat by its ID or name."""
         return Route(endpoint=f"/pokeathlon-stat/{pokeathlon_stat}")
 
@@ -498,7 +498,7 @@ class Endpoint:
         return Route(endpoint="/pokemon", payload={"limit": 10000})
 
     @classmethod
-    def get_pokemon(cls, pokemon: t.Union[int, str]) -> Route:
+    def get_pokemon(cls, pokemon: int | str) -> Route:
         """Get a pokemon by its ID or name."""
         return Route(endpoint=f"/pokemon/{pokemon}")
 
@@ -508,7 +508,7 @@ class Endpoint:
         return Route(endpoint="/pokemon-color", payload={"limit": 10000})
 
     @classmethod
-    def get_pokemon_color(cls, pokemon_color: t.Union[int, str]) -> Route:
+    def get_pokemon_color(cls, pokemon_color: int | str) -> Route:
         """Get a pokemon color by its ID or name."""
         return Route(endpoint=f"/pokemon-color/{pokemon_color}")
 
@@ -518,7 +518,7 @@ class Endpoint:
         return Route(endpoint="/pokemon-form", payload={"limit": 10000})
 
     @classmethod
-    def get_pokemon_form(cls, pokemon_form: t.Union[int, str]) -> Route:
+    def get_pokemon_form(cls, pokemon_form: int | str) -> Route:
         """Get a pokemon form by its ID or name."""
         return Route(endpoint=f"/pokemon-form/{pokemon_form}")
 
@@ -528,7 +528,7 @@ class Endpoint:
         return Route(endpoint="/pokemon-habitat", payload={"limit": 10000})
 
     @classmethod
-    def get_pokemon_habitat(cls, pokemon_habitat: t.Union[int, str]) -> Route:
+    def get_pokemon_habitat(cls, pokemon_habitat: int | str) -> Route:
         """Get a pokemon habitat by its ID or name."""
         return Route(endpoint=f"/pokemon-habitat/{pokemon_habitat}")
 
@@ -538,7 +538,7 @@ class Endpoint:
         return Route(endpoint="/pokemon-shape", payload={"limit": 10000})
 
     @classmethod
-    def get_pokemon_shape(cls, pokemon_shape: t.Union[int, str]) -> Route:
+    def get_pokemon_shape(cls, pokemon_shape: int | str) -> Route:
         """Get a pokemon shape by its ID or name."""
         return Route(endpoint=f"/pokemon-shape/{pokemon_shape}")
 
@@ -548,7 +548,7 @@ class Endpoint:
         return Route(endpoint="/pokemon-species", payload={"limit": 10000})
 
     @classmethod
-    def get_pokemon_species(cls, pokemon_species: t.Union[int, str]) -> Route:
+    def get_pokemon_species(cls, pokemon_species: int | str) -> Route:
         """Get a pokemon species by its ID or name."""
         return Route(endpoint=f"/pokemon-species/{pokemon_species}")
 
@@ -558,7 +558,7 @@ class Endpoint:
         return Route(endpoint="/stat", payload={"limit": 10000})
 
     @classmethod
-    def get_stat(cls, stat: t.Union[int, str]) -> Route:
+    def get_stat(cls, stat: int | str) -> Route:
         """Get a stat by its ID or name."""
         return Route(endpoint=f"/stat/{stat}")
 
@@ -568,6 +568,6 @@ class Endpoint:
         return Route(endpoint="/type", payload={"limit": 10000})
 
     @classmethod
-    def get_type(cls, type_: t.Union[int, str]) -> Route:
+    def get_type(cls, type_: int | str) -> Route:
         """Get a type by its ID or name."""
         return Route(endpoint=f"/type/{type_}")

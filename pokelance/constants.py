@@ -7,23 +7,23 @@ import typing as t
 
 import attrs
 
-__all__: t.Tuple[str, ...] = (
+__all__: tuple[str, ...] = (
     "DEFAULT_BASE_URL",
     "BaseEnum",
-    "Extension",
     "BerryExtension",
     "ContestExtension",
     "EncounterExtension",
     "EvolutionExtension",
+    "Extension",
+    "ExtensionEnum",
+    "ExtensionsL",
     "GameExtension",
+    "GenderEnum",
     "ItemExtension",
     "LocationExtension",
     "MachineExtension",
     "MoveExtension",
     "PokemonExtension",
-    "ExtensionEnum",
-    "ExtensionsL",
-    "GenderEnum",
     "PokemonFormTriggerEnum",
     "RequestObject",
     "get_base_url",
@@ -37,7 +37,7 @@ ExtensionsL = t.Literal[
 ]
 
 # Special case subcategory /pokemon/{id}/encounters endpoint for getch_data and from_url methods, due to inconsistent naming in the API
-_SUBCATEGORY_MAP: t.Dict[str, str] = {"encounters": "location-area-encounter"}
+_SUBCATEGORY_MAP: dict[str, str] = {"encounters": "location-area-encounter"}
 
 
 def _convert_category(value: str) -> str:
@@ -55,7 +55,7 @@ def get_base_url() -> str:
     return os.environ.get("POKEAPI_BASE_URL", DEFAULT_BASE_URL).rstrip("/")
 
 
-def validate_url(url: str) -> t.Optional[re.Match[str]]:
+def validate_url(url: str) -> re.Match[str] | None:
     pattern = re.compile(
         rf"{re.escape(get_base_url())}/(?P<category>[\w-]+)/(?P<value>[\w-]+)(?:/(?P<sub_category>[\w-]+))?/?"
     )
@@ -106,8 +106,8 @@ class GenderEnum(BaseEnum):
     def from_int(cls, value: int | None) -> GenderEnum | None:
         if value is None:
             return None
-        _convert_map: t.Dict[int, GenderEnum] = {1: cls.FEMALE, 2: cls.MALE, 3: cls.GENDERLESS}
-        return cls(_convert_map.get(value, cls.UNDEFINED))
+        convert_map: dict[int, GenderEnum] = {1: cls.FEMALE, 2: cls.MALE, 3: cls.GENDERLESS}
+        return cls(convert_map.get(value, cls.UNDEFINED))
 
 
 @attrs.define(slots=True, frozen=True)
@@ -117,7 +117,7 @@ class Extension:
     """
 
     name: str
-    categories: t.List[str] = attrs.field(factory=list)
+    categories: list[str] = attrs.field(factory=list)
 
 
 @attrs.define(slots=True, frozen=True)
@@ -134,7 +134,7 @@ class BerryExtension(Extension):
     """
 
     name: str = "berry"
-    categories: t.List[str] = ["berry", "berry-firmness", "berry-flavor"]
+    categories: list[str] = ["berry", "berry-firmness", "berry-flavor"]
 
 
 @attrs.define(slots=True, frozen=True)
@@ -151,7 +151,7 @@ class ContestExtension(Extension):
     """
 
     name: str = "contest"
-    categories: t.List[str] = ["contest-type", "contest-effect", "super-contest-effect"]
+    categories: list[str] = ["contest-type", "contest-effect", "super-contest-effect"]
 
 
 @attrs.define(slots=True, frozen=True)
@@ -168,7 +168,7 @@ class EncounterExtension(Extension):
     """
 
     name: str = "encounter"
-    categories: t.List[str] = ["encounter-method", "encounter-condition", "encounter-condition-value"]
+    categories: list[str] = ["encounter-method", "encounter-condition", "encounter-condition-value"]
 
 
 @attrs.define(slots=True, frozen=True)
@@ -185,7 +185,7 @@ class EvolutionExtension(Extension):
     """
 
     name: str = "evolution"
-    categories: t.List[str] = ["evolution-chain", "evolution-trigger"]
+    categories: list[str] = ["evolution-chain", "evolution-trigger"]
 
 
 @attrs.define(slots=True, frozen=True)
@@ -202,7 +202,7 @@ class GameExtension(Extension):
     """
 
     name: str = "game"
-    categories: t.List[str] = ["generation", "pokedex", "version", "version-group"]
+    categories: list[str] = ["generation", "pokedex", "version", "version-group"]
 
 
 @attrs.define(slots=True, frozen=True)
@@ -219,7 +219,7 @@ class ItemExtension(Extension):
     """
 
     name: str = "item"
-    categories: t.List[str] = [
+    categories: list[str] = [
         "currency",
         "item",
         "item-attribute",
@@ -243,7 +243,7 @@ class LocationExtension(Extension):
     """
 
     name: str = "location"
-    categories: t.List[str] = ["location", "location-area", "pal-park-area", "region"]
+    categories: list[str] = ["location", "location-area", "pal-park-area", "region"]
 
 
 @attrs.define(slots=True, frozen=True)
@@ -260,7 +260,7 @@ class MachineExtension(Extension):
     """
 
     name: str = "machine"
-    categories: t.List[str] = ["machine"]
+    categories: list[str] = ["machine"]
 
 
 @attrs.define(slots=True, frozen=True)
@@ -277,7 +277,7 @@ class MoveExtension(Extension):
     """
 
     name: str = "move"
-    categories: t.List[str] = [
+    categories: list[str] = [
         "move",
         "move-ailment",
         "move-battle-style",
@@ -302,7 +302,7 @@ class PokemonExtension(Extension):
     """
 
     name: str = "pokemon"
-    categories: t.List[str] = [
+    categories: list[str] = [
         "ability",
         "characteristic",
         "egg-group",
@@ -336,7 +336,7 @@ class UtilityExtension(Extension):
     """
 
     name: str = "utility"
-    categories: t.List[str] = ["language", "api-metadata"]
+    categories: list[str] = ["language", "api-metadata"]
 
 
 class ExtensionEnum(BaseEnum):
@@ -353,7 +353,7 @@ class ExtensionEnum(BaseEnum):
     Utility = UtilityExtension()
 
     @classmethod
-    def validate_url(cls, url: str) -> t.Optional[RequestObject]:
+    def validate_url(cls, url: str) -> RequestObject | None:
         """
         Validate the url.
         """
@@ -366,5 +366,5 @@ class ExtensionEnum(BaseEnum):
         raise ValueError(f"Invalid url: {url}")
 
     @classmethod
-    def get_categories(cls, name: str) -> t.List[str]:
+    def get_categories(cls, name: str) -> list[str]:
         return getattr(cls[name].value, "categories", [])

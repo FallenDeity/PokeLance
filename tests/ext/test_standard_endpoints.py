@@ -19,6 +19,7 @@ value object directly, while item-style access (ExtensionEnum["Pokemon"]) gives
 the raw enum member. getch_data() accepts the value object OR a plain string;
 we use plain strings to avoid the __getitem__ vs __get__ ambiguity entirely.
 """
+
 import asyncio
 import random
 import typing as t
@@ -26,10 +27,12 @@ import typing as t
 import pytest
 
 import pokelance
-from pokelance.cache import BaseCache
 from pokelance.constants import ExtensionEnum
 from pokelance.http import Endpoint
-from pokelance.models import Berry, BerryFirmness, BerryFlavor, Move, Pokemon, Type
+
+if t.TYPE_CHECKING:
+    from pokelance.cache import BaseCache
+    from pokelance.models import Berry, BerryFirmness, BerryFlavor, Move, Pokemon, Type
 
 # ---------------------------------------------------------------------------
 # Parametrised sweep: every category with a list-endpoint
@@ -37,7 +40,7 @@ from pokelance.models import Berry, BerryFirmness, BerryFlavor, Move, Pokemon, T
 
 # Build (ext_name, category) pairs at collection time.
 # _ext.value gives the Extension object directly (same as __get__ attribute access).
-_ENDPOINT_CATEGORIES: t.List[t.Tuple[str, str]] = []
+_ENDPOINT_CATEGORIES: list[tuple[str, str]] = []
 for _ext in ExtensionEnum:
     for _cat in _ext.value.categories:
         _list_name = f"get_{_cat.replace('-', '_')}_endpoints"
@@ -69,7 +72,7 @@ async def test_fetch_then_get_cache_hit(
     #    (machines, evolution chains, contest effects, etc.)
     chosen = random.choice(list(sub_cache.endpoints.keys()))
     try:
-        arg: t.Union[str, int] = int(chosen)
+        arg: str | int = int(chosen)
     except ValueError:
         arg = chosen
 
@@ -193,7 +196,7 @@ async def test_getch_data_fetch_and_cache_hit(
 
     chosen = random.choice(list(sub_cache.endpoints.keys()))
     try:
-        arg: t.Union[str, int] = int(chosen)
+        arg: str | int = int(chosen)
     except ValueError:
         arg = chosen
 

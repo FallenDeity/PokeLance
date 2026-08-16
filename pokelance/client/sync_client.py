@@ -1,18 +1,20 @@
 from __future__ import annotations
 
 import functools
-import logging
 import typing as t
 from pathlib import Path
 
-import niquests
+from typing_extensions import Self
 
 from pokelance.client._base import _ClientBase
 from pokelance.constants import ExtensionEnum, ExtensionsL
 from pokelance.http._sync import SyncHttpClient
 
 if t.TYPE_CHECKING:
+    import logging
     from types import TracebackType
+
+    import niquests
 
     from pokelance.ext.sync import (
         Berry,
@@ -29,7 +31,7 @@ if t.TYPE_CHECKING:
     )
     from pokelance.models import BaseModel
 
-__all__: t.Tuple[str, ...] = ("PokeLanceSyncClient",)
+__all__: tuple[str, ...] = ("PokeLanceSyncClient",)
 
 BaseType = t.TypeVar("BaseType", bound="BaseModel")
 
@@ -90,9 +92,9 @@ class PokeLanceSyncClient(_ClientBase[SyncHttpClient]):
         audio_cache_size: int = 128,
         image_cache_size: int = 128,
         cache_size: int = 100,
-        logger: t.Optional[logging.Logger] = None,
+        logger: logging.Logger | None = None,
         cache_endpoints: bool = True,
-        session: t.Optional[niquests.Session] = None,
+        session: niquests.Session | None = None,
     ) -> None:
         http = SyncHttpClient(client=self, session=session, cache_size=cache_size)
         self._setup_common(
@@ -106,14 +108,14 @@ class PokeLanceSyncClient(_ClientBase[SyncHttpClient]):
         self._cached_get_audio = functools.lru_cache(maxsize=audio_cache_size)(self._http.load_audio)
         self.setup_hook("pokelance.ext.sync")
 
-    def __enter__(self) -> PokeLanceSyncClient:
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(
         self,
-        exc_type: t.Optional[t.Type[BaseException]],
-        exc_val: t.Optional[BaseException],
-        exc_tb: t.Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         self._logger.warning("Closing session!")
         self._http.close()
@@ -129,16 +131,16 @@ class PokeLanceSyncClient(_ClientBase[SyncHttpClient]):
 
     def getch_data(
         self,
-        ext: t.Union[ExtensionEnum, ExtensionsL, str],
+        ext: ExtensionEnum | ExtensionsL | str,
         category: str,
-        id_: t.Optional[t.Union[int, str]] = None,
+        id_: int | str | None = None,
     ) -> BaseType:
         """A getch method that looks up the cache first, then fetches from the API if not cached."""
         ext_instance, resolved_category = self._resolve_extension_category(ext, category)
         get_ = getattr(ext_instance, f"get_{resolved_category}")
         fetch_ = getattr(ext_instance, f"fetch_{resolved_category}")
         params = (id_,) if id_ is not None else ()
-        return t.cast(BaseType, get_(*params) or fetch_(*params))
+        return t.cast("BaseType", get_(*params) or fetch_(*params))
 
     def from_url(self, url: str) -> BaseType:
         """Constructs a request from URLs present in API data."""

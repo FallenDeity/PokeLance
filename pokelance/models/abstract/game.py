@@ -7,7 +7,7 @@ from pokelance.models.common import Description, Name, NamedResource
 
 from .utils import PokemonEntry
 
-__all__: t.Tuple[str, ...] = (
+__all__: tuple[str, ...] = (
     "Generation",
     "Pokedex",
     "Version",
@@ -43,16 +43,16 @@ class Generation(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    abilities: t.List[NamedResource] = attrs.field(factory=list)
-    names: t.List[Name] = attrs.field(factory=list)
+    abilities: list[NamedResource] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
     main_region: NamedResource = attrs.field(factory=NamedResource)
-    moves: t.List[NamedResource] = attrs.field(factory=list)
-    pokemon_species: t.List[NamedResource] = attrs.field(factory=list)
-    types: t.List[NamedResource] = attrs.field(factory=list)
-    version_groups: t.List[NamedResource] = attrs.field(factory=list)
+    moves: list[NamedResource] = attrs.field(factory=list)
+    pokemon_species: list[NamedResource] = attrs.field(factory=list)
+    types: list[NamedResource] = attrs.field(factory=list)
+    version_groups: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Generation":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Generation":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -94,14 +94,14 @@ class Pokedex(BaseModel):
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
     is_main_series: bool = attrs.field(factory=bool)
-    descriptions: t.List[Description] = attrs.field(factory=list)
-    names: t.List[Name] = attrs.field(factory=list)
-    pokemon_entries: t.List[PokemonEntry] = attrs.field(factory=list)
-    region: t.Optional[NamedResource] = attrs.field(default=None)
-    version_groups: t.List[NamedResource] = attrs.field(factory=list)
+    descriptions: list[Description] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
+    pokemon_entries: list[PokemonEntry] = attrs.field(factory=list)
+    region: NamedResource | None = attrs.field(default=None)
+    version_groups: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Pokedex":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Pokedex":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -133,11 +133,11 @@ class Version(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    names: t.List[Name] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Version":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Version":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -175,13 +175,13 @@ class VersionGroup(BaseModel):
     name: str = attrs.field(factory=str)
     order: int = attrs.field(factory=int)
     generation: NamedResource = attrs.field(factory=NamedResource)
-    move_learn_methods: t.List[NamedResource] = attrs.field(factory=list)
-    pokedexes: t.List[NamedResource] = attrs.field(factory=list)
-    regions: t.List[NamedResource] = attrs.field(factory=list)
-    versions: t.List[NamedResource] = attrs.field(factory=list)
+    move_learn_methods: list[NamedResource] = attrs.field(factory=list)
+    pokedexes: list[NamedResource] = attrs.field(factory=list)
+    regions: list[NamedResource] = attrs.field(factory=list)
+    versions: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "VersionGroup":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "VersionGroup":
         return cls(
             raw=payload,
             id=payload.get("id", 0),

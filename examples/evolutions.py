@@ -2,15 +2,16 @@ import asyncio
 import collections
 import itertools
 import json
+import pathlib
 import typing as t
 
 from pokelance import PokeLance
 from pokelance.models import EvolutionChain, PokemonSpecies
 from pokelance.models.abstract.evolution import ChainLink
 
-DATA = t.Dict[str, t.Any]
+DATA = dict[str, t.Any]
 
-FORM_FLAGS: t.Final[t.Tuple[str, ...]] = (
+FORM_FLAGS: t.Final[tuple[str, ...]] = (
     "alola",
     "hisui",
     "galar",
@@ -57,7 +58,7 @@ FORM_FLAGS: t.Final[t.Tuple[str, ...]] = (
     "koraidon",
     "eternal",
 )
-BATTLE_FORMS: t.Final[t.Tuple[str, ...]] = (
+BATTLE_FORMS: t.Final[tuple[str, ...]] = (
     "mega",
     "sunny",
     "rainy",
@@ -101,14 +102,14 @@ BATTLE_FORMS: t.Final[t.Tuple[str, ...]] = (
     "hearthflame",
     "cornerstone",
 )
-BATTLE_FORM_FILTERS: t.Final[t.Tuple[str, ...]] = (
+BATTLE_FORM_FILTERS: t.Final[tuple[str, ...]] = (
     "meteor",
     "totem",
     "wormadam",
     "plumage",
     "striped",
 )
-INVALID_FORMS: t.Final[t.Tuple[str, ...]] = (
+INVALID_FORMS: t.Final[tuple[str, ...]] = (
     "gmax",  # gmax pokemon like toxtricity
     "totem",  # totem pokemon like marowak
     "zen",  # galarian darmanitan zen mode
@@ -116,11 +117,11 @@ INVALID_FORMS: t.Final[t.Tuple[str, ...]] = (
     "cap",  # cap pikachu
 )
 # evolutions that have multiple forms but all of them evolve only to a specific form
-CONVERGING_EVOLUTIONS: t.Final[t.Tuple[str, ...]] = (
+CONVERGING_EVOLUTIONS: t.Final[tuple[str, ...]] = (
     "gimmighoul",
     "slowbro",
 )
-NO_EVOLUTIONS: t.Final[t.Tuple[str, ...]] = ("floette-eternal",)
+NO_EVOLUTIONS: t.Final[tuple[str, ...]] = ("floette-eternal",)
 
 ENABLE_BATTLE_FORMS = False
 
@@ -140,23 +141,23 @@ def match_variety(name: str) -> bool:
     if name in NO_EVOLUTIONS:
         return False
     if len(name.split("-")) > 1:
-        _d_form_flags = [i for i in FORM_FLAGS if "-" in i]
-        _d_invalid_forms = [i for i in INVALID_FORMS if "-" in i]
-        _form_flags = [i for i in FORM_FLAGS if "-" not in i]
-        _invalid_forms = [i for i in INVALID_FORMS if "-" not in i]
-        _form_flag = any(i == segment for segment in name.split("-") for i in _form_flags)
-        _invalid_form = any(i == segment for segment in name.split("-") for i in _invalid_forms)
-        _d_form_flag = any(i in name for i in _d_form_flags)
-        _d_invalid_form = any(i in name for i in _d_invalid_forms)
-        return any((_d_form_flag, _form_flag)) and not any((_d_invalid_form, _invalid_form))
+        d_form_flags = [i for i in FORM_FLAGS if "-" in i]
+        d_invalid_forms = [i for i in INVALID_FORMS if "-" in i]
+        form_flags = [i for i in FORM_FLAGS if "-" not in i]
+        invalid_forms = [i for i in INVALID_FORMS if "-" not in i]
+        form_flag = any(i == segment for segment in name.split("-") for i in form_flags)
+        invalid_form = any(i == segment for segment in name.split("-") for i in invalid_forms)
+        d_form_flag = any(i in name for i in d_form_flags)
+        d_invalid_form = any(i in name for i in d_invalid_forms)
+        return any((d_form_flag, form_flag)) and not any((d_invalid_form, invalid_form))
     return False
 
 
-async def get_evolutions(data: EvolutionChain) -> t.Tuple[DATA, DATA]:
-    evolution_dict: t.Dict[str, t.List[str]] = {}
-    details_dict: t.Dict[str, t.List[t.Dict[str, t.Any]]] = {}
+async def get_evolutions(data: EvolutionChain) -> tuple[DATA, DATA]:
+    evolution_dict: dict[str, list[str]] = {}
+    details_dict: dict[str, list[dict[str, t.Any]]] = {}
 
-    def _clean_dict(d: t.Dict[str, t.Any]) -> t.Dict[str, t.Any]:
+    def _clean_dict(d: dict[str, t.Any]) -> dict[str, t.Any]:
         return {k: _clean_dict(v) if isinstance(v, dict) else v for k, v in d.items() if k != "raw"}
 
     async def process_evolution_chain(chain: ChainLink, n: int = 0) -> None:
@@ -187,27 +188,26 @@ async def get_evolutions(data: EvolutionChain) -> t.Tuple[DATA, DATA]:
     return evolution_dict, details_dict
 
 
-def stringify_dict(data: t.List[t.Dict[str, t.Any]]) -> str:
-    common: t.DefaultDict[str, t.Set[t.Any]] = collections.defaultdict(set)
+def stringify_dict(data: list[dict[str, t.Any]]) -> str:
+    common: collections.defaultdict[str, set[t.Any]] = collections.defaultdict(set)
     for i in data:
         for k, v in i.items():
             common[k].add(v["name"] if isinstance(v, dict) else v)
     return "".join([f"{k}: {', '.join(v)}\n" if len(v) > 1 else f"{k}: {v.pop()}\n" for k, v in common.items()])
 
 
-def converging_evolution(varieties: t.List[str], details: t.List[t.Dict[str, t.Any]]) -> None:
-    evos = details[:]
-    evo_map: t.Dict[str, t.Any] = {k: v for i in evos for k, v in i.items()}
+def converging_evolution(varieties: list[str], details: list[dict[str, t.Any]]) -> None:
+    evos = details.copy()
+    evo_map: dict[str, t.Any] = {k: v for i in evos for k, v in i.items()}
     if any(i in varieties for i in CONVERGING_EVOLUTIONS):
-        for _ in range(len(varieties)):
-            details.append(evo_map)
+        details.extend(evo_map for _ in range(len(varieties)))
 
 
-def converge_data(evolution_dict: DATA, details_dict: DATA, variety_dict: t.Optional[DATA]) -> DATA:
+def converge_data(evolution_dict: DATA, details_dict: DATA, variety_dict: DATA | None) -> DATA:
     if not variety_dict:
         return {k: {i: details_dict[i] for i in v} for k, v in evolution_dict.items()}
     final: DATA = {}
-    keys: t.List[str] = []
+    keys: list[str] = []
     for k, v in evolution_dict.items():
         varieties = variety_dict.get(k, [k])
         details = [
@@ -217,7 +217,7 @@ def converge_data(evolution_dict: DATA, details_dict: DATA, variety_dict: t.Opti
         ]
         # for basculin where it has 3 forms but evolves only from the white stripe form, so we just add another white stripe form
         # pokeapi holds no such context about forms, so we have to manually add them
-        if len(details) == 2 and set(list(i.keys())[0].split("-")[-1] for i in details) == {"male", "female"}:
+        if len(details) == 2 and {next(iter(i.keys())).split("-")[-1] for i in details} == {"male", "female"}:
             varieties += [varieties[-1]]
         # cases where multiple forms evolve to a single form
         converging_evolution(varieties, details)
@@ -339,8 +339,8 @@ async def main() -> None:
     # await client.wait_until_ready()
     # await client.pokemon.cache.pokemon_species.load_all_batch(batch_size=20)
     # branched = [i.name for i in client.pokemon.cache.pokemon_species.values()]
-    processed_chains: t.Set[int] = set()
-    strings: t.List[str] = []
+    processed_chains: set[int] = set()
+    strings: list[str] = []
     for n, i in enumerate(branched, start=1):
         species: PokemonSpecies = await client.pokemon.fetch_pokemon_species(i)
         if not species.evolution_chain:
@@ -353,13 +353,13 @@ async def main() -> None:
         evo_data, detail_data = await get_evolutions(evolution_chain)
         variety_data = {}
         form_entries: DATA = {}
-        for k in evo_data.keys():
+        for k in evo_data:
             pokemon = await client.pokemon.fetch_pokemon(k)
             varieties = (await client.pokemon.fetch_pokemon_species(pokemon.species.name)).varieties
-            default = [i.pokemon.name for i in varieties if i.is_default][0]
+            default = next(i.pokemon.name for i in varieties if i.is_default)
             forms = [i.pokemon.name for i in varieties if not i.is_default and match_variety(i.pokemon.name)]
             if forms:
-                variety_data[default] = [default] + forms
+                variety_data[default] = [default, *forms]
             battle_forms = [i.pokemon.name for i in varieties if not i.is_default and match_battle_form(i.pokemon.name)]
             if ENABLE_BATTLE_FORMS and battle_forms:
                 evo_data[k] = evo_data.get(k, []) + battle_forms
@@ -372,8 +372,7 @@ async def main() -> None:
         evo_data.update(form_entries)
         strings.append(json.dumps(converge_data(evo_data, detail_data, variety_data), indent=4))
         client.logger.info(f"Processed {evolution_chain.id} | {n}/{len(branched)}")
-    with open("evolutions.json", "w", encoding="utf-8") as f:
-        f.write("[" + ",\n".join(strings) + "]")
+    pathlib.Path("evolutions.json").write_text("[" + ",\n".join(strings) + "]", encoding="utf-8")
     await client.close()
 
 

@@ -3,32 +3,40 @@ from __future__ import annotations
 import logging
 import typing as t
 
-import niquests
-
 from pokelance.exceptions import AudioNotFound, HTTPException, ImageNotFound
 from pokelance.http.endpoints import Route
 
 if t.TYPE_CHECKING:
+    import niquests
+
+    from pokelance.cache._async.manager import AsyncCacheManager
+    from pokelance.cache.sync.manager import SyncCacheManager
     from pokelance.client._base import _ClientBase
 
-__all__: t.Tuple[str, ...] = ("BaseHttpClient",)
+    AnyCacheManager = t.Union[AsyncCacheManager, SyncCacheManager]
+
+__all__: tuple[str, ...] = ("BaseHttpClient",)
 
 logger = logging.getLogger(__name__)
 
 _ClientT = t.TypeVar("_ClientT", bound="_ClientBase")
-_SessionT = t.TypeVar("_SessionT", bound="t.Union[niquests.Session, niquests.AsyncSession]")
-_CacheT = t.TypeVar("_CacheT")
+_SessionT = t.TypeVar("_SessionT", bound="niquests.Session | niquests.AsyncSession")
+_CacheManagerT = t.TypeVar(
+    "_CacheManagerT",
+    bound="AsyncCacheManager | SyncCacheManager",
+    default="AsyncCacheManager | SyncCacheManager",
+)
 
 
-class BaseHttpClient(t.Generic[_ClientT, _SessionT, _CacheT]):
+class BaseHttpClient(t.Generic[_ClientT, _SessionT, _CacheManagerT]):
     """Base class containing shared HTTP logic, validation, and media checks."""
 
-    IMAGE_FORMATS: t.ClassVar[t.Tuple[str, ...]] = ("png", "jpg", "jpeg", "gif", "webp", "svg")
-    AUDIO_FORMATS: t.ClassVar[t.Tuple[str, ...]] = ("ogg", "wav", "mp3")
+    IMAGE_FORMATS: t.ClassVar[tuple[str, ...]] = ("png", "jpg", "jpeg", "gif", "webp", "svg")
+    AUDIO_FORMATS: t.ClassVar[tuple[str, ...]] = ("ogg", "wav", "mp3")
 
     _client: _ClientT
-    session: t.Optional[_SessionT]
-    _cache: _CacheT
+    session: _SessionT | None
+    _cache_manager: _CacheManagerT
     _is_ready: bool
     _session_owner: bool
 
@@ -36,7 +44,7 @@ class BaseHttpClient(t.Generic[_ClientT, _SessionT, _CacheT]):
         self,
         *,
         client: _ClientT,
-        session: t.Optional[_SessionT] = None,
+        session: _SessionT | None = None,
     ) -> None:
         self._client = client
         self.session = session
@@ -44,9 +52,9 @@ class BaseHttpClient(t.Generic[_ClientT, _SessionT, _CacheT]):
         self._session_owner = session is None
 
     @property
-    def cache(self) -> _CacheT:
+    def cache_manager(self) -> _CacheManagerT:
         """The cache manager used by this HTTP client."""
-        return self._cache
+        return self._cache_manager
 
     @classmethod
     def _validate_response(cls, response: niquests.Response, route: Route) -> t.Any:

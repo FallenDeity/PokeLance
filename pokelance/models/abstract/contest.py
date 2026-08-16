@@ -7,9 +7,9 @@ from pokelance.models.common import Effect, NamedResource
 
 from .utils import ContestEffectFlavorText, ContestName, SuperContestEffectFlavorText
 
-__all__: t.Tuple[str, ...] = (
-    "ContestType",
+__all__: tuple[str, ...] = (
     "ContestEffect",
+    "ContestType",
     "SuperContestEffect",
 )
 
@@ -33,10 +33,10 @@ class ContestType(BaseModel):
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
     berry_flavor: NamedResource = attrs.field(factory=NamedResource)
-    names: t.List[ContestName] = attrs.field(factory=list)
+    names: list[ContestName] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ContestType":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "ContestType":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -67,11 +67,11 @@ class ContestEffect(BaseModel):
     id: int = attrs.field(factory=int)
     appeal: int = attrs.field(factory=int)
     jam: int = attrs.field(factory=int)
-    effect_entries: t.List[Effect] = attrs.field(factory=list)
-    flavor_text_entries: t.List[ContestEffectFlavorText] = attrs.field(factory=list)
+    effect_entries: list[Effect] = attrs.field(factory=list)
+    flavor_text_entries: list[ContestEffectFlavorText] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "ContestEffect":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "ContestEffect":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -103,11 +103,11 @@ class SuperContestEffect(BaseModel):
 
     id: int = attrs.field(factory=int)
     appeal: int = attrs.field(factory=int)
-    flavor_text_entries: t.List[SuperContestEffectFlavorText] = attrs.field(factory=list)
-    moves: t.List[NamedResource] = attrs.field(factory=list)
+    flavor_text_entries: list[SuperContestEffectFlavorText] = attrs.field(factory=list)
+    moves: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "SuperContestEffect":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "SuperContestEffect":
         return cls(
             raw=payload,
             id=payload.get("id", 0),

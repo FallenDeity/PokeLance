@@ -7,7 +7,7 @@ from pokelance.models.common import Name, NamedResource
 
 from .utils import ChainLink
 
-__all__: t.Tuple[str, ...] = (
+__all__: tuple[str, ...] = (
     "ChainLink",
     "EvolutionChain",
     "EvolutionTrigger",
@@ -31,11 +31,11 @@ class EvolutionChain(BaseModel):
     """
 
     id: int = attrs.field(factory=int)
-    baby_trigger_item: t.Optional[NamedResource] = attrs.field(default=None)
+    baby_trigger_item: NamedResource | None = attrs.field(default=None)
     chain: ChainLink = attrs.field(factory=ChainLink)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EvolutionChain":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "EvolutionChain":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
@@ -62,11 +62,11 @@ class EvolutionTrigger(BaseModel):
 
     id: int = attrs.field(factory=int)
     name: str = attrs.field(factory=str)
-    names: t.List[Name] = attrs.field(factory=list)
-    pokemon_species: t.List[NamedResource] = attrs.field(factory=list)
+    names: list[Name] = attrs.field(factory=list)
+    pokemon_species: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "EvolutionTrigger":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "EvolutionTrigger":
         return cls(
             raw=payload,
             id=payload.get("id", 0),

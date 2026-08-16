@@ -1,81 +1,160 @@
+from __future__ import annotations
+
+import abc
 import typing as t
 from difflib import get_close_matches
 
+from typing_extensions import TypeVar
+
 from pokelance.exceptions import ResourceNotFound
-from pokelance.http import Endpoint
 
 if t.TYPE_CHECKING:
-    from pokelance.cache import BaseCache, Cache
-    from pokelance.http import HttpClient, Route
-    from pokelance.models import BaseModel
+    from pokelance.cache._async.base import AsyncCacheGroup
+    from pokelance.cache._async.manager import AsyncCacheManager
+    from pokelance.cache._base import BaseCacheState
+    from pokelance.cache.sync.base import SyncCacheGroup
+    from pokelance.cache.sync.manager import SyncCacheManager
+    from pokelance.http._async import AsyncHttpClient
+    from pokelance.http._base import BaseHttpClient
+    from pokelance.http._sync import SyncHttpClient
+    from pokelance.http.endpoints import Route
+
+    AnyHttpClient = t.Union[AsyncHttpClient, SyncHttpClient]
+    AnyCacheManager = t.Union[AsyncCacheManager, SyncCacheManager]
+    AnyCacheGroup = t.Union[AsyncCacheGroup, SyncCacheGroup]
+
+__all__: tuple[str, ...] = (
+    "AsyncBaseExtension",
+    "BaseExtension",
+    "SyncBaseExtension",
+)
+
+_CacheManagerT = TypeVar(
+    "_CacheManagerT",
+    bound="AsyncCacheManager | SyncCacheManager",
+    default="AsyncCacheManager | SyncCacheManager",
+    covariant=True,
+)
+_HTTPClientT = TypeVar(
+    "_HTTPClientT",
+    bound="BaseHttpClient[t.Any, t.Any, t.Any]",
+    default="BaseHttpClient[t.Any, t.Any, t.Any]",
+    covariant=True,
+)
+_CacheGroupT = TypeVar(
+    "_CacheGroupT",
+    bound="AsyncCacheGroup | SyncCacheGroup",
+    default="AsyncCacheGroup | SyncCacheGroup",
+    covariant=True,
+)
+_AsyncCacheGroupT = TypeVar(
+    "_AsyncCacheGroupT",
+    bound="AsyncCacheGroup",
+    default="AsyncCacheGroup",
+    covariant=True,
+)
+_SyncCacheGroupT = TypeVar(
+    "_SyncCacheGroupT",
+    bound="SyncCacheGroup",
+    default="SyncCacheGroup",
+    covariant=True,
+)
 
 
-__all__: t.Tuple[str, ...] = ("BaseExtension",)
-_KT = t.TypeVar("_KT", bound="Route")
-_VT = t.TypeVar("_VT", bound="t.Union[BaseModel, t.List[t.Any]]")
-
-
-class BaseExtension:
+class BaseExtension(abc.ABC, t.Generic[_HTTPClientT, _CacheManagerT, _CacheGroupT]):
     """The base extension class.
 
     Parameters
     ----------
-    client: pokelance.http.HttpClient
-        The client to use for requests.
+    client : _HTTPClientT
+        The HTTP client to use for requests.
 
     Attributes
     ----------
-    _client: pokelance.http.HttpClient
-        The client to use for requests.
-    _cache: pokelance.cache.Cache
-        The cache to use for requests.
+    _client : _HTTPClientT
+        The HTTP client to use for requests.
+    _cache_manager : _CacheManagerT
+        The top-level cache manager.
+    _cache_group : _CacheGroupT
+        The category-specific cache group.
     """
 
-    _cache: "Cache"
+    _client: _HTTPClientT
+    _cache_manager: _CacheManagerT
+    _cache_group: _CacheGroupT
 
-    def __init__(self, client: "HttpClient") -> None:
-        """Initializes the extension.
-
-        Parameters
-        ----------
-        client: pokelance.http.HttpClient
-            The client to use for requests.
-        """
+    def __init__(self, client: _HTTPClientT) -> None:
         self._client = client
-        self._cache = self._client.cache
-        self.cache = getattr(self._cache, self.__class__.__name__.lower())
+        self._cache_manager = client.cache_manager
+        self._cache_group = getattr(self._cache_manager, self.__class__.__name__.lower())
 
-    def _validate_resource(self, cache: "BaseCache[_KT, _VT]", resource: t.Union[str, int], route: "Route") -> None:
-        """Validates a resource.
+    @property
+    def cache_group(self) -> _CacheGroupT:
+        """The cache group for this extension."""
+        return self._cache_group
+
+    @property
+    def cache_manager(self) -> _CacheManagerT:
+        """The top-level cache manager."""
+        return self._cache_manager
+
+    @abc.abstractmethod
+    def setup(self) -> t.Coroutine[t.Any, t.Any, None] | None:
+        """Sets up the extension."""
+        raise NotImplementedError
+
+    def _validate_resource(
+        self,
+        cache: BaseCacheState[t.Any, t.Any, t.Any],
+        resource: str | int,
+        route: Route,
+    ) -> None:
+        """Validates a resource against cached identifiers.
 
         Parameters
         ----------
-        cache: pokelance.cache.BaseCache[t.Any, t.Any]
-            The cache to use for the validation.
-        resource: t.Union[str, int]
-            The resource to validate.
-        route: pokelance.http.Route
-            The route to use for the validation.
+        cache : BaseCacheState
+            The cache to check identifiers against.
+        resource : t.Union[str, int]
+            The resource name or ID to validate.
+        route : Route
+            The route associated with this resource.
 
         Raises
         ------
-        pokelance.exceptions.ResourceNotFound
-            The resource was not found in the cache.
+        ResourceNotFound
+            If identifiers are cached and the resource is not present.
         """
-        data: t.Set[str] = cache.identifiers
+        data: set[str] = cache.identifiers
         if data and str(resource) not in data:
             suggestions = get_close_matches(str(resource), data, n=10, cutoff=0.5)
             raise ResourceNotFound(
-                message=f"Resource not found - {route.url}", route=route, status=404, suggestions=suggestions
+                message=f"Resource not found - {route.url}",
+                route=route,
+                status=404,
+                suggestions=suggestions,
             )
 
+
+class AsyncBaseExtension(
+    BaseExtension["AsyncHttpClient", "AsyncCacheManager", _AsyncCacheGroupT],
+    t.Generic[_AsyncCacheGroupT],
+):
+    """Abstract base class for asynchronous extensions."""
+
+    @abc.abstractmethod
     async def setup(self) -> None:
-        """Sets up the extension."""
-        for item in dir(self):
-            if item.startswith("fetch_"):
-                endpoint_name = f"get_{item[6:]}_endpoints"
-                if not hasattr(Endpoint, endpoint_name):
-                    continue
-                endpoint: t.Callable[[], "Route"] = getattr(Endpoint, endpoint_name)
-                data = await self._client.request(endpoint())
-                self._cache.load_documents(str(self.__class__.__name__), item[6:], data["results"])
+        """Sets up the extension asynchronously."""
+        raise NotImplementedError
+
+
+class SyncBaseExtension(
+    BaseExtension["SyncHttpClient", "SyncCacheManager", _SyncCacheGroupT],
+    t.Generic[_SyncCacheGroupT],
+):
+    """Abstract base class for synchronous extensions."""
+
+    @abc.abstractmethod
+    def setup(self) -> None:
+        """Sets up the extension synchronously."""
+        raise NotImplementedError

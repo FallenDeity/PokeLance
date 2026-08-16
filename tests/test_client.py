@@ -10,9 +10,9 @@ Coverage
 - get_image_async / get_audio_async: bytes returned, cache-hit faster, error
 - model __eq__
 """
+
 import random
 import time
-import typing as t
 
 import pytest
 
@@ -62,12 +62,12 @@ async def test_getch_data_cache_hit(cached_client: pokelance.PokeLance) -> None:
 @pytest.mark.asyncio
 async def test_getch_data_random_endpoint(cached_client: pokelance.PokeLance) -> None:
     """Fetch a random name from the endpoint registry; confirm it lands in cache."""
-    _id = random.choice(list(cached_client.pokemon.cache.pokemon.endpoints.keys()))
-    pokemon: Pokemon = await cached_client.getch_data(ExtensionEnum.Pokemon, "pokemon", _id)
-    assert pokemon.name == _id
-    route = Endpoint.get_pokemon(_id)
-    cached: t.Optional[Pokemon] = cached_client.pokemon.cache.pokemon.get(route)
-    assert cached is not None and cached.name == _id
+    id_ = random.choice(list(cached_client.pokemon.cache.pokemon.endpoints.keys()))
+    pokemon: Pokemon = await cached_client.getch_data(ExtensionEnum.Pokemon, "pokemon", id_)
+    assert pokemon.name == id_
+    route = Endpoint.get_pokemon(id_)
+    cached: Pokemon | None = cached_client.pokemon.cache.pokemon.get(route)
+    assert cached is not None and cached.name == id_
 
 
 # ---------------------------------------------------------------------------
@@ -100,12 +100,12 @@ async def test_getch_data_invalid_extension(cached_client: pokelance.PokeLance) 
 
 @pytest.mark.asyncio
 async def test_from_url(cached_client: pokelance.PokeLance) -> None:
-    _id = random.choice(list(cached_client.pokemon.cache.pokemon.endpoints.keys()))
-    pokemon: Pokemon = await cached_client.from_url(f"https://pokeapi.co/api/v2/pokemon/{_id}")
-    assert pokemon.name == _id
-    route = Endpoint.get_pokemon(_id)
-    cached: t.Optional[Pokemon] = cached_client.pokemon.cache.pokemon.get(route)
-    assert cached is not None and cached.name == _id
+    id_ = random.choice(list(cached_client.pokemon.cache.pokemon.endpoints.keys()))
+    pokemon: Pokemon = await cached_client.from_url(f"https://pokeapi.co/api/v2/pokemon/{id_}")
+    assert pokemon.name == id_
+    route = Endpoint.get_pokemon(id_)
+    cached: Pokemon | None = cached_client.pokemon.cache.pokemon.get(route)
+    assert cached is not None and cached.name == id_
 
 
 # ---------------------------------------------------------------------------

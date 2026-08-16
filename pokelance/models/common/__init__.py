@@ -1,5 +1,3 @@
-import typing as t
-
 from .models import (
     APIMetadata,
     Description,
@@ -17,20 +15,20 @@ from .models import (
 )
 from .resources import NamedResource, Resource
 
-__all__: t.Tuple[str, ...] = (
+__all__: tuple[str, ...] = (
+    "APIMetadata",
     "Description",
     "Effect",
     "Encounter",
     "FlavorText",
     "GenerationGameIndex",
+    "Language",
     "MachineVersionDetail",
     "Name",
+    "NamedResource",
+    "Resource",
     "VerboseEffect",
     "VersionEncounterDetail",
     "VersionGameIndex",
     "VersionGroupFlavorText",
-    "Resource",
-    "NamedResource",
-    "Language",
-    "APIMetadata",
 )

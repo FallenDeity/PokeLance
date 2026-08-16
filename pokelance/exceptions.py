@@ -4,12 +4,12 @@ if t.TYPE_CHECKING:
     from pokelance.http import Route
 
 
-__all__: t.Tuple[str, ...] = (
-    "PokeLanceException",
-    "HTTPException",
-    "ResourceNotFound",
-    "ImageNotFound",
+__all__: tuple[str, ...] = (
     "AudioNotFound",
+    "HTTPException",
+    "ImageNotFound",
+    "PokeLanceException",
+    "ResourceNotFound",
 )
 
 
@@ -38,7 +38,7 @@ class PokeLanceException(Exception):
         super().__init__(message)
 
     def __str__(self) -> str:
-        return f"{self.message} | {str(self.route)}"
+        return f"{self.message} | {self.route!s}"
 
 
 class HTTPException(PokeLanceException):
@@ -68,7 +68,7 @@ class HTTPException(PokeLanceException):
         super().__init__(message, route)
 
     def __str__(self) -> str:
-        return f"{self.message} | {str(self.route)} | {self.status}"
+        return f"{self.message} | {self.route!s} | {self.status}"
 
     def create(self) -> "HTTPException":
         """Creates an exception from the status code."""
@@ -114,7 +114,7 @@ class ResourceNotFound(NotFound):
         Possible suggestions for the resource.
     """
 
-    def __init__(self, message: str, route: "Route", status: int, suggestions: t.Optional[t.List[str]] = None) -> None:
+    def __init__(self, message: str, route: "Route", status: int, suggestions: list[str] | None = None) -> None:
         self.suggestions = suggestions
         super().__init__(message, route, status)
 
@@ -122,7 +122,7 @@ class ResourceNotFound(NotFound):
         message = self.message
         if self.suggestions:
             message += f" Suggestions: {', '.join(self.suggestions)}"
-        return f"{message} | {str(self.route)} | {self.status}"
+        return f"{message} | {self.route!s} | {self.status}"
 
 
 class ImageNotFound(NotFound):
@@ -142,7 +142,7 @@ class ImageNotFound(NotFound):
         super().__init__(message, route, status)
 
     def __str__(self) -> str:
-        return f"{self.message} | {str(self.route)} | {self.status}"
+        return f"{self.message} | {self.route!s} | {self.status}"
 
 
 class AudioNotFound(NotFound):
@@ -162,10 +162,10 @@ class AudioNotFound(NotFound):
         super().__init__(message, route, status)
 
     def __str__(self) -> str:
-        return f"{self.message} | {str(self.route)} | {self.status}"
+        return f"{self.message} | {self.route!s} | {self.status}"
 
 
-CODES: t.Dict[int, t.Type[HTTPException]] = {
+CODES: dict[int, type[HTTPException]] = {
     400: BadRequest,
     401: Unauthorized,
     403: Forbidden,
@@ -174,7 +174,7 @@ CODES: t.Dict[int, t.Type[HTTPException]] = {
 }
 
 
-def get_exception(status: int) -> t.Type[HTTPException]:
+def get_exception(status: int) -> type[HTTPException]:
     """Gets an exception from the status code.
 
     Parameters

@@ -39,7 +39,11 @@ small so it drops cleanly into bots, web services, and scripts alike.
 ```python exec="true" source="above" result="text"
 import subprocess
 
-print(subprocess.run(["uv", "run", "python", "-c", "import pokelance; print(pokelance.__version__)"], capture_output=True, text=True).stdout.strip())
+print(
+    subprocess.run(
+        ["uv", "run", "python", "-c", "import pokelance; print(pokelance.__version__)"], capture_output=True, text=True
+    ).stdout.strip()
+)
 ```
 
 If that prints a version string, you're ready for the [Quickstart](quickstart.md).

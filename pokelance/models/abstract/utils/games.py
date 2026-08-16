@@ -5,7 +5,7 @@ import attrs
 from pokelance.models import BaseModel
 from pokelance.models.common import NamedResource
 
-__all__: t.Tuple[str, ...] = ("PokemonEntry",)
+__all__: tuple[str, ...] = ("PokemonEntry",)
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -24,7 +24,7 @@ class PokemonEntry(BaseModel):
     pokemon_species: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "PokemonEntry":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonEntry":
         return cls(
             raw=payload,
             entry_number=payload.get("entry_number", 0),

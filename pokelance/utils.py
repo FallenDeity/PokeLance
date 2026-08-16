@@ -1,18 +1,14 @@
 import asyncio
+import contextlib
 import dataclasses
 import sys
 from asyncio.coroutines import _is_coroutine  # type: ignore[attr-defined]
+from collections import OrderedDict
+from collections.abc import Callable, Coroutine, Hashable
 from functools import _CacheInfo, _make_key, partial, partialmethod
 from typing import (
     Any,
-    Callable,
-    Coroutine,
     Generic,
-    Hashable,
-    Optional,
-    OrderedDict,
-    Set,
-    Type,
     TypedDict,
     TypeVar,
     Union,
@@ -42,7 +38,7 @@ _CBP = Union[_CB[_R], "partial[_Coro[_R]]", "partialmethod[_Coro[_R]]"]
 @final
 class _CacheParameters(TypedDict):
     typed: bool
-    maxsize: Optional[int]
+    maxsize: int | None
     tasks: int
     closed: bool
 
@@ -51,7 +47,7 @@ class _CacheParameters(TypedDict):
 @dataclasses.dataclass
 class _CacheItem(Generic[_R]):
     fut: "asyncio.Future[_R]"
-    later_call: Optional[asyncio.Handle]
+    later_call: asyncio.Handle | None
 
     def cancel(self) -> None:
         if self.later_call is not None:
@@ -64,34 +60,22 @@ class _LRUCacheWrapper(Generic[_R]):
     def __init__(
         self,
         fn: _CB[_R],
-        maxsize: Optional[int],
+        maxsize: int | None,
         typed: bool,
-        ttl: Optional[float],
+        ttl: float | None,
     ) -> None:
-        try:
+        with contextlib.suppress(AttributeError):
             self.__module__ = fn.__module__
-        except AttributeError:
-            pass
-        try:
+        with contextlib.suppress(AttributeError):
             self.__name__ = fn.__name__
-        except AttributeError:
-            pass
-        try:
+        with contextlib.suppress(AttributeError):
             self.__qualname__ = fn.__qualname__
-        except AttributeError:
-            pass
-        try:
+        with contextlib.suppress(AttributeError):
             self.__doc__ = fn.__doc__
-        except AttributeError:
-            pass
-        try:
+        with contextlib.suppress(AttributeError):
             self.__annotations__ = fn.__annotations__
-        except AttributeError:
-            pass
-        try:
+        with contextlib.suppress(AttributeError):
             self.__dict__.update(fn.__dict__)
-        except AttributeError:
-            pass
         # set __wrapped__ last so we don't inadvertently copy it
         # from the wrapped function when updating __dict__
         self._is_coroutine = _is_coroutine
@@ -103,7 +87,7 @@ class _LRUCacheWrapper(Generic[_R]):
         self.__closed = False
         self.__hits = 0
         self.__misses = 0
-        self.__tasks: Set["asyncio.Task[_R]"] = set()
+        self.__tasks: set[asyncio.Task[_R]] = set()
 
     def __contains__(self, /, *args: Hashable, **kwargs: Any) -> bool:
         key = _make_key(args, kwargs, self.__typed)
@@ -228,7 +212,7 @@ class _LRUCacheWrapper(Generic[_R]):
         self._cache_miss(key)
         return await asyncio.shield(fut)
 
-    def __get__(self, instance: _T, owner: Optional[Type[_T]]) -> Union[Self, "_LRUCacheWrapperInstanceMethod[_R, _T]"]:
+    def __get__(self, instance: _T, owner: type[_T] | None) -> Union[Self, "_LRUCacheWrapperInstanceMethod[_R, _T]"]:
         if owner is None:
             return self
         else:
@@ -242,30 +226,18 @@ class _LRUCacheWrapperInstanceMethod(Generic[_R, _T]):
         wrapper: _LRUCacheWrapper[_R],
         instance: _T,
     ) -> None:
-        try:
+        with contextlib.suppress(AttributeError):
             self.__module__ = wrapper.__module__
-        except AttributeError:
-            pass
-        try:
+        with contextlib.suppress(AttributeError):
             self.__name__ = wrapper.__name__
-        except AttributeError:
-            pass
-        try:
+        with contextlib.suppress(AttributeError):
             self.__qualname__ = wrapper.__qualname__
-        except AttributeError:
-            pass
-        try:
+        with contextlib.suppress(AttributeError):
             self.__doc__ = wrapper.__doc__
-        except AttributeError:
-            pass
-        try:
+        with contextlib.suppress(AttributeError):
             self.__annotations__ = wrapper.__annotations__
-        except AttributeError:
-            pass
-        try:
+        with contextlib.suppress(AttributeError):
             self.__dict__.update(wrapper.__dict__)
-        except AttributeError:
-            pass
         # set __wrapped__ last so we don't inadvertently copy it
         # from the wrapped function when updating __dict__
         self._is_coroutine = _is_coroutine
@@ -299,9 +271,9 @@ class _LRUCacheWrapperInstanceMethod(Generic[_R, _T]):
 
 
 def _make_wrapper(
-    maxsize: Optional[int],
+    maxsize: int | None,
     typed: bool,
-    ttl: Optional[float] = None,
+    ttl: float | None = None,
 ) -> Callable[[_CBP[_R]], _LRUCacheWrapper[_R]]:
     def wrapper(fn: _CBP[_R]) -> _LRUCacheWrapper[_R]:
         origin = fn
@@ -316,39 +288,37 @@ def _make_wrapper(
         if hasattr(fn, "_make_unbound_method"):
             fn = fn._make_unbound_method()
 
-        return _LRUCacheWrapper(cast(_CB[_R], fn), maxsize, typed, ttl)
+        return _LRUCacheWrapper(cast("_CB[_R]", fn), maxsize, typed, ttl)
 
     return wrapper
 
 
 @overload
 def alru_cache(
-    maxsize: Optional[int] = 128,
+    maxsize: int | None = 128,
     typed: bool = False,
     *,
-    ttl: Optional[float] = None,
-) -> Callable[[_CBP[_R]], _LRUCacheWrapper[_R]]:
-    ...
+    ttl: float | None = None,
+) -> Callable[[_CBP[_R]], _LRUCacheWrapper[_R]]: ...
 
 
 @overload
 def alru_cache(
     maxsize: _CBP[_R],
     /,
-) -> _LRUCacheWrapper[_R]:
-    ...
+) -> _LRUCacheWrapper[_R]: ...
 
 
 def alru_cache(
-    maxsize: Union[Optional[int], _CBP[_R]] = 128,
+    maxsize: int | _CBP[_R] | None = 128,
     typed: bool = False,
     *,
-    ttl: Optional[float] = None,
-) -> Union[Callable[[_CBP[_R]], _LRUCacheWrapper[_R]], _LRUCacheWrapper[_R]]:
+    ttl: float | None = None,
+) -> Callable[[_CBP[_R]], _LRUCacheWrapper[_R]] | _LRUCacheWrapper[_R]:
     if maxsize is None or isinstance(maxsize, int):
         return _make_wrapper(maxsize, typed, ttl)
     else:
-        fn = cast(_CB[_R], maxsize)
+        fn = cast("_CB[_R]", maxsize)
 
         if callable(fn) or hasattr(fn, "_make_unbound_method"):
             return _make_wrapper(128, False, None)(fn)

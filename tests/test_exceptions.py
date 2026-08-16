@@ -18,6 +18,7 @@ Coverage
 - get_exception(): all mapped codes and fallback
 - CODES dict: correct mapping
 """
+
 import typing as t
 
 import pytest

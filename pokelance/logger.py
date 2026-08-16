@@ -11,21 +11,23 @@ import sys
 import traceback
 import typing as t
 from logging.handlers import RotatingFileHandler
-from types import TracebackType
 
-__all__: t.Tuple[str, ...] = (
-    "LogLevelColors",
-    "RelativePathFilter",
+if t.TYPE_CHECKING:
+    from types import TracebackType
+
+__all__: tuple[str, ...] = (
     "DailyRotatingFileHandler",
     "JSONFormatter",
+    "LogLevelColors",
+    "RelativePathFilter",
     "TextFormatter",
-    "setup_logging",
     "handle_exception",
+    "setup_logging",
 )
 
 logger = logging.getLogger(__name__)
 
-BASE_DICT_ATTRS: t.Tuple[str, ...] = (
+BASE_DICT_ATTRS: tuple[str, ...] = (
     "name",
     "msg",
     "args",
@@ -180,7 +182,9 @@ class DailyRotatingFileHandler(RotatingFileHandler):
         if self._last_entry.date() != datetime.datetime.today().date():
             self._last_entry = datetime.datetime.today()
             self.close()
-            self.baseFilename = (self.folder / f"{self._last_entry.strftime('%Y-%m-%d')}-{self.filename}.log").as_posix()
+            self.baseFilename = (
+                self.folder / f"{self._last_entry.strftime('%Y-%m-%d')}-{self.filename}.log"
+            ).as_posix()
             self.stream = self._open()
         super().emit(record)
 

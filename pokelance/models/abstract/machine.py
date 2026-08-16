@@ -5,7 +5,7 @@ import attrs
 from pokelance.models import BaseModel
 from pokelance.models.common import NamedResource
 
-__all__: t.Tuple[str, ...] = ("Machine",)
+__all__: tuple[str, ...] = ("Machine",)
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -30,7 +30,7 @@ class Machine(BaseModel):
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
-    def from_payload(cls, payload: t.Dict[str, t.Any]) -> "Machine":
+    def from_payload(cls, payload: dict[str, t.Any]) -> "Machine":
         return cls(
             raw=payload,
             id=payload.get("id", 0),
