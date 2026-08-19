@@ -36,7 +36,8 @@ ExtensionsL = t.Literal[
     "berry", "contest", "encounter", "evolution", "game", "item", "location", "machine", "move", "pokemon"
 ]
 
-# Special case subcategory /pokemon/{id}/encounters endpoint for getch_data and from_url methods, due to inconsistent naming in the API
+# Special case subcategory /pokemon/{id}/encounters endpoint for getch_data and from_url methods,
+# due to inconsistent naming in the PokéAPI specification.
 _SUBCATEGORY_MAP: dict[str, str] = {"encounters": "location-area-encounter"}
 
 
@@ -67,7 +68,7 @@ class BaseEnum(enum.Enum):
     Base enum class for all enums in the library.
     """
 
-    def __get__(self, instance: t.Any, owner: t.Any) -> t.Any:
+    def __get__(self, instance: object, owner: type[object] | None = None) -> object:
         """
         Get the value of the enum.
         """
@@ -117,7 +118,7 @@ class Extension:
     """
 
     name: str
-    categories: list[str] = attrs.field(factory=list)
+    categories: tuple[str, ...] = attrs.field(factory=tuple)
 
 
 @attrs.define(slots=True, frozen=True)
@@ -134,7 +135,7 @@ class BerryExtension(Extension):
     """
 
     name: str = "berry"
-    categories: list[str] = ["berry", "berry-firmness", "berry-flavor"]
+    categories: tuple[str, ...] = ("berry", "berry-firmness", "berry-flavor")
 
 
 @attrs.define(slots=True, frozen=True)
@@ -151,7 +152,7 @@ class ContestExtension(Extension):
     """
 
     name: str = "contest"
-    categories: list[str] = ["contest-type", "contest-effect", "super-contest-effect"]
+    categories: tuple[str, ...] = ("contest-type", "contest-effect", "super-contest-effect")
 
 
 @attrs.define(slots=True, frozen=True)
@@ -168,7 +169,7 @@ class EncounterExtension(Extension):
     """
 
     name: str = "encounter"
-    categories: list[str] = ["encounter-method", "encounter-condition", "encounter-condition-value"]
+    categories: tuple[str, ...] = ("encounter-method", "encounter-condition", "encounter-condition-value")
 
 
 @attrs.define(slots=True, frozen=True)
@@ -185,7 +186,7 @@ class EvolutionExtension(Extension):
     """
 
     name: str = "evolution"
-    categories: list[str] = ["evolution-chain", "evolution-trigger"]
+    categories: tuple[str, ...] = ("evolution-chain", "evolution-trigger")
 
 
 @attrs.define(slots=True, frozen=True)
@@ -202,7 +203,7 @@ class GameExtension(Extension):
     """
 
     name: str = "game"
-    categories: list[str] = ["generation", "pokedex", "version", "version-group"]
+    categories: tuple[str, ...] = ("generation", "pokedex", "version", "version-group")
 
 
 @attrs.define(slots=True, frozen=True)
@@ -219,14 +220,14 @@ class ItemExtension(Extension):
     """
 
     name: str = "item"
-    categories: list[str] = [
+    categories: tuple[str, ...] = (
         "currency",
         "item",
         "item-attribute",
         "item-category",
         "item-fling-effect",
         "item-pocket",
-    ]
+    )
 
 
 @attrs.define(slots=True, frozen=True)
@@ -243,7 +244,7 @@ class LocationExtension(Extension):
     """
 
     name: str = "location"
-    categories: list[str] = ["location", "location-area", "pal-park-area", "region"]
+    categories: tuple[str, ...] = ("location", "location-area", "pal-park-area", "region")
 
 
 @attrs.define(slots=True, frozen=True)
@@ -260,7 +261,7 @@ class MachineExtension(Extension):
     """
 
     name: str = "machine"
-    categories: list[str] = ["machine"]
+    categories: tuple[str, ...] = ("machine",)
 
 
 @attrs.define(slots=True, frozen=True)
@@ -277,7 +278,7 @@ class MoveExtension(Extension):
     """
 
     name: str = "move"
-    categories: list[str] = [
+    categories: tuple[str, ...] = (
         "move",
         "move-ailment",
         "move-battle-style",
@@ -285,7 +286,7 @@ class MoveExtension(Extension):
         "move-damage-class",
         "move-learn-method",
         "move-target",
-    ]
+    )
 
 
 @attrs.define(slots=True, frozen=True)
@@ -302,7 +303,7 @@ class PokemonExtension(Extension):
     """
 
     name: str = "pokemon"
-    categories: list[str] = [
+    categories: tuple[str, ...] = (
         "ability",
         "characteristic",
         "egg-group",
@@ -319,7 +320,7 @@ class PokemonExtension(Extension):
         "pokemon-species",
         "stat",
         "type",
-    ]
+    )
 
 
 @attrs.define(slots=True, frozen=True)
@@ -336,7 +337,7 @@ class UtilityExtension(Extension):
     """
 
     name: str = "utility"
-    categories: list[str] = ["language", "api-metadata"]
+    categories: tuple[str, ...] = ("language", "api-metadata")
 
 
 class ExtensionEnum(BaseEnum):

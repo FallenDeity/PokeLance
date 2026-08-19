@@ -10,6 +10,7 @@ import attrs
 
 from pokelance.cache._base import BaseCacheGroup, BaseCacheState, CacheEndpoint
 from pokelance.endpoints import Route
+from pokelance.exceptions import HTTPException
 
 _KT = t.TypeVar("_KT", bound="Route")
 _VT = t.TypeVar("_VT", bound="BaseModel | t.Sequence[BaseModel]")
@@ -93,8 +94,8 @@ class SyncCache(_BaseCacheState[_KT, _VT], t.Generic[_KT, _VT]):
 
     def load(self, path: str = ".") -> None:
         """Load the cache from a JSON file synchronously."""
-        with open(pathlib.Path(f"{path}/{self._name}.json"), encoding="utf-8") as f:
-            self.deserialize(json.loads(f.read()))
+        data = pathlib.Path(f"{path}/{self._name}.json").read_text(encoding="utf-8")
+        self.deserialize(json.loads(data))
 
     def load_all(self) -> None:
         """Load all documents/data from api into the cache synchronously."""
@@ -124,9 +125,9 @@ class SyncCache(_BaseCacheState[_KT, _VT], t.Generic[_KT, _VT]):
                 route = t.cast("_KT", Route.from_raw_url(ep.url))
                 if not self.get(route):
                     self._fetch_and_cache(route)
-            logger.debug(
-                f"Loaded batch {i // batch_size + 1}/{(total_endpoints + batch_size - 1) // batch_size} for {self._name}"
-            )
+            current_batch = i // batch_size + 1
+            total_batches = (total_endpoints + batch_size - 1) // batch_size
+            logger.debug(f"Loaded batch {current_batch}/{total_batches} for {self._name}")
         logger.info(f"Loaded {self._name} - {len(self._cache)}/{total_endpoints} items.")
 
     def _fetch_and_cache(self, route: _KT) -> None:
@@ -136,7 +137,7 @@ class SyncCache(_BaseCacheState[_KT, _VT], t.Generic[_KT, _VT]):
         try:
             data = self._client.http.request(route)
             self.setdefault(route, self.from_payload(data))
-        except Exception as e:
+        except (HTTPException, KeyError, ValueError, TypeError) as e:
             logger.error(f"Failed to load {route}: {e}")
 
 

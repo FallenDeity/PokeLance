@@ -23,7 +23,10 @@ class EvolutionDetail(BaseModel):
     version_group: NamedResource
         The version group in which the evolution was introduced.
     is_default: bool
-        Whether the evolution is considered as the expected evolution in a main series game. Each unique Pokémon variety of a line capable of evolution should have exactly one 'default' evolution. For example, the Meowth species has three default evolutions as there are three distinct varieties it can evolve into: Persian, Alolan Persian, and Perrserker.
+        Whether the evolution is considered as the expected evolution in a main series game.
+        Each unique Pokémon variety of a line capable of evolution should have exactly one 'default' evolution.
+        For example, the Meowth species has three default evolutions as there are three distinct varieties it can
+        evolve into: Persian, Alolan Persian, and Perrserker.
     item: t.Optional[NamedResource]
         The item required to cause evolution this into Pokémon species.
     trigger: NamedResource
@@ -71,13 +74,15 @@ class EvolutionDetail(BaseModel):
     evolved_form: t.Optional[NamedResource]
         The form to which this evolution occurs.
     used_move: t.Optional[NamedResource]
-        The move that must be used by the evolving Pokémon species during the evolution trigger event in order to evolve into this Pokémon species.
+        The move that must be used by the evolving Pokémon species during the evolution trigger event
+        in order to evolve into this Pokémon species.
     min_move_count: t.Optional[int]
         The minimum number of times a move must be used in order to evolve into this Pokémon species.
     min_steps: t.Optional[int]
         The minimum number of steps that must be taken in order to evolve into this Pokémon species.
     min_damage_taken: t.Optional[int]
-        The minimum amount of damage taken during the evolution trigger event in order to evolve into this Pokémon species.
+        The minimum amount of damage taken during the evolution trigger event in order to evolve
+        into this Pokémon species.
     """
 
     version_group: NamedResource = attrs.field(factory=NamedResource)

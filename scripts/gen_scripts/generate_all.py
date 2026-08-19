@@ -2,10 +2,10 @@
 """AST-based master code generator for PokeLance sync/async dual-client support.
 
 Reads scripts/gen_scripts/_registry.py (single source of truth) and generates:
-  1. pokelance/cache/_async/manager.py   — AsyncCacheManager
-  2. pokelance/cache/sync/manager.py    — SyncCacheManager
-  3. pokelance/ext/_async/{name}.py      — async extensions
-  4. pokelance/ext/sync/{name}.py       — sync extensions
+  1. pokelance/cache/_async/manager.py   - AsyncCacheManager
+  2. pokelance/cache/sync/manager.py    - SyncCacheManager
+  3. pokelance/ext/_async/{name}.py      - async extensions
+  4. pokelance/ext/sync/{name}.py       - sync extensions
 
 Usage:
     $ python scripts/gen_scripts/generate_all.py                 # regenerate everything

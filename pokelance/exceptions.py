@@ -13,7 +13,7 @@ __all__: tuple[str, ...] = (
 )
 
 
-class PokeLanceException(Exception):
+class PokeLanceException(Exception):  # ruff: ignore[error-suffix-on-exception-name]
     """Base exception class for PokeLance.
 
     Parameters

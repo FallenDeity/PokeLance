@@ -50,7 +50,10 @@ class AsyncEndpointLoader:
         logger.debug(f"Loading {message}...")
         try:
             await coroutine()
-        except Exception:
+        except (asyncio.CancelledError, Exception):
+            if self._client.http.is_closing:
+                logger.debug(f"Extension loading aborted due to client closing: {message}")
+                return
             logger.exception(f"Failed loading {message}")
             raise
         finally:
@@ -83,15 +86,20 @@ class AsyncEndpointLoader:
 
     async def cancel_tasks(self) -> None:
         """Cancels and awaits all in-flight endpoint loading tasks."""
-        count = sum(1 for task in self._tasks if not task.done())
-        if count > 0:
-            logger.warning(f"Cancelling {count} in-flight endpoint loading task(s)...")
-        for task in list(self._tasks):
-            if not task.done():
+        tasks = [task for task in self._tasks if not task.done()]
+        if tasks:
+            logger.warning(f"Cancelling {len(tasks)} in-flight endpoint loading task(s)...")
+            for task in tasks:
                 task.cancel()
                 logger.warning(f"Cancelled task {task.get_name()}")
-        if self._tasks:
-            await asyncio.gather(*self._tasks, return_exceptions=True)
+            try:
+                await asyncio.wait_for(asyncio.gather(*tasks, return_exceptions=True), timeout=1.5)
+            except asyncio.TimeoutError:
+                logger.warning("Timed out waiting for endpoint loading tasks to cancel.")
+        self._tasks.clear()
+        self._scheduled = False
+        self._remaining = 0
+        self._ready_event.set()
 
 
 @t.final
@@ -112,6 +120,7 @@ class AsyncHttpClient(_BaseHttpClient):
     __slots__: tuple[str, ...] = (
         "_cache_manager",
         "_client",
+        "_closing",
         "_is_ready",
         "_loader",
         "_session_owner",
@@ -135,17 +144,25 @@ class AsyncHttpClient(_BaseHttpClient):
         return self._loader
 
     async def close(self) -> None:
-        """Closes the HTTP client and cancels pending endpoint loaders."""
-        await self._loader.cancel_tasks()
-        if self.session and self._session_owner:
-            logger.debug("Closing internal async HTTP session...")
-            await self.session.close()
+        """Closes the HTTP client session and cancels pending endpoint loaders."""
+        if self._closing:
+            return
+        self._closing = True
+        try:
+            await self._loader.cancel_tasks()
+            session_to_close = self.session if self._session_owner else None
             self.session = None
-        elif self.session:
-            logger.debug("Session was provided externally, not closing it.")
+            if session_to_close:
+                logger.debug("Closing internal async HTTP session...")
+                await session_to_close.close()
+        finally:
+            self._is_ready = False
+            self._closing = False
 
     async def connect(self) -> None:
         """Connects the HTTP client and sets up the session."""
+        if self._closing:
+            raise RuntimeError("Cannot connect while the HTTP client is closing.")
         if self.session is None:
             logger.debug("Initializing internal async HTTP session (niquests)...")
             self.session = niquests.AsyncSession(resolver="system://")
@@ -173,6 +190,8 @@ class AsyncHttpClient(_BaseHttpClient):
         HTTPException
             An error occurred while making the request.
         """
+        if self._closing:
+            raise RuntimeError("Cannot make a request while the HTTP client is closing.")
         await self.connect()
         if self.session is not None:
             logger.debug(f"Sending {route.method} request to {route.url}")

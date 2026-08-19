@@ -11,6 +11,7 @@ import attrs
 
 from pokelance.cache._base import BaseCacheGroup, BaseCacheState, CacheEndpoint
 from pokelance.endpoints import Route
+from pokelance.exceptions import HTTPException
 
 _KT = t.TypeVar("_KT", bound="Route")
 _VT = t.TypeVar("_VT", bound="BaseModel | t.Sequence[BaseModel]")
@@ -128,9 +129,9 @@ class AsyncCache(_BaseCacheState[_KT, _VT], t.Generic[_KT, _VT]):
             ]
             if tasks:
                 await asyncio.gather(*tasks)
-            logger.debug(
-                f"Loaded batch {i // batch_size + 1}/{(total_endpoints + batch_size - 1) // batch_size} for {self._name}"
-            )
+            current_batch = i // batch_size + 1
+            total_batches = (total_endpoints + batch_size - 1) // batch_size
+            logger.debug(f"Loaded batch {current_batch}/{total_batches} for {self._name}")
         logger.info(f"Loaded {self._name} - {len(self._cache)}/{total_endpoints} items.")
 
     async def _fetch_and_cache(self, route: _KT) -> None:
@@ -140,7 +141,7 @@ class AsyncCache(_BaseCacheState[_KT, _VT], t.Generic[_KT, _VT]):
         try:
             data = await self._client.http.request(route)
             self.setdefault(route, self.from_payload(data))
-        except Exception as e:
+        except (HTTPException, KeyError, ValueError, TypeError) as e:
             logger.error(f"Failed to load {route}: {e}")
 
 

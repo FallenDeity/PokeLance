@@ -1,6 +1,7 @@
 line-length = 120
 exclude = [
     "playground/",
+    "scripts/",
 ]
 
 [lint]
@@ -27,3 +28,6 @@ extend-select = [
     "W",      # pycodestyle: PEP 8 warnings
 ]
 preview = true
+
+[lint.per-file-ignores]
+"pokelance/ext/**" = ["builtin-argument-shadowing"]

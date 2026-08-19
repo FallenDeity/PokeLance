@@ -39,6 +39,7 @@ class BaseHttpClient(t.Generic[_ClientT, _SessionT, _CacheManagerT]):
     _cache_manager: _CacheManagerT
     _is_ready: bool
     _session_owner: bool
+    _closing: bool
 
     def __init__(
         self,
@@ -50,6 +51,17 @@ class BaseHttpClient(t.Generic[_ClientT, _SessionT, _CacheManagerT]):
         self.session = session
         self._is_ready = False
         self._session_owner = session is None
+        self._closing = False
+
+    @property
+    def is_closing(self) -> bool:
+        """Whether the HTTP client is currently closing."""
+        return self._closing
+
+    @property
+    def is_connected(self) -> bool:
+        """Whether the HTTP client currently has an active session."""
+        return self.session is not None
 
     @property
     def cache_manager(self) -> _CacheManagerT:
@@ -57,7 +69,7 @@ class BaseHttpClient(t.Generic[_ClientT, _SessionT, _CacheManagerT]):
         return self._cache_manager
 
     @classmethod
-    def _validate_response(cls, response: niquests.Response, route: Route) -> t.Any:
+    def _validate_response(cls, response: niquests.Response, route: Route) -> dict[str, t.Any]:
         """Validate an HTTP response and return parsed JSON or raise HTTPException."""
         status = response.status_code or -1
         if 200 <= status < 300:

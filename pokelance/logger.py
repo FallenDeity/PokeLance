@@ -135,7 +135,7 @@ class JSONFormatter(logging.Formatter):
         for attr in record.__dict__:
             if attr not in BASE_DICT_ATTRS:
                 if attr == "color_message" and self.use_colors:
-                    json_log["message"] = _pass_args(record.args, getattr(record, attr))  # type: ignore
+                    json_log["message"] = _pass_args(record.args, getattr(record, attr))  # type: ignore[arg-type]
                 elif attr == "color_message" and not self.use_colors:
                     pass
                 else:
@@ -152,8 +152,8 @@ class DailyRotatingFileHandler(RotatingFileHandler):
         self,
         filename: str | os.PathLike[str],
         mode: str = "a",
-        maxBytes: int = 10 * 1024 * 1024,
-        backupCount: int = 5,
+        max_bytes: int = 10 * 1024 * 1024,
+        backup_count: int = 5,
         encoding: str | None = "utf-8",
         delay: bool = False,
         errors: str | None = None,
@@ -161,15 +161,15 @@ class DailyRotatingFileHandler(RotatingFileHandler):
         *,
         folder: pathlib.Path | str = "logs",
     ) -> None:
-        self._last_entry = datetime.datetime.today()
+        self._last_entry = datetime.datetime.now(datetime.timezone.utc)
         self.folder = pathlib.Path(folder)
         self.filename = filename
         self.folder.mkdir(exist_ok=True)
         super().__init__(
-            self.folder / f"{datetime.datetime.today().strftime('%Y-%m-%d')}-{self.filename}.log",
+            self.folder / f"{datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d')}-{self.filename}.log",
             mode=mode,
-            maxBytes=maxBytes,
-            backupCount=backupCount,
+            maxBytes=max_bytes,
+            backupCount=backup_count,
             encoding=encoding,
             delay=delay,
             errors=errors,
@@ -179,8 +179,9 @@ class DailyRotatingFileHandler(RotatingFileHandler):
 
     def emit(self, record: logging.LogRecord) -> None:
         """Emit a log record."""
-        if self._last_entry.date() != datetime.datetime.today().date():
-            self._last_entry = datetime.datetime.today()
+        now = datetime.datetime.now(datetime.timezone.utc)
+        if self._last_entry.date() != now.date():
+            self._last_entry = now
             self.close()
             self.baseFilename = (
                 self.folder / f"{self._last_entry.strftime('%Y-%m-%d')}-{self.filename}.log"

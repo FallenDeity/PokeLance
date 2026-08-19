@@ -59,6 +59,9 @@ class SyncEndpointLoader:
         try:
             fn()
         except Exception:
+            if self._client.http.is_closing:
+                logger.debug(f"Extension loading aborted due to client closing: {message}")
+                return
             logger.exception(f"Failed loading {message}")
             raise
         finally:
@@ -129,6 +132,7 @@ class SyncHttpClient(_BaseHttpClient):
     __slots__: tuple[str, ...] = (
         "_cache_manager",
         "_client",
+        "_closing",
         "_is_ready",
         "_loader",
         "_lock",
@@ -155,17 +159,26 @@ class SyncHttpClient(_BaseHttpClient):
 
     def close(self) -> None:
         """Closes the HTTP client and shuts down the endpoint loader thread pool."""
-        self._loader.shutdown()
-        if self.session and self._session_owner:
-            logger.debug("Closing internal sync HTTP session...")
-            self.session.close()
-            self.session = None
-        elif self.session:
-            logger.debug("Session was provided externally, not closing it.")
+        with self._lock:
+            if self._closing:
+                return
+            self._closing = True
+            try:
+                session_to_close = self.session if self._session_owner else None
+                self.session = None
+                if session_to_close:
+                    logger.debug("Closing internal sync HTTP session...")
+                    session_to_close.close()
+                self._loader.shutdown()
+            finally:
+                self._is_ready = False
+                self._closing = False
 
     def connect(self) -> None:
         """Connects the HTTP client and sets up the session."""
         with self._lock:
+            if self._closing:
+                raise RuntimeError("Cannot connect while the HTTP client is closing.")
             if self.session is None:
                 logger.debug("Initializing internal sync HTTP session (niquests)...")
                 self.session = niquests.Session(resolver="system://")
@@ -193,6 +206,8 @@ class SyncHttpClient(_BaseHttpClient):
         HTTPException
             An error occurred while making the request.
         """
+        if self._closing:
+            raise RuntimeError("Cannot make a request while the HTTP client is closing.")
         self.connect()
         if self.session is not None:
             logger.debug(f"Sending {route.method} request to {route.url}")
