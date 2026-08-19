@@ -1,6 +1,7 @@
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 from pokelance.models import BaseModel
 from pokelance.models.common import NamedResource, VersionEncounterDetail
@@ -29,6 +30,7 @@ class EncounterVersionDetails(BaseModel):
     version: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "EncounterVersionDetails":
         return cls(
             raw=payload,
@@ -53,6 +55,7 @@ class EncounterMethodRate(BaseModel):
     version_details: list[EncounterVersionDetails] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "EncounterMethodRate":
         return cls(
             raw=payload,
@@ -77,6 +80,7 @@ class PokemonEncounter(BaseModel):
     version_details: list[VersionEncounterDetail] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonEncounter":
         return cls(
             raw=payload,
@@ -104,6 +108,7 @@ class PalParkEncounterSpecies(BaseModel):
     pokemon_species: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PalParkEncounterSpecies":
         return cls(
             raw=payload,

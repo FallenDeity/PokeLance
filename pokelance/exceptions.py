@@ -1,5 +1,7 @@
 import typing as t
 
+from typing_extensions import override
+
 if t.TYPE_CHECKING:
     from pokelance.http import Route
 
@@ -37,6 +39,7 @@ class PokeLanceException(Exception):  # ruff: ignore[error-suffix-on-exception-n
         self.route = route
         super().__init__(message)
 
+    @override
     def __str__(self) -> str:
         return f"{self.message} | {self.route!s}"
 
@@ -67,6 +70,7 @@ class HTTPException(PokeLanceException):
         self.status = status
         super().__init__(message, route)
 
+    @override
     def __str__(self) -> str:
         return f"{self.message} | {self.route!s} | {self.status}"
 
@@ -118,6 +122,7 @@ class ResourceNotFound(NotFound):
         self.suggestions = suggestions
         super().__init__(message, route, status)
 
+    @override
     def __str__(self) -> str:
         message = self.message
         if self.suggestions:
@@ -141,6 +146,7 @@ class ImageNotFound(NotFound):
     def __init__(self, message: str, route: "Route", status: int) -> None:
         super().__init__(message, route, status)
 
+    @override
     def __str__(self) -> str:
         return f"{self.message} | {self.route!s} | {self.status}"
 
@@ -161,6 +167,7 @@ class AudioNotFound(NotFound):
     def __init__(self, message: str, route: "Route", status: int) -> None:
         super().__init__(message, route, status)
 
+    @override
     def __str__(self) -> str:
         return f"{self.message} | {self.route!s} | {self.status}"
 

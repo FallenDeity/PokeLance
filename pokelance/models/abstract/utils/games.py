@@ -1,6 +1,7 @@
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 from pokelance.models import BaseModel
 from pokelance.models.common import NamedResource
@@ -24,6 +25,7 @@ class PokemonEntry(BaseModel):
     pokemon_species: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonEntry":
         return cls(
             raw=payload,

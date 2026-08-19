@@ -1,6 +1,7 @@
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 from pokelance.constants import PokemonFormTriggerEnum
 from pokelance.models import BaseModel
@@ -92,6 +93,7 @@ class Animated(BaseSprite):
     """
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Animated":
         return cls(
             raw=payload,
@@ -116,6 +118,7 @@ class ShowdownSprites(BaseSprite):
     """
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "ShowdownSprites":
         return cls(
             raw=payload,
@@ -161,6 +164,7 @@ class VersionSprite(BaseSprite):
     animated: Animated = attrs.field(factory=Animated)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "VersionSprite":
         return cls(
             raw=payload,
@@ -198,6 +202,7 @@ class GenerationI(Generation):
     yellow: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationI":
         return cls(
             raw=payload,
@@ -225,6 +230,7 @@ class GenerationII(Generation):
     silver: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationII":
         return cls(
             raw=payload,
@@ -253,6 +259,7 @@ class GenerationIII(Generation):
     ruby_sapphire: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationIII":
         return cls(
             raw=payload,
@@ -281,6 +288,7 @@ class GenerationIV(Generation):
     platinum: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationIV":
         return cls(
             raw=payload,
@@ -303,6 +311,7 @@ class GenerationV(Generation):
     black_white: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationV":
         return cls(
             raw=payload,
@@ -326,6 +335,7 @@ class GenerationVI(Generation):
     x_y: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationVI":
         return cls(
             raw=payload,
@@ -350,6 +360,7 @@ class GenerationVII(Generation):
     ultra_sun_ultra_moon: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationVII":
         return cls(
             raw=payload,
@@ -371,6 +382,7 @@ class GenerationVIII(Generation):
     icons: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationVIII":
         return cls(
             raw=payload,
@@ -412,6 +424,7 @@ class Versions(BaseModel):
     generation_viii: GenerationVIII = attrs.field(factory=GenerationVIII)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Versions":
         return cls(
             raw=payload,
@@ -442,6 +455,7 @@ class DreamWorld(BaseModel):
     front_female: str | None = attrs.field(default=None)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "DreamWorld":
         return cls(
             raw=payload,
@@ -472,6 +486,7 @@ class Home(BaseModel):
     front_shiny_female: str | None = attrs.field(default=None)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Home":
         return cls(
             raw=payload,
@@ -498,6 +513,7 @@ class OfficialArtwork(BaseModel):
     front_shiny: str | None = attrs.field(default=None)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "OfficialArtwork":
         return cls(
             raw=payload,
@@ -528,6 +544,7 @@ class Other(BaseModel):
     showdown: ShowdownSprites = attrs.field(factory=ShowdownSprites)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Other":
         return cls(
             raw=payload,
@@ -555,6 +572,7 @@ class PokemonCries(BaseModel):
     legacy: str | None = attrs.field(default=None)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonCries":
         return cls(
             raw=payload,
@@ -579,6 +597,7 @@ class TypeIcon(BaseModel):
     symbol_icon: str | None = attrs.field(default=None)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIcon":
         return cls(
             raw=payload,
@@ -617,6 +636,7 @@ class TypeIconGenerationIII(TypeIconGeneration):
     xd: TypeIcon = attrs.field(factory=TypeIcon)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIconGenerationIII":
         return cls(
             raw=payload,
@@ -647,6 +667,7 @@ class TypeIconGenerationIV(TypeIconGeneration):
     platinum: TypeIcon = attrs.field(factory=TypeIcon)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIconGenerationIV":
         return cls(
             raw=payload,
@@ -672,6 +693,7 @@ class TypeIconGenerationV(TypeIconGeneration):
     black_2_white_2: TypeIcon = attrs.field(factory=TypeIcon)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIconGenerationV":
         return cls(
             raw=payload,
@@ -696,6 +718,7 @@ class TypeIconGenerationVI(TypeIconGeneration):
     omega_ruby_alpha_sapphire: TypeIcon = attrs.field(factory=TypeIcon)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIconGenerationVI":
         return cls(
             raw=payload,
@@ -723,6 +746,7 @@ class TypeIconGenerationVII(TypeIconGeneration):
     lets_go_pikachu_lets_go_eevee: TypeIcon = attrs.field(factory=TypeIcon)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIconGenerationVII":
         return cls(
             raw=payload,
@@ -751,6 +775,7 @@ class TypeIconGenerationVIII(TypeIconGeneration):
     legends_arceus: TypeIcon = attrs.field(factory=TypeIcon)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIconGenerationVIII":
         return cls(
             raw=payload,
@@ -771,6 +796,7 @@ class TypeIconGenerationIX(TypeIconGeneration):
     scarlet_violet: TypeIcon = attrs.field(factory=TypeIcon)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIconGenerationIX":
         return cls(
             raw=payload,
@@ -809,6 +835,7 @@ class TypeIcons(BaseModel):
     generation_ix: TypeIconGenerationIX = attrs.field(factory=TypeIconGenerationIX)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "TypeIcons":
         return cls(
             raw=payload,
@@ -838,6 +865,7 @@ class AbilityEffectChange(BaseModel):
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "AbilityEffectChange":
         return cls(
             raw=payload,
@@ -865,6 +893,7 @@ class AbilityFlavorText(BaseModel):
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "AbilityFlavorText":
         return cls(
             raw=payload,
@@ -893,6 +922,7 @@ class AbilityPokemon(BaseModel):
     pokemon: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "AbilityPokemon":
         return cls(
             raw=payload,
@@ -918,6 +948,7 @@ class PokemonSpeciesGender(BaseModel):
     pokemon_species: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonSpeciesGender":
         return cls(
             raw=payload,
@@ -942,6 +973,7 @@ class GrowthRateExperienceLevel(BaseModel):
     experience: int = attrs.field(factory=int)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "GrowthRateExperienceLevel":
         return cls(
             raw=payload,
@@ -966,6 +998,7 @@ class NatureStatChange(BaseModel):
     pokeathlon_stat: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "NatureStatChange":
         return cls(
             raw=payload,
@@ -993,6 +1026,7 @@ class MoveBattleStylePreference(BaseModel):
     move_battle_style: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "MoveBattleStylePreference":
         return cls(
             raw=payload,
@@ -1018,6 +1052,7 @@ class NaturePokeathlonStatAffect(BaseModel):
     nature: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "NaturePokeathlonStatAffect":
         return cls(
             raw=payload,
@@ -1042,6 +1077,7 @@ class NaturePokeathlonStatAffectSet(BaseModel):
     decrease: list[NaturePokeathlonStatAffect] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "NaturePokeathlonStatAffectSet":
         return cls(
             raw=payload,
@@ -1069,6 +1105,7 @@ class PokemonAbility(BaseModel):
     ability: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonAbility":
         return cls(
             raw=payload,
@@ -1097,6 +1134,7 @@ class PokemonPastAbility(BaseModel):
     ability: NamedResource | None = attrs.field(default=None)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonPastAbility":
         return cls(
             raw=payload,
@@ -1122,6 +1160,7 @@ class PokemonType(BaseModel):
     type: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonType":
         return cls(
             raw=payload,
@@ -1146,6 +1185,7 @@ class PokemonFormType(BaseModel):
     type: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonFormType":
         return cls(
             raw=payload,
@@ -1170,6 +1210,7 @@ class PokemonTypePast(BaseModel):
     types: list[PokemonType] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonTypePast":
         return cls(
             raw=payload,
@@ -1194,6 +1235,7 @@ class PokemonAbilityPast(BaseModel):
     abilities: list[PokemonPastAbility] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonAbilityPast":
         return cls(
             raw=payload,
@@ -1218,6 +1260,7 @@ class PokemonHeldItemVersion(BaseModel):
     rarity: int = attrs.field(factory=int)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonHeldItemVersion":
         return cls(
             raw=payload,
@@ -1242,6 +1285,7 @@ class PokemonHeldItem(BaseModel):
     version_details: list[PokemonHeldItemVersion] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonHeldItem":
         return cls(
             raw=payload,
@@ -1272,6 +1316,7 @@ class PokemonMoveVersion(BaseModel):
     order: int | None = attrs.field(default=None)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonMoveVersion":
         return cls(
             raw=payload,
@@ -1298,6 +1343,7 @@ class PokemonMove(BaseModel):
     version_group_details: list[PokemonMoveVersion] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonMove":
         return cls(
             raw=payload,
@@ -1327,6 +1373,7 @@ class PokemonStat(BaseModel):
     base_stat: int = attrs.field(factory=int)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonStat":
         return cls(
             raw=payload,
@@ -1352,6 +1399,7 @@ class PokemonStatPast(BaseModel):
     stats: list[PokemonStat] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonStatPast":
         return cls(
             raw=payload,
@@ -1376,6 +1424,7 @@ class PokemonSprite(BaseSprite):
     versions: Versions = attrs.field(factory=Versions)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonSprite":
         return cls(
             raw=payload,
@@ -1429,6 +1478,7 @@ class PokemonFormSprites(BaseModel):
     versions: Versions = attrs.field(factory=Versions)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonFormSprites":
         return cls(
             raw=payload,
@@ -1463,6 +1513,7 @@ class PokemonFormTriggerCondition(BaseModel):
     url: str = attrs.field(factory=str)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonFormTriggerCondition":
         return cls(
             raw=payload,
@@ -1488,6 +1539,7 @@ class AwesomeName(BaseModel):
     language: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "AwesomeName":
         return cls(
             raw=payload,
@@ -1512,6 +1564,7 @@ class Genus(BaseModel):
     language: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Genus":
         return cls(
             raw=payload,
@@ -1536,6 +1589,7 @@ class PokemonSpeciesDexEntry(BaseModel):
     pokedex: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonSpeciesDexEntry":
         return cls(
             raw=payload,
@@ -1563,6 +1617,7 @@ class PalParkEncounterArea(BaseModel):
     area: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PalParkEncounterArea":
         return cls(
             raw=payload,
@@ -1588,6 +1643,7 @@ class PokemonSpeciesVariety(BaseModel):
     pokemon: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonSpeciesVariety":
         return cls(
             raw=payload,
@@ -1612,6 +1668,7 @@ class MoveStatAffect(BaseModel):
     move: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "MoveStatAffect":
         return cls(
             raw=payload,
@@ -1636,6 +1693,7 @@ class MoveStatAffectSets(BaseModel):
     decrease: list[MoveStatAffect] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "MoveStatAffectSets":
         return cls(
             raw=payload,
@@ -1660,6 +1718,7 @@ class NatureStatAffectSets(BaseModel):
     decrease: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "NatureStatAffectSets":
         return cls(
             raw=payload,
@@ -1684,6 +1743,7 @@ class TypePokemon(BaseModel):
     pokemon: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "TypePokemon":
         return cls(
             raw=payload,
@@ -1720,6 +1780,7 @@ class TypeRelations(BaseModel):
     double_damage_from: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "TypeRelations":
         return cls(
             raw=payload,
@@ -1748,6 +1809,7 @@ class TypeRelationsPast(BaseModel):
     damage_relations: TypeRelations = attrs.field(factory=TypeRelations)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "TypeRelationsPast":
         return cls(
             raw=payload,

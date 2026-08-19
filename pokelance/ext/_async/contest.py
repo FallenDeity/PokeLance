@@ -7,6 +7,8 @@ from __future__ import annotations
 import asyncio
 import typing as t
 
+from typing_extensions import override
+
 from pokelance.endpoints import Endpoint
 from pokelance.ext._async._base import AsyncBaseExtension
 
@@ -25,6 +27,7 @@ __all__: tuple[str, ...] = ("Contest", "setup")
 class Contest(_Base):
     """Extension for contest related endpoints."""
 
+    @override
     async def setup(self) -> None:
         routes = {
             "contest_type": Endpoint.get_contest_type_endpoints(),

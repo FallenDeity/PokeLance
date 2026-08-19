@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 from pokelance.constants import get_base_url, validate_url
 
@@ -38,6 +39,7 @@ class Route:
     method: str = "GET"
     payload: dict[str, t.Any] | None = None
 
+    @override
     def __str__(self) -> str:
         return f"<Route endpoint={self.endpoint} method={self.method}>"
 

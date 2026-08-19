@@ -92,6 +92,12 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path, w
         [
             # import typing as t
             ast.Import(names=[ast.alias(name="typing", asname="t")]),
+            # from typing_extensions import override
+            ast.ImportFrom(
+                module="typing_extensions",
+                names=[ast.alias(name="override")],
+                level=0,
+            ),
             # from pokelance.ext.<_async/sync>._base import <AsyncBaseExtension / SyncBaseExtension>
             ast.ImportFrom(
                 module=base_ext_mod,
@@ -382,7 +388,7 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path, w
                 ),
                 returns=ast.Constant(value=None),
                 body=setup_stmts,
-                decorator_list=[],
+                decorator_list=[ast.Name(id="override", ctx=ast.Load())],
             )
         )
     else:
@@ -394,7 +400,7 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path, w
                 ),
                 returns=ast.Constant(value=None),
                 body=setup_stmts,
-                decorator_list=[],
+                decorator_list=[ast.Name(id="override", ctx=ast.Load())],
             )
         )
 

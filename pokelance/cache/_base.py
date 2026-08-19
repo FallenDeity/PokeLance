@@ -4,6 +4,7 @@ import typing as t
 from collections import OrderedDict
 
 import attrs
+from typing_extensions import override
 
 from pokelance.endpoints import Route
 from pokelance.models import BaseModel
@@ -45,6 +46,7 @@ class CacheEndpoint:
     id: str | int = attrs.field(factory=str)
     url: str = attrs.field(factory=str)
 
+    @override
     def __str__(self) -> str:
         return str(self.id)
 
@@ -133,6 +135,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
             return t.cast("_VT", [self._model.from_payload(item) for item in payload])
         return t.cast("_VT", self._model.from_payload(payload))
 
+    @override
     def __getitem__(self, key: _KT) -> _VT:
         try:
             val = self._cache[key]
@@ -143,6 +146,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
             self._stats.misses += 1
             raise
 
+    @override
     def __setitem__(self, key: _KT, value: _VT) -> None:
         self._stats.sets += 1
         if key in self._cache:
@@ -154,27 +158,35 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
                 self._stats.evictions += 1
             self._cache[key] = value
 
+    @override
     def __delitem__(self, key: _KT) -> None:
         del self._cache[key]
 
+    @override
     def __len__(self) -> int:
         return len(self._cache)
 
+    @override
     def __iter__(self) -> t.Iterator[_KT]:
         return iter(self._cache)
 
+    @override
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self._cache})"
 
+    @override
     def keys(self) -> t.KeysView[_KT]:
         return self._cache.keys()
 
+    @override
     def values(self) -> t.ValuesView[_VT]:
         return self._cache.values()
 
+    @override
     def items(self) -> t.ItemsView[_KT, _VT]:
         return self._cache.items()
 
+    @override
     def setdefault(self, __key: _KT, /, __default: _VT | None = None) -> _VT:
         if __key not in self._cache and __default is not None:
             self[__key] = __default
@@ -183,6 +195,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         self._cache.move_to_end(__key)
         return self._cache[__key]
 
+    @override
     def clear(self) -> None:
         """Clear the cached data only. The endpoint registry is left intact."""
         self._cache.clear()
@@ -202,6 +215,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         self._identifiers.clear()
         self._endpoints_cached = False
 
+    @override
     def get(self, key: _KT, default: _VT | None = None) -> _VT | None:  # pyright: ignore[reportIncompatibleMethodOverride]
         """Get an item from the cache. If the exact key isn't found, attempt alias resolution."""
         if key in self._cache:

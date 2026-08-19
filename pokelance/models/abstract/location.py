@@ -1,6 +1,7 @@
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 from pokelance.models import BaseModel
 from pokelance.models.common import GenerationGameIndex, Name, NamedResource
@@ -44,6 +45,7 @@ class Location(BaseModel):
     areas: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Location":
         return cls(
             raw=payload,
@@ -90,6 +92,7 @@ class LocationArea(BaseModel):
     pokemon_encounters: list[PokemonEncounter] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "LocationArea":
         return cls(
             raw=payload,
@@ -128,6 +131,7 @@ class PalParkArea(BaseModel):
     pokemon_encounters: list[PalParkEncounterSpecies] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PalParkArea":
         return cls(
             raw=payload,
@@ -169,6 +173,7 @@ class Region(BaseModel):
     version_groups: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Region":
         return cls(
             raw=payload,

@@ -1,6 +1,7 @@
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 from pokelance.models import BaseModel
 from pokelance.models.common import (
@@ -75,6 +76,7 @@ class Item(BaseModel):
     machines: list[MachineVersionDetail] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Item":
         return cls(
             raw=payload,
@@ -129,6 +131,7 @@ class ItemAttribute(BaseModel):
     descriptions: list[Description] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "ItemAttribute":
         return cls(
             raw=payload,
@@ -165,6 +168,7 @@ class ItemCategory(BaseModel):
     pocket: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "ItemCategory":
         return cls(
             raw=payload,
@@ -198,6 +202,7 @@ class ItemFlingEffect(BaseModel):
     items: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "ItemFlingEffect":
         return cls(
             raw=payload,
@@ -230,6 +235,7 @@ class ItemPocket(BaseModel):
     names: list[Name] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "ItemPocket":
         return cls(
             raw=payload,
@@ -259,6 +265,7 @@ class Currency(BaseModel):
     names: list[Name] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Currency":
         return cls(
             raw=payload,

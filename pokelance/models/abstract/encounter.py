@@ -1,6 +1,7 @@
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 from pokelance.models import BaseModel
 from pokelance.models.common import Name, NamedResource
@@ -34,6 +35,7 @@ class EncounterMethod(BaseModel):
     names: list[Name] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "EncounterMethod":
         return cls(
             raw=payload,
@@ -66,6 +68,7 @@ class EncounterCondition(BaseModel):
     values: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "EncounterCondition":
         return cls(
             raw=payload,
@@ -98,6 +101,7 @@ class EncounterConditionValue(BaseModel):
     names: list[Name] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "EncounterConditionValue":
         return cls(
             raw=payload,

@@ -12,6 +12,8 @@ import traceback
 import typing as t
 from logging.handlers import RotatingFileHandler
 
+from typing_extensions import override
+
 if t.TYPE_CHECKING:
     from types import TracebackType
 
@@ -68,6 +70,7 @@ class LogLevelColors(enum.StrEnum):
 
 
 class RelativePathFilter(logging.Filter):
+    @override
     def filter(self, record: logging.LogRecord) -> bool:
         record.pathname = record.pathname.replace(os.getcwd(), "~")
         return True
@@ -92,6 +95,7 @@ class TextFormatter(logging.Formatter):
         super().__init__(fmt=fmt, datefmt=datefmt)
         self.use_colors = use_colors
 
+    @override
     def format(self, record: logging.LogRecord) -> str:
         formatted = super().format(record)
         if self.use_colors:
@@ -112,6 +116,7 @@ class JSONFormatter(logging.Formatter):
         super().__init__("%(levelname)s %(name)s %(message)s", datefmt=datefmt)
         self.use_colors = use_colors
 
+    @override
     def format(self, record: logging.LogRecord) -> str:
         json_log: dict[str, t.Any] = {
             "asctime": self.formatTime(record, self.datefmt),
@@ -177,6 +182,7 @@ class DailyRotatingFileHandler(RotatingFileHandler):
         self.setFormatter(JSONFormatter(use_colors=False) if structured else TextFormatter(use_colors=False))
         self.addFilter(RelativePathFilter())
 
+    @override
     def emit(self, record: logging.LogRecord) -> None:
         """Emit a log record."""
         now = datetime.datetime.now(datetime.timezone.utc)

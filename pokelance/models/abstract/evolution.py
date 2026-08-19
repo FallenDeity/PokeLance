@@ -1,6 +1,7 @@
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 from pokelance.models import BaseModel
 from pokelance.models.common import Name, NamedResource
@@ -35,6 +36,7 @@ class EvolutionChain(BaseModel):
     chain: ChainLink = attrs.field(factory=ChainLink)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "EvolutionChain":
         return cls(
             raw=payload,
@@ -66,6 +68,7 @@ class EvolutionTrigger(BaseModel):
     pokemon_species: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "EvolutionTrigger":
         return cls(
             raw=payload,

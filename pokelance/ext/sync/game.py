@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import typing as t
 
+from typing_extensions import override
+
 from pokelance.endpoints import Endpoint
 from pokelance.ext.sync._base import SyncBaseExtension
 
@@ -24,6 +26,7 @@ __all__: tuple[str, ...] = ("Game", "setup")
 class Game(_Base):
     """Extension for game related endpoints."""
 
+    @override
     def setup(self) -> None:
         routes = {
             "generation": Endpoint.get_generation_endpoints(),

@@ -3,6 +3,7 @@ from __future__ import annotations
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 from pokelance.constants import GenderEnum
 from pokelance.models import BaseModel
@@ -129,6 +130,7 @@ class EvolutionDetail(BaseModel):
         return simplified_details
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> EvolutionDetail:
         return cls(
             raw=payload,
@@ -186,6 +188,7 @@ class ChainLink(BaseModel):
     evolves_to: list[ChainLink] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> ChainLink:
         return cls(
             raw=payload,

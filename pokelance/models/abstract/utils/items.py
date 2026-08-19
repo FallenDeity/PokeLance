@@ -1,6 +1,7 @@
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 from pokelance.models import BaseModel
 from pokelance.models.common import NamedResource
@@ -26,6 +27,7 @@ class ItemSprites(BaseModel):
     default: str | None = attrs.field(default=None)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "ItemSprites":
         return cls(raw=payload, default=payload.get("default"))
 
@@ -46,6 +48,7 @@ class ItemHolderPokemonVersionDetail(BaseModel):
     version: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "ItemHolderPokemonVersionDetail":
         return cls(
             raw=payload,
@@ -70,6 +73,7 @@ class ItemHolderPokemon(BaseModel):
     version_details: list[ItemHolderPokemonVersionDetail] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "ItemHolderPokemon":
         return cls(
             raw=payload,
@@ -103,6 +107,7 @@ class ItemPrice(BaseModel):
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "ItemPrice":
         return cls(
             raw=payload,

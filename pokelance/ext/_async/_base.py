@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 import typing as t
 
-from typing_extensions import TypeVar
+from typing_extensions import TypeVar, override
 
 from pokelance.cache._async.manager import AsyncCacheManager
 from pokelance.ext._base import BaseExtension
@@ -30,6 +30,7 @@ class AsyncBaseExtension(
     """Abstract base class for asynchronous extensions."""
 
     @abc.abstractmethod
+    @override
     async def setup(self) -> None:
         """Sets up the extension asynchronously."""
         raise NotImplementedError

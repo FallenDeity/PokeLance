@@ -22,6 +22,7 @@ Coverage
 import typing as t
 
 import pytest
+from typing_extensions import override
 
 from pokelance.exceptions import (
     AudioNotFound,
@@ -44,7 +45,7 @@ from pokelance.exceptions import (
 
 
 class _FakeRoute:
-    @t.override
+    @override
     def __str__(self) -> str:
         return "/fake/route"
 

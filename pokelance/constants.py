@@ -6,6 +6,7 @@ import re
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 __all__: tuple[str, ...] = (
     "DEFAULT_BASE_URL",
@@ -74,6 +75,7 @@ class BaseEnum(enum.Enum):
         """
         return self.value
 
+    @override
     def __str__(self) -> str:
         """
         Get the string representation of the enum.

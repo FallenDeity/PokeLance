@@ -1,6 +1,7 @@
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 from pokelance.models import BaseModel
 from pokelance.models.common import Name, NamedResource
@@ -64,6 +65,7 @@ class Berry(BaseModel):
     natural_gift_type: NamedResource | None = attrs.field(default=None)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Berry":
         return cls(
             raw=payload,
@@ -104,6 +106,7 @@ class BerryFirmness(BaseModel):
     names: list[Name] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "BerryFirmness":
         return cls(
             raw=payload,
@@ -139,6 +142,7 @@ class BerryFlavor(BaseModel):
     names: list[Name] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "BerryFlavor":
         return cls(
             raw=payload,

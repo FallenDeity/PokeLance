@@ -1,6 +1,7 @@
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 from pokelance.models import BaseModel
 
@@ -23,6 +24,7 @@ class Resource(BaseModel):
     url: str = attrs.field(factory=str)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Resource":
         return cls(
             raw=payload,
@@ -46,5 +48,6 @@ class NamedResource(BaseModel):
     url: str = attrs.field(factory=str)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, str]) -> "NamedResource":
         return cls(raw=payload, name=payload.get("name", ""), url=payload.get("url", ""))

@@ -1,6 +1,7 @@
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 from pokelance.models import BaseModel
 from pokelance.models.common import Description, MachineVersionDetail, Name, NamedResource, Resource, VerboseEffect
@@ -108,6 +109,7 @@ class Move(BaseModel):
     type: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Move":
         return cls(
             raw=payload,
@@ -161,6 +163,7 @@ class MoveAilment(BaseModel):
     names: list[Name] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "MoveAilment":
         return cls(
             raw=payload,
@@ -191,6 +194,7 @@ class MoveBattleStyle(BaseModel):
     names: list[Name] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "MoveBattleStyle":
         return cls(
             raw=payload,
@@ -223,6 +227,7 @@ class MoveCategory(BaseModel):
     descriptions: list[Description] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "MoveCategory":
         return cls(
             raw=payload,
@@ -259,6 +264,7 @@ class MoveDamageClass(BaseModel):
     names: list[Name] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "MoveDamageClass":
         return cls(
             raw=payload,
@@ -296,6 +302,7 @@ class MoveLearnMethod(BaseModel):
     version_groups: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "MoveLearnMethod":
         return cls(
             raw=payload,
@@ -333,6 +340,7 @@ class MoveTarget(BaseModel):
     names: list[Name] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "MoveTarget":
         return cls(
             raw=payload,

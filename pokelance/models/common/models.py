@@ -1,6 +1,7 @@
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 from pokelance.models import BaseModel
 
@@ -39,6 +40,7 @@ class Description(BaseModel):
     language: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Description":
         return cls(
             raw=payload,
@@ -63,6 +65,7 @@ class Effect(BaseModel):
     language: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Effect":
         return cls(
             raw=payload,
@@ -93,6 +96,7 @@ class EncounterPokemonDetail(BaseModel):
     is_alpha: bool = attrs.field(factory=bool)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "EncounterPokemonDetail":
         return cls(
             raw=payload,
@@ -131,6 +135,7 @@ class Encounter(BaseModel):
     pokemon_details: EncounterPokemonDetail | None = attrs.field(default=None)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Encounter":
         return cls(
             raw=payload,
@@ -162,6 +167,7 @@ class FlavorText(BaseModel):
     version: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "FlavorText":
         return cls(
             raw=payload,
@@ -187,6 +193,7 @@ class GenerationGameIndex(BaseModel):
     generation: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationGameIndex":
         return cls(
             raw=payload,
@@ -211,6 +218,7 @@ class MachineVersionDetail(BaseModel):
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "MachineVersionDetail":
         return cls(
             raw=payload,
@@ -235,6 +243,7 @@ class Name(BaseModel):
     language: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Name":
         return cls(
             raw=payload,
@@ -262,6 +271,7 @@ class VerboseEffect(BaseModel):
     language: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "VerboseEffect":
         return cls(
             raw=payload,
@@ -290,6 +300,7 @@ class VersionEncounterDetail(BaseModel):
     encounter_details: list[Encounter] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "VersionEncounterDetail":
         return cls(
             raw=payload,
@@ -315,6 +326,7 @@ class VersionGameIndex(BaseModel):
     version: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "VersionGameIndex":
         return cls(
             raw=payload,
@@ -342,6 +354,7 @@ class VersionGroupFlavorText(BaseModel):
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "VersionGroupFlavorText":
         return cls(
             raw=payload,
@@ -379,6 +392,7 @@ class Language(BaseModel):
     names: list[Name] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Language":
         return cls(
             raw=payload,
@@ -410,6 +424,7 @@ class APIMetadata(BaseModel):
     tag: str | None = attrs.field(default=None)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "APIMetadata":
         return cls(
             raw=payload,

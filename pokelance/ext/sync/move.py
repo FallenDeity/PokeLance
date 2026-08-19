@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import typing as t
 
+from typing_extensions import override
+
 from pokelance.endpoints import Endpoint
 from pokelance.ext.sync._base import SyncBaseExtension
 
@@ -24,6 +26,7 @@ __all__: tuple[str, ...] = ("Move", "setup")
 class Move(_Base):
     """Extension for move related endpoints."""
 
+    @override
     def setup(self) -> None:
         routes = {
             "move": Endpoint.get_move_endpoints(),

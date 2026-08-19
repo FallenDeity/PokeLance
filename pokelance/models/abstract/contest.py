@@ -1,6 +1,7 @@
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 from pokelance.models import BaseModel
 from pokelance.models.common import Effect, NamedResource
@@ -36,6 +37,7 @@ class ContestType(BaseModel):
     names: list[ContestName] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "ContestType":
         return cls(
             raw=payload,
@@ -71,6 +73,7 @@ class ContestEffect(BaseModel):
     flavor_text_entries: list[ContestEffectFlavorText] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "ContestEffect":
         return cls(
             raw=payload,
@@ -107,6 +110,7 @@ class SuperContestEffect(BaseModel):
     moves: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "SuperContestEffect":
         return cls(
             raw=payload,

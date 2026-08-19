@@ -1,6 +1,7 @@
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 from pokelance.models import BaseModel
 from pokelance.models.common import NamedResource, VerboseEffect
@@ -31,6 +32,7 @@ class ContestComboDetail(BaseModel):
     use_after: list[NamedResource] | None = attrs.field(default=None)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "ContestComboDetail":
         return cls(
             raw=payload,
@@ -55,6 +57,7 @@ class ContestComboSet(BaseModel):
     super: ContestComboDetail = attrs.field(factory=ContestComboDetail)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "ContestComboSet":
         return cls(
             raw=payload,
@@ -82,6 +85,7 @@ class MoveFlavorText(BaseModel):
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "MoveFlavorText":
         return cls(
             raw=payload,
@@ -137,6 +141,7 @@ class MoveMetaData(BaseModel):
     stat_chance: int = attrs.field(factory=int)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "MoveMetaData":
         return cls(
             raw=payload,
@@ -171,6 +176,7 @@ class MoveStatChange(BaseModel):
     stat: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "MoveStatChange":
         return cls(
             raw=payload,
@@ -210,6 +216,7 @@ class PastMoveStatValues(BaseModel):
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PastMoveStatValues":
         return cls(
             raw=payload,

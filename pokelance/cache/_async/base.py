@@ -8,6 +8,7 @@ import typing as t
 
 import aiofiles
 import attrs
+from typing_extensions import override
 
 from pokelance.cache._base import BaseCacheGroup, BaseCacheState, CacheEndpoint
 from pokelance.endpoints import Route
@@ -71,11 +72,13 @@ class AsyncCache(_BaseCacheState[_KT, _VT], t.Generic[_KT, _VT]):
         """Wait until the cache is ready."""
         await self._ready.wait()
 
+    @override
     def set_ready(self) -> None:
         """Set the cache as ready."""
         super().set_ready()
         self._ready.set()
 
+    @override
     def reset_endpoints(self) -> None:
         """Reset endpoints and clear readiness event."""
         super().reset_endpoints()

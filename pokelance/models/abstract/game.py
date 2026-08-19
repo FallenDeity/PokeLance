@@ -1,6 +1,7 @@
 import typing as t
 
 import attrs
+from typing_extensions import override
 
 from pokelance.models import BaseModel
 from pokelance.models.common import Description, Name, NamedResource
@@ -52,6 +53,7 @@ class Generation(BaseModel):
     version_groups: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Generation":
         return cls(
             raw=payload,
@@ -101,6 +103,7 @@ class Pokedex(BaseModel):
     version_groups: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Pokedex":
         return cls(
             raw=payload,
@@ -137,6 +140,7 @@ class Version(BaseModel):
     version_group: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "Version":
         return cls(
             raw=payload,
@@ -181,6 +185,7 @@ class VersionGroup(BaseModel):
     versions: list[NamedResource] = attrs.field(factory=list)
 
     @classmethod
+    @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "VersionGroup":
         return cls(
             raw=payload,

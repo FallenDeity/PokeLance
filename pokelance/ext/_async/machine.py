@@ -7,6 +7,8 @@ from __future__ import annotations
 import asyncio
 import typing as t
 
+from typing_extensions import override
+
 from pokelance.endpoints import Endpoint
 from pokelance.ext._async._base import AsyncBaseExtension
 
@@ -25,6 +27,7 @@ __all__: tuple[str, ...] = ("Machine", "setup")
 class Machine(_Base):
     """Extension for machine related endpoints."""
 
+    @override
     async def setup(self) -> None:
         routes = {"machine": Endpoint.get_machine_endpoints()}
         results = await asyncio.gather(*(self._client.request(r) for r in routes.values()))
