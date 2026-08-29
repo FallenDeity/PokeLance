@@ -152,7 +152,7 @@ def test_resource_not_found_str_with_suggestions() -> None:
 
 def test_resource_not_found_suggestions_none_by_default() -> None:
     exc = ResourceNotFound("not found", ROUTE, 404)
-    assert exc.suggestions is None
+    assert exc.suggestions == []
 
 
 def test_resource_not_found_suggestions_stored() -> None:
