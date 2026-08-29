@@ -90,7 +90,7 @@ class EvolutionDetail(BaseModel):
     is_default: bool = attrs.field(factory=bool)
     item: NamedResource | None = attrs.field(default=None)
     trigger: NamedResource = attrs.field(factory=NamedResource)
-    gender: GenderEnum | None = attrs.field(converter=GenderEnum.from_int)  # type: ignore[misc]
+    gender: GenderEnum | None = attrs.field(converter=GenderEnum.from_int)
     held_item: NamedResource | None = attrs.field(default=None)
     known_move: NamedResource | None = attrs.field(default=None)
     known_move_type: NamedResource | None = attrs.field(default=None)
@@ -125,7 +125,7 @@ class EvolutionDetail(BaseModel):
         simplified_details: dict[str, t.Any] = {
             k: v
             for k, v in self.to_dict().items()
-            if ((is_dict := isinstance(v, dict)) and v.get("name") and v.get("url")) or (not is_dict and v)
+            if ((is_dict := isinstance(v, dict)) and v.get("name") and v.get("url")) or (not is_dict and v)  # pyright: ignore[reportUnknownMemberType]
         }
         return simplified_details
 

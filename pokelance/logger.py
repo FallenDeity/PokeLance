@@ -54,7 +54,7 @@ BASE_DICT_ATTRS: tuple[str, ...] = (
 )
 
 
-class LogLevelColors(enum.StrEnum):
+class LogLevelColors(str, enum.Enum):
     """Colors for the log levels."""
 
     DEBUG = "\033[96m"
@@ -76,7 +76,7 @@ class RelativePathFilter(logging.Filter):
         return True
 
 
-def _pass_args(args: t.Sequence[t.Any], msg: str) -> str:
+def _pass_args(args: t.Sequence[t.Any] | t.Mapping[str, t.Any] | None, msg: str) -> str:
     msg = str(msg)
     if args:
         msg = msg % tuple(args)
@@ -140,7 +140,7 @@ class JSONFormatter(logging.Formatter):
         for attr in record.__dict__:
             if attr not in BASE_DICT_ATTRS:
                 if attr == "color_message" and self.use_colors:
-                    json_log["message"] = _pass_args(record.args, getattr(record, attr))  # type: ignore[arg-type]
+                    json_log["message"] = _pass_args(record.args, getattr(record, attr))
                 elif attr == "color_message" and not self.use_colors:
                     pass
                 else:

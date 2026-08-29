@@ -187,7 +187,7 @@ def test_sync_round_trip_encounter_values_match(sync_cached_client: pokelance.Po
             new_client.http.cache_manager.pokemon.location_area_encounter.load(tmpdir)
             route = Endpoint.get_location_area_encounter(1)
             loaded = new_client.http.cache_manager.pokemon.location_area_encounter.get(route)
-            assert loaded is not None
+            assert loaded is not None, "Loaded encounter list should not be None."
             loaded_areas = {e.location_area.name for e in loaded if e.location_area}
             assert original_areas == loaded_areas
 

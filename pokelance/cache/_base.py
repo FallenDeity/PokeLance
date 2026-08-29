@@ -10,11 +10,7 @@ from pokelance.endpoints import Route
 from pokelance.models import BaseModel
 
 if t.TYPE_CHECKING:
-    from pokelance.cache._async import AsyncCache
-    from pokelance.cache.sync import SyncCache
     from pokelance.client._base import _ClientBase
-
-    AnyCache = AsyncCache[Route, t.Any] | SyncCache[Route, t.Any]
 
 __all__: tuple[str, ...] = (
     "BaseCacheGroup",
@@ -27,7 +23,7 @@ __all__: tuple[str, ...] = (
 _KT = t.TypeVar("_KT", bound="Route")
 _VT = t.TypeVar("_VT", bound="BaseModel | t.Sequence[BaseModel]")
 _ClientT = t.TypeVar("_ClientT", bound="_ClientBase")
-_CacheT = t.TypeVar("_CacheT", bound="AnyCache")
+_CacheT = t.TypeVar("_CacheT", bound="BaseCacheState[t.Any, t.Any, t.Any]")
 _GroupT = t.TypeVar("_GroupT", bound="BaseCacheGroup[t.Any, t.Any]")
 
 
@@ -216,7 +212,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         self._endpoints_cached = False
 
     @override
-    def get(self, key: _KT, default: _VT | None = None) -> _VT | None:  # pyright: ignore[reportIncompatibleMethodOverride]
+    def get(self, key: _KT, default: _VT | None = None) -> _VT | None:  # ty: ignore[invalid-method-override] # pyright: ignore[reportIncompatibleMethodOverride]
         """Get an item from the cache. If the exact key isn't found, attempt alias resolution."""
         if key in self._cache:
             self._stats.hits += 1
@@ -303,7 +299,7 @@ class BaseCacheGroup(t.Generic[_ClientT, _CacheT]):
     def set_client(self, client: _ClientT) -> None:
         """Set the client for all sub-caches in this group."""
         for cache in self._walk_caches():
-            cache._client = client  # pyright: ignore[reportPrivateUsage, reportAttributeAccessIssue]
+            cache._client = client  # pyright: ignore[reportPrivateUsage]
 
     def set_size(self, max_size: int = 100) -> None:
         """Set the maximum cache size for this group and its sub-caches."""

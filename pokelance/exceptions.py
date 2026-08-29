@@ -119,7 +119,7 @@ class ResourceNotFound(NotFound):
     """
 
     def __init__(self, message: str, route: "Route", status: int, suggestions: list[str] | None = None) -> None:
-        self.suggestions = suggestions
+        self.suggestions = suggestions or []
         super().__init__(message, route, status)
 
     @override

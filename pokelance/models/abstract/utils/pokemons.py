@@ -1514,7 +1514,7 @@ class PokemonFormTriggerCondition(BaseModel):
     """
 
     name: str = attrs.field(factory=str)
-    trigger: PokemonFormTriggerEnum = attrs.field(converter=PokemonFormTriggerEnum.from_str)  # type: ignore[misc]
+    trigger: PokemonFormTriggerEnum = attrs.field(converter=PokemonFormTriggerEnum.from_str)
     url: str = attrs.field(factory=str)
     base_form: NamedResource = attrs.field(factory=NamedResource)
 
@@ -1540,13 +1540,13 @@ class PokemonFormFlavorText(BaseModel):
         The localized flavor text for an API resource in a specific language.
     language: NamedResource
         The language this flavor text is in.
-    version_group: NamedResource
+    version: NamedResource
         The version group that uses this flavor text.
     """
 
     flavor_text: str = attrs.field(factory=str)
     language: NamedResource = attrs.field(factory=NamedResource)
-    version_group: NamedResource = attrs.field(factory=NamedResource)
+    version: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
     @override
@@ -1555,7 +1555,7 @@ class PokemonFormFlavorText(BaseModel):
             raw=payload,
             flavor_text=payload.get("flavor_text", ""),
             language=NamedResource.from_payload(payload.get("language", {})),
-            version_group=NamedResource.from_payload(payload.get("version_group", {})),
+            version=NamedResource.from_payload(payload.get("version", {})),
         )
 
 

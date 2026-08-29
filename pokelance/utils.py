@@ -4,7 +4,6 @@ import asyncio
 import contextlib
 import dataclasses
 import inspect
-from asyncio.coroutines import _is_coroutine  # type: ignore[attr-defined]
 from collections import OrderedDict
 from collections.abc import Callable, Coroutine, Hashable
 from functools import _CacheInfo, _make_key, partial, partialmethod  # pyright: ignore[reportPrivateUsage]
@@ -21,14 +20,12 @@ from typing import (
 
 from typing_extensions import ParamSpec, Self
 
-__version__ = "2.0.4"
-
 __all__ = ("alru_cache",)
 
 
 _P = ParamSpec("_P")
 _P2 = ParamSpec("_P2")
-_T = TypeVar("_T")
+_T = TypeVar("_T", bound=Hashable)
 _R = TypeVar("_R")
 _Coro = Coroutine[Any, Any, _R]
 _CB = Callable[_P, _Coro[_R]]
@@ -67,9 +64,9 @@ class _LRUCacheWrapper(Generic[_P, _R]):
         with contextlib.suppress(AttributeError):
             self.__module__ = fn.__module__
         with contextlib.suppress(AttributeError):
-            self.__name__ = fn.__name__
+            self.__name__ = getattr(fn, "__name__", fn.__class__.__name__)
         with contextlib.suppress(AttributeError):
-            self.__qualname__ = fn.__qualname__
+            self.__qualname__ = getattr(fn, "__qualname__", fn.__class__.__name__)
         with contextlib.suppress(AttributeError):
             self.__doc__ = fn.__doc__
         with contextlib.suppress(AttributeError):
@@ -78,7 +75,10 @@ class _LRUCacheWrapper(Generic[_P, _R]):
             self.__dict__.update(fn.__dict__)
         # set __wrapped__ last so we don't inadvertently copy it
         # from the wrapped function when updating __dict__
-        self._is_coroutine = _is_coroutine  # pyright: ignore[reportUnknownMemberType]
+        if hasattr(inspect, "markcoroutinefunction"):
+            inspect.markcoroutinefunction(self)
+        else:
+            self._is_coroutine = getattr(asyncio.coroutines, "_is_coroutine", None)
         self.__wrapped__ = fn
         self.__maxsize = maxsize
         self.__typed = typed
@@ -254,7 +254,10 @@ class _LRUCacheWrapperInstanceMethod(Generic[_P, _R, _T]):
             self.__dict__.update(wrapper.__dict__)
         # set __wrapped__ last so we don't inadvertently copy it
         # from the wrapped function when updating __dict__
-        self._is_coroutine = _is_coroutine  # pyright: ignore[reportUnknownMemberType]
+        if hasattr(inspect, "markcoroutinefunction"):
+            inspect.markcoroutinefunction(self)
+        else:
+            self._is_coroutine = getattr(asyncio.coroutines, "_is_coroutine", None)
         self.__wrapped__ = wrapper.__wrapped__
         self.__instance = instance
         self.__wrapper = wrapper
@@ -300,7 +303,7 @@ def _make_wrapper(
 
         # functools.partialmethod support
         if hasattr(fn, "_make_unbound_method"):
-            fn = fn._make_unbound_method()  # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType, reportAttributeAccessIssue, reportFunctionMemberAccess]
+            fn = cast("Any", fn)._make_unbound_method()
 
         return _LRUCacheWrapper(cast("_CB[_P, _R]", fn), maxsize, typed, ttl)
 
@@ -328,7 +331,7 @@ def alru_cache(
     typed: bool = False,
     *,
     ttl: float | None = None,
-) -> Callable[[_CBP[_P, _R]], _LRUCacheWrapper[_P, _R]] | _LRUCacheWrapper[_P, _R]:
+) -> Any:
     if maxsize is None or isinstance(maxsize, int):
         return _make_wrapper(maxsize, typed, ttl)
     else:

@@ -38,7 +38,6 @@ logger = logging.getLogger(__name__)
 BaseModelT = TypeVar(
     "BaseModelT",
     bound="BaseModel | t.Sequence[BaseModel]",
-    default="BaseModel | t.Sequence[BaseModel]",
 )
 
 
@@ -146,12 +145,12 @@ class PokeLanceAsyncClient(_ClientBase[AsyncHttpClient]):
         raise ValueError(f"Invalid URL: {url}")
 
     @alru_cache(maxsize=128, typed=True)
-    async def get_image(self, url: str) -> bytes:
+    async def get_image(self, /, url: str) -> bytes:
         """Gets an image from the URL asynchronously."""
         return await self._http.load_image(url)
 
     @alru_cache(maxsize=128, typed=True)
-    async def get_audio(self, url: str) -> bytes:
+    async def get_audio(self, /, url: str) -> bytes:
         """Gets audio from the URL asynchronously."""
         return await self._http.load_audio(url)
 

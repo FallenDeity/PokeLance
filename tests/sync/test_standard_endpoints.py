@@ -181,8 +181,8 @@ def test_sync_getch_data_fetch_and_cache_hit(
     except ValueError:
         arg = chosen
 
-    result1: t.Any = sync_cached_client.getch_data(ext_name, category, arg)
+    result1: t.Any = sync_cached_client.getch_data(ext_name, category, arg)  # pyright: ignore[reportUnknownVariableType]
     assert result1 is not None
 
-    result2: t.Any = sync_cached_client.getch_data(ext_name, category, arg)
+    result2: t.Any = sync_cached_client.getch_data(ext_name, category, arg)  # pyright: ignore[reportUnknownVariableType]
     assert result1 == result2

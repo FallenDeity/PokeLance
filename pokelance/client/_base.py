@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import typing as t
 
-from typing_extensions import TypeVar
+from typing_extensions import TypeVar, Unpack
 
 from pokelance.constants import Extension, ExtensionEnum, ExtensionsL
 from pokelance.logger import setup_logging
@@ -54,8 +54,8 @@ class _ClientBase(t.Generic[_HTTPClientT_co]):
     def __init__(
         self,
         *,
-        http: _HTTPClientT_co,  # pyright: ignore[reportGeneralTypeIssues]
-        **kwargs: t.Unpack[ClientConfig],
+        http: _HTTPClientT_co,
+        **kwargs: Unpack[ClientConfig],
     ) -> None:
         if kwargs.get("setup_logging", True):
             setup_logging(

@@ -155,6 +155,7 @@ async def test_cache_clear(client: pokelance.PokeLanceAsyncClient) -> None:
 async def test_image_cache_contains(client: pokelance.PokeLanceAsyncClient) -> None:
     pokemon = await client.pokemon.fetch_pokemon(1)
     url = pokemon.sprites.front_default
+    assert url is not None, "Pokemon sprite URL should not be None."
     await client.get_image(url)
     assert client.get_image.__contains__(client, url)
 
@@ -163,6 +164,7 @@ async def test_image_cache_contains(client: pokelance.PokeLanceAsyncClient) -> N
 async def test_image_cache_clear(client: pokelance.PokeLanceAsyncClient) -> None:
     pokemon = await client.pokemon.fetch_pokemon(1)
     url = pokemon.sprites.front_default
+    assert url is not None, "Pokemon sprite URL should not be None."
     await client.get_image(url)
     client.get_image.cache_clear()
     assert not client.get_image.__contains__(client, url)
@@ -177,6 +179,7 @@ def test_image_cache_set_size(client: pokelance.PokeLanceAsyncClient) -> None:
 async def test_audio_cache_contains(client: pokelance.PokeLanceAsyncClient) -> None:
     pokemon = await client.pokemon.fetch_pokemon(1)
     url = pokemon.cries.latest
+    assert url is not None, "Pokemon cry URL should not be None."
     await client.get_audio(url)
     assert client.get_audio.__contains__(client, url)
 
@@ -185,6 +188,7 @@ async def test_audio_cache_contains(client: pokelance.PokeLanceAsyncClient) -> N
 async def test_audio_cache_clear(client: pokelance.PokeLanceAsyncClient) -> None:
     pokemon = await client.pokemon.fetch_pokemon(1)
     url = pokemon.cries.latest
+    assert url is not None, "Pokemon cry URL should not be None."
     await client.get_audio(url)
     client.get_audio.cache_clear()
     assert not client.get_audio.__contains__(client, url)

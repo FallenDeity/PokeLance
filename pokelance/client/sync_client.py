@@ -38,7 +38,6 @@ logger = logging.getLogger(__name__)
 BaseModelT = TypeVar(
     "BaseModelT",
     bound="BaseModel | t.Sequence[BaseModel]",
-    default="BaseModel | t.Sequence[BaseModel]",
 )
 
 
