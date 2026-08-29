@@ -25,6 +25,19 @@ class CategorySpec:
     endpoint_key_is_id: bool = False
     url_suffix: str = ""
     is_list: bool = False
+    example_value: str | int | None = None
+
+    @property
+    def example_arg(self) -> str:
+        """Returns the formatted argument literal to use in code examples."""
+        if self.example_value is not None:
+            if isinstance(self.example_value, int):
+                return str(self.example_value)
+            return f'"{self.example_value}"'
+        if self.endpoint_key_is_id:
+            return "1"
+        return f'"{self.name.replace("_", "-")}"'
+
 
 
 @dataclass
@@ -53,6 +66,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_berry_endpoints,
                 model=models.Berry,
                 cache_attr="berry",
+                example_value="cheri",
             ),
             CategorySpec(
                 name="berry_firmness",
@@ -60,6 +74,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_berry_firmness_endpoints,
                 model=models.BerryFirmness,
                 cache_attr="berry_firmness",
+                example_value="very-soft",
             ),
             CategorySpec(
                 name="berry_flavor",
@@ -67,6 +82,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_berry_flavor_endpoints,
                 model=models.BerryFlavor,
                 cache_attr="berry_flavor",
+                example_value="spicy",
             ),
         ],
     ),
@@ -81,6 +97,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_contest_type_endpoints,
                 model=models.ContestType,
                 cache_attr="contest_type",
+                example_value="cool",
             ),
             CategorySpec(
                 name="contest_effect",
@@ -89,6 +106,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 model=models.ContestEffect,
                 cache_attr="contest_effect",
                 endpoint_key_is_id=True,
+                example_value=1,
             ),
             CategorySpec(
                 name="super_contest_effect",
@@ -97,6 +115,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 model=models.SuperContestEffect,
                 cache_attr="super_contest_effect",
                 endpoint_key_is_id=True,
+                example_value=1,
             ),
         ],
     ),
@@ -111,6 +130,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_encounter_method_endpoints,
                 model=models.EncounterMethod,
                 cache_attr="encounter_method",
+                example_value="walk",
             ),
             CategorySpec(
                 name="encounter_condition",
@@ -118,6 +138,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_encounter_condition_endpoints,
                 model=models.EncounterCondition,
                 cache_attr="encounter_condition",
+                example_value="swarm",
             ),
             CategorySpec(
                 name="encounter_condition_value",
@@ -125,6 +146,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_encounter_condition_value_endpoints,
                 model=models.EncounterConditionValue,
                 cache_attr="encounter_condition_value",
+                example_value="swarm-yes",
             ),
         ],
     ),
@@ -140,6 +162,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 model=models.EvolutionChain,
                 cache_attr="evolution_chain",
                 endpoint_key_is_id=True,
+                example_value=1,
             ),
             CategorySpec(
                 name="evolution_trigger",
@@ -147,6 +170,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_evolution_trigger_endpoints,
                 model=models.EvolutionTrigger,
                 cache_attr="evolution_trigger",
+                example_value="level-up",
             ),
         ],
     ),
@@ -161,6 +185,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_generation_endpoints,
                 model=models.Generation,
                 cache_attr="generation",
+                example_value="generation-i",
             ),
             CategorySpec(
                 name="pokedex",
@@ -168,6 +193,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_pokedex_endpoints,
                 model=models.Pokedex,
                 cache_attr="pokedex",
+                example_value="national",
             ),
             CategorySpec(
                 name="version",
@@ -175,6 +201,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_version_endpoints,
                 model=models.Version,
                 cache_attr="version",
+                example_value="red",
             ),
             CategorySpec(
                 name="version_group",
@@ -182,6 +209,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_version_group_endpoints,
                 model=models.VersionGroup,
                 cache_attr="version_group",
+                example_value="red-blue",
             ),
         ],
     ),
@@ -196,6 +224,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_item_endpoints,
                 model=models.Item,
                 cache_attr="item",
+                example_value="master-ball",
             ),
             CategorySpec(
                 name="item_attribute",
@@ -203,6 +232,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_item_attribute_endpoints,
                 model=models.ItemAttribute,
                 cache_attr="item_attribute",
+                example_value="countable",
             ),
             CategorySpec(
                 name="item_category",
@@ -210,6 +240,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_item_category_endpoints,
                 model=models.ItemCategory,
                 cache_attr="item_category",
+                example_value="stat-boosts",
             ),
             CategorySpec(
                 name="item_fling_effect",
@@ -217,6 +248,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_item_fling_effect_endpoints,
                 model=models.ItemFlingEffect,
                 cache_attr="item_fling_effect",
+                example_value="badly-poison",
             ),
             CategorySpec(
                 name="item_pocket",
@@ -224,6 +256,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_item_pocket_endpoints,
                 model=models.ItemPocket,
                 cache_attr="item_pocket",
+                example_value="misc",
             ),
             CategorySpec(
                 name="currency",
@@ -231,6 +264,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_currency_endpoints,
                 model=models.Currency,
                 cache_attr="currency",
+                example_value="money",
             ),
         ],
     ),
@@ -245,6 +279,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_location_endpoints,
                 model=models.Location,
                 cache_attr="location",
+                example_value="canalave-city",
             ),
             CategorySpec(
                 name="location_area",
@@ -252,6 +287,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_location_area_endpoints,
                 model=models.LocationArea,
                 cache_attr="location_area",
+                example_value="canalave-city-area",
             ),
             CategorySpec(
                 name="pal_park_area",
@@ -259,6 +295,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_pal_park_area_endpoints,
                 model=models.PalParkArea,
                 cache_attr="pal_park_area",
+                example_value="forest",
             ),
             CategorySpec(
                 name="region",
@@ -266,6 +303,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_region_endpoints,
                 model=models.Region,
                 cache_attr="region",
+                example_value="kanto",
             ),
         ],
     ),
@@ -281,6 +319,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 model=models.Machine,
                 cache_attr="machine",
                 endpoint_key_is_id=True,
+                example_value=1,
             ),
         ],
     ),
@@ -295,6 +334,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_move_endpoints,
                 model=models.Move,
                 cache_attr="move",
+                example_value="pound",
             ),
             CategorySpec(
                 name="move_ailment",
@@ -302,6 +342,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_move_ailment_endpoints,
                 model=models.MoveAilment,
                 cache_attr="move_ailment",
+                example_value="paralysis",
             ),
             CategorySpec(
                 name="move_battle_style",
@@ -309,6 +350,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_move_battle_style_endpoints,
                 model=models.MoveBattleStyle,
                 cache_attr="move_battle_style",
+                example_value="attack",
             ),
             CategorySpec(
                 name="move_category",
@@ -316,6 +358,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_move_category_endpoints,
                 model=models.MoveCategory,
                 cache_attr="move_category",
+                example_value="damage",
             ),
             CategorySpec(
                 name="move_damage_class",
@@ -323,6 +366,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_move_damage_class_endpoints,
                 model=models.MoveDamageClass,
                 cache_attr="move_damage_class",
+                example_value="physical",
             ),
             CategorySpec(
                 name="move_learn_method",
@@ -330,6 +374,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_move_learn_method_endpoints,
                 model=models.MoveLearnMethod,
                 cache_attr="move_learn_method",
+                example_value="level-up",
             ),
             CategorySpec(
                 name="move_target",
@@ -337,6 +382,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_move_target_endpoints,
                 model=models.MoveTarget,
                 cache_attr="move_target",
+                example_value="specific-move",
             ),
         ],
     ),
@@ -351,6 +397,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_ability_endpoints,
                 model=models.Ability,
                 cache_attr="ability",
+                example_value="stench",
             ),
             CategorySpec(
                 name="characteristic",
@@ -359,6 +406,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 model=models.Characteristic,
                 cache_attr="characteristic",
                 endpoint_key_is_id=True,
+                example_value=1,
             ),
             CategorySpec(
                 name="egg_group",
@@ -366,6 +414,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_egg_group_endpoints,
                 model=models.EggGroup,
                 cache_attr="egg_group",
+                example_value="monster",
             ),
             CategorySpec(
                 name="gender",
@@ -373,6 +422,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_gender_endpoints,
                 model=models.Gender,
                 cache_attr="gender",
+                example_value="female",
             ),
             CategorySpec(
                 name="growth_rate",
@@ -380,6 +430,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_growth_rate_endpoints,
                 model=models.GrowthRate,
                 cache_attr="growth_rate",
+                example_value="slow",
             ),
             CategorySpec(
                 name="nature",
@@ -387,6 +438,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_nature_endpoints,
                 model=models.Nature,
                 cache_attr="nature",
+                example_value="hardy",
             ),
             CategorySpec(
                 name="pokeathlon_stat",
@@ -394,6 +446,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_pokeathlon_stat_endpoints,
                 model=models.PokeathlonStat,
                 cache_attr="pokeathlon_stat",
+                example_value="speed",
             ),
             CategorySpec(
                 name="pokemon",
@@ -401,6 +454,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_pokemon_endpoints,
                 model=models.Pokemon,
                 cache_attr="pokemon",
+                example_value="pikachu",
             ),
             CategorySpec(
                 name="pokemon_color",
@@ -408,6 +462,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_pokemon_color_endpoints,
                 model=models.PokemonColor,
                 cache_attr="pokemon_color",
+                example_value="black",
             ),
             CategorySpec(
                 name="pokemon_form",
@@ -415,6 +470,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_pokemon_form_endpoints,
                 model=models.PokemonForm,
                 cache_attr="pokemon_form",
+                example_value="pikachu",
             ),
             CategorySpec(
                 name="pokemon_habitat",
@@ -422,6 +478,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_pokemon_habitat_endpoints,
                 model=models.PokemonHabitats,
                 cache_attr="pokemon_habitat",
+                example_value="cave",
             ),
             CategorySpec(
                 name="pokemon_shape",
@@ -429,6 +486,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_pokemon_shape_endpoints,
                 model=models.PokemonShape,
                 cache_attr="pokemon_shape",
+                example_value="ball",
             ),
             CategorySpec(
                 name="pokemon_species",
@@ -436,6 +494,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_pokemon_species_endpoints,
                 model=models.PokemonSpecies,
                 cache_attr="pokemon_species",
+                example_value="pikachu",
             ),
             CategorySpec(
                 name="stat",
@@ -443,6 +502,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_stat_endpoints,
                 model=models.Stat,
                 cache_attr="stat",
+                example_value="hp",
             ),
             CategorySpec(
                 name="type",
@@ -450,6 +510,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_type_endpoints,
                 model=models.Type,
                 cache_attr="type",
+                example_value="normal",
             ),
             CategorySpec(
                 name="location_area_encounter",
@@ -459,6 +520,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 cache_attr="location_area_encounter",
                 url_suffix="/encounters",
                 is_list=True,
+                example_value="pikachu",
             ),
         ],
     ),
@@ -474,6 +536,7 @@ EXTENSIONS: list[ExtensionSpec] = [
                 model=models.Language,
                 cache_attr="language",
                 endpoint_key_is_id=True,
+                example_value="en",
             ),
             CategorySpec(
                 name="api_metadata",

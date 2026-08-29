@@ -8,22 +8,18 @@ import typing as t
 
 from typing_extensions import override
 
+from pokelance.cache.sync.manager import Game as GameCache
 from pokelance.endpoints import Endpoint
 from pokelance.ext.sync._base import SyncBaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import models
-    from pokelance.cache.sync.manager import Game as GameCache
     from pokelance.client.sync_client import PokeLanceSyncClient
-
-    _Base = SyncBaseExtension[GameCache]
-else:
-    _Base = SyncBaseExtension
 
 __all__: tuple[str, ...] = ("Game", "setup")
 
 
-class Game(_Base):
+class Game(SyncBaseExtension[GameCache]):
     """Extension for game related endpoints."""
 
     @override
@@ -49,7 +45,15 @@ class Game(_Base):
         Returns
         -------
         models.Generation | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        generation = client.game.get_generation("generation-i")
+        if generation:
+            print(generation)
+        ```"""
         route = Endpoint.get_generation(name)
         self._validate_resource(self._cache_group.generation, name, route)
         return self._cache_group.generation.get(route, None)
@@ -65,7 +69,14 @@ class Game(_Base):
         Returns
         -------
         models.Generation
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        generation = client.game.fetch_generation("generation-i")
+        print(generation)
+        ```"""
         route = Endpoint.get_generation(name)
         self._validate_resource(self._cache_group.generation, name, route)
         data = self._client.request(route)
@@ -82,7 +93,15 @@ class Game(_Base):
         Returns
         -------
         models.Pokedex | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        pokedex = client.game.get_pokedex("national")
+        if pokedex:
+            print(pokedex)
+        ```"""
         route = Endpoint.get_pokedex(name)
         self._validate_resource(self._cache_group.pokedex, name, route)
         return self._cache_group.pokedex.get(route, None)
@@ -98,7 +117,14 @@ class Game(_Base):
         Returns
         -------
         models.Pokedex
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        pokedex = client.game.fetch_pokedex("national")
+        print(pokedex)
+        ```"""
         route = Endpoint.get_pokedex(name)
         self._validate_resource(self._cache_group.pokedex, name, route)
         data = self._client.request(route)
@@ -115,7 +141,15 @@ class Game(_Base):
         Returns
         -------
         models.Version | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        version = client.game.get_version("red")
+        if version:
+            print(version)
+        ```"""
         route = Endpoint.get_version(name)
         self._validate_resource(self._cache_group.version, name, route)
         return self._cache_group.version.get(route, None)
@@ -131,7 +165,14 @@ class Game(_Base):
         Returns
         -------
         models.Version
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        version = client.game.fetch_version("red")
+        print(version)
+        ```"""
         route = Endpoint.get_version(name)
         self._validate_resource(self._cache_group.version, name, route)
         data = self._client.request(route)
@@ -148,7 +189,15 @@ class Game(_Base):
         Returns
         -------
         models.VersionGroup | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        group = client.game.get_version_group("red-blue")
+        if group:
+            print(group)
+        ```"""
         route = Endpoint.get_version_group(name)
         self._validate_resource(self._cache_group.version_group, name, route)
         return self._cache_group.version_group.get(route, None)
@@ -164,7 +213,14 @@ class Game(_Base):
         Returns
         -------
         models.VersionGroup
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        group = client.game.fetch_version_group("red-blue")
+        print(group)
+        ```"""
         route = Endpoint.get_version_group(name)
         self._validate_resource(self._cache_group.version_group, name, route)
         data = self._client.request(route)

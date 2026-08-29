@@ -8,22 +8,18 @@ import typing as t
 
 from typing_extensions import override
 
+from pokelance.cache.sync.manager import Contest as ContestCache
 from pokelance.endpoints import Endpoint
 from pokelance.ext.sync._base import SyncBaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import models
-    from pokelance.cache.sync.manager import Contest as ContestCache
     from pokelance.client.sync_client import PokeLanceSyncClient
-
-    _Base = SyncBaseExtension[ContestCache]
-else:
-    _Base = SyncBaseExtension
 
 __all__: tuple[str, ...] = ("Contest", "setup")
 
 
-class Contest(_Base):
+class Contest(SyncBaseExtension[ContestCache]):
     """Extension for contest related endpoints."""
 
     @override
@@ -48,7 +44,15 @@ class Contest(_Base):
         Returns
         -------
         models.ContestType | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        contest_type_data = client.contest.get_contest_type("cool")
+        if contest_type_data:
+            print(contest_type_data)
+        ```"""
         route = Endpoint.get_contest_type(name)
         self._validate_resource(self._cache_group.contest_type, name, route)
         return self._cache_group.contest_type.get(route, None)
@@ -64,7 +68,14 @@ class Contest(_Base):
         Returns
         -------
         models.ContestType
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        contest_type_data = client.contest.fetch_contest_type("cool")
+        print(contest_type_data)
+        ```"""
         route = Endpoint.get_contest_type(name)
         self._validate_resource(self._cache_group.contest_type, name, route)
         data = self._client.request(route)
@@ -81,7 +92,15 @@ class Contest(_Base):
         Returns
         -------
         models.ContestEffect | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        effect = client.contest.get_contest_effect(1)
+        if effect:
+            print(effect)
+        ```"""
         route = Endpoint.get_contest_effect(id)
         self._validate_resource(self._cache_group.contest_effect, id, route)
         return self._cache_group.contest_effect.get(route, None)
@@ -97,7 +116,14 @@ class Contest(_Base):
         Returns
         -------
         models.ContestEffect
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        effect = client.contest.fetch_contest_effect(1)
+        print(effect)
+        ```"""
         route = Endpoint.get_contest_effect(id)
         self._validate_resource(self._cache_group.contest_effect, id, route)
         data = self._client.request(route)
@@ -114,7 +140,15 @@ class Contest(_Base):
         Returns
         -------
         models.SuperContestEffect | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        effect = client.contest.get_super_contest_effect(1)
+        if effect:
+            print(effect)
+        ```"""
         route = Endpoint.get_super_contest_effect(id)
         self._validate_resource(self._cache_group.super_contest_effect, id, route)
         return self._cache_group.super_contest_effect.get(route, None)
@@ -130,7 +164,14 @@ class Contest(_Base):
         Returns
         -------
         models.SuperContestEffect
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        effect = client.contest.fetch_super_contest_effect(1)
+        print(effect)
+        ```"""
         route = Endpoint.get_super_contest_effect(id)
         self._validate_resource(self._cache_group.super_contest_effect, id, route)
         data = self._client.request(route)

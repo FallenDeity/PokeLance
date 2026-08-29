@@ -17,10 +17,6 @@ from pokelance.http._base import BaseHttpClient
 if t.TYPE_CHECKING:
     from pokelance.client.sync_client import PokeLanceSyncClient
 
-    _BaseHttpClient = BaseHttpClient[PokeLanceSyncClient, niquests.Session, SyncCacheManager]
-else:
-    _BaseHttpClient = BaseHttpClient
-
 __all__: tuple[str, ...] = ("SyncEndpointLoader", "SyncHttpClient")
 
 logger = logging.getLogger(__name__)
@@ -115,7 +111,7 @@ class SyncEndpointLoader:
 
 
 @t.final
-class SyncHttpClient(_BaseHttpClient):
+class SyncHttpClient(BaseHttpClient["PokeLanceSyncClient", niquests.Session, SyncCacheManager]):
     """The synchronous HTTP client for PokeLance.
 
     Parameters
@@ -124,7 +120,7 @@ class SyncHttpClient(_BaseHttpClient):
         The client that this HTTP client is for.
     cache_size: int
         The size of the cache.
-    session: t.Optional[niquests.Session]
+    session: niquests.Session | None, optional
         The session to use for the HTTP client. If not provided, one is created
         internally on the first request and owned by this client.
     """

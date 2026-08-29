@@ -34,7 +34,7 @@ import pytest
 
 import pokelance
 from pokelance.constants import ExtensionEnum
-from pokelance.http import Endpoint
+from pokelance.endpoints import Endpoint
 from pokelance.models import LocationAreaEncounter
 
 # ---------------------------------------------------------------------------

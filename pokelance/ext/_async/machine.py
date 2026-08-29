@@ -9,22 +9,18 @@ import typing as t
 
 from typing_extensions import override
 
+from pokelance.cache._async.manager import Machine as MachineCache
 from pokelance.endpoints import Endpoint
 from pokelance.ext._async._base import AsyncBaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import models
-    from pokelance.cache._async.manager import Machine as MachineCache
     from pokelance.client.async_client import PokeLanceAsyncClient
-
-    _Base = AsyncBaseExtension[MachineCache]
-else:
-    _Base = AsyncBaseExtension
 
 __all__: tuple[str, ...] = ("Machine", "setup")
 
 
-class Machine(_Base):
+class Machine(AsyncBaseExtension[MachineCache]):
     """Extension for machine related endpoints."""
 
     @override
@@ -45,7 +41,15 @@ class Machine(_Base):
         Returns
         -------
         models.Machine | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        machine = client.machine.get_machine(1)
+        if machine:
+            print(machine)
+        ```"""
         route = Endpoint.get_machine(id)
         self._validate_resource(self._cache_group.machine, id, route)
         return self._cache_group.machine.get(route, None)
@@ -61,7 +65,14 @@ class Machine(_Base):
         Returns
         -------
         models.Machine
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        machine = await client.machine.fetch_machine(1)
+        print(machine)
+        ```"""
         route = Endpoint.get_machine(id)
         self._validate_resource(self._cache_group.machine, id, route)
         data = await self._client.request(route)

@@ -316,14 +316,42 @@ def alru_cache(
     typed: bool = False,
     *,
     ttl: float | None = None,
-) -> Callable[[_CBP[_P, _R]], _LRUCacheWrapper[_P, _R]]: ...
+) -> Callable[[_CBP[_P, _R]], _LRUCacheWrapper[_P, _R]]:
+    """Decorator to wrap an asynchronous function with an LRU cache.
+
+    Parameters
+    ----------
+    maxsize : int | None, optional
+        Maximum cache size. If None, cache is unbounded.
+    typed : bool, optional
+        Whether arguments of different types are cached separately.
+    ttl : float | None, optional
+        Time-to-live in seconds for cache entries.
+
+    Returns
+    -------
+    Callable
+        A wrapper decorator for the coroutine function.
+    """
 
 
 @overload
 def alru_cache(
     maxsize: _CBP[_P, _R],
     /,
-) -> _LRUCacheWrapper[_P, _R]: ...
+) -> _LRUCacheWrapper[_P, _R]:
+    """Decorator to wrap an asynchronous function with an LRU cache using default settings.
+
+    Parameters
+    ----------
+    maxsize : Callable
+        The coroutine function to decorate.
+
+    Returns
+    -------
+    _LRUCacheWrapper
+        The decorated async function.
+    """
 
 
 def alru_cache(
@@ -332,6 +360,22 @@ def alru_cache(
     *,
     ttl: float | None = None,
 ) -> Any:
+    """Decorator to wrap an asynchronous function with an LRU cache.
+
+    Parameters
+    ----------
+    maxsize : int | Callable | None, optional
+        Maximum cache size. Can also be the function to decorate directly.
+    typed : bool, optional
+        Whether arguments of different types are cached separately.
+    ttl : float | None, optional
+        Time-to-live in seconds for cache entries.
+
+    Returns
+    -------
+    Any
+        The decorated wrapper or decorator function.
+    """
     if maxsize is None or isinstance(maxsize, int):
         return _make_wrapper(maxsize, typed, ttl)
     else:

@@ -8,22 +8,18 @@ import typing as t
 
 from typing_extensions import override
 
+from pokelance.cache.sync.manager import Pokemon as PokemonCache
 from pokelance.endpoints import Endpoint
 from pokelance.ext.sync._base import SyncBaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import models
-    from pokelance.cache.sync.manager import Pokemon as PokemonCache
     from pokelance.client.sync_client import PokeLanceSyncClient
-
-    _Base = SyncBaseExtension[PokemonCache]
-else:
-    _Base = SyncBaseExtension
 
 __all__: tuple[str, ...] = ("Pokemon", "setup")
 
 
-class Pokemon(_Base):
+class Pokemon(SyncBaseExtension[PokemonCache]):
     """Extension for pokemon related endpoints."""
 
     @override
@@ -61,7 +57,15 @@ class Pokemon(_Base):
         Returns
         -------
         models.Ability | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        ability = client.pokemon.get_ability("stench")
+        if ability:
+            print(ability)
+        ```"""
         route = Endpoint.get_ability(name)
         self._validate_resource(self._cache_group.ability, name, route)
         return self._cache_group.ability.get(route, None)
@@ -77,7 +81,14 @@ class Pokemon(_Base):
         Returns
         -------
         models.Ability
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        ability = client.pokemon.fetch_ability("stench")
+        print(ability)
+        ```"""
         route = Endpoint.get_ability(name)
         self._validate_resource(self._cache_group.ability, name, route)
         data = self._client.request(route)
@@ -94,7 +105,15 @@ class Pokemon(_Base):
         Returns
         -------
         models.Characteristic | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        characteristic = client.pokemon.get_characteristic(1)
+        if characteristic:
+            print(characteristic)
+        ```"""
         route = Endpoint.get_characteristic(id)
         self._validate_resource(self._cache_group.characteristic, id, route)
         return self._cache_group.characteristic.get(route, None)
@@ -110,7 +129,14 @@ class Pokemon(_Base):
         Returns
         -------
         models.Characteristic
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        characteristic = client.pokemon.fetch_characteristic(1)
+        print(characteristic)
+        ```"""
         route = Endpoint.get_characteristic(id)
         self._validate_resource(self._cache_group.characteristic, id, route)
         data = self._client.request(route)
@@ -127,7 +153,15 @@ class Pokemon(_Base):
         Returns
         -------
         models.EggGroup | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        group = client.pokemon.get_egg_group("monster")
+        if group:
+            print(group)
+        ```"""
         route = Endpoint.get_egg_group(name)
         self._validate_resource(self._cache_group.egg_group, name, route)
         return self._cache_group.egg_group.get(route, None)
@@ -143,7 +177,14 @@ class Pokemon(_Base):
         Returns
         -------
         models.EggGroup
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        group = client.pokemon.fetch_egg_group("monster")
+        print(group)
+        ```"""
         route = Endpoint.get_egg_group(name)
         self._validate_resource(self._cache_group.egg_group, name, route)
         data = self._client.request(route)
@@ -160,7 +201,15 @@ class Pokemon(_Base):
         Returns
         -------
         models.Gender | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        gender = client.pokemon.get_gender("female")
+        if gender:
+            print(gender)
+        ```"""
         route = Endpoint.get_gender(name)
         self._validate_resource(self._cache_group.gender, name, route)
         return self._cache_group.gender.get(route, None)
@@ -176,7 +225,14 @@ class Pokemon(_Base):
         Returns
         -------
         models.Gender
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        gender = client.pokemon.fetch_gender("female")
+        print(gender)
+        ```"""
         route = Endpoint.get_gender(name)
         self._validate_resource(self._cache_group.gender, name, route)
         data = self._client.request(route)
@@ -193,7 +249,15 @@ class Pokemon(_Base):
         Returns
         -------
         models.GrowthRate | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        rate = client.pokemon.get_growth_rate("slow")
+        if rate:
+            print(rate)
+        ```"""
         route = Endpoint.get_growth_rate(name)
         self._validate_resource(self._cache_group.growth_rate, name, route)
         return self._cache_group.growth_rate.get(route, None)
@@ -209,7 +273,14 @@ class Pokemon(_Base):
         Returns
         -------
         models.GrowthRate
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        rate = client.pokemon.fetch_growth_rate("slow")
+        print(rate)
+        ```"""
         route = Endpoint.get_growth_rate(name)
         self._validate_resource(self._cache_group.growth_rate, name, route)
         data = self._client.request(route)
@@ -226,7 +297,15 @@ class Pokemon(_Base):
         Returns
         -------
         models.Nature | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        nature = client.pokemon.get_nature("hardy")
+        if nature:
+            print(nature)
+        ```"""
         route = Endpoint.get_nature(name)
         self._validate_resource(self._cache_group.nature, name, route)
         return self._cache_group.nature.get(route, None)
@@ -242,7 +321,14 @@ class Pokemon(_Base):
         Returns
         -------
         models.Nature
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        nature = client.pokemon.fetch_nature("hardy")
+        print(nature)
+        ```"""
         route = Endpoint.get_nature(name)
         self._validate_resource(self._cache_group.nature, name, route)
         data = self._client.request(route)
@@ -259,7 +345,15 @@ class Pokemon(_Base):
         Returns
         -------
         models.PokeathlonStat | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        stat = client.pokemon.get_pokeathlon_stat("speed")
+        if stat:
+            print(stat)
+        ```"""
         route = Endpoint.get_pokeathlon_stat(name)
         self._validate_resource(self._cache_group.pokeathlon_stat, name, route)
         return self._cache_group.pokeathlon_stat.get(route, None)
@@ -275,7 +369,14 @@ class Pokemon(_Base):
         Returns
         -------
         models.PokeathlonStat
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        stat = client.pokemon.fetch_pokeathlon_stat("speed")
+        print(stat)
+        ```"""
         route = Endpoint.get_pokeathlon_stat(name)
         self._validate_resource(self._cache_group.pokeathlon_stat, name, route)
         data = self._client.request(route)
@@ -292,7 +393,15 @@ class Pokemon(_Base):
         Returns
         -------
         models.Pokemon | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        pokemon = client.pokemon.get_pokemon("pikachu")
+        if pokemon:
+            print(pokemon)
+        ```"""
         route = Endpoint.get_pokemon(name)
         self._validate_resource(self._cache_group.pokemon, name, route)
         return self._cache_group.pokemon.get(route, None)
@@ -308,7 +417,14 @@ class Pokemon(_Base):
         Returns
         -------
         models.Pokemon
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        pokemon = client.pokemon.fetch_pokemon("pikachu")
+        print(pokemon)
+        ```"""
         route = Endpoint.get_pokemon(name)
         self._validate_resource(self._cache_group.pokemon, name, route)
         data = self._client.request(route)
@@ -325,7 +441,15 @@ class Pokemon(_Base):
         Returns
         -------
         models.PokemonColor | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        color = client.pokemon.get_pokemon_color("black")
+        if color:
+            print(color)
+        ```"""
         route = Endpoint.get_pokemon_color(name)
         self._validate_resource(self._cache_group.pokemon_color, name, route)
         return self._cache_group.pokemon_color.get(route, None)
@@ -341,7 +465,14 @@ class Pokemon(_Base):
         Returns
         -------
         models.PokemonColor
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        color = client.pokemon.fetch_pokemon_color("black")
+        print(color)
+        ```"""
         route = Endpoint.get_pokemon_color(name)
         self._validate_resource(self._cache_group.pokemon_color, name, route)
         data = self._client.request(route)
@@ -358,7 +489,15 @@ class Pokemon(_Base):
         Returns
         -------
         models.PokemonForm | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        form = client.pokemon.get_pokemon_form("pikachu")
+        if form:
+            print(form)
+        ```"""
         route = Endpoint.get_pokemon_form(name)
         self._validate_resource(self._cache_group.pokemon_form, name, route)
         return self._cache_group.pokemon_form.get(route, None)
@@ -374,7 +513,14 @@ class Pokemon(_Base):
         Returns
         -------
         models.PokemonForm
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        form = client.pokemon.fetch_pokemon_form("pikachu")
+        print(form)
+        ```"""
         route = Endpoint.get_pokemon_form(name)
         self._validate_resource(self._cache_group.pokemon_form, name, route)
         data = self._client.request(route)
@@ -391,7 +537,15 @@ class Pokemon(_Base):
         Returns
         -------
         models.PokemonHabitats | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        habitat = client.pokemon.get_pokemon_habitat("cave")
+        if habitat:
+            print(habitat)
+        ```"""
         route = Endpoint.get_pokemon_habitat(name)
         self._validate_resource(self._cache_group.pokemon_habitat, name, route)
         return self._cache_group.pokemon_habitat.get(route, None)
@@ -407,7 +561,14 @@ class Pokemon(_Base):
         Returns
         -------
         models.PokemonHabitats
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        habitat = client.pokemon.fetch_pokemon_habitat("cave")
+        print(habitat)
+        ```"""
         route = Endpoint.get_pokemon_habitat(name)
         self._validate_resource(self._cache_group.pokemon_habitat, name, route)
         data = self._client.request(route)
@@ -424,7 +585,15 @@ class Pokemon(_Base):
         Returns
         -------
         models.PokemonShape | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        shape = client.pokemon.get_pokemon_shape("ball")
+        if shape:
+            print(shape)
+        ```"""
         route = Endpoint.get_pokemon_shape(name)
         self._validate_resource(self._cache_group.pokemon_shape, name, route)
         return self._cache_group.pokemon_shape.get(route, None)
@@ -440,7 +609,14 @@ class Pokemon(_Base):
         Returns
         -------
         models.PokemonShape
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        shape = client.pokemon.fetch_pokemon_shape("ball")
+        print(shape)
+        ```"""
         route = Endpoint.get_pokemon_shape(name)
         self._validate_resource(self._cache_group.pokemon_shape, name, route)
         data = self._client.request(route)
@@ -457,7 +633,15 @@ class Pokemon(_Base):
         Returns
         -------
         models.PokemonSpecies | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        species = client.pokemon.get_pokemon_species("pikachu")
+        if species:
+            print(species)
+        ```"""
         route = Endpoint.get_pokemon_species(name)
         self._validate_resource(self._cache_group.pokemon_species, name, route)
         return self._cache_group.pokemon_species.get(route, None)
@@ -473,7 +657,14 @@ class Pokemon(_Base):
         Returns
         -------
         models.PokemonSpecies
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        species = client.pokemon.fetch_pokemon_species("pikachu")
+        print(species)
+        ```"""
         route = Endpoint.get_pokemon_species(name)
         self._validate_resource(self._cache_group.pokemon_species, name, route)
         data = self._client.request(route)
@@ -490,7 +681,15 @@ class Pokemon(_Base):
         Returns
         -------
         models.Stat | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        stat = client.pokemon.get_stat("hp")
+        if stat:
+            print(stat)
+        ```"""
         route = Endpoint.get_stat(name)
         self._validate_resource(self._cache_group.stat, name, route)
         return self._cache_group.stat.get(route, None)
@@ -506,7 +705,14 @@ class Pokemon(_Base):
         Returns
         -------
         models.Stat
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        stat = client.pokemon.fetch_stat("hp")
+        print(stat)
+        ```"""
         route = Endpoint.get_stat(name)
         self._validate_resource(self._cache_group.stat, name, route)
         data = self._client.request(route)
@@ -523,7 +729,15 @@ class Pokemon(_Base):
         Returns
         -------
         models.Type | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        type_data = client.pokemon.get_type("normal")
+        if type_data:
+            print(type_data)
+        ```"""
         route = Endpoint.get_type(name)
         self._validate_resource(self._cache_group.type, name, route)
         return self._cache_group.type.get(route, None)
@@ -539,7 +753,14 @@ class Pokemon(_Base):
         Returns
         -------
         models.Type
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        type_data = client.pokemon.fetch_type("normal")
+        print(type_data)
+        ```"""
         route = Endpoint.get_type(name)
         self._validate_resource(self._cache_group.type, name, route)
         data = self._client.request(route)
@@ -556,7 +777,15 @@ class Pokemon(_Base):
         Returns
         -------
         list[models.LocationAreaEncounter] | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        encounter = client.pokemon.get_location_area_encounter("pikachu")
+        if encounter:
+            print(encounter)
+        ```"""
         route = Endpoint.get_location_area_encounter(name)
         self._validate_resource(self._cache_group.location_area_encounter, name, route)
         return self._cache_group.location_area_encounter.get(route, None)
@@ -572,7 +801,14 @@ class Pokemon(_Base):
         Returns
         -------
         list[models.LocationAreaEncounter]
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        encounter = client.pokemon.fetch_location_area_encounter("pikachu")
+        print(encounter)
+        ```"""
         route = Endpoint.get_location_area_encounter(name)
         self._validate_resource(self._cache_group.location_area_encounter, name, route)
         data = self._client.request(route)

@@ -125,14 +125,13 @@ class Extension:
 
 @attrs.define(slots=True, frozen=True)
 class BerryExtension(Extension):
-    """
-    Represents the berry extension.
+    """Represents the berry extension.
 
     Attributes
     ----------
     name : str
         The name of the extension.
-    categories : t.List[str]
+    categories : tuple[str, ...]
         The categories of the extension.
     """
 
@@ -142,14 +141,13 @@ class BerryExtension(Extension):
 
 @attrs.define(slots=True, frozen=True)
 class ContestExtension(Extension):
-    """
-    Represents the contest extension.
+    """Represents the contest extension.
 
     Attributes
     ----------
     name : str
         The name of the extension.
-    categories : t.List[str]
+    categories : tuple[str, ...]
         The categories of the extension.
     """
 
@@ -159,14 +157,13 @@ class ContestExtension(Extension):
 
 @attrs.define(slots=True, frozen=True)
 class EncounterExtension(Extension):
-    """
-    Represents the encounter extension.
+    """Represents the encounter extension.
 
     Attributes
     ----------
     name : str
         The name of the extension.
-    categories : t.List[str]
+    categories : tuple[str, ...]
         The categories of the extension.
     """
 
@@ -176,14 +173,13 @@ class EncounterExtension(Extension):
 
 @attrs.define(slots=True, frozen=True)
 class EvolutionExtension(Extension):
-    """
-    Represents the evolution extension.
+    """Represents the evolution extension.
 
     Attributes
     ----------
     name : str
         The name of the extension.
-    categories : t.List[str]
+    categories : tuple[str, ...]
         The categories of the extension.
     """
 
@@ -193,14 +189,13 @@ class EvolutionExtension(Extension):
 
 @attrs.define(slots=True, frozen=True)
 class GameExtension(Extension):
-    """
-    Represents the game extension.
+    """Represents the game extension.
 
     Attributes
     ----------
     name : str
         The name of the extension.
-    categories : t.List[str]
+    categories : tuple[str, ...]
         The categories of the extension.
     """
 
@@ -210,14 +205,13 @@ class GameExtension(Extension):
 
 @attrs.define(slots=True, frozen=True)
 class ItemExtension(Extension):
-    """
-    Represents the item extension.
+    """Represents the item extension.
 
     Attributes
     ----------
     name : str
         The name of the extension.
-    categories : t.List[str]
+    categories : tuple[str, ...]
         The categories of the extension.
     """
 
@@ -234,14 +228,13 @@ class ItemExtension(Extension):
 
 @attrs.define(slots=True, frozen=True)
 class LocationExtension(Extension):
-    """
-    Represents the location extension.
+    """Represents the location extension.
 
     Attributes
     ----------
     name : str
         The name of the extension.
-    categories : t.List[str]
+    categories : tuple[str, ...]
         The categories of the extension.
     """
 
@@ -251,14 +244,13 @@ class LocationExtension(Extension):
 
 @attrs.define(slots=True, frozen=True)
 class MachineExtension(Extension):
-    """
-    Represents the machine extension.
+    """Represents the machine extension.
 
     Attributes
     ----------
     name : str
         The name of the extension.
-    categories : t.List[str]
+    categories : tuple[str, ...]
         The categories of the extension.
     """
 
@@ -268,14 +260,13 @@ class MachineExtension(Extension):
 
 @attrs.define(slots=True, frozen=True)
 class MoveExtension(Extension):
-    """
-    Represents the move extension.
+    """Represents the move extension.
 
     Attributes
     ----------
     name : str
         The name of the extension.
-    categories : t.List[str]
+    categories : tuple[str, ...]
         The categories of the extension.
     """
 
@@ -293,14 +284,13 @@ class MoveExtension(Extension):
 
 @attrs.define(slots=True, frozen=True)
 class PokemonExtension(Extension):
-    """
-    Represents the pokemon extension.
+    """Represents the pokemon extension.
 
     Attributes
     ----------
     name : str
         The name of the extension.
-    categories : t.List[str]
+    categories : tuple[str, ...]
         The categories of the extension.
     """
 
@@ -327,14 +317,13 @@ class PokemonExtension(Extension):
 
 @attrs.define(slots=True, frozen=True)
 class UtilityExtension(Extension):
-    """
-    Represents the utility extension.
+    """Represents the utility extension.
 
     Attributes
     ----------
     name : str
         The name of the extension.
-    categories : t.List[str]
+    categories : tuple[str, ...]
         The categories of the extension.
     """
 

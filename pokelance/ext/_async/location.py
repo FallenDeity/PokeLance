@@ -9,22 +9,18 @@ import typing as t
 
 from typing_extensions import override
 
+from pokelance.cache._async.manager import Location as LocationCache
 from pokelance.endpoints import Endpoint
 from pokelance.ext._async._base import AsyncBaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import models
-    from pokelance.cache._async.manager import Location as LocationCache
     from pokelance.client.async_client import PokeLanceAsyncClient
-
-    _Base = AsyncBaseExtension[LocationCache]
-else:
-    _Base = AsyncBaseExtension
 
 __all__: tuple[str, ...] = ("Location", "setup")
 
 
-class Location(_Base):
+class Location(AsyncBaseExtension[LocationCache]):
     """Extension for location related endpoints."""
 
     @override
@@ -50,7 +46,15 @@ class Location(_Base):
         Returns
         -------
         models.Location | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        location = client.location.get_location("canalave-city")
+        if location:
+            print(location)
+        ```"""
         route = Endpoint.get_location(name)
         self._validate_resource(self._cache_group.location, name, route)
         return self._cache_group.location.get(route, None)
@@ -66,7 +70,14 @@ class Location(_Base):
         Returns
         -------
         models.Location
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        location = await client.location.fetch_location("canalave-city")
+        print(location)
+        ```"""
         route = Endpoint.get_location(name)
         self._validate_resource(self._cache_group.location, name, route)
         data = await self._client.request(route)
@@ -83,7 +94,15 @@ class Location(_Base):
         Returns
         -------
         models.LocationArea | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        area = client.location.get_location_area("canalave-city-area")
+        if area:
+            print(area)
+        ```"""
         route = Endpoint.get_location_area(name)
         self._validate_resource(self._cache_group.location_area, name, route)
         return self._cache_group.location_area.get(route, None)
@@ -99,7 +118,14 @@ class Location(_Base):
         Returns
         -------
         models.LocationArea
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        area = await client.location.fetch_location_area("canalave-city-area")
+        print(area)
+        ```"""
         route = Endpoint.get_location_area(name)
         self._validate_resource(self._cache_group.location_area, name, route)
         data = await self._client.request(route)
@@ -116,7 +142,15 @@ class Location(_Base):
         Returns
         -------
         models.PalParkArea | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        area = client.location.get_pal_park_area("forest")
+        if area:
+            print(area)
+        ```"""
         route = Endpoint.get_pal_park_area(name)
         self._validate_resource(self._cache_group.pal_park_area, name, route)
         return self._cache_group.pal_park_area.get(route, None)
@@ -132,7 +166,14 @@ class Location(_Base):
         Returns
         -------
         models.PalParkArea
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        area = await client.location.fetch_pal_park_area("forest")
+        print(area)
+        ```"""
         route = Endpoint.get_pal_park_area(name)
         self._validate_resource(self._cache_group.pal_park_area, name, route)
         data = await self._client.request(route)
@@ -149,7 +190,15 @@ class Location(_Base):
         Returns
         -------
         models.Region | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        region = client.location.get_region("kanto")
+        if region:
+            print(region)
+        ```"""
         route = Endpoint.get_region(name)
         self._validate_resource(self._cache_group.region, name, route)
         return self._cache_group.region.get(route, None)
@@ -165,7 +214,14 @@ class Location(_Base):
         Returns
         -------
         models.Region
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        region = await client.location.fetch_region("kanto")
+        print(region)
+        ```"""
         route = Endpoint.get_region(name)
         self._validate_resource(self._cache_group.region, name, route)
         data = await self._client.request(route)

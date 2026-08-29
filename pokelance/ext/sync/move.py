@@ -8,22 +8,18 @@ import typing as t
 
 from typing_extensions import override
 
+from pokelance.cache.sync.manager import Move as MoveCache
 from pokelance.endpoints import Endpoint
 from pokelance.ext.sync._base import SyncBaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import models
-    from pokelance.cache.sync.manager import Move as MoveCache
     from pokelance.client.sync_client import PokeLanceSyncClient
-
-    _Base = SyncBaseExtension[MoveCache]
-else:
-    _Base = SyncBaseExtension
 
 __all__: tuple[str, ...] = ("Move", "setup")
 
 
-class Move(_Base):
+class Move(SyncBaseExtension[MoveCache]):
     """Extension for move related endpoints."""
 
     @override
@@ -52,7 +48,15 @@ class Move(_Base):
         Returns
         -------
         models.Move | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        move = client.move.get_move("pound")
+        if move:
+            print(move)
+        ```"""
         route = Endpoint.get_move(name)
         self._validate_resource(self._cache_group.move, name, route)
         return self._cache_group.move.get(route, None)
@@ -68,7 +72,14 @@ class Move(_Base):
         Returns
         -------
         models.Move
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        move = client.move.fetch_move("pound")
+        print(move)
+        ```"""
         route = Endpoint.get_move(name)
         self._validate_resource(self._cache_group.move, name, route)
         data = self._client.request(route)
@@ -85,7 +96,15 @@ class Move(_Base):
         Returns
         -------
         models.MoveAilment | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        ailment = client.move.get_move_ailment("paralysis")
+        if ailment:
+            print(ailment)
+        ```"""
         route = Endpoint.get_move_ailment(name)
         self._validate_resource(self._cache_group.move_ailment, name, route)
         return self._cache_group.move_ailment.get(route, None)
@@ -101,7 +120,14 @@ class Move(_Base):
         Returns
         -------
         models.MoveAilment
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        ailment = client.move.fetch_move_ailment("paralysis")
+        print(ailment)
+        ```"""
         route = Endpoint.get_move_ailment(name)
         self._validate_resource(self._cache_group.move_ailment, name, route)
         data = self._client.request(route)
@@ -118,7 +144,15 @@ class Move(_Base):
         Returns
         -------
         models.MoveBattleStyle | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        style = client.move.get_move_battle_style("attack")
+        if style:
+            print(style)
+        ```"""
         route = Endpoint.get_move_battle_style(name)
         self._validate_resource(self._cache_group.move_battle_style, name, route)
         return self._cache_group.move_battle_style.get(route, None)
@@ -134,7 +168,14 @@ class Move(_Base):
         Returns
         -------
         models.MoveBattleStyle
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        style = client.move.fetch_move_battle_style("attack")
+        print(style)
+        ```"""
         route = Endpoint.get_move_battle_style(name)
         self._validate_resource(self._cache_group.move_battle_style, name, route)
         data = self._client.request(route)
@@ -153,7 +194,15 @@ class Move(_Base):
         Returns
         -------
         models.MoveCategory | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        category = client.move.get_move_category("damage")
+        if category:
+            print(category)
+        ```"""
         route = Endpoint.get_move_category(name)
         self._validate_resource(self._cache_group.move_category, name, route)
         return self._cache_group.move_category.get(route, None)
@@ -169,7 +218,14 @@ class Move(_Base):
         Returns
         -------
         models.MoveCategory
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        category = client.move.fetch_move_category("damage")
+        print(category)
+        ```"""
         route = Endpoint.get_move_category(name)
         self._validate_resource(self._cache_group.move_category, name, route)
         data = self._client.request(route)
@@ -186,7 +242,15 @@ class Move(_Base):
         Returns
         -------
         models.MoveDamageClass | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        move_damage_class_data = client.move.get_move_damage_class("physical")
+        if move_damage_class_data:
+            print(move_damage_class_data)
+        ```"""
         route = Endpoint.get_move_damage_class(name)
         self._validate_resource(self._cache_group.move_damage_class, name, route)
         return self._cache_group.move_damage_class.get(route, None)
@@ -202,7 +266,14 @@ class Move(_Base):
         Returns
         -------
         models.MoveDamageClass
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        move_damage_class_data = client.move.fetch_move_damage_class("physical")
+        print(move_damage_class_data)
+        ```"""
         route = Endpoint.get_move_damage_class(name)
         self._validate_resource(self._cache_group.move_damage_class, name, route)
         data = self._client.request(route)
@@ -221,7 +292,15 @@ class Move(_Base):
         Returns
         -------
         models.MoveLearnMethod | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        method = client.move.get_move_learn_method("level-up")
+        if method:
+            print(method)
+        ```"""
         route = Endpoint.get_move_learn_method(name)
         self._validate_resource(self._cache_group.move_learn_method, name, route)
         return self._cache_group.move_learn_method.get(route, None)
@@ -237,7 +316,14 @@ class Move(_Base):
         Returns
         -------
         models.MoveLearnMethod
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        method = client.move.fetch_move_learn_method("level-up")
+        print(method)
+        ```"""
         route = Endpoint.get_move_learn_method(name)
         self._validate_resource(self._cache_group.move_learn_method, name, route)
         data = self._client.request(route)
@@ -256,7 +342,15 @@ class Move(_Base):
         Returns
         -------
         models.MoveTarget | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        target = client.move.get_move_target("specific-move")
+        if target:
+            print(target)
+        ```"""
         route = Endpoint.get_move_target(name)
         self._validate_resource(self._cache_group.move_target, name, route)
         return self._cache_group.move_target.get(route, None)
@@ -272,7 +366,14 @@ class Move(_Base):
         Returns
         -------
         models.MoveTarget
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        target = client.move.fetch_move_target("specific-move")
+        print(target)
+        ```"""
         route = Endpoint.get_move_target(name)
         self._validate_resource(self._cache_group.move_target, name, route)
         data = self._client.request(route)

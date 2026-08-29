@@ -9,22 +9,18 @@ import typing as t
 
 from typing_extensions import override
 
+from pokelance.cache._async.manager import Item as ItemCache
 from pokelance.endpoints import Endpoint
 from pokelance.ext._async._base import AsyncBaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import models
-    from pokelance.cache._async.manager import Item as ItemCache
     from pokelance.client.async_client import PokeLanceAsyncClient
-
-    _Base = AsyncBaseExtension[ItemCache]
-else:
-    _Base = AsyncBaseExtension
 
 __all__: tuple[str, ...] = ("Item", "setup")
 
 
-class Item(_Base):
+class Item(AsyncBaseExtension[ItemCache]):
     """Extension for item related endpoints."""
 
     @override
@@ -52,7 +48,15 @@ class Item(_Base):
         Returns
         -------
         models.Item | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        item = client.item.get_item("master-ball")
+        if item:
+            print(item)
+        ```"""
         route = Endpoint.get_item(name)
         self._validate_resource(self._cache_group.item, name, route)
         return self._cache_group.item.get(route, None)
@@ -68,7 +72,14 @@ class Item(_Base):
         Returns
         -------
         models.Item
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        item = await client.item.fetch_item("master-ball")
+        print(item)
+        ```"""
         route = Endpoint.get_item(name)
         self._validate_resource(self._cache_group.item, name, route)
         data = await self._client.request(route)
@@ -85,7 +96,15 @@ class Item(_Base):
         Returns
         -------
         models.ItemAttribute | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        attribute = client.item.get_item_attribute("countable")
+        if attribute:
+            print(attribute)
+        ```"""
         route = Endpoint.get_item_attribute(name)
         self._validate_resource(self._cache_group.item_attribute, name, route)
         return self._cache_group.item_attribute.get(route, None)
@@ -101,7 +120,14 @@ class Item(_Base):
         Returns
         -------
         models.ItemAttribute
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        attribute = await client.item.fetch_item_attribute("countable")
+        print(attribute)
+        ```"""
         route = Endpoint.get_item_attribute(name)
         self._validate_resource(self._cache_group.item_attribute, name, route)
         data = await self._client.request(route)
@@ -118,7 +144,15 @@ class Item(_Base):
         Returns
         -------
         models.ItemCategory | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        category = client.item.get_item_category("stat-boosts")
+        if category:
+            print(category)
+        ```"""
         route = Endpoint.get_item_category(name)
         self._validate_resource(self._cache_group.item_category, name, route)
         return self._cache_group.item_category.get(route, None)
@@ -134,7 +168,14 @@ class Item(_Base):
         Returns
         -------
         models.ItemCategory
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        category = await client.item.fetch_item_category("stat-boosts")
+        print(category)
+        ```"""
         route = Endpoint.get_item_category(name)
         self._validate_resource(self._cache_group.item_category, name, route)
         data = await self._client.request(route)
@@ -151,7 +192,15 @@ class Item(_Base):
         Returns
         -------
         models.ItemFlingEffect | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        effect = client.item.get_item_fling_effect("badly-poison")
+        if effect:
+            print(effect)
+        ```"""
         route = Endpoint.get_item_fling_effect(name)
         self._validate_resource(self._cache_group.item_fling_effect, name, route)
         return self._cache_group.item_fling_effect.get(route, None)
@@ -167,7 +216,14 @@ class Item(_Base):
         Returns
         -------
         models.ItemFlingEffect
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        effect = await client.item.fetch_item_fling_effect("badly-poison")
+        print(effect)
+        ```"""
         route = Endpoint.get_item_fling_effect(name)
         self._validate_resource(self._cache_group.item_fling_effect, name, route)
         data = await self._client.request(route)
@@ -186,7 +242,15 @@ class Item(_Base):
         Returns
         -------
         models.ItemPocket | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        pocket = client.item.get_item_pocket("misc")
+        if pocket:
+            print(pocket)
+        ```"""
         route = Endpoint.get_item_pocket(name)
         self._validate_resource(self._cache_group.item_pocket, name, route)
         return self._cache_group.item_pocket.get(route, None)
@@ -202,7 +266,14 @@ class Item(_Base):
         Returns
         -------
         models.ItemPocket
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        pocket = await client.item.fetch_item_pocket("misc")
+        print(pocket)
+        ```"""
         route = Endpoint.get_item_pocket(name)
         self._validate_resource(self._cache_group.item_pocket, name, route)
         data = await self._client.request(route)
@@ -219,7 +290,15 @@ class Item(_Base):
         Returns
         -------
         models.Currency | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        currency = client.item.get_currency("money")
+        if currency:
+            print(currency)
+        ```"""
         route = Endpoint.get_currency(name)
         self._validate_resource(self._cache_group.currency, name, route)
         return self._cache_group.currency.get(route, None)
@@ -235,7 +314,14 @@ class Item(_Base):
         Returns
         -------
         models.Currency
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        currency = await client.item.fetch_currency("money")
+        print(currency)
+        ```"""
         route = Endpoint.get_currency(name)
         self._validate_resource(self._cache_group.currency, name, route)
         data = await self._client.request(route)

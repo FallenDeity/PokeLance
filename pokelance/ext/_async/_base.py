@@ -20,11 +20,10 @@ _AsyncCacheGroupT_co = TypeVar(
     default="AsyncCacheGroup",
     covariant=True,
 )
-_BaseAsyncExt = BaseExtension[AsyncHttpClient, AsyncCacheManager, _AsyncCacheGroupT_co]
 
 
 class AsyncBaseExtension(
-    _BaseAsyncExt[_AsyncCacheGroupT_co],
+    BaseExtension[AsyncHttpClient, AsyncCacheManager, _AsyncCacheGroupT_co],
     t.Generic[_AsyncCacheGroupT_co],
 ):
     """Abstract base class for asynchronous extensions."""

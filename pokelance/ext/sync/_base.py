@@ -22,11 +22,10 @@ _SyncCacheGroupT_co = TypeVar(
     default="SyncCacheGroup",
     covariant=True,
 )
-_BaseSyncExt = BaseExtension[SyncHttpClient, SyncCacheManager, _SyncCacheGroupT_co]
 
 
 class SyncBaseExtension(
-    _BaseSyncExt[_SyncCacheGroupT_co],
+    BaseExtension[SyncHttpClient, SyncCacheManager, _SyncCacheGroupT_co],
     t.Generic[_SyncCacheGroupT_co],
 ):
     """Abstract base class for synchronous extensions."""

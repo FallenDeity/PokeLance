@@ -99,7 +99,7 @@ class BaseExtension(abc.ABC, t.Generic[_HTTPClientT_co, _CacheManagerT_co, _Cach
         ----------
         cache : BaseCacheState
             The cache to check identifiers against.
-        resource : t.Union[str, int]
+        resource : str | int
             The resource name or ID to validate.
         route : Route
             The route associated with this resource.

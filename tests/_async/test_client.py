@@ -18,8 +18,8 @@ import pytest
 
 import pokelance
 from pokelance.constants import DEFAULT_BASE_URL, ExtensionEnum, get_base_url
+from pokelance.endpoints import Endpoint
 from pokelance.exceptions import ImageNotFound, ResourceNotFound
-from pokelance.http import Endpoint
 from pokelance.models import Pokemon
 
 # ---------------------------------------------------------------------------

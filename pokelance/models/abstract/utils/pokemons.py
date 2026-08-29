@@ -311,6 +311,7 @@ class GenerationV(Generation):
         The black-white depiction of this pokemon.
     """
 
+    icons: VersionSprite = attrs.field(factory=VersionSprite)
     black_white: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
@@ -318,6 +319,7 @@ class GenerationV(Generation):
     def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationV":
         return cls(
             raw=payload,
+            icons=VersionSprite.from_payload(payload.get("icons", {})),
             black_white=VersionSprite.from_payload(payload.get("black-white", {})),
         )
 
@@ -380,9 +382,12 @@ class GenerationVIII(Generation):
     ----------
     icons: VersionSprite
         The icons depiction of this pokemon.
+    brilliant_diamond_shining_pearl: VersionSprite
+        The brilliant-diamond-shining-pearl depiction of this pokemon.
     """
 
     icons: VersionSprite = attrs.field(factory=VersionSprite)
+    brilliant_diamond_shining_pearl: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
     @override
@@ -390,7 +395,28 @@ class GenerationVIII(Generation):
         return cls(
             raw=payload,
             icons=VersionSprite.from_payload(payload.get("icons", {})),
+            brilliant_diamond_shining_pearl=VersionSprite.from_payload(
+                payload.get("brilliant-diamond-shining-pearl", {})
+            ),
         )
+
+
+@attrs.define(kw_only=True, slots=True)
+class GenerationIX(Generation):
+    """A generation IX resource.
+
+    Attributes
+    ----------
+    scarlet_violet: VersionSprite
+        The scarlet-violet depiction of this pokemon.
+    """
+
+    scarlet_violet: VersionSprite = attrs.field(factory=VersionSprite)
+
+    @classmethod
+    @override
+    def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationIX":
+        return cls(raw=payload, scarlet_violet=VersionSprite.from_payload(payload.get("scarlet-violet", {})))
 
 
 @attrs.define(kw_only=True, slots=True)
@@ -415,6 +441,8 @@ class Versions(BaseModel):
         The generation VII depiction of this pokemon.
     generation_viii: GenerationVIII
         The generation VIII depiction of this pokemon.
+    generation_ix: GenerationIX
+        The generation IX depiction of this pokemon.
     """
 
     generation_i: GenerationI = attrs.field(factory=GenerationI)
@@ -425,6 +453,7 @@ class Versions(BaseModel):
     generation_vi: GenerationVI = attrs.field(factory=GenerationVI)
     generation_vii: GenerationVII = attrs.field(factory=GenerationVII)
     generation_viii: GenerationVIII = attrs.field(factory=GenerationVIII)
+    generation_ix: GenerationIX = attrs.field(factory=GenerationIX)
 
     @classmethod
     @override
@@ -439,6 +468,7 @@ class Versions(BaseModel):
             generation_vi=GenerationVI.from_payload(payload.get("generation-vi", {})),
             generation_vii=GenerationVII.from_payload(payload.get("generation-vii", {})),
             generation_viii=GenerationVIII.from_payload(payload.get("generation-viii", {})),
+            generation_ix=GenerationIX.from_payload(payload.get("generation-ix", {}))
         )
 
 
@@ -783,6 +813,8 @@ class TypeIconGenerationVIII(TypeIconGeneration):
         return cls(
             raw=payload,
             sword_shield=TypeIcon.from_payload(payload.get("sword-shield", {})),
+            brilliant_diamond_shining_pearl=TypeIcon.from_payload(payload.get("brilliant-diamond-shining-pearl", {})),
+            legends_arceus=TypeIcon.from_payload(payload.get("legends-arceus", {}))
         )
 
 

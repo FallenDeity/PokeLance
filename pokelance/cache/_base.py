@@ -10,7 +10,7 @@ from pokelance.endpoints import Route
 from pokelance.models import BaseModel
 
 if t.TYPE_CHECKING:
-    from pokelance.client._base import _ClientBase
+    from pokelance.client._base import ClientBase
 
 __all__: tuple[str, ...] = (
     "BaseCacheGroup",
@@ -22,21 +22,21 @@ __all__: tuple[str, ...] = (
 
 _KT = t.TypeVar("_KT", bound="Route")
 _VT = t.TypeVar("_VT", bound="BaseModel | t.Sequence[BaseModel]")
-_ClientT = t.TypeVar("_ClientT", bound="_ClientBase")
+_ClientT = t.TypeVar("_ClientT", bound="ClientBase")
 _CacheT = t.TypeVar("_CacheT", bound="BaseCacheState[t.Any, t.Any, t.Any]")
 _GroupT = t.TypeVar("_GroupT", bound="BaseCacheGroup[t.Any, t.Any]")
 
 
 @attrs.define(kw_only=True, slots=True, frozen=True)
 class CacheEndpoint:
-    """Represents a cached API endpoint.
+    """Represents a cached API endpoint identifier and URL.
 
     Attributes
     ----------
     id : str | int
-        The ID of the endpoint.
+        The numeric ID or string identifier of the endpoint.
     url : str
-        The URL of the endpoint.
+        The full PokeAPI resource URL for this endpoint.
     """
 
     id: str | int = attrs.field(factory=str)
@@ -49,7 +49,27 @@ class CacheEndpoint:
 
 @attrs.define(slots=True, kw_only=True)
 class CacheStats:
-    """Statistics tracking cache hits, misses, insertions, and evictions."""
+    """Statistics tracking cache hits, misses, insertions, and evictions.
+
+    Attributes
+    ----------
+    hits : int
+        Number of successful cache lookups.
+    misses : int
+        Number of failed cache lookups.
+    sets : int
+        Number of entries inserted or updated in the cache.
+    evictions : int
+        Number of entries removed due to reaching maximum cache capacity (LRU eviction).
+
+    Examples
+    --------
+    ```python
+    stats = client.cache.stats
+    print(f"Hits: {stats.hits}, Misses: {stats.misses}")
+    print(f"Hit Ratio: {stats.hit_ratio:.1%}")
+    ```
+    """
 
     hits: int = 0
     misses: int = 0
@@ -68,7 +88,14 @@ class CacheStats:
         return (self.hits / total) if total > 0 else 0.0
 
     def reset(self) -> None:
-        """Reset all statistical counters."""
+        """Resets all statistical counters to zero.
+
+        Examples
+        --------
+        ```python
+        client.cache.stats.reset()
+        ```
+        """
         self.hits = 0
         self.misses = 0
         self.sets = 0
@@ -89,9 +116,36 @@ class CacheStats:
 
 
 class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
-    """All in-memory operations. No I/O. No async. No events.
+    """In-memory LRU cache state with endpoint indexing and lookup metrics.
 
-    Fully testable without an event loop or HTTP session.
+    Manages cached items in an `OrderedDict` respecting a maximum capacity,
+    tracks endpoint URLs by name and ID, and records lookup statistics.
+
+    Parameters
+    ----------
+    max_size : int, default: 100
+        Maximum number of items to keep in memory before evicting least recently used items.
+    model : type[BaseModel] | None, optional
+        The PokeLance model class to instantiate when deserializing payloads.
+    name : str, optional
+        The name of this cache partition (e.g. 'pokemon', 'berry').
+    endpoint_key_is_id : bool, default: False
+        Whether the primary key for endpoints in this cache is the numeric ID rather than the name.
+    url_suffix : str, default: ""
+        URL suffix to append when building endpoint URLs (e.g. '/encounters').
+    is_list : bool, default: False
+        Whether this cache stores lists of models rather than single model instances.
+
+    Attributes
+    ----------
+    stats : CacheStats
+        Real-time statistics for lookups, hits, misses, and evictions on this cache.
+    endpoints : dict[str, CacheEndpoint]
+        Mapping from resource name (or ID) to CacheEndpoint metadata.
+    identifiers : set[str]
+        Set of all valid resource names and IDs known to this cache.
+    cache : OrderedDict[_KT, _VT]
+        The underlying OrderedDict storing cached items.
     """
 
     _client: _ClientT
@@ -120,11 +174,22 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
 
     @property
     def stats(self) -> CacheStats:
-        """Statistics for this specific cache."""
+        """Statistics for this specific cache partition."""
         return self._stats
 
     def from_payload(self, payload: dict[str, t.Any] | list[dict[str, t.Any]]) -> _VT:
-        """Create a model instance or list of model instances from a raw payload."""
+        """Creates a model instance or list of model instances from a raw payload dict.
+
+        Parameters
+        ----------
+        payload : dict[str, t.Any] | list[dict[str, t.Any]]
+            The raw JSON payload from PokéAPI.
+
+        Returns
+        -------
+        BaseModel | list[BaseModel]
+            The instantiated PokeLance model or list of models.
+        """
         if self._model is None:
             raise RuntimeError(f"Model class not configured for cache '{self._name}'")
         if isinstance(payload, list):
@@ -184,6 +249,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
 
     @override
     def setdefault(self, __key: _KT, /, __default: _VT | None = None) -> _VT:
+        """Returns the cached value for key if present, otherwise inserts default and returns it."""
         if __key not in self._cache and __default is not None:
             self[__key] = __default
             return self._cache[__key]
@@ -193,7 +259,14 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
 
     @override
     def clear(self) -> None:
-        """Clear the cached data only. The endpoint registry is left intact."""
+        """Clears all cached model data while keeping the endpoint registry intact.
+
+        Examples
+        --------
+        ```python
+        client.cache.pokemon.pokemon.clear()
+        ```
+        """
         self._cache.clear()
 
     def _mark_endpoints_cached(self) -> None:
@@ -201,11 +274,11 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         self.set_ready()
 
     def set_ready(self) -> None:
-        """Set the cache endpoint state as ready."""
+        """Sets the cache endpoint state as ready."""
         self._endpoints_cached = True
 
     def reset_endpoints(self) -> None:
-        """Clear the endpoint registry."""
+        """Clears the endpoint registry and marks the cache as unready."""
         self._endpoints.clear()
         self._endpoints_by_id.clear()
         self._identifiers.clear()
@@ -213,7 +286,29 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
 
     @override
     def get(self, key: _KT, default: _VT | None = None) -> _VT | None:  # ty: ignore[invalid-method-override] # pyright: ignore[reportIncompatibleMethodOverride]
-        """Get an item from the cache. If the exact key isn't found, attempt alias resolution."""
+        """Gets an item from the cache. If the exact key is missing, attempts alias resolution.
+
+        Parameters
+        ----------
+        key : Route
+            The endpoint route to look up.
+        default : BaseModel | list[BaseModel] | None, optional
+            The default value returned if not found in cache.
+
+        Returns
+        -------
+        BaseModel | list[BaseModel] | None
+            The cached model instance or default if not cached.
+
+        Examples
+        --------
+        ```python
+        from pokelance.endpoints import Endpoint
+
+        route = Endpoint.get_pokemon("pikachu")
+        cached_pokemon = client.cache.pokemon.pokemon.get(route)
+        ```
+        """
         if key in self._cache:
             self._stats.hits += 1
             self._cache.move_to_end(key)
@@ -230,7 +325,13 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         return default
 
     def load_documents(self, data: list[dict[str, str]]) -> None:
-        """Abstracted to handle standard, secondary, and location area endpoints."""
+        """Loads endpoint metadata documents into this cache partition's registry.
+
+        Parameters
+        ----------
+        data : list[dict[str, str]]
+            The raw list of endpoint documents containing `name` and `url`.
+        """
         self.reset_endpoints()
         for document in data:
             original_url = document["url"]
@@ -245,18 +346,54 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         self._mark_endpoints_cached()
 
     def set_size(self, size: int) -> None:
-        """Set the max size of the cache."""
+        """Sets the maximum capacity of this cache partition.
+
+        Parameters
+        ----------
+        size : int
+            The maximum number of items allowed in the cache.
+
+        Examples
+        --------
+        ```python
+        client.cache.pokemon.pokemon.set_size(200)
+        ```
+        """
         self._max_size = size
 
     def serialize(self) -> dict[str, t.Any]:
-        """Serialise the in-memory cache to a plain dict."""
+        """Serializes all in-memory cached models into a raw dictionary.
+
+        Returns
+        -------
+        dict[str, t.Any]
+            A dictionary mapping endpoint routes to raw model payload dictionaries.
+
+        Examples
+        --------
+        ```python
+        data = client.cache.pokemon.pokemon.serialize()
+        ```
+        """
         dummy: dict[str, t.Any] = {}
         for k, v in self.items():
             dummy[k.endpoint] = v.raw if isinstance(v, BaseModel) else [i.raw for i in v]
         return dummy
 
     def deserialize(self, data: dict[str, t.Any]) -> None:
-        """Populate the in-memory cache from a plain dict (output of serialize)."""
+        """Populates this cache partition from a serialized dictionary.
+
+        Parameters
+        ----------
+        data : dict[str, t.Any]
+            Dictionary previously generated by `serialize()`.
+
+        Examples
+        --------
+        ```python
+        client.cache.pokemon.pokemon.deserialize(saved_data)
+        ```
+        """
         self._max_size = max(self._max_size, len(data))
         for endpoint, info in data.items():
             route = Route(endpoint=endpoint)
@@ -264,29 +401,46 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
 
     @property
     def endpoints(self) -> dict[str, CacheEndpoint]:
-        """The endpoints that are cached."""
+        """Mapping from resource name (or ID) to CacheEndpoint metadata."""
         return self._endpoints
 
     @property
     def identifiers(self) -> set[str]:
-        """Every valid name and id (as strings) for this category."""
+        """Every valid resource name and ID known to this cache partition."""
         return self._identifiers
 
     @property
     def cache(self) -> OrderedDict[_KT, _VT]:
-        """The cache itself."""
+        """The underlying OrderedDict storing cached items."""
         return self._cache
 
 
 @attrs.define(slots=True, kw_only=True)
 class BaseCacheGroup(t.Generic[_ClientT, _CacheT]):
-    """Base class for all cache groups / aggregates."""
+    """Base class for all category cache aggregates.
+
+    Groups multiple related sub-caches (e.g. `berry`, `berry_firmness`, `berry_flavor`)
+    under a unified namespace and provides batch management methods.
+
+    Attributes
+    ----------
+    max_size : int
+        Maximum cache capacity configured across sub-caches in this group.
+    """
 
     max_size: int
 
     @property
     def stats(self) -> CacheStats:
-        """Aggregated statistics across all sub-caches in this group."""
+        """Aggregated statistics across all sub-caches in this group.
+
+        Examples
+        --------
+        ```python
+        group_stats = client.cache.pokemon.stats
+        print(f"Pokemon category hit ratio: {group_stats.hit_ratio:.1%}")
+        ```
+        """
         return sum((cache.stats for cache in self._walk_caches()), CacheStats())
 
     def _walk_caches(self) -> t.Iterator[_CacheT]:
@@ -297,30 +451,60 @@ class BaseCacheGroup(t.Generic[_ClientT, _CacheT]):
                 yield t.cast("_CacheT", val)
 
     def set_client(self, client: _ClientT) -> None:
-        """Set the client for all sub-caches in this group."""
+        """Sets the parent client instance for all sub-caches in this group."""
         for cache in self._walk_caches():
             cache._client = client  # pyright: ignore[reportPrivateUsage]
 
     def set_size(self, max_size: int = 100) -> None:
-        """Set the maximum cache size for this group and its sub-caches."""
+        """Sets the maximum cache capacity for all sub-caches in this group.
+
+        Parameters
+        ----------
+        max_size : int, default: 100
+            The maximum number of items allowed in each sub-cache.
+
+        Examples
+        --------
+        ```python
+        client.cache.pokemon.set_size(250)
+        ```
+        """
         self.max_size = max_size
         for cache in self._walk_caches():
             cache.set_size(max_size)
 
     def clear(self) -> None:
-        """Clear all data in this cache group."""
+        """Clears all cached model data in every sub-cache in this group.
+
+        Examples
+        --------
+        ```python
+        client.cache.pokemon.clear()
+        ```
+        """
         for cache in self._walk_caches():
             cache.clear()
 
     def reset(self) -> None:
-        """Reset all endpoint registries in this cache group."""
+        """Resets all endpoint registries in every sub-cache in this group."""
         for cache in self._walk_caches():
             cache.reset_endpoints()
 
 
 @attrs.define(slots=True, kw_only=True)
 class BaseCacheManager(t.Generic[_ClientT, _GroupT]):
-    """Base class for cache managers (sync and async)."""
+    """Base manager coordinating all category cache groups across the client.
+
+    Provides global configuration, bulk endpoint loading, cache clearance,
+    and cumulative statistics across all sub-caches.
+
+    Attributes
+    ----------
+    client : ClientBase
+        The parent client instance owning this cache manager.
+    max_size : int, default: 100
+        The default maximum capacity applied to all sub-caches.
+    """
 
     client: _ClientT
     max_size: int = 100
@@ -338,26 +522,71 @@ class BaseCacheManager(t.Generic[_ClientT, _GroupT]):
             aggregate.set_client(self.client)
 
     def set_size(self, max_size: int = 100) -> None:
-        """Set max cache size across all aggregates."""
+        """Sets the maximum cache size across all category aggregates and sub-caches.
+
+        Parameters
+        ----------
+        max_size : int, default: 100
+            The maximum number of items allowed in each cache partition.
+
+        Examples
+        --------
+        ```python
+        client.cache.set_size(500)
+        ```
+        """
         self.max_size = max_size
         for aggregate in self._walk_aggregates():
             aggregate.set_size(max_size)
 
     def load_documents(self, category: str, _type: str, data: list[dict[str, str]]) -> None:
-        """Load endpoint documents into the specified category subcache."""
+        """Loads endpoint metadata documents into the specified category sub-cache.
+
+        Parameters
+        ----------
+        category : str
+            The top-level category name (e.g. 'pokemon', 'berry').
+        _type : str
+            The specific sub-cache partition name (e.g. 'pokemon_species', 'berry_flavor').
+        data : list[dict[str, str]]
+            The raw list of endpoint documents.
+        """
         getattr(getattr(self, category.lower()), _type).load_documents(data)
 
     def clear(self) -> None:
-        """Clear all cached data in all aggregates."""
+        """Clears all cached model data across all category aggregates.
+
+        Examples
+        --------
+        ```python
+        client.cache.clear()
+        ```
+        """
         for aggregate in self._walk_aggregates():
             aggregate.clear()
 
     def reset(self) -> None:
-        """Reset all endpoint registries in all aggregates."""
+        """Resets all endpoint registries across all category aggregates.
+
+        Examples
+        --------
+        ```python
+        client.cache.reset()
+        ```
+        """
         for aggregate in self._walk_aggregates():
             aggregate.reset()
 
     @property
     def stats(self) -> CacheStats:
-        """Aggregate statistics across all sub-caches in all aggregates."""
+        """Cumulative statistics across all sub-caches in all category aggregates.
+
+        Examples
+        --------
+        ```python
+        total_stats = client.cache.stats
+        print(f"Overall cache hits: {total_stats.hits}")
+        print(f"Overall hit ratio: {total_stats.hit_ratio:.1%}")
+        ```
+        """
         return sum((aggregate.stats for aggregate in self._walk_aggregates()), CacheStats())

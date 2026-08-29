@@ -16,10 +16,6 @@ from pokelance.http._base import BaseHttpClient
 if t.TYPE_CHECKING:
     from pokelance.client.async_client import PokeLanceAsyncClient
 
-    _BaseHttpClient = BaseHttpClient[PokeLanceAsyncClient, niquests.AsyncSession, AsyncCacheManager]
-else:
-    _BaseHttpClient = BaseHttpClient
-
 __all__: tuple[str, ...] = ("AsyncEndpointLoader", "AsyncHttpClient")
 
 logger = logging.getLogger(__name__)
@@ -103,7 +99,7 @@ class AsyncEndpointLoader:
 
 
 @t.final
-class AsyncHttpClient(_BaseHttpClient):
+class AsyncHttpClient(BaseHttpClient["PokeLanceAsyncClient", niquests.AsyncSession, AsyncCacheManager]):
     """The asynchronous HTTP client for PokeLance.
 
     Parameters
@@ -112,7 +108,7 @@ class AsyncHttpClient(_BaseHttpClient):
         The client that this HTTP client is for.
     cache_size: int
         The size of the cache.
-    session: t.Optional[niquests.AsyncSession]
+    session: niquests.AsyncSession | None, optional
         The session to use for the HTTP client. If not provided, one is created
         internally on the first request and owned by this client.
     """

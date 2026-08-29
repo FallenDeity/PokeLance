@@ -1,6 +1,6 @@
 [project]
 name = "pokelance"
-version = "0.2.17"
+version = "1.0.0b1"
 description = "A flexible and easy to use pokemon library."
 authors = [{ name = "FallenDeity", email = "61227305+FallenDeity@users.noreply.github.com" }]
 requires-python = ">=3.10,<4"
@@ -35,6 +35,7 @@ dev = [
 ]
 docs = [
     "cairosvg>=2.9.0",
+    "griffe-typingdoc>=0.3.1",
     "markdown-exec[ansi]>=1.12.3",
     "mkdocs>=1.6.1",
     "mkdocs-jupyter>=0.26.3",

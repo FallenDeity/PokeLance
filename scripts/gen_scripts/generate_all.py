@@ -24,8 +24,9 @@ import sys
 import tempfile
 from pathlib import Path
 
-# Add current script directory to sys.path
+# Add current script directory and project root to sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 # Import the single source of truth
 from _registry import EXTENSIONS, ExtensionSpec
@@ -35,6 +36,7 @@ from _registry import EXTENSIONS, ExtensionSpec
 # ---------------------------------------------------------------------------
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+
 
 
 # ---------------------------------------------------------------------------
@@ -98,10 +100,10 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path, w
                 names=[ast.alias(name="override")],
                 level=0,
             ),
-            # from pokelance.ext.<_async/sync>._base import <AsyncBaseExtension / SyncBaseExtension>
+            # from pokelance.cache.<_async/sync>.manager import <spec.name> as <spec.name>Cache
             ast.ImportFrom(
-                module=base_ext_mod,
-                names=[ast.alias(name=base_ext_cls)],
+                module=cache_manager_mod,
+                names=[ast.alias(name=spec.name, asname=f"{spec.name}Cache")],
                 level=0,
             ),
             # from pokelance.endpoints import Endpoint
@@ -110,7 +112,13 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path, w
                 names=[ast.alias(name="Endpoint")],
                 level=0,
             ),
-            # if t.TYPE_CHECKING: import models, cache aggregate, client and define _Base
+            # from pokelance.ext.<_async/sync>._base import <AsyncBaseExtension / SyncBaseExtension>
+            ast.ImportFrom(
+                module=base_ext_mod,
+                names=[ast.alias(name=base_ext_cls)],
+                level=0,
+            ),
+            # if t.TYPE_CHECKING: import models, client
             ast.If(
                 test=ast.Attribute(value=ast.Name(id="t", ctx=ast.Load()), attr="TYPE_CHECKING", ctx=ast.Load()),
                 body=[
@@ -120,30 +128,12 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path, w
                         level=0,
                     ),
                     ast.ImportFrom(
-                        module=cache_manager_mod,
-                        names=[ast.alias(name=spec.name, asname=f"{spec.name}Cache")],
-                        level=0,
-                    ),
-                    ast.ImportFrom(
                         module=client_mod,
                         names=[ast.alias(name=client_type)],
                         level=0,
                     ),
-                    ast.Assign(
-                        targets=[ast.Name(id="_Base", ctx=ast.Store())],
-                        value=ast.Subscript(
-                            value=ast.Name(id=base_ext_cls, ctx=ast.Load()),
-                            slice=ast.Name(id=f"{spec.name}Cache", ctx=ast.Load()),
-                            ctx=ast.Load(),
-                        ),
-                    ),
                 ],
-                orelse=[
-                    ast.Assign(
-                        targets=[ast.Name(id="_Base", ctx=ast.Store())],
-                        value=ast.Name(id=base_ext_cls, ctx=ast.Load()),
-                    ),
-                ],
+                orelse=[],
             ),
             # __all__: tuple[str, ...] = ("setup", spec.name)
             ast.AnnAssign(
@@ -456,13 +446,26 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path, w
             right=ast.Constant(value=None),
         )
 
+        sample_arg = cat.example_arg
+        sample_call_arg = f"({sample_arg})" if len(params) > 0 else "()"
+        var_name = cat.name.split("_")[-1] if "_" in cat.name else cat.name
+        if var_name in ("type", "from", "class", "global", "import", "def", "return"):
+            var_name = f"{cat.name}_data"
+
         get_doc_str = format_docstring(
             f"Gets a {cat.name.replace('_', ' ')} from the cache.\n\n"
             f"{get_doc_params}"
             f"Returns\n"
             f"-------\n"
             f"{'list[models.' + model_name + '] | None' if cat.is_list else 'models.' + model_name + ' | None'}\n"
-            f"    The cached model or None.",
+            f"    The cached model or None.\n\n"
+            f"Examples\n"
+            f"--------\n"
+            f"```python\n"
+            f"{var_name} = client.{spec.module_name}.get_{cat.name}{sample_call_arg}\n"
+            f"if {var_name}:\n"
+            f"    print({var_name})\n"
+            f"```",
             8,
         )
 
@@ -599,13 +602,20 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path, w
             keywords=[],
         )
 
+        fetch_call_prefix = "await " if is_async else ""
         fetch_doc_str = format_docstring(
             f"Fetches a {cat.name.replace('_', ' ')} from the API.\n\n"
             f"{fetch_doc_params}"
             f"Returns\n"
             f"-------\n"
             f"{'list[models.' + model_name + ']' if cat.is_list else 'models.' + model_name}\n"
-            f"    The fetched model.",
+            f"    The fetched model.\n\n"
+            f"Examples\n"
+            f"--------\n"
+            f"```python\n"
+            f"{var_name} = {fetch_call_prefix}client.{spec.module_name}.fetch_{cat.name}{sample_call_arg}\n"
+            f"print({var_name})\n"
+            f"```",
             8,
         )
 
@@ -693,11 +703,17 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path, w
                 )
             )
 
-    # Class definition: class <SpecName>(_Base):
+    # Class definition: class <SpecName>(AsyncBaseExtension[<SpecName>Cache]):
     body.append(
         ast.ClassDef(
             name=spec.name,
-            bases=[ast.Name(id="_Base", ctx=ast.Load())],
+            bases=[
+                ast.Subscript(
+                    value=ast.Name(id=base_ext_cls, ctx=ast.Load()),
+                    slice=ast.Name(id=f"{spec.name}Cache", ctx=ast.Load()),
+                    ctx=ast.Load(),
+                )
+            ],
             keywords=[],
             body=class_body,
             decorator_list=[],
@@ -809,32 +825,13 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> None:
             ),
             # from pokelance.endpoints import Route
             ast.ImportFrom(module="pokelance.endpoints", names=[ast.alias(name="Route")], level=0),
-            # if t.TYPE_CHECKING: import client type and type _BaseCacheManager
+            # if t.TYPE_CHECKING: import client type
             ast.If(
                 test=ast.Attribute(value=ast.Name(id="t", ctx=ast.Load()), attr="TYPE_CHECKING", ctx=ast.Load()),
                 body=[
                     ast.ImportFrom(module=client_import_mod, names=[ast.alias(name=client_type)], level=0),
-                    ast.Assign(
-                        targets=[ast.Name(id="_BaseCacheManager", ctx=ast.Store())],
-                        value=ast.Subscript(
-                            value=ast.Name(id="BaseCacheManager", ctx=ast.Load()),
-                            slice=ast.Tuple(
-                                elts=[
-                                    ast.Name(id=client_type, ctx=ast.Load()),
-                                    ast.Name(id=base_agg_cls, ctx=ast.Load()),
-                                ],
-                                ctx=ast.Load(),
-                            ),
-                            ctx=ast.Load(),
-                        ),
-                    ),
                 ],
-                orelse=[
-                    ast.Assign(
-                        targets=[ast.Name(id="_BaseCacheManager", ctx=ast.Store())],
-                        value=ast.Name(id="BaseCacheManager", ctx=ast.Load()),
-                    ),
-                ],
+                orelse=[],
             ),
             # __all__: tuple[str, ...] = (manager_name, base_agg_cls)
             ast.AnnAssign(
@@ -957,9 +954,37 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> None:
         )
 
     # Top-level Manager Class
+    manager_doc = format_docstring(
+        f"""Top-level {'asynchronous' if is_async else 'synchronous'} cache manager.
+
+Coordinates category cache aggregates and provides centralized configuration,
+cache clearance, readiness synchronization, and aggregated metrics across all sub-caches.
+
+Attributes
+----------
+client : {client_type}
+    The parent {'async' if is_async else 'sync'} client instance.
+max_size : int, default: 100
+    The maximum number of items allowed in each cache partition.
+
+Examples
+--------
+```python
+# Check total hits and hit ratio across all endpoints
+stats = client.cache.stats
+print(f"Total lookups: {{stats.total_lookups}}, Hit ratio: {{stats.hit_ratio:.1%}}")
+
+# Set cache capacity globally
+client.cache.set_size(200)
+
+# Clear all cached data
+client.cache.clear()
+```""",
+        4,
+    )
     manager_body: list[ast.stmt] = [
         # Docstring
-        ast.Expr(value=ast.Constant(value=f"Top-level {'async' if is_async else 'sync'} cache manager.")),
+        ast.Expr(value=ast.Constant(value=manager_doc)),
         # client: PokeLanceAsyncClient / PokeLanceSyncClient
         ast.AnnAssign(
             target=ast.Name(id="client", ctx=ast.Store()),
@@ -991,6 +1016,16 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> None:
     )
 
     # wait_until_ready for top-level manager
+    wait_doc = format_docstring(
+        f"""{'Waits asynchronously' if is_async else 'Blocks synchronously'} until all sub-caches in all aggregates are ready.
+
+Examples
+--------
+```python
+{'await client.cache.wait_until_ready()' if is_async else 'client.cache.wait_until_ready()'}
+```""",
+        8,
+    )
     if is_async:
         manager_body.append(
             ast.AsyncFunctionDef(
@@ -1001,7 +1036,7 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> None:
                 returns=ast.Constant(value=None),
                 body=[
                     # Docstring
-                    ast.Expr(value=ast.Constant(value="Wait for all sub-caches in all aggregates to be ready.")),
+                    ast.Expr(value=ast.Constant(value=wait_doc)),
                     # tasks = [aggregate.wait_until_ready() for aggregate in self._walk_aggregates()]
                     ast.Assign(
                         targets=[ast.Name(id="tasks", ctx=ast.Store())],
@@ -1061,7 +1096,7 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> None:
                 returns=ast.Constant(value=None),
                 body=[
                     # Docstring
-                    ast.Expr(value=ast.Constant(value="Wait for all sub-caches in all aggregates to be ready.")),
+                    ast.Expr(value=ast.Constant(value=wait_doc)),
                     # for aggregate in self._walk_aggregates(): aggregate.wait_until_ready()
                     ast.For(
                         target=ast.Name(id="aggregate", ctx=ast.Store()),
@@ -1098,7 +1133,16 @@ def generate_cache_manager(is_async: bool, output_path: Path) -> None:
     body.append(
         ast.ClassDef(
             name=manager_name,
-            bases=[ast.Name(id="_BaseCacheManager", ctx=ast.Load())],
+            bases=[
+                ast.Subscript(
+                    value=ast.Name(id="BaseCacheManager", ctx=ast.Load()),
+                    slice=ast.Tuple(
+                        elts=[ast.Constant(value=client_type), ast.Name(id=base_agg_cls, ctx=ast.Load())],
+                        ctx=ast.Load(),
+                    ),
+                    ctx=ast.Load(),
+                )
+            ],
             keywords=[],
             body=manager_body,
             decorator_list=[attrs_define],

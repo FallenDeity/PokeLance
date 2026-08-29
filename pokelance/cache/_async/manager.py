@@ -17,10 +17,6 @@ if t.TYPE_CHECKING:
     from pokelance.client.async_client import PokeLanceAsyncClient
     from pokelance.endpoints import Route
 
-    _BaseCacheManager = BaseCacheManager[PokeLanceAsyncClient, AsyncCacheGroup]
-else:
-    _BaseCacheManager = BaseCacheManager
-
 __all__: tuple[str, ...] = ("AsyncCacheGroup", "AsyncCacheManager")
 
 
@@ -249,8 +245,32 @@ class Utility(AsyncCacheGroup):
 
 
 @attrs.define(slots=True, kw_only=True)
-class AsyncCacheManager(_BaseCacheManager):
-    """Top-level async cache manager."""
+class AsyncCacheManager(BaseCacheManager["PokeLanceAsyncClient", AsyncCacheGroup]):
+    """Top-level asynchronous cache manager.
+
+    Coordinates category cache aggregates and provides centralized configuration,
+    cache clearance, readiness synchronization, and aggregated metrics across all sub-caches.
+
+    Attributes
+    ----------
+    client : PokeLanceAsyncClient
+        The parent async client instance.
+    max_size : int, default: 100
+        The maximum number of items allowed in each cache partition.
+
+    Examples
+    --------
+    ```python
+    # Check total hits and hit ratio across all endpoints
+    stats = client.cache.stats
+    print(f"Total lookups: {stats.total_lookups}, Hit ratio: {stats.hit_ratio:.1%}")
+
+    # Set cache capacity globally
+    client.cache.set_size(200)
+
+    # Clear all cached data
+    client.cache.clear()
+    ```"""
 
     client: PokeLanceAsyncClient
     max_size: int = 100
@@ -267,6 +287,12 @@ class AsyncCacheManager(_BaseCacheManager):
     utility: Utility = attrs.field(factory=Utility)
 
     async def wait_until_ready(self) -> None:
-        """Wait for all sub-caches in all aggregates to be ready."""
+        """Waits asynchronously until all sub-caches in all aggregates are ready.
+
+        Examples
+        --------
+        ```python
+        await client.cache.wait_until_ready()
+        ```"""
         tasks = [aggregate.wait_until_ready() for aggregate in self._walk_aggregates()]
         await asyncio.gather(*tasks)

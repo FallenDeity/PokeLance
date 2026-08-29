@@ -9,22 +9,18 @@ import typing as t
 
 from typing_extensions import override
 
+from pokelance.cache._async.manager import Encounter as EncounterCache
 from pokelance.endpoints import Endpoint
 from pokelance.ext._async._base import AsyncBaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import models
-    from pokelance.cache._async.manager import Encounter as EncounterCache
     from pokelance.client.async_client import PokeLanceAsyncClient
-
-    _Base = AsyncBaseExtension[EncounterCache]
-else:
-    _Base = AsyncBaseExtension
 
 __all__: tuple[str, ...] = ("Encounter", "setup")
 
 
-class Encounter(_Base):
+class Encounter(AsyncBaseExtension[EncounterCache]):
     """Extension for encounter related endpoints."""
 
     @override
@@ -49,7 +45,15 @@ class Encounter(_Base):
         Returns
         -------
         models.EncounterMethod | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        method = client.encounter.get_encounter_method("walk")
+        if method:
+            print(method)
+        ```"""
         route = Endpoint.get_encounter_method(name)
         self._validate_resource(self._cache_group.encounter_method, name, route)
         return self._cache_group.encounter_method.get(route, None)
@@ -65,7 +69,14 @@ class Encounter(_Base):
         Returns
         -------
         models.EncounterMethod
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        method = await client.encounter.fetch_encounter_method("walk")
+        print(method)
+        ```"""
         route = Endpoint.get_encounter_method(name)
         self._validate_resource(self._cache_group.encounter_method, name, route)
         data = await self._client.request(route)
@@ -84,7 +95,15 @@ class Encounter(_Base):
         Returns
         -------
         models.EncounterCondition | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        condition = client.encounter.get_encounter_condition("swarm")
+        if condition:
+            print(condition)
+        ```"""
         route = Endpoint.get_encounter_condition(name)
         self._validate_resource(self._cache_group.encounter_condition, name, route)
         return self._cache_group.encounter_condition.get(route, None)
@@ -100,7 +119,14 @@ class Encounter(_Base):
         Returns
         -------
         models.EncounterCondition
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        condition = await client.encounter.fetch_encounter_condition("swarm")
+        print(condition)
+        ```"""
         route = Endpoint.get_encounter_condition(name)
         self._validate_resource(self._cache_group.encounter_condition, name, route)
         data = await self._client.request(route)
@@ -119,7 +145,15 @@ class Encounter(_Base):
         Returns
         -------
         models.EncounterConditionValue | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        value = client.encounter.get_encounter_condition_value("swarm-yes")
+        if value:
+            print(value)
+        ```"""
         route = Endpoint.get_encounter_condition_value(name)
         self._validate_resource(self._cache_group.encounter_condition_value, name, route)
         return self._cache_group.encounter_condition_value.get(route, None)
@@ -135,7 +169,14 @@ class Encounter(_Base):
         Returns
         -------
         models.EncounterConditionValue
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        value = await client.encounter.fetch_encounter_condition_value("swarm-yes")
+        print(value)
+        ```"""
         route = Endpoint.get_encounter_condition_value(name)
         self._validate_resource(self._cache_group.encounter_condition_value, name, route)
         data = await self._client.request(route)

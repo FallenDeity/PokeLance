@@ -3,7 +3,7 @@ import typing as t
 from typing_extensions import override
 
 if t.TYPE_CHECKING:
-    from pokelance.http import Route
+    from pokelance.endpoints import Route
 
 
 __all__: tuple[str, ...] = (
@@ -29,7 +29,7 @@ class PokeLanceException(Exception):  # ruff: ignore[error-suffix-on-exception-n
     ----------
     message: str
         The message to display.
-    route: pokelance.http.Route
+    route: pokelance.endpoints.Route
         The route that caused the exception.
 
     """
@@ -51,7 +51,7 @@ class HTTPException(PokeLanceException):
     ----------
     message: str
         The message to display.
-    route: pokelance.http.Route
+    route: pokelance.endpoints.Route
         The route that caused the exception.
     status: int
         The status code of the exception.
@@ -60,7 +60,7 @@ class HTTPException(PokeLanceException):
     ----------
     message: str
         The message to display.
-    route: pokelance.http.Route
+    route: pokelance.endpoints.Route
         The route that caused the exception.
     status: int
         The status code of the exception.
@@ -110,11 +110,11 @@ class ResourceNotFound(NotFound):
     ----------
     message: str
         The message to display.
-    route: pokelance.http.Route
+    route: pokelance.endpoints.Route
         The route that caused the exception.
     status: int
         The status code of the exception.
-    suggestions: t.Optional[t.List[str]]
+    suggestions: list[str] | None, optional
         Possible suggestions for the resource.
     """
 
@@ -137,7 +137,7 @@ class ImageNotFound(NotFound):
     ----------
     message: str
         The message to display.
-    route: pokelance.http.Route
+    route: pokelance.endpoints.Route
         The route that caused the exception.
     status: int
         The status code of the exception.
@@ -158,7 +158,7 @@ class AudioNotFound(NotFound):
     ----------
     message: str
         The message to display.
-    route: pokelance.http.Route
+    route: pokelance.endpoints.Route
         The route that caused the exception.
     status: int
         The status code of the exception.

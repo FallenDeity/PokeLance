@@ -9,22 +9,18 @@ import typing as t
 
 from typing_extensions import override
 
+from pokelance.cache._async.manager import Berry as BerryCache
 from pokelance.endpoints import Endpoint
 from pokelance.ext._async._base import AsyncBaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import models
-    from pokelance.cache._async.manager import Berry as BerryCache
     from pokelance.client.async_client import PokeLanceAsyncClient
-
-    _Base = AsyncBaseExtension[BerryCache]
-else:
-    _Base = AsyncBaseExtension
 
 __all__: tuple[str, ...] = ("Berry", "setup")
 
 
-class Berry(_Base):
+class Berry(AsyncBaseExtension[BerryCache]):
     """Extension for berry related endpoints."""
 
     @override
@@ -49,7 +45,15 @@ class Berry(_Base):
         Returns
         -------
         models.Berry | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        berry = client.berry.get_berry("cheri")
+        if berry:
+            print(berry)
+        ```"""
         route = Endpoint.get_berry(name)
         self._validate_resource(self._cache_group.berry, name, route)
         return self._cache_group.berry.get(route, None)
@@ -65,7 +69,14 @@ class Berry(_Base):
         Returns
         -------
         models.Berry
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        berry = await client.berry.fetch_berry("cheri")
+        print(berry)
+        ```"""
         route = Endpoint.get_berry(name)
         self._validate_resource(self._cache_group.berry, name, route)
         data = await self._client.request(route)
@@ -82,7 +93,15 @@ class Berry(_Base):
         Returns
         -------
         models.BerryFirmness | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        firmness = client.berry.get_berry_firmness("very-soft")
+        if firmness:
+            print(firmness)
+        ```"""
         route = Endpoint.get_berry_firmness(name)
         self._validate_resource(self._cache_group.berry_firmness, name, route)
         return self._cache_group.berry_firmness.get(route, None)
@@ -98,7 +117,14 @@ class Berry(_Base):
         Returns
         -------
         models.BerryFirmness
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        firmness = await client.berry.fetch_berry_firmness("very-soft")
+        print(firmness)
+        ```"""
         route = Endpoint.get_berry_firmness(name)
         self._validate_resource(self._cache_group.berry_firmness, name, route)
         data = await self._client.request(route)
@@ -115,7 +141,15 @@ class Berry(_Base):
         Returns
         -------
         models.BerryFlavor | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        flavor = client.berry.get_berry_flavor("spicy")
+        if flavor:
+            print(flavor)
+        ```"""
         route = Endpoint.get_berry_flavor(name)
         self._validate_resource(self._cache_group.berry_flavor, name, route)
         return self._cache_group.berry_flavor.get(route, None)
@@ -131,7 +165,14 @@ class Berry(_Base):
         Returns
         -------
         models.BerryFlavor
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        flavor = await client.berry.fetch_berry_flavor("spicy")
+        print(flavor)
+        ```"""
         route = Endpoint.get_berry_flavor(name)
         self._validate_resource(self._cache_group.berry_flavor, name, route)
         data = await self._client.request(route)

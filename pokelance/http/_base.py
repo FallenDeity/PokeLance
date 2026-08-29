@@ -13,7 +13,7 @@ if t.TYPE_CHECKING:
 
     from pokelance.cache._async.manager import AsyncCacheManager
     from pokelance.cache.sync.manager import SyncCacheManager
-    from pokelance.client._base import _ClientBase
+    from pokelance.client._base import ClientBase
 
     AnyCacheManager = AsyncCacheManager | SyncCacheManager
 
@@ -21,7 +21,7 @@ __all__: tuple[str, ...] = ("BaseHttpClient",)
 
 logger = logging.getLogger(__name__)
 
-_ClientT = TypeVar("_ClientT", bound="_ClientBase")
+_ClientT = TypeVar("_ClientT", bound="ClientBase")
 _SessionT = TypeVar("_SessionT", bound="niquests.Session | niquests.AsyncSession")
 _CacheManagerT = TypeVar(
     "_CacheManagerT",

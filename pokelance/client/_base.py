@@ -15,7 +15,7 @@ if t.TYPE_CHECKING:
     from pokelance.http._async import AsyncHttpClient
     from pokelance.http._sync import SyncHttpClient
 
-__all__: tuple[str, ...] = ("ClientConfig", "_ClientBase")
+__all__: tuple[str, ...] = ("ClientBase", "ClientConfig")
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,29 @@ _HTTPClientT_co = TypeVar(
 
 
 class ClientConfig(t.TypedDict, total=False):
-    """Configuration options for PokeLance clients."""
+    """Configuration options for PokeLance clients.
+
+    Attributes
+    ----------
+    audio_cache_size: int
+        Max entries in the audio LRU cache.
+    image_cache_size: int
+        Max entries in the image LRU cache.
+    cache_endpoints: bool
+        Whether to eagerly cache the name/id registries on client startup.
+    setup_logging: bool
+        Whether PokeLance should configure default terminal logging.
+    log_level: int
+        Log severity level filter.
+    structured_logging: bool
+        Output logs as structured JSON rather than ANSI-colored plain text.
+    file_logging: bool
+        Whether to write timestamped log files under `log_dir`.
+    log_dir: str | Path
+        Directory destination when `file_logging=True`.
+    set_excepthook: bool
+        Whether to install a custom exception hook for unhandled exceptions.
+    """
 
     audio_cache_size: int
     image_cache_size: int
@@ -41,12 +63,33 @@ class ClientConfig(t.TypedDict, total=False):
     set_excepthook: bool
 
 
-class _ClientBase(t.Generic[_HTTPClientT_co]):
-    """Shared base logic for PokeLanceAsyncClient and PokeLanceSyncClient."""
+class ClientBase(t.Generic[_HTTPClientT_co]):
+    """Shared base logic for PokeLanceAsyncClient and PokeLanceSyncClient.
+
+    Parameters
+    ----------
+    http : AsyncHttpClient | SyncHttpClient
+        The HTTP client used to make requests to the PokeAPI.
+    **kwargs : Unpack[ClientConfig]
+        Optional client configuration options.
+
+    Attributes
+    ----------
+    http : AsyncHttpClient | SyncHttpClient
+        The HTTP client used to make requests to the PokeAPI.
+    cache_endpoints : bool
+        Whether to pre-populate endpoint caches.
+    image_cache_size : int
+        The size of the image cache.
+    audio_cache_size : int
+        The size of the audio cache.
+    ext_tasks : list[tuple[Callable, str]]
+        A list of setup callables/coroutines to load extension data.
+    """
 
     EXTENSIONS: Path
     _http: _HTTPClientT_co
-    cache_endpoints: bool
+    _cache_endpoints: bool
     _ext_tasks: list[tuple[t.Callable[..., t.Any], str]]
     _image_cache_size: int
     _audio_cache_size: int
@@ -66,7 +109,7 @@ class _ClientBase(t.Generic[_HTTPClientT_co]):
                 set_excepthook=kwargs.get("set_excepthook", True),
             )
         self._http = http
-        self.cache_endpoints = kwargs.get("cache_endpoints", True)
+        self._cache_endpoints = kwargs.get("cache_endpoints", True)
         self._ext_tasks = []
         self._image_cache_size = kwargs.get("image_cache_size", 128)
         self._audio_cache_size = kwargs.get("audio_cache_size", 128)
@@ -114,6 +157,11 @@ class _ClientBase(t.Generic[_HTTPClientT_co]):
     def http(self) -> _HTTPClientT_co:
         """The HTTP client used to make requests to the PokeAPI."""
         return self._http
+
+    @property
+    def cache_endpoints(self) -> bool:
+        """Whether to pre-populate endpoint caches."""
+        return self._cache_endpoints
 
     @property
     def ext_tasks(self) -> list[tuple[t.Callable[..., t.Any], str]]:

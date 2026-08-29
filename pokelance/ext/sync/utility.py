@@ -8,22 +8,18 @@ import typing as t
 
 from typing_extensions import override
 
+from pokelance.cache.sync.manager import Utility as UtilityCache
 from pokelance.endpoints import Endpoint
 from pokelance.ext.sync._base import SyncBaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import models
-    from pokelance.cache.sync.manager import Utility as UtilityCache
     from pokelance.client.sync_client import PokeLanceSyncClient
-
-    _Base = SyncBaseExtension[UtilityCache]
-else:
-    _Base = SyncBaseExtension
 
 __all__: tuple[str, ...] = ("Utility", "setup")
 
 
-class Utility(_Base):
+class Utility(SyncBaseExtension[UtilityCache]):
     """Extension for utility related endpoints."""
 
     @override
@@ -45,7 +41,15 @@ class Utility(_Base):
         Returns
         -------
         models.Language | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        language = client.utility.get_language("en")
+        if language:
+            print(language)
+        ```"""
         route = Endpoint.get_language(id)
         self._validate_resource(self._cache_group.language, id, route)
         return self._cache_group.language.get(route, None)
@@ -61,7 +65,14 @@ class Utility(_Base):
         Returns
         -------
         models.Language
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        language = client.utility.fetch_language("en")
+        print(language)
+        ```"""
         route = Endpoint.get_language(id)
         self._validate_resource(self._cache_group.language, id, route)
         data = self._client.request(route)
@@ -73,7 +84,15 @@ class Utility(_Base):
         Returns
         -------
         models.APIMetadata | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        metadata = client.utility.get_api_metadata()
+        if metadata:
+            print(metadata)
+        ```"""
         route = Endpoint.get_api_metadata()
         return self._cache_group.api_metadata.get(route, None)
 
@@ -83,7 +102,14 @@ class Utility(_Base):
         Returns
         -------
         models.APIMetadata
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        metadata = client.utility.fetch_api_metadata()
+        print(metadata)
+        ```"""
         route = Endpoint.get_api_metadata()
         data = self._client.request(route)
         return self._cache_group.api_metadata.setdefault(route, self._cache_group.api_metadata.from_payload(data))

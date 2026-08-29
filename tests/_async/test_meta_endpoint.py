@@ -21,7 +21,7 @@ Coverage
 import pytest
 
 import pokelance
-from pokelance.http import Endpoint
+from pokelance.endpoints import Endpoint
 from pokelance.models import APIMetadata
 
 # ---------------------------------------------------------------------------

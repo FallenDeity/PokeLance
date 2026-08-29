@@ -8,22 +8,18 @@ import typing as t
 
 from typing_extensions import override
 
+from pokelance.cache.sync.manager import Evolution as EvolutionCache
 from pokelance.endpoints import Endpoint
 from pokelance.ext.sync._base import SyncBaseExtension
 
 if t.TYPE_CHECKING:
     from pokelance import models
-    from pokelance.cache.sync.manager import Evolution as EvolutionCache
     from pokelance.client.sync_client import PokeLanceSyncClient
-
-    _Base = SyncBaseExtension[EvolutionCache]
-else:
-    _Base = SyncBaseExtension
 
 __all__: tuple[str, ...] = ("Evolution", "setup")
 
 
-class Evolution(_Base):
+class Evolution(SyncBaseExtension[EvolutionCache]):
     """Extension for evolution related endpoints."""
 
     @override
@@ -47,7 +43,15 @@ class Evolution(_Base):
         Returns
         -------
         models.EvolutionChain | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        chain = client.evolution.get_evolution_chain(1)
+        if chain:
+            print(chain)
+        ```"""
         route = Endpoint.get_evolution_chain(id)
         self._validate_resource(self._cache_group.evolution_chain, id, route)
         return self._cache_group.evolution_chain.get(route, None)
@@ -63,7 +67,14 @@ class Evolution(_Base):
         Returns
         -------
         models.EvolutionChain
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        chain = client.evolution.fetch_evolution_chain(1)
+        print(chain)
+        ```"""
         route = Endpoint.get_evolution_chain(id)
         self._validate_resource(self._cache_group.evolution_chain, id, route)
         data = self._client.request(route)
@@ -80,7 +91,15 @@ class Evolution(_Base):
         Returns
         -------
         models.EvolutionTrigger | None
-            The cached model or None."""
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        trigger = client.evolution.get_evolution_trigger("level-up")
+        if trigger:
+            print(trigger)
+        ```"""
         route = Endpoint.get_evolution_trigger(name)
         self._validate_resource(self._cache_group.evolution_trigger, name, route)
         return self._cache_group.evolution_trigger.get(route, None)
@@ -96,7 +115,14 @@ class Evolution(_Base):
         Returns
         -------
         models.EvolutionTrigger
-            The fetched model."""
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        trigger = client.evolution.fetch_evolution_trigger("level-up")
+        print(trigger)
+        ```"""
         route = Endpoint.get_evolution_trigger(name)
         self._validate_resource(self._cache_group.evolution_trigger, name, route)
         data = self._client.request(route)
