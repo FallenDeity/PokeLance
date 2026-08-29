@@ -1503,30 +1503,30 @@ class PokemonFormTriggerCondition(BaseModel):
 
     Attributes
     ----------
-    name: str
+    name: str | None
         The name of the condition.
     trigger: PokemonFormTriggerEnum
         The trigger that causes this condition to be met.
-    url: str
+    url: str | None
         The url of the condition.
-    base_form: NamedResource
+    base_form: NamedResource | None
         The base form of the Pokémon that can change into this Pokémon form.
     """
 
-    name: str = attrs.field(factory=str)
+    name: str | None = attrs.field(default=None)
     trigger: PokemonFormTriggerEnum = attrs.field(converter=PokemonFormTriggerEnum.from_str)
-    url: str = attrs.field(factory=str)
-    base_form: NamedResource = attrs.field(factory=NamedResource)
+    url: str | None = attrs.field(default=None)
+    base_form: NamedResource | None = attrs.field(default=None)
 
     @classmethod
     @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonFormTriggerCondition":
         return cls(
             raw=payload,
-            name=payload.get("name", ""),
+            name=payload.get("name"),
             trigger=payload.get("trigger"),
-            url=payload.get("url", ""),
-            base_form=NamedResource.from_payload(payload.get("base_form", {})),
+            url=payload.get("url"),
+            base_form=NamedResource.optional_from_payload(payload.get("base_form")),
         )
 
 
