@@ -1,7 +1,6 @@
 # Guide
 
-Everything you need to build with PokeLance, from your first request to caching entire
-gamut of PokéAPI resources on disk.
+Everything you need to build with PokeLance, from your first request to caching the entire gamut of PokéAPI resources on disk.
 
 <div class="grid cards" markdown>
 
@@ -9,8 +8,7 @@ gamut of PokéAPI resources on disk.
 
     ---
 
-    Install PokeLance with `pip` or `uv` and pick between plain `asyncio` or an
-    async context manager.
+    Install PokeLance with `uv` or `pip` with support for both asynchronous and synchronous execution.
 
     [:octicons-arrow-right-24: Installation](installation.md)
 
@@ -18,8 +16,7 @@ gamut of PokéAPI resources on disk.
 
     ---
 
-    Create a client, ping the API, and fetch your first resources in a few
-    lines of code.
+    Create a client, ping the API, and fetch your first resources in a few lines of code.
 
     [:octicons-arrow-right-24: Quickstart](quickstart.md)
 
@@ -27,8 +24,7 @@ gamut of PokéAPI resources on disk.
 
     ---
 
-    Tune cache sizes, bring your own `aiohttp.ClientSession`, wire up logging,
-    and control endpoint pre-loading.
+    Tune cache sizes, bring your own `niquests` sessions, configure logging, and control endpoint pre-loading.
 
     [:octicons-arrow-right-24: Configuration](configuration.md)
 
@@ -36,8 +32,7 @@ gamut of PokéAPI resources on disk.
 
     ---
 
-    Understand the `get_*` / `fetch_*` pattern, `getch_data`, and constructing
-    requests straight `from_url`.
+    Understand the `get_*` / `fetch_*` pattern, `getch_data`, and constructing requests straight `from_url`.
 
     [:octicons-arrow-right-24: Fetching Data](fetching_data.md)
 
@@ -45,8 +40,7 @@ gamut of PokéAPI resources on disk.
 
     ---
 
-    A complete map of all 11 extensions and every category/endpoint they
-    expose.
+    A complete map of all 11 extensions and every category/endpoint they expose.
 
     [:octicons-arrow-right-24: Extensions Reference](extensions.md)
 
@@ -54,8 +48,7 @@ gamut of PokéAPI resources on disk.
 
     ---
 
-    LRU in-memory caches, endpoint auto-completion, and persisting entire
-    resource sets to disk as JSON.
+    LRU in-memory caches, endpoint auto-completion, and persisting entire resource sets to disk as JSON.
 
     [:octicons-arrow-right-24: Caching In Depth](caching.md)
 
@@ -63,8 +56,7 @@ gamut of PokéAPI resources on disk.
 
     ---
 
-    The exception hierarchy, HTTP status mapping, and "did you mean...?"
-    suggestions for typoed resources.
+    The exception hierarchy, HTTP status mapping, and "did you mean...?" suggestions for typoed resources.
 
     [:octicons-arrow-right-24: Error Handling](error_handling.md)
 
@@ -72,8 +64,7 @@ gamut of PokéAPI resources on disk.
 
     ---
 
-    Download sprites and cries with a built-in async LRU cache, plus the
-    Showdown animated-sprite helper.
+    Download sprites and cries with a built-in LRU cache (`get_image`, `get_audio`).
 
     [:octicons-arrow-right-24: Media](media.md)
 
@@ -89,8 +80,7 @@ Full, runnable integrations built on top of the client.
 
     ---
 
-    Share one `PokeLance` client (and `aiohttp.ClientSession`) across your
-    whole bot's lifetime.
+    Share a `PokeLanceAsyncClient` across your whole bot's lifetime.
 
     [:octicons-arrow-right-24: Discord Bot](recipes/discord_bot.md)
 
@@ -98,8 +88,7 @@ Full, runnable integrations built on top of the client.
 
     ---
 
-    Expose PokeLance's cache-then-fetch pattern as a tiny read-through REST
-    API.
+    Expose PokeLance's cache-then-fetch pattern as a read-through REST API.
 
     [:octicons-arrow-right-24: FastAPI Service](recipes/fastapi.md)
 
@@ -114,5 +103,4 @@ Full, runnable integrations built on top of the client.
 </div>
 
 !!! tip "Reading alongside the API Reference"
-    Every page here links out to the relevant [API Reference](../api_reference/pokelance.md)
-    section. If a guide doesn't cover a method signature in full, the reference docs will.
+    Every page here links out to the relevant [API Reference](../api_reference/pokelance.md) section.

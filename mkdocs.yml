@@ -15,8 +15,8 @@ theme:
   favicon: assets/pokelance.png
 
   font:
-    text: Ubuntu
-    code: JetBrains Mono
+    text: Inter
+    code: Roboto Mono
 
   icon:
     repo: fontawesome/brands/github
@@ -58,6 +58,9 @@ theme:
         icon: material/weather-night
         name: Dark Mode
 
+extra_css:
+  - assets/stylesheets/custom.css
+
 plugins:
   - search
   - markdown-exec
@@ -65,11 +68,26 @@ plugins:
       handlers:
         python:
           options:
+            extensions:
+              - griffe_typingdoc
+            docstring_style: numpy
+            docstring_section_style: table
+            show_source: true
             show_root_heading: true
             show_root_toc_entry: false
-            docstring_style: numpy
+            show_root_full_path: false
+            show_object_full_path: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            show_signature_annotations: true
+            signature_crossrefs: true
+            separate_signature: true
+            unwrap_annotated: true
             merge_init_into_class: true
-            inherited_members: true
+            inherited_members: false
+            members_order: source
+            filters:
+              - "!^_"
           inventories:
             - https://docs.python.org/3/objects.inv
   - mkdocs-jupyter:
@@ -102,26 +120,39 @@ nav:
       - Logging: api_reference/logger.md
       - Exceptions: api_reference/exceptions.md
       - Constants: api_reference/constants.md
-      - Utilities: api_reference/utils.md
       - Cache:
-          - Cache: api_reference/cache/cache.md
-          - CacheManager: api_reference/cache/cache_manager.md
+          - Base: api_reference/cache/_base.md
+          - Async: api_reference/cache/_async.md
+          - Sync: api_reference/cache/sync.md
       - Http:
           - Client: api_reference/http/httpclient.md
           - Routes: api_reference/http/routes.md
       - Extensions:
-          - base: api_reference/ext/_base.md
-          - berry: api_reference/ext/berry.md
-          - contest: api_reference/ext/contest.md
-          - encounter: api_reference/ext/encounter.md
-          - evolution: api_reference/ext/evolution.md
-          - game: api_reference/ext/game.md
-          - item: api_reference/ext/item.md
-          - location: api_reference/ext/location.md
-          - machine: api_reference/ext/machine.md
-          - move: api_reference/ext/move.md
-          - pokemon: api_reference/ext/pokemon.md
-          - utility: api_reference/ext/utility.md
+          - Base: api_reference/ext/_base.md
+          - Async:
+              - Berry: api_reference/ext/_async/berry.md
+              - Contest: api_reference/ext/_async/contest.md
+              - Encounter: api_reference/ext/_async/encounter.md
+              - Evolution: api_reference/ext/_async/evolution.md
+              - Game: api_reference/ext/_async/game.md
+              - Item: api_reference/ext/_async/item.md
+              - Location: api_reference/ext/_async/location.md
+              - Machine: api_reference/ext/_async/machine.md
+              - Move: api_reference/ext/_async/move.md
+              - Pokemon: api_reference/ext/_async/pokemon.md
+              - Utility: api_reference/ext/_async/utility.md
+          - Sync:
+              - Berry: api_reference/ext/sync/berry.md
+              - Contest: api_reference/ext/sync/contest.md
+              - Encounter: api_reference/ext/sync/encounter.md
+              - Evolution: api_reference/ext/sync/evolution.md
+              - Game: api_reference/ext/sync/game.md
+              - Item: api_reference/ext/sync/item.md
+              - Location: api_reference/ext/sync/location.md
+              - Machine: api_reference/ext/sync/machine.md
+              - Move: api_reference/ext/sync/move.md
+              - Pokemon: api_reference/ext/sync/pokemon.md
+              - Utility: api_reference/ext/sync/utility.md
       - Models:
           - Base: api_reference/models/base.md
           - Common:
@@ -149,28 +180,37 @@ nav:
               - Pokemon: api_reference/models/abstract/pokemon.md
 
 markdown_extensions:
-  - tables
-  - footnotes
-  - pymdownx.betterem
-  - pymdownx.critic
-  - pymdownx.caret
-  - pymdownx.keys
-  - pymdownx.mark
-  - pymdownx.tilde
   - abbr
   - admonition
   - attr_list
-  - md_in_html
-  - pymdownx.details
   - def_list
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
+  - footnotes
+  - md_in_html
   - toc:
-      permalink: ⚓︎
+      permalink: true
+      toc_depth: 4
+  - tables
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
   - pymdownx.highlight:
-      auto_title: true
-      line_spans: __span
       anchor_linenums: true
+      line_spans: __span
+      linenums_style: pymdownx-inline
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      normalize_issue_symbols: true
+      repo_url_shorthand: true
+      user: FallenDeity
+      repo: PokeLance
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -185,7 +225,7 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 extra:
-  version: 0.2.17
+  version: 1.0.0b1
   generator: false
   comments:
     enabled: true

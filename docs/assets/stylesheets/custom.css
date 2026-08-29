@@ -1,0 +1,342 @@
+@import url("https://cdn.jsdelivr.net/npm/firacode@6.2.0/distr/fira_code.css");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+:root {
+    --md-text-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --md-code-font: "Fira Code", "Roboto Mono", Consolas, monospace;
+}
+
+/* ==========================================================================
+   Base Typography
+   ========================================================================== */
+
+.md-typeset {
+    font-size: 0.7rem !important;
+    line-height: 1.55 !important;
+}
+
+.md-typeset p {
+    margin-bottom: 0.4rem !important;
+}
+
+/* Main Page Titles */
+.md-typeset h1 {
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+    font-size: 1.5rem !important;
+    margin-bottom: 0.8rem !important;
+}
+
+.md-typeset h2 {
+    font-weight: 600 !important;
+    letter-spacing: -0.015em !important;
+    font-size: 1.2rem !important;
+    margin-top: 1.4rem !important;
+    margin-bottom: 0.35rem !important;
+}
+
+.md-typeset h3 {
+    font-weight: 600 !important;
+    font-size: 1.05rem !important;
+    margin-top: 1.15rem !important;
+    margin-bottom: 0.25rem !important;
+}
+
+.md-typeset h4 {
+    font-weight: 600 !important;
+    font-size: 0.8rem !important;
+}
+
+/* ==========================================================================
+   Navigation Sidebars
+   ========================================================================== */
+
+.md-sidebar--primary .md-nav {
+    font-size: 0.65rem !important;
+}
+
+.md-sidebar--secondary .md-nav {
+    font-size: 0.72rem !important;
+    line-height: 1.4 !important;
+}
+
+.md-sidebar--secondary .md-nav__item {
+    margin: 0 !important;
+}
+
+.md-sidebar--secondary .md-nav__link {
+    padding: 0.07rem 0 !important;
+    font-size: 0.64rem !important;
+}
+
+.md-nav__link .doc-symbol {
+    display: inline-block !important;
+    font-size: 0.56rem !important;
+    font-weight: 600 !important;
+    font-family: var(--md-code-font) !important;
+    text-transform: lowercase !important;
+    letter-spacing: normal !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin-right: 0.3em !important;
+}
+
+.md-nav__link .doc-symbol-class {
+    color: #00bfa5 !important; /* Teal */
+}
+
+.md-nav__link .doc-symbol-method,
+.md-nav__link .doc-symbol-function {
+    color: #ba68c8 !important; /* Purple */
+}
+
+.md-nav__link .doc-symbol-attribute,
+.md-nav__link .doc-symbol-property {
+    color: #ff9800 !important; /* Orange */
+}
+
+.md-nav__link .doc-symbol-module {
+    color: #42a5f5 !important; /* Sky Blue */
+}
+
+/* ==========================================================================
+   mkdocstrings Object Headings
+   ========================================================================== */
+
+.doc-object {
+    margin-bottom: 1.3rem;
+}
+
+.doc-heading {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    font-size: 1.05rem !important;
+    font-weight: 400 !important;
+    font-family: var(--md-text-font) !important;
+    line-height: 1.4 !important;
+    margin-top: 1.3rem !important;
+    margin-bottom: 0.3rem !important;
+    padding: 0 !important;
+    border: none !important;
+}
+
+/* Symbol Badges in Headings */
+.doc-heading .doc-symbol {
+    display: inline-block !important;
+    font-size: 0.74rem !important;
+    font-weight: 600 !important;
+    font-family: var(--md-code-font) !important;
+    text-transform: lowercase !important;
+    letter-spacing: normal !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin-right: 0.4rem !important;
+    vertical-align: middle !important;
+}
+
+.doc-heading .doc-symbol-class {
+    color: #00bfa5 !important;
+}
+
+.doc-heading .doc-symbol-method,
+.doc-heading .doc-symbol-function {
+    color: #ba68c8 !important;
+}
+
+.doc-heading .doc-symbol-attribute,
+.doc-heading .doc-symbol-property {
+    color: #ff9800 !important;
+}
+
+.doc-heading .doc-symbol-module {
+    color: #42a5f5 !important;
+}
+
+/* Method / Class / Attribute Name in Heading */
+.doc-heading .doc-symbol-name,
+.doc-heading .doc-object-name {
+    font-family: var(--md-text-font) !important;
+    font-size: 1.05rem !important;
+    font-weight: 500 !important;
+    color: var(--md-default-fg-color) !important;
+    background: transparent !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Header link (¶ icon) in Amber */
+.doc-heading .headerlink {
+    font-size: 0.9rem !important;
+    color: #ffa000 !important;
+    margin-left: 0.3rem !important;
+    opacity: 0.85;
+}
+
+/* Hide async / other redundant labels in heading */
+.doc-heading .doc-labels,
+.doc-heading .doc-symbol-async {
+    display: none !important;
+}
+
+/* ==========================================================================
+   Signature Block (Normal Clean Codeblock)
+   ========================================================================== */
+
+.doc-signature {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0.25rem 0 0.5rem 0 !important;
+}
+
+.doc-signature .highlight {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+.doc-signature .highlight pre {
+    background-color: var(--md-code-bg-color) !important;
+    padding: 0.35rem 0.65rem !important;
+    margin: 0 !important;
+    border-radius: 4px !important;
+    font-family: var(--md-code-font) !important;
+    font-size: 0.74rem !important;
+    line-height: 1.45 !important;
+    border: 1px solid var(--md-default-fg-color--lightest) !important;
+}
+
+.doc-signature .nf,
+.doc-signature .nc {
+    color: #ba68c8 !important; /* Method name in purple */
+}
+
+/* ==========================================================================
+   3-Column Parameter & Attribute Tables (Name | Type | Description)
+   ========================================================================== */
+
+.doc-contents table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    width: 100% !important;
+    margin: 0.4rem 0 0.8rem 0 !important;
+    border: 1px solid var(--md-default-fg-color--lightest) !important;
+    border-radius: 4px !important;
+    overflow: hidden !important;
+    font-size: 0.72rem !important;
+}
+
+/* Table Header */
+.doc-contents table th {
+    font-size: 0.64rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    color: var(--md-default-fg-color--lighter) !important;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid var(--md-default-fg-color--lightest) !important;
+    padding: 0.3rem 0.55rem !important;
+    text-align: left !important;
+}
+
+.doc-contents table th .doc-section-title {
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    color: inherit !important;
+}
+
+/* Table Rows & Divider Lines */
+.doc-contents table tr,
+.doc-section-item {
+    background: transparent !important;
+}
+
+.doc-contents table td {
+    padding: 0.28rem 0.55rem !important;
+    border: none !important;
+    border-bottom: 1px solid var(--md-default-fg-color--lightest) !important;
+    vertical-align: top !important;
+    font-size: 0.72rem !important;
+    line-height: 1.45 !important;
+    background: transparent !important;
+}
+
+.doc-contents table tr:last-child td {
+    border-bottom: none !important;
+}
+
+/* Column 1: Name */
+.doc-contents table td:first-child code {
+    font-family: var(--md-code-font) !important;
+    font-size: 0.72rem !important;
+    font-weight: 500 !important;
+    background: transparent !important;
+    color: var(--md-code-fg-color) !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Column 2: Type */
+.doc-contents table td:nth-child(2) {
+    white-space: nowrap !important;
+}
+
+/* Descriptions across all doc tables (Parameters, Attributes, Returns) */
+.doc-contents table td .doc-md-description,
+.doc-contents table td .doc-md-description p,
+.doc-contents table td:last-child,
+.doc-contents table td:last-child p {
+    color: var(--md-default-fg-color) !important;
+    font-weight: 300 !important;
+    font-size: 0.6rem !important;
+    line-height: 1.45 !important;
+}
+
+/* Column 4: Default / Required Badge */
+.doc-contents table td:nth-child(4) {
+    white-space: nowrap !important;
+}
+
+.doc-contents table td:nth-child(4) code,
+.doc-contents table td:nth-child(4) em {
+    font-family: var(--md-code-font) !important;
+    font-size: 0.48rem !important;
+    font-style: normal !important;
+    padding: 0.08rem 0.35rem !important;
+    border-radius: 3px !important;
+    display: inline-block !important;
+}
+
+.doc-contents table td:nth-child(4) em {
+    background: rgba(124, 77, 255, 0.08) !important;
+    color: var(--md-default-fg-color--light) !important;
+    border: 1px solid var(--md-default-fg-color--lightest) !important;
+    font-weight: 400 !important;
+}
+
+.doc-contents table td:nth-child(4) code {
+    background: var(--md-code-bg-color) !important;
+    color: var(--md-default-fg-color--light) !important;
+    border: 1px solid var(--md-default-fg-color--lightest) !important;
+}
+
+/* ==========================================================================
+   General Code Blocks & Inline Code
+   ========================================================================== */
+
+.md-typeset code:not(.highlight code):not(.doc-signature code) {
+    font-size: 0.76em !important;
+    padding: 0.05em 0.25em !important;
+    border-radius: 0.15rem !important;
+}
+
+.highlight pre {
+    border-radius: 4px !important;
+    font-size: 0.74rem !important;
+    line-height: 1.45 !important;
+}

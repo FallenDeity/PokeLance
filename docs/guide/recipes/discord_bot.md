@@ -1,26 +1,27 @@
 # Recipe: Discord Bot
 
-A common pattern: your bot already owns an `aiohttp.ClientSession` (or you want one shared
-connector pool for everything), so PokeLance should reuse it rather than opening its own.
+A common pattern is integrating PokeLance with a Discord bot framework (like `discord.py`) using `PokeLanceAsyncClient`.
 
 ## Full example
 
 ```python
 import os
 import asyncio
-
-import aiohttp
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-from pokelance import PokeLance
+from pokelance import PokeLanceAsyncClient
 
 
 class Bot(commands.Bot):
-    def __init__(self, *, web_client: aiohttp.ClientSession, pokemon_db: PokeLance) -> None:
+    def __init__(self, *, pokemon_db: PokeLanceAsyncClient) -> None:
         super().__init__(command_prefix="!", intents=discord.Intents.all(), case_insensitive=True)
-        self.web_client = web_client
         self.pokemon_db = pokemon_db
+
+    async def setup_hook(self) -> None:
+        # Pre-warm registries before accepting interactions
+        await self.pokemon_db.wait_until_ready()
+        await self.tree.sync()
 
     async def on_ready(self) -> None:
         print(f"Logged in as {self.user} ({self.user.id})")
@@ -28,24 +29,22 @@ class Bot(commands.Bot):
 
 async def main() -> None:
     load_dotenv()
-    async with aiohttp.ClientSession() as session, PokeLance(session=session) as pokemon_db:
-        async with Bot(web_client=session, pokemon_db=pokemon_db) as bot:
-            await bot.start(os.getenv("TOKEN"))
+    async with PokeLanceAsyncClient() as pokemon_db:
+        async with Bot(pokemon_db=pokemon_db) as bot:
+            await bot.start(os.getenv("TOKEN", ""))
 
 
 asyncio.run(main())
 ```
 
-Both `aiohttp.ClientSession` and `PokeLance` are entered as async context managers around
-the bot's own lifetime, so everything tears down cleanly together on shutdown (`Ctrl+C`,
-a crash, or a graceful `bot.close()`).
+`PokeLanceAsyncClient` is entered as an async context manager around the bot's own lifetime, so all network connections, registries, and background tasks tear down cleanly together on shutdown (`Ctrl+C`, a crash, or a graceful `bot.close()`).
 
 ## A `/pokedex` slash command
 
-Putting [Fetching Data](../fetching_data.md) and [Error Handling](../error_handling.md)
-together into an actual command:
+Putting [Fetching Data](../fetching_data.md) and [Error Handling](../error_handling.md) together into a slash command:
 
 ```python
+import discord
 from discord import app_commands, Interaction
 from pokelance.exceptions import ResourceNotFound
 
@@ -72,24 +71,19 @@ async def pokedex(interaction: Interaction, name: str) -> None:
     await interaction.followup.send(embed=embed)
 ```
 
-Because `client.pokemon.fetch_pokemon` checks the cache first, running `/pokedex pikachu`
-twice only hits the network once subsequent lookups (from this or any other command
-sharing the same client) are served from memory.
+Because `bot.pokemon_db.pokemon.fetch_pokemon` checks the LRU cache first, running `/pokedex pikachu` twice only hits the network once; subsequent lookups (from this or any other command sharing the client) are served instantly from memory.
 
-## Autocomplete using `all_pokemons`
+## Autocomplete using endpoint registries
 
-Once the endpoint registry is loaded (`await bot.pokemon_db.wait_until_ready()` during
-startup), you get free autocomplete data:
+Once endpoint registries are pre-warmed (`await bot.pokemon_db.wait_until_ready()` in `setup_hook()`), you get instant, network-free autocomplete data:
 
 ```python
 @pokedex.autocomplete("name")
-async def pokedex_autocomplete(interaction: Interaction, current: str):
-    names = bot.pokemon_db.pokemon.all_pokemons or []
+async def pokedex_autocomplete(interaction: Interaction, current: str) -> list[app_commands.Choice[str]]:
+    names = bot.pokemon_db.pokemon.cache_group.pokemon.identifiers
     matches = [n for n in names if current.lower() in n][:25]
     return [app_commands.Choice(name=n, value=n) for n in matches]
 ```
 
 !!! tip "Warm the cache before the bot starts accepting commands"
-    Call `await pokemon_db.wait_until_ready()` right after entering the `PokeLance` context
-    manager and before `bot.start(...)`, so `all_pokemons` and friends are populated by the
-    time users can invoke commands.
+    Call `await pokemon_db.wait_until_ready()` inside `setup_hook()` before `tree.sync()`, so `cache_group.pokemon.identifiers` and all other registries are fully populated by the time users can invoke slash commands.

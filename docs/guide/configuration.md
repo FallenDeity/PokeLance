@@ -1,52 +1,52 @@
 # Configuration
 
-[`PokeLance`][pokelance.client.PokeLance] accepts a handful of keyword-only arguments that control
-caching, logging, and session ownership. All of them have sane defaults, so `PokeLance()`
-with no arguments is a perfectly valid client.
+Both [`PokeLanceAsyncClient`][pokelance.client.async_client.PokeLanceAsyncClient] and [`PokeLanceSyncClient`][pokelance.client.sync_client.PokeLanceSyncClient] accept keyword arguments controlling cache sizing, logging, endpoint caching, and HTTP sessions. All options have sane defaults:
 
 ```python
-client = PokeLance(
+from pokelance import PokeLanceAsyncClient
+
+client = PokeLanceAsyncClient(
+    cache_size=100,
     audio_cache_size=128,
     image_cache_size=128,
-    cache_size=100,
-    logger=None,
-    file_logging=False,
     cache_endpoints=True,
+    setup_logging=True,
+    file_logging=False,
+    structured_logging=False,
     session=None,
 )
 ```
 
-| Parameter          | Type                              | Default | Purpose                                                                                                     |
-| ------------------ | --------------------------------- | ------- | ----------------------------------------------------------------------------------------------------------- |
-| `cache_size`       | `int`                             | `100`   | Max entries kept per-resource-type in the LRU model cache (see [Caching](caching.md)).                      |
-| `image_cache_size` | `int`                             | `128`   | Max entries in the async LRU cache backing [`get_image_async`][pokelance.client.PokeLance.get_image_async]. |
-| `audio_cache_size` | `int`                             | `128`   | Max entries in the async LRU cache backing [`get_audio_async`][pokelance.client.PokeLance.get_audio_async]. |
-| `cache_endpoints`  | `bool`                            | `True`  | Whether to eagerly cache the *name/id registries* for every extension on startup.                           |
-| `session`          | `Optional[aiohttp.ClientSession]` | `None`  | Bring your own session; otherwise one is lazily created and owned by the client.                            |
-| `logger`           | `Optional[logging.Logger]`        | `None`  | Provide your own logger; otherwise PokeLance's own [`Logger`][pokelance.logger.Logger] is used.             |
-| `file_logging`     | `bool`                            | `False` | When using the built-in logger, also write timestamped log files under `logs/`.                             |
+| Parameter            | Type                                            | Default            | Purpose                                                                                           |
+| -------------------- | ----------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------- |
+| `cache_size`         | `int`                                           | `100`              | Max entries kept per-category in the LRU model cache (see [Caching](caching.md)).                |
+| `image_cache_size`   | `int`                                           | `128`              | Max entries in the LRU cache backing [`get_image`][pokelance.client.async_client.PokeLanceAsyncClient.get_image].   |
+| `audio_cache_size`   | `int`                                           | `128`              | Max entries in the LRU cache backing [`get_audio`][pokelance.client.async_client.PokeLanceAsyncClient.get_audio].   |
+| `cache_endpoints`    | `bool`                                          | `True`             | Whether to eagerly cache name/id registries on client startup for fuzzy search & validation.       |
+| `setup_logging`      | `bool`                                          | `True`             | Whether PokeLance should configure default terminal logging.                                     |
+| `log_level`          | `int`                                           | `logging.INFO`     | Log severity level filter.                                                                        |
+| `file_logging`       | `bool`                                          | `False`            | Whether to write timestamped log files under `log_dir`.                                           |
+| `structured_logging` | `bool`                                          | `False`            | Output logs as structured JSON rather than ANSI-colored plain text.                              |
+| `log_dir`            | `str \| Path`                                   | `"logs/"`          | Directory destination when `file_logging=True`.                                                   |
+| `session`            | `niquests.AsyncSession \| niquests.Session \| None` | `None`          | Optional external niquests session instance.                                                      |
 
 ## Cache sizing
 
-Every extension (`berry`, `pokemon`, `move`, ...) gets its own set of per-category LRU
-caches sized by `cache_size`. Bump this up if you're iterating over large swaths of the
-Pokédex and don't want to keep re-fetching:
+Every resource category (`pokemon`, `berry`, `move`, ...) gets its own LRU cache sized by `cache_size`:
 
 ```python
-from pokelance import PokeLance
+from pokelance import PokeLanceAsyncClient
 
-client = PokeLance(cache_size=1000)  # keep up to 1000 of *each* resource category
+client = PokeLanceAsyncClient(cache_size=1000)  # keep up to 1000 of *each* resource category
 ```
 
-You can also resize a running client's caches (this re-applies the limit to every
-sub-cache):
+You can also resize a running client's caches dynamically:
 
 ```python
-client.http.cache.set_size(500)
+client.http.cache_manager.set_size(500)
 ```
 
-Image and audio caches are independent since they store raw `bytes` rather than models, and
-resizing them is exposed directly on the client:
+Image and audio caches are independent since they store raw `bytes` rather than model objects:
 
 ```python
 client.image_cache_size = 256
@@ -55,78 +55,97 @@ client.audio_cache_size = 32
 
 ## Disabling endpoint pre-loading
 
-By default (`cache_endpoints=True`), as soon as the client connects (either implicitly via your first API request, or explicitly via `wait_until_ready()`), it schedules background tasks that fetch every extension's *list* endpoints (e.g. `GET /pokemon?limit=10000`) so that `get_*`/`fetch_*` calls can validate names/ids and suggest corrections immediately.
+By default (`cache_endpoints=True`), when the client initializes, it schedules background tasks that fetch every extension's list index (e.g. `GET /pokemon?limit=10000`) so that `get_*`/`fetch_*` calls can validate names/ids and suggest fuzzy corrections immediately.
 
-If you only ever fetch a handful of known resources and want to skip that warm-up entirely
-(useful in tests, or serverless functions with a cold-start budget), disable it:
+If you only ever fetch a handful of known resources and want to skip that warm-up entirely:
 
 ```python
-client = PokeLance(cache_endpoints=False)
+client = PokeLanceAsyncClient(cache_endpoints=False)
 ```
 
 !!! warning "Effect on validation"
     With `cache_endpoints=False`, [`ResourceNotFound`][pokelance.exceptions.ResourceNotFound]
-    suggestions won't be available (the registries they're computed from are empty), but
-    fetching still works exactly the same, a request is simply sent straight to the
-    API and any 404 still raises normally.
+    suggestions won't be available, but fetching still works as requests are dispatched directly to the API.
 
-## Waiting for the registries to finish loading
+## Waiting for registries to finish loading
 
-Pre-loading happens in the background via `asyncio.create_task`, so it doesn't block your
-first request. If you need to *guarantee* the registries are fully populated (for example,
-before iterating `client.pokemon.all_pokemons`), await
-[`wait_until_ready()`][pokelance.client.PokeLance.wait_until_ready]:
+Pre-loading happens asynchronously in the background. If you need to *guarantee* registries are fully loaded before querying (e.g. before iterating known identifiers):
 
-```python
-import asyncio
-from pokelance import PokeLance
+=== "Async"
+
+    ```python exec="true" source="above" result="text"
+    import asyncio
+    from pokelance import PokeLanceAsyncClient
 
 
-async def main() -> None:
-    client = PokeLance()
-    # Implicitly schedules on first request or call to wait_until_ready,
-    # blocks until finished
-    await client.wait_until_ready()
-    print(len(client.pokemon.all_pokemons or []))
-    await client.close()
+    async def main() -> None:
+        async with PokeLanceAsyncClient() as client:
+            await client.wait_until_ready()
+            pokemon_names = client.pokemon.cache_group.pokemon.identifiers
+            print(f"Registered {len(pokemon_names)} Pokemon names/IDs")
 
 
-asyncio.run(main())
-```
+    asyncio.run(main())
+    ```
+
+=== "Sync"
+
+    ```python exec="true" source="above" result="text"
+    from pokelance import PokeLanceSyncClient
+
+    with PokeLanceSyncClient() as client:
+        client.wait_until_ready()
+        pokemon_names = client.pokemon.cache_group.pokemon.identifiers
+        print(f"Registered {len(pokemon_names)} Pokemon names/IDs")
+    ```
 
 ## Bringing your own session
 
-Useful when PokeLance shares an event loop and connection pool with something else that
-also owns an `aiohttp.ClientSession`, a web app sharing one session across its request
-lifespan being the canonical example (see the [FastAPI recipe](recipes/fastapi.md)):
+When PokeLance shares an HTTP session with another service (such as in a FastAPI app):
 
-```python
-import aiohttp
-from pokelance import PokeLance
+=== "Async"
 
-session = aiohttp.ClientSession()
-client = PokeLance(session=session)
-```
+    ```python
+    import asyncio
+    import niquests
+    from pokelance import PokeLanceAsyncClient
 
-PokeLance will *use* the session but won't close it on `client.close()` unless it created
-it itself, closing `session` yourself remains your responsibility in that case.
+
+    async def main() -> None:
+        async with niquests.AsyncSession() as session:
+            async with PokeLanceAsyncClient(session=session) as client:
+                pokemon = await client.pokemon.fetch_pokemon("pikachu")
+                print(pokemon.name)
+
+
+    asyncio.run(main())
+    ```
+
+=== "Sync"
+
+    ```python
+    import niquests
+    from pokelance import PokeLanceSyncClient
+
+    with niquests.Session() as session:
+        with PokeLanceSyncClient(session=session) as client:
+            pokemon = client.pokemon.fetch_pokemon("pikachu")
+            print(pokemon.name)
+    ```
+
+PokeLance will use the shared session without closing it when the client exits.
 
 ## Logging
 
-The default [`Logger`][pokelance.logger.Logger] is a colorized `logging.Logger` subclass.
-Pass `file_logging=True` to also persist rotating, dated log files under `logs/<name>-<date>.log`:
+PokeLance comes with built-in colorized logging and structured JSON formatting:
 
 ```python
-client = PokeLance(file_logging=True)
-client.logger.info("This goes to both stdout and logs/pokelance-YYYY-MM-DD.log")
-```
+from pokelance import PokeLanceAsyncClient
 
-Prefer your own logging setup? Pass any standard `logging.Logger`:
-
-```python
-import logging
-from pokelance import PokeLance
-
-logger = logging.getLogger("my-app")
-client = PokeLance(logger=logger)
+# Enable structured JSON logging with file outputs
+client = PokeLanceAsyncClient(
+    structured_logging=True,
+    file_logging=True,
+    log_dir="logs/",
+)
 ```

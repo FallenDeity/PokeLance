@@ -3,90 +3,83 @@
 <img src="https://raw.githubusercontent.com/FallenDeity/PokeLance/master/docs/assets/pokelance.png" width=450 alt="logo"><br><br>
 <img src="https://img.shields.io/github/license/FallenDeity/PokeLance?style=flat-square" alt="license">
 <img src="https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square" alt="black">
-<img src="https://img.shields.io/badge/%20type_checker-mypy-%231674b1?style=flat-square" alt="mypy">
-<img src="https://img.shields.io/badge/%20linter-ruff-%231674b1?style=flat-square" alt="ruff">
+<img src="https://img.shields.io/badge/type_checker-ty-%231674b1?style=flat-square" alt="ty">
+<img src="https://img.shields.io/badge/linter-ruff-%231674b1?style=flat-square" alt="ruff">
 <img src="https://img.shields.io/github/stars/FallenDeity/PokeLance?style=flat-square" alt="stars">
 <img src="https://img.shields.io/pypi/dm/pokelance.svg" alt="downloads">
 <img src="https://img.shields.io/github/last-commit/FallenDeity/PokeLance?style=flat-square" alt="commits">
 <img src="https://img.shields.io/pypi/pyversions/PokeLance?style=flat-square" alt="py">
 <img src="https://img.shields.io/pypi/v/PokeLance?style=flat-square" alt="versions">
 <br><br>
-A flexible, statically typed and easy to use pokeapi wrapper for python 🚀
+A flexible, statically typed and easy to use PokéAPI wrapper for Python 🚀
 </p>
 
 ---
 
+### Features:
 
-Features:
-- Modern and pythonic API asynchronously built on top of aiohttp
-- Flexible and easy to use
-- Fully typed with mypy
-- Linted with ruff
-- Well documented
-- Optimized for speed and performance
-- Automatically caches data for faster access
-- Caches endpoints for user convenience
+- **Dual Client Architecture**: Full support for both Asynchronous (`PokeLanceAsyncClient`) and Synchronous (`PokeLanceSyncClient`) paradigms.
+- **Modern HTTP Engine**: Built on top of [`niquests`](https://github.com/jawah/niquests) with HTTP/2 and HTTP/3 support.
+- **Statically Typed**: Fully typed with strict typing support using [`ty`](https://github.com/astral-sh/ty).
+- **Automatic Caching**: Dual-level caching with in-memory LRU model caches, endpoint pre-warming, and disk serialization.
+- **Media Helpers**: Built-in async and sync media loaders (`get_image`, `get_audio`) with dedicated caching.
+- **Developer Experience**: Fuzzy "did you mean...?" suggestions on invalid lookups and structured logging.
 
 ---
 
 ## Installation
 
 ```bash
-$ python -m pip install PokeLance
+# Using uv (recommended)
+$ uv add git+https://github.com/FallenDeity/PokeLance.git@beta-v1
+
+# Using pip
+$ python -m pip install -U git+https://github.com/FallenDeity/PokeLance.git@beta-v1
 ```
 
 ---
 
-## Usage
+## Quickstart
+
+### Asynchronous Client
 
 ```python
 import asyncio
-
-from pokelance import PokeLance
-
-client = PokeLance()  # Create a client instance
+from pokelance import PokeLanceAsyncClient
 
 
 async def main() -> None:
-    print(await client.ping())  # Ping the pokeapi
-    print(await client.berry.fetch_berry("cheri"))  # Fetch a berry from the pokeapi
-    print(await client.berry.fetch_berry_flavor("spicy"))
-    print(await client.berry.fetch_berry_firmness("very-soft"))
-    print(client.berry.get_berry("cheri"))  # Get a cached berry it will return None if it doesn't exist
-    print(client.berry.get_berry_flavor("spicy"))
-    print(client.berry.get_berry_firmness("very-soft"))
-    await client.close()  # Close the client
-    return None
+    async with PokeLanceAsyncClient() as client:
+        print(await client.ping())
+
+        # Fetch from network (and populate LRU cache)
+        berry = await client.berry.fetch_berry("cheri")
+        print(f"Fetched: {berry.name} (id={berry.id})")
+
+        # Instant synchronous cache lookup
+        cached_berry = client.berry.get_berry("cheri")
+        print(f"Cached: {cached_berry}")
 
 
 asyncio.run(main())
 ```
 
-## With Async Context Manager
+### Synchronous Client
 
 ```python
-import asyncio
+from pokelance import PokeLanceSyncClient
 
-import aiohttp
-from pokelance import PokeLance
+with PokeLanceSyncClient() as client:
+    print(client.ping())
 
+    berry = client.berry.fetch_berry("cheri")
+    print(f"Fetched: {berry.name} (id={berry.id})")
 
-async def main() -> None:
-    # Use an async context manager to create a client instance
-    async with aiohttp.ClientSession() as session, PokeLance(session=session) as client:
-        print(await client.ping())  # Ping the pokeapi
-        print(await client.berry.fetch_berry("cheri"))  # Fetch a berry from the pokeapi
-        print(await client.berry.fetch_berry_flavor("spicy"))
-        print(await client.berry.fetch_berry_firmness("very-soft"))
-        print(client.berry.get_berry("cheri"))  # Get a cached berry it will return None if it doesn't exist
-        print(client.berry.get_berry_flavor("spicy"))
-        print(client.berry.get_berry_firmness("very-soft"))
-        # The client will be closed automatically when the async context manager exits
-    return None
-
-
-asyncio.run(main())
+    cached_berry = client.berry.get_berry("cheri")
+    print(f"Cached: {cached_berry}")
 ```
+
+---
 
 ## Documentation
 
@@ -98,15 +91,11 @@ asyncio.run(main())
 - [Media - Sprites & Cries](https://fallendeity.github.io/PokeLance/guide/media/)
 - [API Reference](https://fallendeity.github.io/PokeLance/api_reference/pokelance/)
 
-## Recipes
+---
 
-- [Discord Bot](https://fallendeity.github.io/PokeLance/guide/recipes/discord_bot/)
-- [FastAPI Service](https://fallendeity.github.io/PokeLance/guide/recipes/fastapi/)
-- [Notebook Playground](https://fallendeity.github.io/PokeLance/guide/recipes/playground/)
-
-## Links
+## Important Links
 
 - [PokeAPI](https://pokeapi.co/)
-- [PokeLance Documentation](https://FallenDeity.github.io/PokeLance/)
+- [PokeLance Documentation](https://fallendeity.github.io/PokeLance/)
 - [PokeLance GitHub](https://github.com/FallenDeity/PokeLance)
 - [PokeLance PyPI](https://pypi.org/project/PokeLance/)

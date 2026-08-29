@@ -1,52 +1,56 @@
 # Media: Sprites & Cries
 
-Pokémon models come back from PokéAPI full of URLs to sprites and cries, not the raw bytes.
-PokeLance gives you two async helpers to fetch those, each backed by their own async LRU
-cache so re-downloading the same sprite is instant. This page also shows both rendered
-inline, live: the bytes are downloaded at doc-build time, base64-encoded, and dropped
-straight into an `<img>`/`<audio>` tag.
+Pokémon models come back from PokéAPI full of URLs to sprites and cries, not raw bytes. PokeLance provides dedicated helpers (`get_image` and `get_audio`) to fetch those, backed by an LRU cache so repeated lookups are instant.
 
 ## Fetching an image
 
-[`get_image_async`][pokelance.client.PokeLance.get_image_async] downloads and validates any
-sprite URL, returning raw `bytes`:
+[`get_image`][pokelance.client.async_client.PokeLanceAsyncClient.get_image] downloads and validates any sprite URL, returning raw `bytes`:
 
-```python exec="true" source="above" result="text" session="media"
-import asyncio
-from pokelance import PokeLance
+=== "Async"
 
-client = PokeLance()
-
-
-async def main() -> str:
-    pokemon = await client.pokemon.fetch_pokemon("pikachu")
-    img = await client.get_image_async(pokemon.sprites.front_default)
-    await client.close()
-    return f"downloaded {len(img)} bytes from {pokemon.sprites.front_default}"
+    ```python exec="true" source="above" result="text" session="media_img_async"
+    import asyncio
+    from pokelance import PokeLanceAsyncClient
 
 
-print(asyncio.run(main()))
-```
+    async def main() -> None:
+        async with PokeLanceAsyncClient() as client:
+            pokemon = await client.pokemon.fetch_pokemon("pikachu")
+            assert pokemon.sprites.front_default is not None
+            img = await client.get_image(pokemon.sprites.front_default)
+            print(f"Downloaded {len(img)} bytes from {pokemon.sprites.front_default}")
 
-Accepted content types are `png`, `jpg`, `jpeg`, `gif`, `webp`, and `svg`, anything else
-(or a non-2xx response) raises [`ImageNotFound`][pokelance.exceptions.ImageNotFound].
 
-### Embedding it as `<img>`
+    asyncio.run(main())
+    ```
 
-```python exec="true" source="above" html="true" session="media"
+=== "Sync"
+
+    ```python exec="true" source="above" result="text" session="media_img_sync"
+    from pokelance import PokeLanceSyncClient
+
+    with PokeLanceSyncClient() as client:
+        pokemon = client.pokemon.fetch_pokemon("pikachu")
+        assert pokemon.sprites.front_default is not None
+        img = client.get_image(pokemon.sprites.front_default)
+        print(f"Downloaded {len(img)} bytes from {pokemon.sprites.front_default}")
+    ```
+
+Accepted content types are `png`, `jpg`, `jpeg`, `gif`, `webp`, and `svg`; anything else raises [`ImageNotFound`][pokelance.exceptions.ImageNotFound].
+
+```python exec="true" source="above" html="true" session="media_img_async"
 import asyncio
 import base64
-from pokelance import PokeLance
-
-client = PokeLance()
+from pokelance import PokeLanceAsyncClient
 
 
 async def main() -> str:
-    pokemon = await client.pokemon.fetch_pokemon("pikachu")
-    img = await client.get_image_async(pokemon.sprites.front_default)
-    await client.close()
-    encoded = base64.b64encode(img).decode("ascii")
-    return f'<img src="data:image/png;base64,{encoded}" alt="pikachu sprite" width="96" height="96"/>'
+    async with PokeLanceAsyncClient() as client:
+        pokemon = await client.pokemon.fetch_pokemon("pikachu")
+        assert pokemon.sprites.front_default is not None
+        img = await client.get_image(pokemon.sprites.front_default)
+        encoded = base64.b64encode(img).decode("ascii")
+        return f'<img src="data:image/png;base64,{encoded}" alt="pikachu sprite" width="96" height="96"/>'
 
 
 print(asyncio.run(main()))
@@ -54,114 +58,85 @@ print(asyncio.run(main()))
 
 ## Fetching a cry
 
-[`get_audio_async`][pokelance.client.PokeLance.get_audio_async] works identically, for the
-newer `cries` field on [`Pokemon`][pokelance.models.abstract.pokemon.Pokemon] models:
+[`get_audio`][pokelance.client.async_client.PokeLanceAsyncClient.get_audio] works identically for the `cries` field on [`Pokemon`][pokelance.models.abstract.pokemon.Pokemon] models:
 
-```python exec="true" source="above" result="text" session="media"
-import asyncio
-from pokelance import PokeLance
+=== "Async"
 
-client = PokeLance()
-
-
-async def main() -> str:
-    pokemon = await client.pokemon.fetch_pokemon("pikachu")
-    audio = await client.get_audio_async(pokemon.cries.latest)
-    await client.close()
-    return f"downloaded {len(audio)} bytes from {pokemon.cries.latest}"
+    ```python exec="true" source="above" result="text" session="media_cry_async"
+    import asyncio
+    from pokelance import PokeLanceAsyncClient
 
 
-print(asyncio.run(main()))
-```
+    async def main() -> None:
+        async with PokeLanceAsyncClient() as client:
+            pokemon = await client.pokemon.fetch_pokemon("pikachu")
+            audio = await client.get_audio(pokemon.cries.latest)
+            print(f"Downloaded {len(audio)} bytes from {pokemon.cries.latest}")
 
-Accepted content types here are `ogg`, `wav`, and `mp3`; anything else raises
-[`AudioNotFound`][pokelance.exceptions.AudioNotFound].
 
-### Embedding it as `<audio>`
+    asyncio.run(main())
+    ```
 
-```python exec="true" source="above" html="true" session="media"
+=== "Sync"
+
+    ```python exec="true" source="above" result="text" session="media_cry_sync"
+    from pokelance import PokeLanceSyncClient
+
+    with PokeLanceSyncClient() as client:
+        pokemon = client.pokemon.fetch_pokemon("pikachu")
+        audio = client.get_audio(pokemon.cries.latest)
+        print(f"Downloaded {len(audio)} bytes from {pokemon.cries.latest}")
+    ```
+
+Accepted content types are `ogg`, `wav`, and `mp3`; anything else raises [`AudioNotFound`][pokelance.exceptions.AudioNotFound].
+
+```python exec="true" source="above" html="true" session="media_cry_async"
 import asyncio
 import base64
-from pokelance import PokeLance
-
-client = PokeLance()
+from pokelance import PokeLanceAsyncClient
 
 
 async def main() -> str:
-    pokemon = await client.pokemon.fetch_pokemon("pikachu")
-    audio = await client.get_audio_async(pokemon.cries.latest)
-    await client.close()
-    encoded = base64.b64encode(audio).decode("ascii")
-    return f'<audio controls preload="none"><source src="data:audio/ogg;base64,{encoded}" type="audio/ogg"></audio>'
+    async with PokeLanceAsyncClient() as client:
+        pokemon = await client.pokemon.fetch_pokemon("pikachu")
+        audio = await client.get_audio(pokemon.cries.latest)
+        encoded = base64.b64encode(audio).decode("ascii")
+        return (
+            f'<audio controls preload="none">'
+            f'<source src="data:audio/ogg;base64,{encoded}" type="audio/ogg"></audio>'
+        )
 
 
 print(asyncio.run(main()))
 ```
 
-## Why these are cached separately
+## Media caching
 
-Unlike model caches (bounded by `cache_size`), image and audio helpers are decorated with
-PokeLance's own [`alru_cache`](../api_reference/utils.md), an async-aware LRU cache that
-also de-duplicates concurrent in-flight requests for the same URL (two coroutines awaiting
-the same sprite at the same time share one download instead of firing two).
+Image and audio helpers in `PokeLanceAsyncClient` use an asynchronous LRU cache (`alru_cache`), which deduplicates concurrent in-flight requests for the same URL.
 
-Sizes are configured independently from the model cache, via the client constructor or
-properties (see [Configuration](configuration.md#cache-sizing)):
+Cache sizes can be configured during client construction or dynamically:
 
 ```python
-client = PokeLance(image_cache_size=256, audio_cache_size=64)
-client.image_cache_size = 512  # can also be changed after construction
-```
-
-A cached hit is measurably faster since it skips the network entirely:
-
-```python exec="true" source="above" result="text"
-import asyncio
-import time
-
-from pokelance import PokeLance
-
-
-async def main() -> None:
-    client = PokeLance()
-    url = (await client.pokemon.fetch_pokemon("pikachu")).sprites.front_default
-
-    t0 = time.perf_counter()
-    await client.get_image_async(url)
-    first = time.perf_counter() - t0
-
-    t1 = time.perf_counter()
-    await client.get_image_async(url)  # same URL: served from the LRU cache
-    second = time.perf_counter() - t1
-
-    print(f"first fetch: {first:.4f}s, second fetch: {second:.4f}s")
-    assert first > second
-    await client.close()
-
-
-asyncio.run(main())
+client = PokeLanceAsyncClient(image_cache_size=256, audio_cache_size=64)
+client.image_cache_size = 512  # resize image cache
 ```
 
 ## Error handling
 
-Both helpers raise before returning any bytes if the response isn't actually image/audio
-content, or the request failed outright:
+Both helpers raise descriptive exceptions if the media URL is invalid or the network request fails:
 
-```python exec="true" source="above" result="text" session="media"
+```python exec="true" source="above" result="text"
 import asyncio
-from pokelance import PokeLance
+from pokelance import PokeLanceAsyncClient
 from pokelance.exceptions import ImageNotFound
-
-client = PokeLance()
 
 
 async def main() -> None:
-    try:
-        await client.get_image_async("https://pokeapi.co/api/v2/pokemon/invalid")
-    except ImageNotFound as exc:
-        print(exc)  # e.g. "... was unsuccessful or the URL is not an image. (...) | ... | 404"
-    finally:
-        await client.close()
+    async with PokeLanceAsyncClient() as client:
+        try:
+            await client.get_image("https://pokeapi.co/api/v2/pokemon/invalid")
+        except ImageNotFound as exc:
+            print(f"Caught expected error: {exc}")
 
 
 asyncio.run(main())

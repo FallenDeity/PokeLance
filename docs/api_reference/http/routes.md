@@ -1,1 +1,1 @@
-::: pokelance.http.endpoints
+::: pokelance.endpoints

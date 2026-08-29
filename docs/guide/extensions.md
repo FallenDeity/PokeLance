@@ -1,24 +1,18 @@
 # Extensions Reference
 
-PokeLance groups PokéAPI's ~60 resource categories into 11 **extensions**, each attached to
-the client as an attribute (`client.berry`, `client.pokemon`, ...). This page is the
-complete map: which extension owns which category, what identifier it takes, and any
-quirks worth knowing about.
+PokeLance groups PokéAPI's ~60 resource categories into 11 **extensions**, attached to the client as attributes (`client.berry`, `client.pokemon`, ...).
 
-Extensions are loaded automatically in [`setup_hook`][pokelance.client.PokeLance.setup_hook],
-you never construct them yourself.
+Extensions are loaded dynamically during client initialization, you never construct them manually.
 
 ## How to read the tables
 
 - **Category** is the API resource name (hyphenated, matching PokéAPI's own naming).
-- **Methods** are always `get_<category>` / `fetch_<category>` with hyphens turned into
-  underscores, per [Fetching Data](fetching_data.md).
+- **Methods** are always `get_<category>` / `fetch_<category>` with hyphens turned into underscores.
 - **Key** is what you pass in: a `name` (`str`), an `id` (`int`), or both interchangeably.
-- **Cache model** notes anything non-obvious about how the result is stored.
 
 === "Berry"
 
-    `client.berry`, [`Berry`][pokelance.ext.berry.Berry]
+    `client.berry`, [`Berry`][pokelance.ext._async.berry.Berry]
 
     | Category         | Key        | Returns                                                                 |
     | ---------------- | ---------- | ----------------------------------------------------------------------- |
@@ -28,17 +22,17 @@ you never construct them yourself.
 
 === "Contest"
 
-    `client.contest`, [`Contest`][pokelance.ext.contest.Contest]
+    `client.contest`, [`Contest`][pokelance.ext._async.contest.Contest]
 
     | Category               | Key        | Returns                                                                                               |
     | ---------------------- | ---------- | ----------------------------------------------------------------------------------------------------- |
     | `contest-type`         | name or id | [`models.ContestType`][pokelance.models.abstract.contest.ContestType]                                 |
-    | `contest-effect`       | id only    | [`models.ContestEffect`][pokelance.models.abstract.contest.ContestEffect] (secondary cache)           |
-    | `super-contest-effect` | id only    | [`models.SuperContestEffect`][pokelance.models.abstract.contest.SuperContestEffect] (secondary cache) |
+    | `contest-effect`       | id only    | [`models.ContestEffect`][pokelance.models.abstract.contest.ContestEffect]                             |
+    | `super-contest-effect` | id only    | [`models.SuperContestEffect`][pokelance.models.abstract.contest.SuperContestEffect]                   |
 
 === "Encounter"
 
-    `client.encounter`, [`Encounter`][pokelance.ext.encounter.Encounter]
+    `client.encounter`, [`Encounter`][pokelance.ext._async.encounter.Encounter]
 
     | Category                    | Key        | Returns                                                                                         |
     | --------------------------- | ---------- | ----------------------------------------------------------------------------------------------- |
@@ -48,16 +42,16 @@ you never construct them yourself.
 
 === "Evolution"
 
-    `client.evolution`, [`Evolution`][pokelance.ext.evolution.Evolution]
+    `client.evolution`, [`Evolution`][pokelance.ext._async.evolution.Evolution]
 
-    | Category            | Key        | Returns                                                                                         |
-    | ------------------- | ---------- | ----------------------------------------------------------------------------------------------- |
-    | `evolution-chain`   | id only    | [`models.EvolutionChain`][pokelance.models.abstract.evolution.EvolutionChain] (secondary cache) |
-    | `evolution-trigger` | name or id | [`models.EvolutionTrigger`][pokelance.models.abstract.evolution.EvolutionTrigger]               |
+    | Category            | Key        | Returns                                                                           |
+    | ------------------- | ---------- | --------------------------------------------------------------------------------- |
+    | `evolution-chain`   | id only    | [`models.EvolutionChain`][pokelance.models.abstract.evolution.EvolutionChain]     |
+    | `evolution-trigger` | name or id | [`models.EvolutionTrigger`][pokelance.models.abstract.evolution.EvolutionTrigger] |
 
 === "Game"
 
-    `client.game`, [`Game`][pokelance.ext.game.Game]
+    `client.game`, [`Game`][pokelance.ext._async.game.Game]
 
     | Category        | Key        | Returns                                                              |
     | --------------- | ---------- | -------------------------------------------------------------------- |
@@ -68,7 +62,7 @@ you never construct them yourself.
 
 === "Item"
 
-    `client.item`, [`Item`][pokelance.ext.item.Item]
+    `client.item`, [`Item`][pokelance.ext._async.item.Item]
 
     | Category            | Key        | Returns                                                                    |
     | ------------------- | ---------- | -------------------------------------------------------------------------- |
@@ -81,7 +75,7 @@ you never construct them yourself.
 
 === "Location"
 
-    `client.location`, [`Location`][pokelance.ext.location.Location]
+    `client.location`, [`Location`][pokelance.ext._async.location.Location]
 
     | Category        | Key        | Returns                                                                  |
     | --------------- | ---------- | ------------------------------------------------------------------------ |
@@ -92,15 +86,15 @@ you never construct them yourself.
 
 === "Machine"
 
-    `client.machine`, [`Machine`][pokelance.ext.machine.Machine]
+    `client.machine`, [`Machine`][pokelance.ext._async.machine.Machine]
 
-    | Category  | Key     | Returns                                                                         |
-    | --------- | ------- | ------------------------------------------------------------------------------- |
-    | `machine` | id only | [`models.Machine`][pokelance.models.abstract.machine.Machine] (secondary cache) |
+    | Category  | Key     | Returns                                                       |
+    | --------- | ------- | ------------------------------------------------------------- |
+    | `machine` | id only | [`models.Machine`][pokelance.models.abstract.machine.Machine] |
 
 === "Move"
 
-    `client.move`, [`Move`][pokelance.ext.move.Move]
+    `client.move`, [`Move`][pokelance.ext._async.move.Move]
 
     | Category            | Key        | Returns                                                                    |
     | ------------------- | ---------- | -------------------------------------------------------------------------- |
@@ -110,16 +104,16 @@ you never construct them yourself.
     | `move-category`     | name or id | [`models.MoveCategory`][pokelance.models.abstract.move.MoveCategory]       |
     | `move-damage-class` | name or id | [`models.MoveDamageClass`][pokelance.models.abstract.move.MoveDamageClass] |
     | `move-learn-method` | name or id | [`models.MoveLearnMethod`][pokelance.models.abstract.move.MoveLearnMethod] |
-    | `move-target`       | name or id | [`models.MoveTarget`](../api_reference/models/abstract/move.md)            |
+    | `move-target`       | name or id | [`models.MoveTarget`][pokelance.models.abstract.move.MoveTarget]           |
 
 === "Pokemon"
 
-    `client.pokemon`, [`Pokemon`][pokelance.ext.pokemon.Pokemon]
+    `client.pokemon`, [`Pokemon`][pokelance.ext._async.pokemon.Pokemon]
 
     | Category                  | Key        | Returns                                                                                                                             |
     | ------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------- |
     | `ability`                 | name or id | [`models.Ability`][pokelance.models.abstract.pokemon.Ability]                                                                       |
-    | `characteristic`          | id only    | [`models.Characteristic`][pokelance.models.abstract.pokemon.Characteristic] (secondary cache)                                       |
+    | `characteristic`          | id only    | [`models.Characteristic`][pokelance.models.abstract.pokemon.Characteristic]                                                         |
     | `egg-group`               | name or id | [`models.EggGroup`][pokelance.models.abstract.pokemon.EggGroup]                                                                     |
     | `gender`                  | name or id | [`models.Gender`][pokelance.models.abstract.pokemon.Gender]                                                                         |
     | `growth-rate`             | name or id | [`models.GrowthRate`][pokelance.models.abstract.pokemon.GrowthRate]                                                                 |
@@ -135,84 +129,40 @@ you never construct them yourself.
     | `stat`                    | name or id | [`models.Stat`][pokelance.models.abstract.pokemon.Stat]                                                                             |
     | `type`                    | name or id | [`models.Type`][pokelance.models.abstract.pokemon.Type]                                                                             |
 
-    `client.pokemon.all_pokemons` also gives you every known Pokémon name as a
-    `list[str]`, once endpoints are cached, handy for autocompletion.
-
 === "Utility"
 
-    `client.utility`, [`Utility`][pokelance.ext.utility.Utility]
+    `client.utility`, [`Utility`][pokelance.ext._async.utility.Utility]
 
     | Category       | Key        | Returns                                                                                         |
     | -------------- | ---------- | ----------------------------------------------------------------------------------------------- |
     | `language`     | name or id | [`models.Language`][pokelance.models.common.models.Language]                                    |
     | `api-metadata` | *none*     | [`models.APIMetadata`][pokelance.models.common.models.APIMetadata], singleton, no list endpoint |
 
-    !!! warning "Not part of `getch_data` / `from_url`"
-        `utility` is **not** registered in
-        [`ExtensionEnum`][pokelance.constants.ExtensionEnum], so
-        [`getch_data`][pokelance.client.PokeLance.getch_data] and
-        [`from_url`][pokelance.client.PokeLance.from_url] can't dispatch to it. Call
-        `client.utility.fetch_language(...)` / `client.utility.fetch_api_metadata()`
-        directly instead.
+## Inspecting valid names and IDs
 
-## Secondary caches (id-only, no list endpoint)
+Once endpoint registries are cached (either on initial client connection or after `await client.wait_until_ready()`), all valid names and IDs for any category across all 11 extensions can be inspected directly:
 
-A handful of categories, `machine`, `evolution-chain`, `characteristic`, `contest-effect`,
-`super-contest-effect`, `language`, `api-metadata`, use a secondary keyed cache instead of
-the regular [`BaseCache`][pokelance.cache.cache.BaseCache]. PokéAPI doesn't give these a
-stable `name`, only a numeric id embedded in the resource URL, so they're addressed by
-**id only**, not name, and their endpoint registry (when one exists) keys by the id parsed
-out of the URL rather than a `name` field in the payload.
+- **`client.<ext>.cache_group.<category>.identifiers`**: A `set[str]` containing every valid name and ID for the category (e.g. `client.pokemon.cache_group.pokemon.identifiers`).
+- **`client.<ext>.cache_group.<category>.endpoints`**: A `dict[str, CacheEndpoint]` mapping each resource identifier to its [`CacheEndpoint`][pokelance.cache._base.CacheEndpoint] metadata (`id`, `url`).
 
-Here's the contrast in practice:
+```python exec="true" source="above" result="text"
+import asyncio
+from pokelance import PokeLanceAsyncClient
 
-=== "Regular category (has a name)"
 
-    ```json
-    {
-      "id": 1,
-      "name": "cheri",
-      "growth_time": 3,
-      ...
-    }
-    ```
+async def main() -> None:
+    async with PokeLanceAsyncClient() as client:
+        await client.wait_until_ready()
+        berries = client.berry.cache_group.berry.endpoints
+        print(f"Registered {len(berries)} berries (e.g. 'cheri' -> id {berries['cheri'].id})")
 
-    ```python
-    await client.berry.fetch_berry("cheri")  # or fetch_berry(1), both work
-    ```
 
-=== "Secondary category (id only)"
-
-    ```json
-    {
-      "id": 1,
-      "descriptions": [
-        {
-          "description": "Loves to eat",
-          "language": {...},
-        }
-      ],
-      ...
-    }
-    ```
-
-    ```python
-    await client.pokemon.fetch_characteristic(1)  # no name to fetch by
-    ```
-
-`api-metadata` has no list endpoint at all (it's a true singleton, `GET /meta`) and is
-gracefully skipped during [`setup_hook`][pokelance.client.PokeLance.setup_hook] when populating
-the endpoint registries.
+asyncio.run(main())
+```
 
 ## Programmatic access via `ExtensionEnum`
 
-If you're building something generic (a REPL, a lookup endpoint or a cli tool, ...), the categories
-above are also available as data through
-[`pokelance.constants.ExtensionEnum`][pokelance.constants.ExtensionEnum]. Note that, because
-of the `__get__` descriptor on [`BaseEnum`][pokelance.constants.BaseEnum] this only applies
-when *iterating* the enum, direct attribute access like `ExtensionEnum.Pokemon` returns the
-underlying [`PokemonExtension`][pokelance.constants.PokemonExtension] object directly rather
-than the enum member:
+Categories are also available programmatically through [`pokelance.constants.ExtensionEnum`][pokelance.constants.ExtensionEnum]:
 
 ```python exec="true" source="above" result="text"
 from pokelance.constants import ExtensionEnum
@@ -220,6 +170,3 @@ from pokelance.constants import ExtensionEnum
 for ext in ExtensionEnum:
     print(f"{ext.name:<10} -> {', '.join(ext.value.categories)}")
 ```
-
-This is exactly what powers [`getch_data`](fetching_data.md#one-call-for-any-extension-getch_data)'s
-extension/category validation.
