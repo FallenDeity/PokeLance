@@ -81,4 +81,3 @@ See [Media](../media.md) for details on image and audio caching.
 
 !!! tip "One client for the whole app's lifetime"
     Construct `PokeLanceAsyncClient` once during application startup (managed cleanly via FastAPI's `lifespan` context manager as shown above) and reuse it across all request handlers. Creating a new client per-request would discard all caching and connection pooling benefits.
-

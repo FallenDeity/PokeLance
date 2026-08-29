@@ -468,7 +468,7 @@ class Versions(BaseModel):
             generation_vi=GenerationVI.from_payload(payload.get("generation-vi", {})),
             generation_vii=GenerationVII.from_payload(payload.get("generation-vii", {})),
             generation_viii=GenerationVIII.from_payload(payload.get("generation-viii", {})),
-            generation_ix=GenerationIX.from_payload(payload.get("generation-ix", {}))
+            generation_ix=GenerationIX.from_payload(payload.get("generation-ix", {})),
         )
 
 
@@ -814,7 +814,7 @@ class TypeIconGenerationVIII(TypeIconGeneration):
             raw=payload,
             sword_shield=TypeIcon.from_payload(payload.get("sword-shield", {})),
             brilliant_diamond_shining_pearl=TypeIcon.from_payload(payload.get("brilliant-diamond-shining-pearl", {})),
-            legends_arceus=TypeIcon.from_payload(payload.get("legends-arceus", {}))
+            legends_arceus=TypeIcon.from_payload(payload.get("legends-arceus", {})),
         )
 
 

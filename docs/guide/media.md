@@ -101,10 +101,7 @@ async def main() -> str:
         pokemon = await client.pokemon.fetch_pokemon("pikachu")
         audio = await client.get_audio(pokemon.cries.latest)
         encoded = base64.b64encode(audio).decode("ascii")
-        return (
-            f'<audio controls preload="none">'
-            f'<source src="data:audio/ogg;base64,{encoded}" type="audio/ogg"></audio>'
-        )
+        return f'<audio controls preload="none"><source src="data:audio/ogg;base64,{encoded}" type="audio/ogg"></audio>'
 
 
 print(asyncio.run(main()))
