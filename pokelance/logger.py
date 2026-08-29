@@ -64,8 +64,12 @@ class LogLevelColors(str, enum.Enum):
     CRITICAL = "\033[91m"
     ENDC = "\033[0m"
 
+    @override
+    def __str__(self) -> str:
+        return self.value
+
     @classmethod
-    def from_level(cls, level: str) -> str:
+    def from_level(cls, level: str) -> LogLevelColors:
         return getattr(cls, level.upper(), cls.ENDC)
 
 
