@@ -1399,6 +1399,21 @@ wheels = [
 ]
 
 [[package]]
+name = "mkdocstrings-python"
+version = "2.0.7"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "griffelib" },
+    { name = "mkdocs-autorefs" },
+    { name = "mkdocstrings" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/90/5d/1be1c7a49d8fa13dc80f66a85f53333d52cf5206911412006ffdff8fb9a0/mkdocstrings_python-2.0.7.tar.gz", hash = "sha256:8c49faf66d243072d7590a1b5dea028d9d7425fac191f54f096123a4a9c1a783", size = 201598, upload-time = "2026-08-17T16:56:18.239Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b2/6d/77546d8c26f038fce314a507106954f76270f6c182488bcf9ac9721175df/mkdocstrings_python-2.0.7-py3-none-any.whl", hash = "sha256:1fce5fbfe4ffa6e8136a35351cdc97c3bf55219c7efbd3f92a82260f93235d60", size = 105387, upload-time = "2026-08-17T16:56:16.813Z" },
+]
+
+[[package]]
 name = "nbclient"
 version = "0.11.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1701,6 +1716,7 @@ docs = [
     { name = "mkdocs-jupyter" },
     { name = "mkdocs-material" },
     { name = "mkdocstrings" },
+    { name = "mkdocstrings-python" },
     { name = "pillow" },
     { name = "pipwin" },
     { name = "pygments" },
@@ -1735,6 +1751,7 @@ docs = [
     { name = "mkdocs-jupyter", specifier = ">=0.26.3" },
     { name = "mkdocs-material", specifier = ">=9.7.7" },
     { name = "mkdocstrings", specifier = ">=1.0.6" },
+    { name = "mkdocstrings-python", specifier = ">=2.0.7" },
     { name = "pillow", specifier = ">=12.3.0" },
     { name = "pipwin", specifier = ">=0.5.2" },
     { name = "pygments", specifier = ">=2.20.0" },
