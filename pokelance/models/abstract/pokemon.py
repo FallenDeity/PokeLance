@@ -32,6 +32,7 @@ from .utils import (
     PokemonAbility,
     PokemonAbilityPast,
     PokemonCries,
+    PokemonFormFlavorText,
     PokemonFormSprites,
     PokemonFormTriggerCondition,
     PokemonFormType,
@@ -575,6 +576,7 @@ class PokemonForm(BaseModel):
     version_group: NamedResource = attrs.field(factory=NamedResource)
     names: list[Name] = attrs.field(factory=list)
     form_names: list[Name] = attrs.field(factory=list)
+    flavor_text_entries: list[PokemonFormFlavorText] = attrs.field(factory=list)
 
     @classmethod
     @override
@@ -598,6 +600,7 @@ class PokemonForm(BaseModel):
             version_group=NamedResource.from_payload(payload.get("version_group", {})),
             names=[Name.from_payload(i) for i in payload.get("names", [])],
             form_names=[Name.from_payload(i) for i in payload.get("form_names", [])],
+            flavor_text_entries=[PokemonFormFlavorText.from_payload(i) for i in payload.get("flavor_text_entries", [])],
         )
 
 

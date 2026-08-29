@@ -25,6 +25,7 @@ __all__: tuple[str, ...] = (
     "PokemonAbility",
     "PokemonAbilityPast",
     "PokemonCries",
+    "PokemonFormFlavorText",
     "PokemonFormSprites",
     "PokemonFormTriggerCondition",
     "PokemonFormType",
@@ -304,6 +305,8 @@ class GenerationV(Generation):
 
     Attributes
     ----------
+    icons: VersionSprite
+        The icons depiction of this pokemon.
     black_white: VersionSprite
         The black-white depiction of this pokemon.
     """
@@ -1506,11 +1509,14 @@ class PokemonFormTriggerCondition(BaseModel):
         The trigger that causes this condition to be met.
     url: str
         The url of the condition.
+    base_form: NamedResource
+        The base form of the Pokémon that can change into this Pokémon form.
     """
 
     name: str = attrs.field(factory=str)
     trigger: PokemonFormTriggerEnum = attrs.field(converter=PokemonFormTriggerEnum.from_str)  # type: ignore[misc]
     url: str = attrs.field(factory=str)
+    base_form: NamedResource = attrs.field(factory=NamedResource)
 
     @classmethod
     @override
@@ -1520,6 +1526,36 @@ class PokemonFormTriggerCondition(BaseModel):
             name=payload.get("name", ""),
             trigger=payload.get("trigger"),
             url=payload.get("url", ""),
+            base_form=NamedResource.from_payload(payload.get("base_form", {})),
+        )
+
+
+@attrs.define(slots=True, kw_only=True)
+class PokemonFormFlavorText(BaseModel):
+    """A pokemon form flavor text resource.
+
+    Attributes
+    ----------
+    flavor_text: str
+        The localized flavor text for an API resource in a specific language.
+    language: NamedResource
+        The language this flavor text is in.
+    version_group: NamedResource
+        The version group that uses this flavor text.
+    """
+
+    flavor_text: str = attrs.field(factory=str)
+    language: NamedResource = attrs.field(factory=NamedResource)
+    version_group: NamedResource = attrs.field(factory=NamedResource)
+
+    @classmethod
+    @override
+    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonFormFlavorText":
+        return cls(
+            raw=payload,
+            flavor_text=payload.get("flavor_text", ""),
+            language=NamedResource.from_payload(payload.get("language", {})),
+            version_group=NamedResource.from_payload(payload.get("version_group", {})),
         )
 
 

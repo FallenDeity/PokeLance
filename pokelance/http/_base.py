@@ -3,6 +3,8 @@ from __future__ import annotations
 import logging
 import typing as t
 
+from typing_extensions import TypeVar
+
 from pokelance.endpoints import Route
 from pokelance.exceptions import AudioNotFound, HTTPException, ImageNotFound
 
@@ -19,9 +21,9 @@ __all__: tuple[str, ...] = ("BaseHttpClient",)
 
 logger = logging.getLogger(__name__)
 
-_ClientT = t.TypeVar("_ClientT", bound="_ClientBase")
-_SessionT = t.TypeVar("_SessionT", bound="niquests.Session | niquests.AsyncSession")
-_CacheManagerT = t.TypeVar(
+_ClientT = TypeVar("_ClientT", bound="_ClientBase")
+_SessionT = TypeVar("_SessionT", bound="niquests.Session | niquests.AsyncSession")
+_CacheManagerT = TypeVar(
     "_CacheManagerT",
     bound="AsyncCacheManager | SyncCacheManager",
     default="AsyncCacheManager | SyncCacheManager",
