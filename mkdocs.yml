@@ -90,6 +90,7 @@ plugins:
               - "!^_"
           inventories:
             - https://docs.python.org/3/objects.inv
+            - https://niquests.readthedocs.io/en/latest/objects.inv
   - mkdocs-jupyter:
       include_source: true
       execute: false
