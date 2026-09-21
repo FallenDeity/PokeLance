@@ -184,7 +184,7 @@ class EvolutionExtension(Extension):
     """
 
     name: str = "evolution"
-    categories: tuple[str, ...] = ("evolution-chain", "evolution-trigger")
+    categories: tuple[str, ...] = ("evolution-chain", "evolution-trigger", "evolution-variable")
 
 
 @attrs.define(slots=True, frozen=True)

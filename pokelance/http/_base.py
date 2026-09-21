@@ -3,13 +3,19 @@ from __future__ import annotations
 import logging
 import typing as t
 
-from typing_extensions import TypeVar
+from typing_extensions import TypeVar, override
+from urllib3.util import Retry
 
 from pokelance.endpoints import Route
 from pokelance.exceptions import AudioNotFound, HTTPException, ImageNotFound
 
 if t.TYPE_CHECKING:
+    from types import TracebackType
+
     import niquests
+    import urllib3
+    from urllib3._async.connectionpool import AsyncConnectionPool
+    from urllib3.connectionpool import ConnectionPool
 
     from pokelance.cache._async.manager import AsyncCacheManager
     from pokelance.cache.sync.manager import SyncCacheManager
@@ -28,6 +34,27 @@ _CacheManagerT = TypeVar(
     bound="AsyncCacheManager | SyncCacheManager",
     default="AsyncCacheManager | SyncCacheManager",
 )
+
+
+class LoggedRetry(Retry):
+    """A Retry class that logs retry attempts."""
+
+    @override
+    def increment(
+        self,
+        method: str | None = None,
+        url: str | None = None,
+        response: urllib3.HTTPResponse | urllib3.AsyncHTTPResponse | None = None,
+        error: Exception | None = None,
+        _pool: ConnectionPool | AsyncConnectionPool | None = None,
+        _stacktrace: TracebackType | None = None,
+    ) -> Retry:
+        new_retry = super().increment(method, url, response, error, _pool, _stacktrace)
+        attempt = len(new_retry.history)
+        progress = f"{attempt}/{attempt + new_retry.total}" if new_retry.total is not None else f"{attempt}"
+        status = response.status if response is not None else "no response"
+        logger.warning(f"Retrying {method} request to {url} due to {error}. Status: {status}. (Attempt {progress})")
+        return new_retry
 
 
 class BaseHttpClient(t.Generic[_ClientT, _SessionT, _CacheManagerT]):
@@ -78,7 +105,7 @@ class BaseHttpClient(t.Generic[_ClientT, _SessionT, _CacheManagerT]):
             logger.debug(f"Request to {route.url} was successful.")
             return response.json()
         logger.error(f"Request to {route.url} was unsuccessful with status {status}.")
-        raise HTTPException(str(response.reason), route, status).create()
+        raise HTTPException(str(response.reason or "Unknown error"), route, status).create()
 
     @classmethod
     def _validate_image(cls, response: niquests.Response, url: str) -> bytes:
@@ -105,3 +132,14 @@ class BaseHttpClient(t.Generic[_ClientT, _SessionT, _CacheManagerT]):
         logger.error(f"Request to {url} was unsuccessful.")
         message = f"Request to {url} was unsuccessful or the URL is not a cry."
         raise AudioNotFound(f"{message} ({content_type})", Route(), status)
+
+    @property
+    def retry_strategy(self) -> Retry:
+        """Returns a Retry strategy for the HTTP client."""
+        return LoggedRetry(
+            total=3,
+            backoff_factor=0.5,
+            status_forcelist=[429, 500, 502, 503, 504],
+            allowed_methods=["HEAD", "GET"],
+            raise_on_status=False,
+        )

@@ -79,6 +79,9 @@ class Evolution(AsyncCacheGroup):
     evolution_trigger: AsyncCache[Route, models.EvolutionTrigger] = attrs.field(
         factory=lambda: AsyncCache(model=models.EvolutionTrigger, name="evolution_trigger")
     )
+    evolution_variable: AsyncCache[Route, models.EvolutionVariable] = attrs.field(
+        factory=lambda: AsyncCache(model=models.EvolutionVariable, name="evolution_variable")
+    )
 
 
 @attrs.define(slots=True, kw_only=True)

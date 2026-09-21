@@ -177,7 +177,7 @@ class SyncHttpClient(BaseHttpClient["PokeLanceSyncClient", niquests.Session, Syn
                 raise RuntimeError("Cannot connect while the HTTP client is closing.")
             if self.session is None:
                 logger.debug("Initializing internal sync HTTP session (niquests)...")
-                self.session = niquests.Session(resolver="system://")
+                self.session = niquests.Session(resolver="system://", retries=self.retry_strategy)
                 self._session_owner = True
             if not self._is_ready:
                 self._is_ready = True
@@ -204,12 +204,19 @@ class SyncHttpClient(BaseHttpClient["PokeLanceSyncClient", niquests.Session, Syn
         """
         if self._closing:
             raise RuntimeError("Cannot make a request while the HTTP client is closing.")
+
         self.connect()
-        if self.session is not None:
+
+        if self.session is None:
+            raise HTTPException("No session was provided.", route, -1).create()
+
+        try:
             logger.debug(f"Sending {route.method} request to {route.url}")
             response = self.session.request(route.method, route.url, params=route.payload)
             return self._validate_response(response, route)
-        raise HTTPException("No session was provided.", route, -1).create()
+        except niquests.RequestException as e:
+            logger.error(f"Request failed for {route.url} ({type(e).__name__}): {e}")
+            raise HTTPException(str(e), route, -1).create() from e
 
     def load_image(self, url: str) -> bytes:
         """Loads an image from the url synchronously.

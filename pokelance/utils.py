@@ -20,8 +20,33 @@ from typing import (
 
 from typing_extensions import ParamSpec, Self
 
-__all__ = ("alru_cache",)
+__all__ = (
+    "alru_cache",
+    "parse_rpn_expression",
+)
 
+
+_BINARY_OPS: frozenset[str] = frozenset(
+    {
+        "+",
+        "-",
+        "*",
+        "/",
+        "%",
+        ">>",
+        "<<",
+        "&",
+        "|",
+        "^",
+        "==",
+        "!=",
+        "<",
+        ">",
+        "<=",
+        ">=",
+    }
+)
+_COMPARISON_OPS: frozenset[str] = frozenset({"==", "!=", "<", ">", "<=", ">="})
 
 _P = ParamSpec("_P")
 _P2 = ParamSpec("_P2")
@@ -385,3 +410,35 @@ def alru_cache(
             return _make_wrapper(128, False, None)(fn)
 
         raise NotImplementedError(f"{fn!r} decorating is not supported")
+
+
+def parse_rpn_expression(expr: str) -> str:
+    """Convert a Reverse Polish Notation (RPN) expression into a human-readable infix formula.
+
+    Parameters
+    ----------
+    expr : str
+        The space-separated RPN expression (e.g. 'EC 100 % 0 ==').
+
+    Returns
+    -------
+    str
+        The human-readable infix expression (e.g. '(EC % 100) == 0').
+    """
+    if not expr:
+        return ""
+    tokens = expr.strip().split()
+    stack: list[str] = []
+
+    for token in tokens:
+        if token in _BINARY_OPS and len(stack) >= 2:
+            right = stack.pop()
+            left = stack.pop()
+            if token in _COMPARISON_OPS:
+                stack.append(f"{left} {token} {right}")
+            else:
+                stack.append(f"({left} {token} {right})")
+        else:
+            stack.append(token)
+
+    return stack[-1] if stack else expr

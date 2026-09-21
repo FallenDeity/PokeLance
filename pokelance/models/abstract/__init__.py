@@ -1,7 +1,7 @@
 from .berry import Berry, BerryFirmness, BerryFlavor
 from .contest import ContestEffect, ContestType, SuperContestEffect
 from .encounter import EncounterCondition, EncounterConditionValue, EncounterMethod
-from .evolution import EvolutionChain, EvolutionTrigger
+from .evolution import EvolutionChain, EvolutionTrigger, EvolutionVariable
 from .game import Generation, Pokedex, Version, VersionGroup
 from .item import Currency, Item, ItemAttribute, ItemCategory, ItemFlingEffect, ItemPocket
 from .location import Location, LocationArea, PalParkArea, Region
@@ -41,6 +41,7 @@ __all__: tuple[str, ...] = (
     "EncounterMethod",
     "EvolutionChain",
     "EvolutionTrigger",
+    "EvolutionVariable",
     "Gender",
     "Generation",
     "GrowthRate",

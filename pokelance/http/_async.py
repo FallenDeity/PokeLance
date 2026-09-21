@@ -161,7 +161,7 @@ class AsyncHttpClient(BaseHttpClient["PokeLanceAsyncClient", niquests.AsyncSessi
             raise RuntimeError("Cannot connect while the HTTP client is closing.")
         if self.session is None:
             logger.debug("Initializing internal async HTTP session (niquests)...")
-            self.session = niquests.AsyncSession(resolver="system://")
+            self.session = niquests.AsyncSession(resolver="system://", retries=self.retry_strategy)
             self._session_owner = True
         if not self._is_ready:
             self._is_ready = True
@@ -188,12 +188,19 @@ class AsyncHttpClient(BaseHttpClient["PokeLanceAsyncClient", niquests.AsyncSessi
         """
         if self._closing:
             raise RuntimeError("Cannot make a request while the HTTP client is closing.")
+
         await self.connect()
-        if self.session is not None:
+
+        if self.session is None:
+            raise HTTPException("No session was provided.", route, -1).create()
+
+        try:
             logger.debug(f"Sending {route.method} request to {route.url}")
             response = await self.session.request(route.method, route.url, params=route.payload)
             return self._validate_response(response, route)
-        raise HTTPException("No session was provided.", route, -1).create()
+        except niquests.exceptions.RequestException as e:
+            logger.error(f"Request failed for {route.url} ({type(e).__name__}): {e}")
+            raise HTTPException(str(e), route, -1).create() from e
 
     async def load_image(self, url: str) -> bytes:
         """Loads an image from the url asynchronously.

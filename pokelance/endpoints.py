@@ -10,6 +10,13 @@ from pokelance.constants import get_base_url, validate_url
 __all__: tuple[str, ...] = ("Endpoint", "Route")
 
 
+POKEAPI_PAGE_SIZE_LIMIT = 10_000
+"""
+This is a hard coded limit to fetch all valid endpoints from PokeAPI's category list serializers.\n
+10k is well beyond the number of endpoints in any category, so this is a safe limit to use for fetching all endpoints.
+"""
+
+
 @attrs.define(repr=True, slots=True, kw_only=True, hash=True)
 class Route:
     """Represents a route for an endpoint.
@@ -74,7 +81,7 @@ class Endpoint:
     @classmethod
     def get_language_endpoints(cls) -> Route:
         """Gets the language endpoints."""
-        return Route(endpoint="/language", payload={"limit": 10000})
+        return Route(endpoint="/language", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_language(cls, language: str | int) -> Route:
@@ -89,7 +96,7 @@ class Endpoint:
     @classmethod
     def get_berry_endpoints(cls) -> Route:
         """Get a list of berry endpoints."""
-        return Route(endpoint="/berry", payload={"limit": 10000})
+        return Route(endpoint="/berry", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_berry(cls, berry: int | str) -> Route:
@@ -99,7 +106,7 @@ class Endpoint:
     @classmethod
     def get_berry_firmness_endpoints(cls) -> Route:
         """Get a list of berry firmness endpoints."""
-        return Route(endpoint="/berry-firmness", payload={"limit": 10000})
+        return Route(endpoint="/berry-firmness", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_berry_firmness(cls, berry_firmness: int | str) -> Route:
@@ -109,7 +116,7 @@ class Endpoint:
     @classmethod
     def get_berry_flavor_endpoints(cls) -> Route:
         """Get a list of berry flavor endpoints."""
-        return Route(endpoint="/berry-flavor", payload={"limit": 10000})
+        return Route(endpoint="/berry-flavor", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_berry_flavor(cls, berry_flavor: int | str) -> Route:
@@ -119,7 +126,7 @@ class Endpoint:
     @classmethod
     def get_contest_type_endpoints(cls) -> Route:
         """Get a list of contest type endpoints."""
-        return Route(endpoint="/contest-type", payload={"limit": 10000})
+        return Route(endpoint="/contest-type", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_contest_type(cls, contest_type: int | str) -> Route:
@@ -129,7 +136,7 @@ class Endpoint:
     @classmethod
     def get_contest_effect_endpoints(cls) -> Route:
         """Get a list of contest effect endpoints."""
-        return Route(endpoint="/contest-effect", payload={"limit": 10000})
+        return Route(endpoint="/contest-effect", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_contest_effect(cls, contest_effect: int) -> Route:
@@ -139,7 +146,7 @@ class Endpoint:
     @classmethod
     def get_super_contest_effect_endpoints(cls) -> Route:
         """Get a list of super contest effect endpoints."""
-        return Route(endpoint="/super-contest-effect", payload={"limit": 10000})
+        return Route(endpoint="/super-contest-effect", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_super_contest_effect(cls, super_contest_effect: int) -> Route:
@@ -149,7 +156,7 @@ class Endpoint:
     @classmethod
     def get_encounter_method_endpoints(cls) -> Route:
         """Get a list of encounter method endpoints."""
-        return Route(endpoint="/encounter-method", payload={"limit": 10000})
+        return Route(endpoint="/encounter-method", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_encounter_method(cls, encounter_method: int | str) -> Route:
@@ -159,7 +166,7 @@ class Endpoint:
     @classmethod
     def get_encounter_condition_endpoints(cls) -> Route:
         """Get a list of encounter condition endpoints."""
-        return Route(endpoint="/encounter-condition", payload={"limit": 10000})
+        return Route(endpoint="/encounter-condition", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_encounter_condition(cls, encounter_condition: int | str) -> Route:
@@ -169,7 +176,7 @@ class Endpoint:
     @classmethod
     def get_encounter_condition_value_endpoints(cls) -> Route:
         """Get a list of encounter condition value endpoints."""
-        return Route(endpoint="/encounter-condition-value", payload={"limit": 10000})
+        return Route(endpoint="/encounter-condition-value", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_encounter_condition_value(cls, encounter_condition_value: int | str) -> Route:
@@ -179,7 +186,7 @@ class Endpoint:
     @classmethod
     def get_evolution_chain_endpoints(cls) -> Route:
         """Get a list of evolution chain endpoints."""
-        return Route(endpoint="/evolution-chain", payload={"limit": 10000})
+        return Route(endpoint="/evolution-chain", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_evolution_chain(cls, evolution_chain: int) -> Route:
@@ -189,7 +196,7 @@ class Endpoint:
     @classmethod
     def get_evolution_trigger_endpoints(cls) -> Route:
         """Get a list of evolution trigger endpoints."""
-        return Route(endpoint="/evolution-trigger", payload={"limit": 10000})
+        return Route(endpoint="/evolution-trigger", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_evolution_trigger(cls, evolution_trigger: int | str) -> Route:
@@ -197,9 +204,19 @@ class Endpoint:
         return Route(endpoint=f"/evolution-trigger/{evolution_trigger}")
 
     @classmethod
+    def get_evolution_variable_endpoints(cls) -> Route:
+        """Get a list of evolution variable endpoints."""
+        return Route(endpoint="/evolution-variable", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
+
+    @classmethod
+    def get_evolution_variable(cls, evolution_variable: int | str) -> Route:
+        """Get an evolution variable by its ID or name."""
+        return Route(endpoint=f"/evolution-variable/{evolution_variable}")
+
+    @classmethod
     def get_generation_endpoints(cls) -> Route:
         """Get a list of generation endpoints."""
-        return Route(endpoint="/generation", payload={"limit": 10000})
+        return Route(endpoint="/generation", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_generation(cls, generation: int | str) -> Route:
@@ -209,7 +226,7 @@ class Endpoint:
     @classmethod
     def get_pokedex_endpoints(cls) -> Route:
         """Get a list of pokedex endpoints."""
-        return Route(endpoint="/pokedex", payload={"limit": 10000})
+        return Route(endpoint="/pokedex", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_pokedex(cls, pokedex: int | str) -> Route:
@@ -219,7 +236,7 @@ class Endpoint:
     @classmethod
     def get_version_endpoints(cls) -> Route:
         """Get a list of version endpoints."""
-        return Route(endpoint="/version", payload={"limit": 10000})
+        return Route(endpoint="/version", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_version(cls, version: int | str) -> Route:
@@ -229,7 +246,7 @@ class Endpoint:
     @classmethod
     def get_version_group_endpoints(cls) -> Route:
         """Get a list of version group endpoints."""
-        return Route(endpoint="/version-group", payload={"limit": 10000})
+        return Route(endpoint="/version-group", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_version_group(cls, version_group: int | str) -> Route:
@@ -239,7 +256,7 @@ class Endpoint:
     @classmethod
     def get_currency_endpoints(cls) -> Route:
         """Get a list of currency endpoints."""
-        return Route(endpoint="/currency", payload={"limit": 10000})
+        return Route(endpoint="/currency", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_currency(cls, currency: int | str) -> Route:
@@ -249,7 +266,7 @@ class Endpoint:
     @classmethod
     def get_item_endpoints(cls) -> Route:
         """Get a list of item endpoints."""
-        return Route(endpoint="/item", payload={"limit": 10000})
+        return Route(endpoint="/item", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_item(cls, item: int | str) -> Route:
@@ -259,7 +276,7 @@ class Endpoint:
     @classmethod
     def get_item_attribute_endpoints(cls) -> Route:
         """Get a list of item attribute endpoints."""
-        return Route(endpoint="/item-attribute", payload={"limit": 10000})
+        return Route(endpoint="/item-attribute", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_item_attribute(cls, item_attribute: int | str) -> Route:
@@ -269,7 +286,7 @@ class Endpoint:
     @classmethod
     def get_item_category_endpoints(cls) -> Route:
         """Get a list of item category endpoints."""
-        return Route(endpoint="/item-category", payload={"limit": 10000})
+        return Route(endpoint="/item-category", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_item_category(cls, item_category: int | str) -> Route:
@@ -279,7 +296,7 @@ class Endpoint:
     @classmethod
     def get_item_fling_effect_endpoints(cls) -> Route:
         """Get a list of item fling effect endpoints."""
-        return Route(endpoint="/item-fling-effect", payload={"limit": 10000})
+        return Route(endpoint="/item-fling-effect", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_item_fling_effect(cls, item_fling_effect: int | str) -> Route:
@@ -289,7 +306,7 @@ class Endpoint:
     @classmethod
     def get_item_pocket_endpoints(cls) -> Route:
         """Get a list of item pocket endpoints."""
-        return Route(endpoint="/item-pocket", payload={"limit": 10000})
+        return Route(endpoint="/item-pocket", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_item_pocket(cls, item_pocket: int | str) -> Route:
@@ -299,7 +316,7 @@ class Endpoint:
     @classmethod
     def get_location_endpoints(cls) -> Route:
         """Get a list of location endpoints."""
-        return Route(endpoint="/location", payload={"limit": 10000})
+        return Route(endpoint="/location", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_location(cls, location: int | str) -> Route:
@@ -309,7 +326,7 @@ class Endpoint:
     @classmethod
     def get_location_area_endpoints(cls) -> Route:
         """Get a list of location area endpoints."""
-        return Route(endpoint="/location-area", payload={"limit": 10000})
+        return Route(endpoint="/location-area", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_location_area(cls, location_area: int | str) -> Route:
@@ -319,7 +336,7 @@ class Endpoint:
     @classmethod
     def get_pal_park_area_endpoints(cls) -> Route:
         """Get a list of pal park area endpoints."""
-        return Route(endpoint="/pal-park-area", payload={"limit": 10000})
+        return Route(endpoint="/pal-park-area", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_pal_park_area(cls, pal_park_area: int | str) -> Route:
@@ -329,7 +346,7 @@ class Endpoint:
     @classmethod
     def get_region_endpoints(cls) -> Route:
         """Get a list of region endpoints."""
-        return Route(endpoint="/region", payload={"limit": 10000})
+        return Route(endpoint="/region", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_region(cls, region: int | str) -> Route:
@@ -339,7 +356,7 @@ class Endpoint:
     @classmethod
     def get_machine_endpoints(cls) -> Route:
         """Get a list of machine endpoints."""
-        return Route(endpoint="/machine", payload={"limit": 10000})
+        return Route(endpoint="/machine", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_machine(cls, machine: int) -> Route:
@@ -349,7 +366,7 @@ class Endpoint:
     @classmethod
     def get_move_endpoints(cls) -> Route:
         """Get a list of move endpoints."""
-        return Route(endpoint="/move", payload={"limit": 10000})
+        return Route(endpoint="/move", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_move(cls, move: int | str) -> Route:
@@ -359,7 +376,7 @@ class Endpoint:
     @classmethod
     def get_move_ailment_endpoints(cls) -> Route:
         """Get a list of move ailment endpoints."""
-        return Route(endpoint="/move-ailment", payload={"limit": 10000})
+        return Route(endpoint="/move-ailment", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_move_ailment(cls, move_ailment: int | str) -> Route:
@@ -369,7 +386,7 @@ class Endpoint:
     @classmethod
     def get_move_battle_style_endpoints(cls) -> Route:
         """Get a list of move battle style endpoints."""
-        return Route(endpoint="/move-battle-style", payload={"limit": 10000})
+        return Route(endpoint="/move-battle-style", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_move_battle_style(cls, move_battle_style: int | str) -> Route:
@@ -379,7 +396,7 @@ class Endpoint:
     @classmethod
     def get_move_category_endpoints(cls) -> Route:
         """Get a list of move category endpoints."""
-        return Route(endpoint="/move-category", payload={"limit": 10000})
+        return Route(endpoint="/move-category", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_move_category(cls, move_category: int | str) -> Route:
@@ -389,7 +406,7 @@ class Endpoint:
     @classmethod
     def get_move_damage_class_endpoints(cls) -> Route:
         """Get a list of move damage class endpoints."""
-        return Route(endpoint="/move-damage-class", payload={"limit": 10000})
+        return Route(endpoint="/move-damage-class", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_move_damage_class(cls, move_damage_class: int | str) -> Route:
@@ -399,7 +416,7 @@ class Endpoint:
     @classmethod
     def get_move_learn_method_endpoints(cls) -> Route:
         """Get a list of move learn method endpoints."""
-        return Route(endpoint="/move-learn-method", payload={"limit": 10000})
+        return Route(endpoint="/move-learn-method", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_move_learn_method(cls, move_learn_method: int | str) -> Route:
@@ -409,7 +426,7 @@ class Endpoint:
     @classmethod
     def get_move_target_endpoints(cls) -> Route:
         """Get a list of move target endpoints."""
-        return Route(endpoint="/move-target", payload={"limit": 10000})
+        return Route(endpoint="/move-target", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_move_target(cls, move_target: int | str) -> Route:
@@ -419,7 +436,7 @@ class Endpoint:
     @classmethod
     def get_ability_endpoints(cls) -> Route:
         """Get a list of ability endpoints."""
-        return Route(endpoint="/ability", payload={"limit": 10000})
+        return Route(endpoint="/ability", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_ability(cls, ability: int | str) -> Route:
@@ -429,7 +446,7 @@ class Endpoint:
     @classmethod
     def get_characteristic_endpoints(cls) -> Route:
         """Get a list of characteristic endpoints."""
-        return Route(endpoint="/characteristic", payload={"limit": 10000})
+        return Route(endpoint="/characteristic", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_characteristic(cls, characteristic: int) -> Route:
@@ -439,7 +456,7 @@ class Endpoint:
     @classmethod
     def get_egg_group_endpoints(cls) -> Route:
         """Get a list of egg group endpoints."""
-        return Route(endpoint="/egg-group", payload={"limit": 10000})
+        return Route(endpoint="/egg-group", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_egg_group(cls, egg_group: int | str) -> Route:
@@ -449,7 +466,7 @@ class Endpoint:
     @classmethod
     def get_gender_endpoints(cls) -> Route:
         """Get a list of gender endpoints."""
-        return Route(endpoint="/gender", payload={"limit": 10000})
+        return Route(endpoint="/gender", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_gender(cls, gender: int | str) -> Route:
@@ -459,7 +476,7 @@ class Endpoint:
     @classmethod
     def get_growth_rate_endpoints(cls) -> Route:
         """Get a list of growth rate endpoints."""
-        return Route(endpoint="/growth-rate", payload={"limit": 10000})
+        return Route(endpoint="/growth-rate", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_growth_rate(cls, growth_rate: int | str) -> Route:
@@ -469,7 +486,7 @@ class Endpoint:
     @classmethod
     def get_nature_endpoints(cls) -> Route:
         """Get a list of nature endpoints."""
-        return Route(endpoint="/nature", payload={"limit": 10000})
+        return Route(endpoint="/nature", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_nature(cls, nature: int | str) -> Route:
@@ -479,7 +496,7 @@ class Endpoint:
     @classmethod
     def get_location_area_encounter_endpoints(cls) -> Route:
         """Get a list of location area encounter endpoints."""
-        return Route(endpoint="/pokemon", payload={"limit": 10000})
+        return Route(endpoint="/pokemon", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_location_area_encounter(cls, name: int | str) -> Route:
@@ -489,7 +506,7 @@ class Endpoint:
     @classmethod
     def get_pokeathlon_stat_endpoints(cls) -> Route:
         """Get a list of pokeathlon stat endpoints."""
-        return Route(endpoint="/pokeathlon-stat", payload={"limit": 10000})
+        return Route(endpoint="/pokeathlon-stat", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_pokeathlon_stat(cls, pokeathlon_stat: int | str) -> Route:
@@ -499,7 +516,7 @@ class Endpoint:
     @classmethod
     def get_pokemon_endpoints(cls) -> Route:
         """Get a list of pokemon endpoints."""
-        return Route(endpoint="/pokemon", payload={"limit": 10000})
+        return Route(endpoint="/pokemon", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_pokemon(cls, pokemon: int | str) -> Route:
@@ -509,7 +526,7 @@ class Endpoint:
     @classmethod
     def get_pokemon_color_endpoints(cls) -> Route:
         """Get a list of pokemon color endpoints."""
-        return Route(endpoint="/pokemon-color", payload={"limit": 10000})
+        return Route(endpoint="/pokemon-color", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_pokemon_color(cls, pokemon_color: int | str) -> Route:
@@ -519,7 +536,7 @@ class Endpoint:
     @classmethod
     def get_pokemon_form_endpoints(cls) -> Route:
         """Get a list of pokemon form endpoints."""
-        return Route(endpoint="/pokemon-form", payload={"limit": 10000})
+        return Route(endpoint="/pokemon-form", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_pokemon_form(cls, pokemon_form: int | str) -> Route:
@@ -529,7 +546,7 @@ class Endpoint:
     @classmethod
     def get_pokemon_habitat_endpoints(cls) -> Route:
         """Get a list of pokemon habitat endpoints."""
-        return Route(endpoint="/pokemon-habitat", payload={"limit": 10000})
+        return Route(endpoint="/pokemon-habitat", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_pokemon_habitat(cls, pokemon_habitat: int | str) -> Route:
@@ -539,7 +556,7 @@ class Endpoint:
     @classmethod
     def get_pokemon_shape_endpoints(cls) -> Route:
         """Get a list of pokemon shape endpoints."""
-        return Route(endpoint="/pokemon-shape", payload={"limit": 10000})
+        return Route(endpoint="/pokemon-shape", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_pokemon_shape(cls, pokemon_shape: int | str) -> Route:
@@ -549,7 +566,7 @@ class Endpoint:
     @classmethod
     def get_pokemon_species_endpoints(cls) -> Route:
         """Get a list of pokemon species endpoints."""
-        return Route(endpoint="/pokemon-species", payload={"limit": 10000})
+        return Route(endpoint="/pokemon-species", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_pokemon_species(cls, pokemon_species: int | str) -> Route:
@@ -559,7 +576,7 @@ class Endpoint:
     @classmethod
     def get_stat_endpoints(cls) -> Route:
         """Get a list of stat endpoints."""
-        return Route(endpoint="/stat", payload={"limit": 10000})
+        return Route(endpoint="/stat", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_stat(cls, stat: int | str) -> Route:
@@ -569,7 +586,7 @@ class Endpoint:
     @classmethod
     def get_type_endpoints(cls) -> Route:
         """Get a list of type endpoints."""
-        return Route(endpoint="/type", payload={"limit": 10000})
+        return Route(endpoint="/type", payload={"limit": POKEAPI_PAGE_SIZE_LIMIT})
 
     @classmethod
     def get_type(cls, type_: int | str) -> Route:

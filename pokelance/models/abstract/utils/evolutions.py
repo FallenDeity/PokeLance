@@ -8,11 +8,46 @@ from typing_extensions import override
 from pokelance.constants import GenderEnum
 from pokelance.models import BaseModel
 from pokelance.models.common import NamedResource
+from pokelance.utils import parse_rpn_expression
 
 __all__: tuple[str, ...] = (
     "ChainLink",
     "EvolutionDetail",
 )
+
+
+@attrs.define(slots=True, kw_only=True)
+class ConditionExpression(BaseModel):
+    """A condition expression resource.
+
+    Attributes
+    ----------
+    expression: str
+        The reverse Polish notation (RPN) mathematical expression determining form-branching.
+    percentage_chance: int
+        The percentage chance that this evolution will occur.
+    variables: list[NamedResource]
+        The variables used in the condition expression.
+    """
+
+    expression: str = attrs.field(factory=str)
+    percentage_chance: int = attrs.field(factory=int)
+    variables: list[NamedResource] = attrs.field(factory=list)
+
+    @property
+    def readable_expression(self) -> str:
+        """Return the condition expression parsed into human-readable infix notation."""
+        return parse_rpn_expression(self.expression)
+
+    @classmethod
+    @override
+    def from_payload(cls, payload: dict[str, t.Any]) -> ConditionExpression:
+        return cls(
+            raw=payload,
+            expression=payload.get("expression", ""),
+            percentage_chance=payload.get("percentage_chance", 0),
+            variables=[NamedResource.from_payload(var) for var in payload.get("variables", [])],
+        )
 
 
 @attrs.define(slots=True, kw_only=True)
@@ -70,10 +105,10 @@ class EvolutionDetail(BaseModel):
         Whether or not the 3DS needs to be turned upside-down as this Pokémon levels up.
     region: t.Optional[NamedResource]
         The required region in which this evolution can occur.
-    base_form: t.Optional[NamedResource]
-        The required form for which this evolution can occur.
-    evolved_form: t.Optional[NamedResource]
-        The form to which this evolution occurs.
+    required_pokemon_form: t.Optional[NamedResource]
+        The specific pre-evolution form required for this evolution to occur (e.g. sinistea-antique, burmy-plant).
+    evolved_pokemon_form: t.Optional[NamedResource]
+        The specific form resulting from this evolution (e.g. polteageist-antique, wormadam-sandy).
     used_move: t.Optional[NamedResource]
         The move that must be used by the evolving Pokémon species during the evolution trigger event
         in order to evolve into this Pokémon species.
@@ -84,6 +119,10 @@ class EvolutionDetail(BaseModel):
     min_damage_taken: t.Optional[int]
         The minimum amount of damage taken during the evolution trigger event in order to evolve
         into this Pokémon species.
+    allowed_natures: t.Optional[t.List[NamedResource]]
+        The list of allowed natures the Pokémon must have to evolve into this Pokémon species.
+    condition_expression: t.Optional[ConditionExpression]
+        The condition expression that must evaluate to true in order for the evolution to occur.
     """
 
     version_group: NamedResource = attrs.field(factory=NamedResource)
@@ -109,12 +148,14 @@ class EvolutionDetail(BaseModel):
     trade_species: NamedResource | None = attrs.field(default=None)
     turn_upside_down: bool = attrs.field(factory=bool)
     region: NamedResource | None = attrs.field(default=None)
-    base_form: NamedResource | None = attrs.field(default=None)
-    evolved_form: NamedResource | None = attrs.field(default=None)
+    required_pokemon_form: NamedResource | None = attrs.field(default=None)
+    evolved_pokemon_form: NamedResource | None = attrs.field(default=None)
     used_move: NamedResource | None = attrs.field(default=None)
     min_move_count: int | None = attrs.field(default=None)
     min_steps: int | None = attrs.field(default=None)
     min_damage_taken: int | None = attrs.field(default=None)
+    allowed_natures: list[NamedResource] | None = attrs.field(default=None)
+    condition_expression: ConditionExpression | None = attrs.field(default=None)
 
     @property
     def simplified_details(self) -> dict[str, t.Any]:
@@ -122,11 +163,16 @@ class EvolutionDetail(BaseModel):
 
         Prunes out any empty or None values, and only includes concrete or non-empty values.
         """
-        simplified_details: dict[str, t.Any] = {
-            k: v
-            for k, v in self.to_dict().items()
-            if ((is_dict := isinstance(v, dict)) and v.get("name") and v.get("url")) or (not is_dict and v)  # pyright: ignore[reportUnknownMemberType]
-        }
+        simplified_details: dict[str, t.Any] = {}
+        for k, v in self.to_dict().items():
+            if isinstance(v, dict):
+                if (v.get("name") and v.get("url")) or "expression" in v:
+                    simplified_details[k] = v
+            elif isinstance(v, list):
+                if len(v) > 0:
+                    simplified_details[k] = v
+            elif v is not None and v is not False and v != "":
+                simplified_details[k] = v
         return simplified_details
 
     @classmethod
@@ -157,12 +203,18 @@ class EvolutionDetail(BaseModel):
             trade_species=NamedResource.optional_from_payload(payload.get("trade_species")),
             turn_upside_down=payload.get("turn_upside_down", False),
             region=NamedResource.optional_from_payload(payload.get("region")),
-            base_form=NamedResource.optional_from_payload(payload.get("base_form")),
-            evolved_form=NamedResource.optional_from_payload(payload.get("evolved_form")),
+            required_pokemon_form=NamedResource.optional_from_payload(payload.get("required_pokemon_form")),
+            evolved_pokemon_form=NamedResource.optional_from_payload(payload.get("evolved_pokemon_form")),
             used_move=NamedResource.optional_from_payload(payload.get("used_move")),
             min_move_count=payload.get("min_move_count"),
             min_steps=payload.get("min_steps"),
             min_damage_taken=payload.get("min_damage_taken"),
+            allowed_natures=(
+                [NamedResource.from_payload(n) for n in natures]
+                if (natures := payload.get("allowed_natures"))
+                else None
+            ),
+            condition_expression=ConditionExpression.optional_from_payload(payload.get("condition_expression")),
         )
 
 

@@ -28,6 +28,7 @@ class Evolution(AsyncBaseExtension[EvolutionCache]):
         routes = {
             "evolution_chain": Endpoint.get_evolution_chain_endpoints(),
             "evolution_trigger": Endpoint.get_evolution_trigger_endpoints(),
+            "evolution_variable": Endpoint.get_evolution_variable_endpoints(),
         }
         results = await asyncio.gather(*(self._client.request(r) for r in routes.values()))
         for category, data in zip(routes.keys(), results, strict=False):
@@ -129,6 +130,56 @@ class Evolution(AsyncBaseExtension[EvolutionCache]):
         data = await self._client.request(route)
         return self._cache_group.evolution_trigger.setdefault(
             route, self._cache_group.evolution_trigger.from_payload(data)
+        )
+
+    def get_evolution_variable(self, name: str | int) -> models.EvolutionVariable | None:
+        """Gets a evolution variable from the cache.
+
+        Parameters
+        ----------
+        name : str | int
+            The name or id.
+
+        Returns
+        -------
+        models.EvolutionVariable | None
+            The cached model or None.
+
+        Examples
+        --------
+        ```python
+        variable = client.evolution.get_evolution_variable("encryption-constant")
+        if variable:
+            print(variable)
+        ```"""
+        route = Endpoint.get_evolution_variable(name)
+        self._validate_resource(self._cache_group.evolution_variable, name, route)
+        return self._cache_group.evolution_variable.get(route, None)
+
+    async def fetch_evolution_variable(self, name: str | int) -> models.EvolutionVariable:
+        """Fetches a evolution variable from the API.
+
+        Parameters
+        ----------
+        name : str | int
+            The name or id.
+
+        Returns
+        -------
+        models.EvolutionVariable
+            The fetched model.
+
+        Examples
+        --------
+        ```python
+        variable = await client.evolution.fetch_evolution_variable("encryption-constant")
+        print(variable)
+        ```"""
+        route = Endpoint.get_evolution_variable(name)
+        self._validate_resource(self._cache_group.evolution_variable, name, route)
+        data = await self._client.request(route)
+        return self._cache_group.evolution_variable.setdefault(
+            route, self._cache_group.evolution_variable.from_payload(data)
         )
 
 

@@ -172,6 +172,14 @@ EXTENSIONS: list[ExtensionSpec] = [
                 cache_attr="evolution_trigger",
                 example_value="level-up",
             ),
+            CategorySpec(
+                name="evolution_variable",
+                endpoint=Endpoint.get_evolution_variable,
+                endpoint_list=Endpoint.get_evolution_variable_endpoints,
+                model=models.EvolutionVariable,
+                cache_attr="evolution_variable",
+                example_value="encryption-constant",
+            ),
         ],
     ),
     ExtensionSpec(

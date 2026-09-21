@@ -76,6 +76,9 @@ class Evolution(SyncCacheGroup):
     evolution_trigger: SyncCache[Route, models.EvolutionTrigger] = attrs.field(
         factory=lambda: SyncCache(model=models.EvolutionTrigger, name="evolution_trigger")
     )
+    evolution_variable: SyncCache[Route, models.EvolutionVariable] = attrs.field(
+        factory=lambda: SyncCache(model=models.EvolutionVariable, name="evolution_variable")
+    )
 
 
 @attrs.define(slots=True, kw_only=True)
