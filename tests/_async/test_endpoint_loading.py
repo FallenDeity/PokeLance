@@ -1,22 +1,9 @@
 # pyright: reportPrivateUsage=false
-"""
-Tests for endpoint-registry population (the list-endpoint side of caching).
-
-Coverage
---------
-- wait_until_ready() with cache_endpoints=False raises immediately
-- wait_until_ready() with cache_endpoints=True waits for all tasks to finish
-- setup() on an individual extension populates its endpoint registries
-- setup() gracefully skips categories that have no list-endpoint
-  (i.e. api-metadata and location-area-encounter share the /pokemon list)
-- load_documents() correctly populates name→Endpoint and id→Endpoint mappings
-- Extension.cache_group.<category>.endpoints is non-empty after cached_client is ready
-- All extensions' categories with list-endpoints are populated after wait_until_ready()
-"""
+"""Test async registry loading, readiness waits, cancellation, and reconnects."""
 
 import asyncio
 import typing as t
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 
@@ -129,10 +116,64 @@ async def test_cancelled_initialization_unblocks_waits_and_retries(
         request.assert_not_awaited()
 
 
-def test_wait_until_ready_with_cache(cached_client: pokelance.PokeLanceAsyncClient) -> None:
-    """cached_client fixture already called wait_until_ready; loader must be ready."""
-    assert cached_client.http.loader.is_ready, "All background tasks should be complete."
-    assert not cached_client.http.loader._tasks, "No background tasks should remain."
+@pytest.mark.asyncio
+async def test_shutdown_during_registry_request_retries(monkeypatch: pytest.MonkeyPatch) -> None:
+    started, release_request, draining, release_media = (asyncio.Event() for _ in range(4))
+
+    async with pokelance.PokeLanceAsyncClient(setup_logging=False) as client:
+        client.ext_tasks[:] = [(client.berry.setup, "berry")]
+
+        async def request(route: Route) -> dict[str, t.Any]:
+            started.set()
+            await release_request.wait()
+            if client.http.is_closing:
+                raise RuntimeError("HTTP client closing")
+            return {"results": []}
+
+        async def drain() -> None:
+            draining.set()
+            await release_media.wait()
+
+        monkeypatch.setattr(client.http, "request", AsyncMock(side_effect=request))
+        monkeypatch.setattr(client, "get_image", Mock(cache_close=AsyncMock(side_effect=drain)))
+        await client.http.connect()
+        await asyncio.wait_for(started.wait(), timeout=1)
+        closer = asyncio.create_task(client.close())
+        try:
+            await asyncio.wait_for(draining.wait(), timeout=1)
+            release_request.set()
+            with pytest.raises(EndpointInitializationError):
+                await asyncio.wait_for(client.http.loader.wait_until_ready(), timeout=1)
+        finally:
+            release_media.set()
+            await closer
+        request_mock = AsyncMock(return_value={"results": []})
+        monkeypatch.setattr(client.http, "request", request_mock)
+        await asyncio.wait_for(client.wait_until_ready(), timeout=1)
+        assert client.http.loader.is_ready
+        assert request_mock.await_count == 3
+
+
+@pytest.mark.asyncio
+async def test_cancelled_readiness_wait_preserves_startup(monkeypatch: pytest.MonkeyPatch) -> None:
+    started, release = asyncio.Event(), asyncio.Event()
+
+    async def request(route: Route) -> dict[str, t.Any]:
+        started.set()
+        await release.wait()
+        return {"results": []}
+
+    async with pokelance.PokeLanceAsyncClient(setup_logging=False) as client:
+        client.ext_tasks[:] = [(client.berry.setup, "berry")]
+        monkeypatch.setattr(client.http, "request", AsyncMock(side_effect=request))
+        waiter = asyncio.create_task(client.wait_until_ready())
+        await asyncio.wait_for(started.wait(), timeout=1)
+        waiter.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await waiter
+        release.set()
+        await asyncio.wait_for(client.wait_until_ready(), timeout=1)
+        assert client.http.loader.is_ready
 
 
 @pytest.mark.asyncio
@@ -151,16 +192,6 @@ async def test_cache_group_wait_until_ready(cached_client: pokelance.PokeLanceAs
     assert "cheri" in group.berry.endpoints
 
 
-@pytest.mark.asyncio
-async def test_cache_manager_wait_until_ready(cached_client: pokelance.PokeLanceAsyncClient) -> None:
-    """Awaiting cache_manager.wait_until_ready() waits for all sub-caches across all aggregates."""
-    await cached_client.http.cache_manager.wait_until_ready()
-
-    for agg in cached_client.http.cache_manager._walk_aggregates():
-        for cache in agg._walk_caches():
-            assert cache.is_ready
-
-
 # ---------------------------------------------------------------------------
 # Manual setup() per extension
 # ---------------------------------------------------------------------------
@@ -171,14 +202,6 @@ async def test_setup_populates_pokemon_endpoints(client: pokelance.PokeLanceAsyn
     await client.pokemon.setup()
     assert len(client.http.cache_manager.pokemon.pokemon.endpoints) > 0
     assert len(client.http.cache_manager.pokemon.pokemon_species.endpoints) > 0
-
-
-@pytest.mark.asyncio
-async def test_setup_populates_berry_endpoints(client: pokelance.PokeLanceAsyncClient) -> None:
-    await client.berry.setup()
-    assert len(client.http.cache_manager.berry.berry.endpoints) > 0
-    assert len(client.http.cache_manager.berry.berry_firmness.endpoints) > 0
-    assert len(client.http.cache_manager.berry.berry_flavor.endpoints) > 0
 
 
 @pytest.mark.asyncio
@@ -196,12 +219,20 @@ async def test_setup_skips_categories_without_list_endpoint(client: pokelance.Po
 # ---------------------------------------------------------------------------
 
 
-def test_all_list_endpoint_categories_populated(cached_client: pokelance.PokeLanceAsyncClient) -> None:
+@pytest.mark.asyncio
+async def test_all_list_endpoint_categories_populated(cached_client: pokelance.PokeLanceAsyncClient) -> None:
     """
     For every ExtensionEnum value, iterate its categories. For each category
     that has a corresponding Endpoint.get_<category>_endpoints() classmethod,
     the backing BaseCache should have at least one endpoint registered.
     """
+    await cached_client.http.cache_manager.wait_until_ready()
+    assert cached_client.http.loader.is_ready
+    assert all(
+        cache.is_ready
+        for group in cached_client.http.cache_manager._walk_aggregates()
+        for cache in group._walk_caches()
+    )
     exts = [e.value for e in ExtensionEnum]
     missing: list[str] = []
     for ext in exts:
@@ -217,128 +248,6 @@ def test_all_list_endpoint_categories_populated(cached_client: pokelance.PokeLan
             if not sub_cache.endpoints:
                 missing.append(f"{ext.name}.{cat_attr}")
     assert not missing, f"These caches are empty after wait_until_ready: {missing}"
-
-
-# ---------------------------------------------------------------------------
-# load_documents() unit test (no network, pure mapping check)
-# ---------------------------------------------------------------------------
-
-
-def test_load_documents_populates_name_and_id(client: pokelance.PokeLanceAsyncClient) -> None:
-    """
-    load_documents() should populate both name-keyed and id-keyed entries
-    in the endpoint dict.
-    """
-    fake_results = [
-        {"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"},
-        {"name": "ivysaur", "url": "https://pokeapi.co/api/v2/pokemon/2/"},
-    ]
-    cache = client.http.cache_manager.pokemon.pokemon
-    cache.load_documents(fake_results)
-
-    assert "bulbasaur" in cache.endpoints
-    assert "ivysaur" in cache.endpoints
-    assert cache.endpoints["bulbasaur"].id == 1
-    assert cache.endpoints["ivysaur"].id == 2
-
-
-def test_load_documents_populates_reverse_id_index(client: pokelance.PokeLanceAsyncClient) -> None:
-    """
-    load_documents() should also populate _endpoints_by_id, the reverse index
-    BaseCache.get() uses for alias resolution. Previously this reverse mapping
-    was rebuilt from scratch (inverting the whole `_endpoints` dict) on every
-    single get() miss; it should now be a standing index built once here.
-    """
-    fake_results = [
-        {"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"},
-        {"name": "ivysaur", "url": "https://pokeapi.co/api/v2/pokemon/2/"},
-    ]
-    cache = client.http.cache_manager.pokemon.pokemon
-    cache.load_documents(fake_results)
-
-    assert cache._endpoints_by_id["1"] == "bulbasaur"
-    assert cache._endpoints_by_id["2"] == "ivysaur"
-
-
-def test_secondary_type_cache_populates_reverse_id_index(client: pokelance.PokeLanceAsyncClient) -> None:
-    """
-    SecondaryTypeCache keys `_endpoints` by id rather than name (these
-    categories have no name field), so the reverse index maps id -> id for
-    consistency with the same get() lookup path used by name-keyed caches.
-    """
-    fake_results = [
-        {"name": "1", "url": "https://pokeapi.co/api/v2/machine/1/"},
-        {"name": "2", "url": "https://pokeapi.co/api/v2/machine/2/"},
-    ]
-    cache = client.http.cache_manager.machine.machine
-    cache.load_documents(fake_results)
-
-    assert "1" in cache.endpoints
-    assert "2" in cache.endpoints
-    assert cache._endpoints_by_id["1"] == "1"
-    assert cache._endpoints_by_id["2"] == "2"
-
-
-# ---------------------------------------------------------------------------
-# reset_endpoints() allows safe reload
-# ---------------------------------------------------------------------------
-
-
-def test_reset_endpoints_clears_registry_and_rearms_event(client: pokelance.PokeLanceAsyncClient) -> None:
-    """reset_endpoints() must clear all endpoint metadata."""
-    cache = client.pokemon.cache_group.pokemon
-    cache.load_documents([{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}])
-    assert cache._endpoints_cached
-    assert "bulbasaur" in cache.endpoints
-
-    cache.reset_endpoints()
-
-    assert not cache._endpoints_cached
-    assert cache._endpoints == {}
-    assert cache._endpoints_by_id == {}
-    assert cache._identifiers == set()
-
-
-def test_load_documents_after_reset_replaces_registry(client: pokelance.PokeLanceAsyncClient) -> None:
-    """After reset_endpoints(), load_documents() can re-populate cleanly."""
-    cache = client.pokemon.cache_group.pokemon
-    cache.load_documents([{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}])
-    cache.reset_endpoints()
-    cache.load_documents(
-        [
-            {"name": "charmander", "url": "https://pokeapi.co/api/v2/pokemon/4/"},
-            {"name": "squirtle", "url": "https://pokeapi.co/api/v2/pokemon/7/"},
-        ]
-    )
-    assert "charmander" in cache.endpoints
-    assert "squirtle" in cache.endpoints
-    assert "bulbasaur" not in cache.endpoints, "stale entry from previous load must be gone"
-    assert cache._endpoints_cached
-
-
-def test_reset_endpoints_on_secondary_type_cache(client: pokelance.PokeLanceAsyncClient) -> None:
-    """reset_endpoints() works on SecondaryTypeCache (machine) too."""
-    cache = client.machine.cache_group.machine
-    cache.load_documents([{"name": "1", "url": "https://pokeapi.co/api/v2/machine/1/"}])
-    cache.reset_endpoints()
-    assert cache._endpoints == {}
-    cache.load_documents([{"name": "2", "url": "https://pokeapi.co/api/v2/machine/2/"}])
-    assert "2" in cache.endpoints
-    assert "1" not in cache.endpoints
-
-
-@pytest.mark.asyncio
-async def test_reset_endpoints_blocks_wait_until_ready(client: pokelance.PokeLanceAsyncClient) -> None:
-    """After reset_endpoints(), setup() can re-populate endpoints cleanly."""
-    cache = client.pokemon.cache_group.pokemon
-    cache.load_documents([{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}])
-    assert cache._endpoints_cached
-
-    cache.reset_endpoints()
-    assert not cache._endpoints_cached
-
-    await client.pokemon.setup()
-    assert "charmander" in cache.endpoints
 
 
 # ---------------------------------------------------------------------------

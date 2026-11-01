@@ -81,18 +81,22 @@ To learn more about LRU caches and their design, see Python's [`functools.lru_ca
 With `cache_endpoints=True` (the default), registries load asynchronously in the background when the client connects. You can wait for endpoint registries to complete loading at three different levels of granularity:
 
 - **Global**: `await client.wait_until_ready()` waits for all 11 extensions and all categories to finish their initial setup.
-- **Extension-level**: `await client.berry.wait_until_ready()` (or `await client.berry.cache_group.wait_until_ready()`) waits specifically for the berry extension and its associated category registries.
+- **Extension-level**: `await client.berry.cache_group.wait_until_ready()` waits specifically for the berry extension's category registries.
 - **Category-level**: `await client.berry.cache_group.berry.wait_until_ready()` waits specifically for a single category's endpoint registry.
 
 If some registries fail, successful registries remain available. Explicit readiness waits raise `EndpointInitializationError` (from `pokelance.exceptions`), whose `errors` mapping contains the failures and original exceptions. A category wait reports that category's failure; a client wait finishes all extension tasks before reporting failures. Ordinary resource fetching and model caching remain available, including for categories whose registry failed; those categories have no local name/ID validation until their metadata loads successfully.
 
 With `cache_endpoints=False`, client, loader, cache-manager, group, and category readiness waits raise `RuntimeError` immediately. Fetching resources and caching their responses do not require these waits.
 
+If you close the client while registries are loading, it stops that work before closing the HTTP session. Waiting for an interrupted registry raises `EndpointInitializationError`. On the next connection, the client retries incomplete extensions and keeps those that finished successfully.
+
+Cancelling `await client.wait_until_ready()` only stops your wait. The registries continue loading in the background.
+
 ## Loading endpoint registries
 
 Similarly, you can trigger endpoint registry loading at three levels:
 
-- **Global**: `client.http.connect()` triggers all extensions to populate their endpoint registries. This runs automatically once per client on first connect/request or when triggered manually via `await client.wait_until_ready()`.
+- **Global**: `client.http.connect()` triggers endpoint registry loading on the first connect/request or when triggered manually via `await client.wait_until_ready()`. Reconnects load only extensions whose registries are incomplete.
 - **Extension-level**: `await client.<ext>.setup()` triggers a specific extension to load its endpoint registries. You can call this manually to refresh a specific extension's registries without restarting the entire client.
 - **Category-level**: `client.<ext>.cache_group.<category>.load_documents(data)` populates a category's endpoint registry from a list of raw document payloads.
 

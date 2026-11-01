@@ -1,22 +1,11 @@
 # pyright: reportPrivateUsage=false
-"""
-Tests for sync endpoint-registry population (the list-endpoint side of caching).
-
-Coverage
---------
-- wait_until_ready() with cache_endpoints=False raises immediately
-- wait_until_ready() with cache_endpoints=True waits for all tasks to finish
-- setup() on an individual extension populates its endpoint registries
-- setup() gracefully skips categories that have no list-endpoint
-- load_documents() correctly populates name→Endpoint and id→Endpoint mappings
-- Extension.cache_group.<category>.endpoints is non-empty after sync_cached_client is ready
-- All extensions' categories with list-endpoints are populated after wait_until_ready()
-- load_all() fills the data cache from endpoints
-"""
+"""Test sync registry loading, readiness waits, worker shutdown, and reconnects."""
 
 from __future__ import annotations
 
+import threading
 import typing as t
+from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import Mock
 
 import pytest
@@ -81,9 +70,63 @@ def test_sync_partial_initialization_preserves_fetching(monkeypatch: pytest.Monk
         assert client.berry.get_berry_firmness(1) is fetched
 
 
-def test_sync_wait_until_ready_with_cache(sync_cached_client: pokelance.PokeLanceSyncClient) -> None:
-    """sync_cached_client fixture already called wait_until_ready; loader must be ready."""
-    assert sync_cached_client.http.loader.is_ready, "All background threads should be complete."
+def test_sync_interrupted_initialization_retries(monkeypatch: pytest.MonkeyPatch) -> None:
+    started, release, closing = (threading.Event() for _ in range(3))
+    factory = Mock(side_effect=lambda **kwargs: ThreadPoolExecutor(max_workers=1))
+    monkeypatch.setattr("pokelance.http._sync.concurrent.futures.ThreadPoolExecutor", factory)
+
+    with pokelance.PokeLanceSyncClient(setup_logging=False) as client:
+        client.ext_tasks[:] = [(client.berry.setup, "berry"), (client.utility.setup, "utility")]
+
+        def request(route: Route) -> dict[str, t.Any]:
+            started.set()
+            assert release.wait(2)
+            if client.http.is_closing:
+                raise RuntimeError("HTTP client closing")
+            return {"results": []}
+
+        monkeypatch.setattr(client.http, "request", Mock(side_effect=request))
+        shutdown = client.http.loader.shutdown
+
+        def observed_shutdown() -> None:
+            closing.set()
+            shutdown()
+
+        monkeypatch.setattr(client.http.loader, "shutdown", observed_shutdown)
+        client.http.connect()
+        closer = threading.Thread(target=client.close)
+        try:
+            assert started.wait(2)
+            closer.start()
+            assert closing.wait(2)
+        finally:
+            release.set()
+            if closer.ident is not None:
+                closer.join(2)
+        assert not closer.is_alive()
+
+        with pytest.raises(EndpointInitializationError):
+            client.http.loader.wait_until_ready()
+        for group in (client.berry.cache_group, client.utility.cache_group):
+            for cache in group._walk_caches():
+                assert cache._ready.wait(1), "Interrupted initialization must unblock category waits"
+            with pytest.raises(EndpointInitializationError):
+                group.wait_until_ready()
+
+        request_mock = Mock(return_value={"results": []})
+        monkeypatch.setattr(client.http, "request", request_mock)
+        client.wait_until_ready()
+        assert client.http.loader.is_ready
+        assert all(
+            cache.is_ready
+            for group in (client.berry.cache_group, client.utility.cache_group)
+            for cache in group._walk_caches()
+        )
+        assert request_mock.call_count == 4
+        client.close()
+        request_mock.reset_mock()
+        client.wait_until_ready()
+        request_mock.assert_not_called()
 
 
 def test_sync_cache_group_wait_until_ready(sync_cached_client: pokelance.PokeLanceSyncClient) -> None:
@@ -101,15 +144,6 @@ def test_sync_cache_group_wait_until_ready(sync_cached_client: pokelance.PokeLan
     assert "cheri" in group.berry.endpoints
 
 
-def test_sync_cache_manager_wait_until_ready(sync_cached_client: pokelance.PokeLanceSyncClient) -> None:
-    """Calling cache_manager.wait_until_ready() waits for all sub-caches across all aggregates."""
-    sync_cached_client.http.cache_manager.wait_until_ready()
-
-    for agg in sync_cached_client.http.cache_manager._walk_aggregates():
-        for cache in agg._walk_caches():
-            assert cache.is_ready
-
-
 # ---------------------------------------------------------------------------
 # Manual setup() per extension
 # ---------------------------------------------------------------------------
@@ -119,13 +153,6 @@ def test_sync_setup_populates_pokemon_endpoints(sync_client: pokelance.PokeLance
     sync_client.pokemon.setup()
     assert len(sync_client.http.cache_manager.pokemon.pokemon.endpoints) > 0
     assert len(sync_client.http.cache_manager.pokemon.pokemon_species.endpoints) > 0
-
-
-def test_sync_setup_populates_berry_endpoints(sync_client: pokelance.PokeLanceSyncClient) -> None:
-    sync_client.berry.setup()
-    assert len(sync_client.http.cache_manager.berry.berry.endpoints) > 0
-    assert len(sync_client.http.cache_manager.berry.berry_firmness.endpoints) > 0
-    assert len(sync_client.http.cache_manager.berry.berry_flavor.endpoints) > 0
 
 
 def test_sync_setup_skips_categories_without_list_endpoint(sync_client: pokelance.PokeLanceSyncClient) -> None:
@@ -148,6 +175,13 @@ def test_sync_all_list_endpoint_categories_populated(sync_cached_client: pokelan
     that has a corresponding Endpoint.get_<category>_endpoints() classmethod,
     the backing BaseCache should have at least one endpoint registered.
     """
+    sync_cached_client.http.cache_manager.wait_until_ready()
+    assert sync_cached_client.http.loader.is_ready
+    assert all(
+        cache.is_ready
+        for group in sync_cached_client.http.cache_manager._walk_aggregates()
+        for cache in group._walk_caches()
+    )
     exts = [e.value for e in ExtensionEnum]
     missing: list[str] = []
     for ext in exts:
@@ -163,116 +197,6 @@ def test_sync_all_list_endpoint_categories_populated(sync_cached_client: pokelan
             if not sub_cache.endpoints:
                 missing.append(f"{ext.name}.{cat_attr}")
     assert not missing, f"These caches are empty after wait_until_ready: {missing}"
-
-
-# ---------------------------------------------------------------------------
-# load_documents() unit test (no network, pure mapping check)
-# ---------------------------------------------------------------------------
-
-
-def test_sync_load_documents_populates_name_and_id(sync_client: pokelance.PokeLanceSyncClient) -> None:
-    """
-    load_documents() should populate both name-keyed and id-keyed entries
-    in the endpoint dict.
-    """
-    fake_results = [
-        {"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"},
-        {"name": "ivysaur", "url": "https://pokeapi.co/api/v2/pokemon/2/"},
-    ]
-    cache = sync_client.http.cache_manager.pokemon.pokemon
-    cache.load_documents(fake_results)
-
-    assert "bulbasaur" in cache.endpoints
-    assert "ivysaur" in cache.endpoints
-    assert cache.endpoints["bulbasaur"].id == 1
-    assert cache.endpoints["ivysaur"].id == 2
-
-
-def test_sync_load_documents_populates_reverse_id_index(sync_client: pokelance.PokeLanceSyncClient) -> None:
-    fake_results = [
-        {"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"},
-        {"name": "ivysaur", "url": "https://pokeapi.co/api/v2/pokemon/2/"},
-    ]
-    cache = sync_client.http.cache_manager.pokemon.pokemon
-    cache.load_documents(fake_results)
-
-    assert cache._endpoints_by_id["1"] == "bulbasaur"
-    assert cache._endpoints_by_id["2"] == "ivysaur"
-
-
-def test_sync_secondary_type_cache_populates_reverse_id_index(sync_client: pokelance.PokeLanceSyncClient) -> None:
-    fake_results = [
-        {"name": "1", "url": "https://pokeapi.co/api/v2/machine/1/"},
-        {"name": "2", "url": "https://pokeapi.co/api/v2/machine/2/"},
-    ]
-    cache = sync_client.http.cache_manager.machine.machine
-    cache.load_documents(fake_results)
-
-    assert "1" in cache.endpoints
-    assert "2" in cache.endpoints
-    assert cache._endpoints_by_id["1"] == "1"
-    assert cache._endpoints_by_id["2"] == "2"
-
-
-# ---------------------------------------------------------------------------
-# reset_endpoints() allows safe reload
-# ---------------------------------------------------------------------------
-
-
-def test_sync_reset_endpoints_clears_registry_and_rearms_event(sync_client: pokelance.PokeLanceSyncClient) -> None:
-    """reset_endpoints() must clear all endpoint metadata."""
-    cache = sync_client.pokemon.cache_group.pokemon
-    cache.load_documents([{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}])
-    assert cache._endpoints_cached
-    assert "bulbasaur" in cache.endpoints
-
-    cache.reset_endpoints()
-
-    assert not cache._endpoints_cached
-    assert cache._endpoints == {}
-    assert cache._endpoints_by_id == {}
-    assert cache._identifiers == set()
-
-
-def test_sync_load_documents_after_reset_replaces_registry(sync_client: pokelance.PokeLanceSyncClient) -> None:
-    """After reset_endpoints(), load_documents() can re-populate cleanly."""
-    cache = sync_client.pokemon.cache_group.pokemon
-    cache.load_documents([{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}])
-    cache.reset_endpoints()
-    cache.load_documents(
-        [
-            {"name": "charmander", "url": "https://pokeapi.co/api/v2/pokemon/4/"},
-            {"name": "squirtle", "url": "https://pokeapi.co/api/v2/pokemon/7/"},
-        ]
-    )
-    assert "charmander" in cache.endpoints
-    assert "squirtle" in cache.endpoints
-    assert "bulbasaur" not in cache.endpoints, "stale entry from previous load must be gone"
-    assert cache._endpoints_cached
-
-
-def test_sync_reset_endpoints_on_secondary_type_cache(sync_client: pokelance.PokeLanceSyncClient) -> None:
-    """reset_endpoints() works on SecondaryTypeCache (machine) too."""
-    cache = sync_client.machine.cache_group.machine
-    cache.load_documents([{"name": "1", "url": "https://pokeapi.co/api/v2/machine/1/"}])
-    cache.reset_endpoints()
-    assert cache._endpoints == {}
-    cache.load_documents([{"name": "2", "url": "https://pokeapi.co/api/v2/machine/2/"}])
-    assert "2" in cache.endpoints
-    assert "1" not in cache.endpoints
-
-
-def test_sync_reset_endpoints_blocks_wait_until_ready(sync_client: pokelance.PokeLanceSyncClient) -> None:
-    """After reset_endpoints(), setup() can re-populate endpoints cleanly."""
-    cache = sync_client.pokemon.cache_group.pokemon
-    cache.load_documents([{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}])
-    assert cache._endpoints_cached
-
-    cache.reset_endpoints()
-    assert not cache._endpoints_cached
-
-    sync_client.pokemon.setup()
-    assert "charmander" in cache.endpoints
 
 
 # ---------------------------------------------------------------------------

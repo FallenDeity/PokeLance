@@ -2,17 +2,19 @@
 from __future__ import annotations
 
 import concurrent.futures
+import contextlib
 import logging
 import threading
 import time
 import typing as t
+from functools import partial
 
 import niquests
 
 from pokelance.cache.sync.manager import SyncCacheManager
 from pokelance.endpoints import Route
-from pokelance.exceptions import EndpointInitializationError, HTTPException
-from pokelance.http._base import BaseHttpClient
+from pokelance.exceptions import HTTPException
+from pokelance.http._base import BaseEndpointLoader, BaseHttpClient
 
 if t.TYPE_CHECKING:
     from pokelance.client.sync_client import PokeLanceSyncClient
@@ -22,118 +24,59 @@ __all__: tuple[str, ...] = ("SyncEndpointLoader", "SyncHttpClient")
 logger = logging.getLogger(__name__)
 
 
-class SyncEndpointLoader:
-    """Composition helper for scheduling and tracking sync endpoint pre-population tasks via thread pool."""
+class SyncEndpointLoader(BaseEndpointLoader["PokeLanceSyncClient", concurrent.futures.Future[None]]):
+    """Run registry setup in workers and retain their results for readiness."""
 
     def __init__(self, client: PokeLanceSyncClient) -> None:
-        self._client = client
+        super().__init__(client)
         self._executor: concurrent.futures.ThreadPoolExecutor | None = None
-        self._futures: set[concurrent.futures.Future[None]] = set()
-        self._remaining: int = 0
         self._lock = threading.RLock()
-        self._ready_event = threading.Event()
-        self._ready_event.set()
-        self._scheduled: bool = False
-        self._errors: dict[str, Exception] = {}
 
     @property
     def is_ready(self) -> bool:
-        """Whether all background loading tasks have finished successfully."""
-        return self._ready_event.is_set() and not self._errors
+        """Whether every scheduled setup has completed successfully."""
+        return all(task.done() and not task.cancelled() and task.exception() is None for task in self._tasks.values())
 
     def wait_until_ready(self) -> None:
-        """Wait until all background endpoint tasks have completed."""
+        """Finish every setup before reporting initialization failures."""
         if not self._client.cache_endpoints:
             raise RuntimeError("Endpoint loading is disabled (cache_endpoints=False).")
-        awaiting = not self._ready_event.is_set()
-        if awaiting:
-            logger.info("Waiting for endpoint loading to complete...")
-        self._ready_event.wait()
         with self._lock:
-            errors = dict(self._errors)
-        if errors:
-            raise EndpointInitializationError(errors) from next(iter(errors.values()))
-        if awaiting:
-            logger.info("Endpoint loading complete.")
-
-    def _load_ext(self, fn: t.Callable[[], None], message: str, name: str) -> None:
-        """Load an extension's resources synchronously in a thread."""
-        logger.debug(f"Loading {message}...")
-        try:
-            fn()
-        except Exception as error:
-            if self._client.http.is_closing:
-                logger.debug(f"Extension loading aborted due to client closing: {message}")
-                return
-            logger.exception(f"Failed loading {message}")
-            with self._lock:
-                self._errors[name] = error
-            extension = getattr(self._client, name, None)
-            if extension is not None:
-                for cache in extension.cache_group._walk_caches():
-                    if not cache.is_ready and cache._endpoint_error is None:
-                        cache.set_failed(error)
-            return
-        finally:
-            with self._lock:
-                self._remaining -= 1
-                remaining = self._remaining
-                if remaining <= 0:
-                    self._ready_event.set()
-        logger.info(f"Loaded {message} ({remaining} remaining)")
+            tasks = self._tasks
+        # Report all failures together after every worker finishes.
+        for task in tasks.values():
+            with contextlib.suppress(Exception):
+                task.result()
+        self._raise_errors(tasks)
 
     def schedule_tasks(self) -> None:
-        """Schedules the background endpoint-loading tasks on a thread pool."""
+        """Load unfinished extensions; successful registries survive reconnects."""
         with self._lock:
-            if self._scheduled:
+            if any(not task.done() for task in self._tasks.values()):
                 return
-            self._scheduled = True
-            self._errors.clear()
-            self._ready_event.clear()
-            if not self._client.cache_endpoints:
-                self._ready_event.set()
-                self._client.ext_tasks.clear()
+            pending = self._prepare()
+            if not pending:
+                self._tasks = {}
                 return
-            total = len(self._client.ext_tasks)
-            self._remaining = total
-            logger.info(f"Scheduling {total} endpoint pre-population task(s)...")
             if self._executor is None:
                 self._executor = concurrent.futures.ThreadPoolExecutor(
-                    max_workers=min(32, max(4, total)),
+                    max_workers=min(32, max(4, len(pending))),
                     thread_name_prefix="PokeLance-EndpointLoader",
                 )
-            for num, (fn, name) in enumerate(self._client.ext_tasks):
-                message = f"Extension {name} endpoints ({num + 1}/{total})"
-                future = self._executor.submit(self._load_ext, fn, message, name)
-                self._futures.add(future)
-                future.add_done_callback(self._discard_future)
-            self._client.ext_tasks.clear()
-            if self._remaining == 0:
-                self._ready_event.set()
-
-    def _discard_future(self, future: concurrent.futures.Future[None]) -> None:
-        with self._lock:
-            self._futures.discard(future)
+            self._tasks = {name: self._executor.submit(setup) for setup, name in pending}
+            for name, task in self._tasks.items():
+                task.add_done_callback(partial(self._task_done, name))
 
     def shutdown(self) -> None:
-        """Cancels queued work and waits for running endpoint workers to finish."""
+        """Cancel queued work and drain running workers before their session closes."""
         with self._lock:
-            futures = list(self._futures)
+            tasks = tuple(self._tasks.values())
             executor = self._executor
             self._executor = None
-            count = sum(1 for f in futures if not f.done())
-            if count > 0:
-                logger.warning(f"Cancelling {count} in-flight endpoint loading tasks...")
-        # Workers and completion callbacks need the loader lock while exiting.
-        for future in futures:
-            future.cancel()
+        for task in tasks:
+            task.cancel()
         if executor is not None:
-            logger.debug("Shutting down endpoint loader thread pool...")
             executor.shutdown(wait=True, cancel_futures=True)
-        with self._lock:
-            self._futures.clear()
-            self._remaining = 0
-            self._ready_event.set()
 
 
 @t.final

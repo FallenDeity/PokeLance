@@ -8,9 +8,11 @@ from typing_extensions import TypeVar, override
 from urllib3.util import Retry
 
 from pokelance.endpoints import Route
-from pokelance.exceptions import AudioNotFound, HTTPException, ImageNotFound
+from pokelance.exceptions import AudioNotFound, EndpointInitializationError, HTTPException, ImageNotFound
 
 if t.TYPE_CHECKING:
+    import asyncio
+    import concurrent.futures
     from types import TracebackType
 
     import niquests
@@ -29,12 +31,57 @@ __all__: tuple[str, ...] = ("BaseHttpClient",)
 logger = logging.getLogger(__name__)
 
 _ClientT = TypeVar("_ClientT", bound="ClientBase")
+_TaskT = TypeVar("_TaskT", bound="asyncio.Task[None] | concurrent.futures.Future[None]")
 _SessionT = TypeVar("_SessionT", bound="niquests.Session | niquests.AsyncSession")
 _CacheManagerT = TypeVar(
     "_CacheManagerT",
     bound="AsyncCacheManager | SyncCacheManager",
     default="AsyncCacheManager | SyncCacheManager",
 )
+
+
+class BaseEndpointLoader(t.Generic[_ClientT, _TaskT]):
+    """Shared endpoint loader task scheduling and state management."""
+
+    def __init__(self, client: _ClientT) -> None:
+        self._client = client
+        self._tasks: dict[str, _TaskT] = {}
+
+    def _prepare(self) -> list[tuple[t.Callable[..., t.Any], str]]:
+        if not self._client.cache_endpoints:
+            return []
+        pending: list[tuple[t.Callable[..., t.Any], str]] = []
+        for setup, name in self._client.ext_tasks:
+            extension = getattr(self._client, name, None)
+            if extension is not None:
+                caches = tuple(extension.cache_group._walk_caches())
+                if all(cache.is_ready for cache in caches):
+                    continue
+                for cache in caches:
+                    if cache._endpoint_error is not None:
+                        cache.reset_endpoints()
+            pending.append((setup, name))
+        return pending
+
+    @staticmethod
+    def _task_error(name: str, task: asyncio.Task[None] | concurrent.futures.Future[None]) -> Exception | None:
+        if task.cancelled():
+            return RuntimeError(f"Endpoint initialization cancelled: {name}")
+        error = task.exception()
+        return RuntimeError(str(error)) if error is not None and not isinstance(error, Exception) else error
+
+    def _task_done(self, name: str, task: _TaskT) -> None:
+        if (error := self._task_error(name, task)) is not None:
+            extension = getattr(self._client, name, None)
+            if extension is not None:
+                for cache in extension.cache_group._walk_caches():
+                    if not cache.is_ready and cache._endpoint_error is None:
+                        cache.set_failed(error)
+
+    def _raise_errors(self, tasks: t.Mapping[str, _TaskT]) -> None:
+        errors = {name: error for name, task in tasks.items() if (error := self._task_error(name, task)) is not None}
+        if errors:
+            raise EndpointInitializationError(errors) from next(iter(errors.values()))
 
 
 class LoggedRetry(Retry):

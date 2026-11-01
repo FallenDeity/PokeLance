@@ -11,8 +11,8 @@ import niquests
 
 from pokelance.cache._async.manager import AsyncCacheManager
 from pokelance.endpoints import Route
-from pokelance.exceptions import EndpointInitializationError, HTTPException
-from pokelance.http._base import BaseHttpClient
+from pokelance.exceptions import HTTPException
+from pokelance.http._base import BaseEndpointLoader, BaseHttpClient
 
 if t.TYPE_CHECKING:
     from pokelance.client.async_client import PokeLanceAsyncClient
@@ -22,114 +22,36 @@ __all__: tuple[str, ...] = ("AsyncEndpointLoader", "AsyncHttpClient")
 logger = logging.getLogger(__name__)
 
 
-class AsyncEndpointLoader:
-    """Composition helper for scheduling and tracking async endpoint pre-population tasks."""
-
-    def __init__(self, client: PokeLanceAsyncClient) -> None:
-        self._client = client
-        self._tasks: set[asyncio.Task[None]] = set()
-        self._remaining: int = 0
-        self._ready_event: asyncio.Event = asyncio.Event()
-        self._ready_event.set()
-        self._scheduled: bool = False
-        self._errors: dict[str, Exception] = {}
+class AsyncEndpointLoader(BaseEndpointLoader["PokeLanceAsyncClient", asyncio.Task[None]]):
+    """Schedule registry setup once per connection and drain it before closing."""
 
     @property
     def is_ready(self) -> bool:
-        """Whether all background loading tasks have finished successfully."""
-        return self._ready_event.is_set() and not self._errors
+        """Whether every scheduled setup has completed successfully."""
+        return all(task.done() and not task.cancelled() and task.exception() is None for task in self._tasks.values())
 
     async def wait_until_ready(self) -> None:
-        """Wait until all background endpoint tasks have completed."""
+        """Wait for all setup results without cancelling startup if this caller cancels."""
         if not self._client.cache_endpoints:
             raise RuntimeError("Endpoint loading is disabled (cache_endpoints=False).")
-        await self._ready_event.wait()
-        if self._errors:
-            raise EndpointInitializationError(self._errors) from next(iter(self._errors.values()))
-
-    async def _load_ext(
-        self, coroutine: t.Callable[[], t.Coroutine[t.Any, t.Any, None]], message: str, name: str
-    ) -> None:
-        """Load an extension's resources asynchronously."""
-        logger.debug(f"Loading {message}...")
-        try:
-            await coroutine()
-        except Exception as error:
-            if self._client.http.is_closing:
-                logger.debug(f"Extension loading aborted due to client closing: {message}")
-            else:
-                logger.exception(f"Failed loading {message}")
-            self._set_failed(name, error)
-            return
-        logger.info(f"Loaded {message}")
-
-    def _set_failed(self, name: str, error: Exception) -> None:
-        self._errors[name] = error
-        extension = getattr(self._client, name, None)
-        if extension is not None:
-            for cache in extension.cache_group._walk_caches():
-                if not cache.is_ready and cache._endpoint_error is None:
-                    cache.set_failed(error)
-
-    def _task_done(
-        self,
-        coroutine: t.Callable[[], t.Coroutine[t.Any, t.Any, None]],
-        name: str,
-        task: asyncio.Task[None],
-    ) -> None:
-        self._tasks.discard(task)
-        if task.cancelled():
-            self._set_failed(name, RuntimeError(f"Endpoint initialization cancelled: {name}"))
-            self._client.ext_tasks.append((coroutine, name))
-        self._remaining -= 1
-        if self._remaining <= 0:
-            self._ready_event.set()
+        tasks = self._tasks
+        await asyncio.shield(asyncio.gather(*tasks.values(), return_exceptions=True))
+        self._raise_errors(tasks)
 
     async def schedule_tasks(self) -> None:
-        """Schedules background endpoint-loading tasks using asyncio.create_task."""
-        if self._scheduled:
+        """Load unfinished extensions; successful registries survive reconnects."""
+        if any(not task.done() for task in self._tasks.values()):
             return
-        self._scheduled = True
-        self._errors.clear()
-        self._ready_event.clear()
-        if not self._client.cache_endpoints:
-            self._ready_event.set()
-            self._client.ext_tasks.clear()
-            return
-        total = len(self._client.ext_tasks)
-        self._remaining = total
-        logger.info(f"Scheduling {total} endpoint pre-population task(s)...")
-        for num, (coroutine, name) in enumerate(self._client.ext_tasks):
-            extension = getattr(self._client, name, None)
-            if extension is not None:
-                for cache in extension.cache_group._walk_caches():
-                    if cache._endpoint_error is not None:
-                        cache.reset_endpoints()
-            message = f"Extension {name} endpoints ({num + 1}/{total})"
-            task = asyncio.create_task(coro=self._load_ext(coroutine, message, name), name=name)
-            self._tasks.add(task)
-            task.add_done_callback(partial(self._task_done, coroutine, name))
-        self._client.ext_tasks.clear()
-        if self._remaining == 0:
-            self._ready_event.set()
+        self._tasks = {name: asyncio.create_task(setup(), name=name) for setup, name in self._prepare()}
+        for name, task in self._tasks.items():
+            task.add_done_callback(partial(self._task_done, name))
 
     async def cancel_tasks(self) -> None:
-        """Cancels and awaits all in-flight endpoint loading tasks."""
-        tasks = [task for task in self._tasks if not task.done()]
-        if tasks:
-            logger.warning(f"Cancelling {len(tasks)} in-flight endpoint loading task(s)...")
-            for task in tasks:
+        """Cancel and await setup work, including its cancellation cleanup."""
+        for task in self._tasks.values():
+            if not task.done():
                 task.cancel()
-                logger.warning(f"Cancelled task {task.get_name()}")
-            try:
-                await asyncio.wait_for(asyncio.gather(*tasks, return_exceptions=True), timeout=1.5)
-            except asyncio.TimeoutError:
-                logger.warning("Timed out waiting for endpoint loading tasks to cancel.")
-        self._tasks.clear()
-        if self._client.ext_tasks:
-            self._scheduled = False
-        self._remaining = 0
-        self._ready_event.set()
+        await asyncio.gather(*self._tasks.values(), return_exceptions=True)
 
 
 @t.final
@@ -179,8 +101,8 @@ class AsyncHttpClient(BaseHttpClient["PokeLanceAsyncClient", niquests.AsyncSessi
             return
         self._closing = True
         try:
-            await asyncio.gather(self._client.get_image.cache_close(), self._client.get_audio.cache_close())
             await self._loader.cancel_tasks()
+            await asyncio.gather(self._client.get_image.cache_close(), self._client.get_audio.cache_close())
             session_to_close = self.session if self._session_owner else None
             self.session = None
             if session_to_close:

@@ -4,6 +4,7 @@ import json
 import os
 import pathlib
 import tempfile
+import threading
 import typing as t
 from collections import OrderedDict
 
@@ -166,6 +167,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
     ) -> None:
         if max_size <= 0:
             raise ValueError("max_size must be greater than 0")
+        self._lock = threading.RLock()
         self._max_size = max_size
         self._model = model
         self._name = name or self.__class__.__name__
@@ -206,36 +208,40 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
 
     @override
     def __getitem__(self, key: _KT) -> _VT:
-        key = self._canonicalize_key(key)
-        try:
-            val = self._cache[key]
-            self._cache.move_to_end(key)
-            self._stats.hits += 1
-            return val
-        except KeyError:
-            self._stats.misses += 1
-            raise
+        with self._lock:
+            key = self._canonicalize_key(key)
+            try:
+                val = self._cache[key]
+                self._cache.move_to_end(key)
+                self._stats.hits += 1
+                return val
+            except KeyError:
+                self._stats.misses += 1
+                raise
 
     @override
     def __setitem__(self, key: _KT, value: _VT) -> None:
-        key = self._canonicalize_key(key)
-        self._stats.sets += 1
-        if key in self._cache:
-            self._cache[key] = value
-            self._cache.move_to_end(key)
-        else:
-            if len(self._cache) >= self._max_size:
-                self._cache.popitem(last=False)
-                self._stats.evictions += 1
-            self._cache[key] = value
+        with self._lock:
+            key = self._canonicalize_key(key)
+            self._stats.sets += 1
+            if key in self._cache:
+                self._cache[key] = value
+                self._cache.move_to_end(key)
+            else:
+                if len(self._cache) >= self._max_size:
+                    self._cache.popitem(last=False)
+                    self._stats.evictions += 1
+                self._cache[key] = value
 
     @override
     def __delitem__(self, key: _KT) -> None:
-        del self._cache[self._canonicalize_key(key)]
+        with self._lock:
+            del self._cache[self._canonicalize_key(key)]
 
     @override
     def __len__(self) -> int:
-        return len(self._cache)
+        with self._lock:
+            return len(self._cache)
 
     @override
     def __iter__(self) -> t.Iterator[_KT]:
@@ -260,13 +266,14 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
     @override
     def setdefault(self, __key: _KT, /, __default: _VT | None = None) -> _VT:
         """Returns the cached value for key if present, otherwise inserts default and returns it."""
-        key = self._canonicalize_key(__key)
-        if key not in self._cache and __default is not None:
-            self[key] = __default
+        with self._lock:
+            key = self._canonicalize_key(__key)
+            if key not in self._cache and __default is not None:
+                self[key] = __default
+                return self._cache[key]
+            self._stats.hits += 1
+            self._cache.move_to_end(key)
             return self._cache[key]
-        self._stats.hits += 1
-        self._cache.move_to_end(key)
-        return self._cache[key]
 
     @override
     def clear(self) -> None:
@@ -278,7 +285,8 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         client.cache.pokemon.pokemon.clear()
         ```
         """
-        self._cache.clear()
+        with self._lock:
+            self._cache.clear()
 
     def _mark_endpoints_cached(self) -> None:
         self._identifiers = set(self._endpoints) | set(self._endpoints_by_id)
@@ -308,13 +316,15 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
 
     def set_ready(self) -> None:
         """Sets the cache endpoint state as ready."""
-        self._endpoint_error = None
-        self._endpoints_cached = True
+        with self._lock:
+            self._endpoint_error = None
+            self._endpoints_cached = True
 
     def set_failed(self, error: Exception) -> None:
         """Records an endpoint-loading failure without disabling model caching."""
-        self._endpoint_error = error
-        self._endpoints_cached = False
+        with self._lock:
+            self._endpoint_error = error
+            self._endpoints_cached = False
 
     def _check_endpoint_wait(self) -> None:
         if hasattr(self, "_client") and not self._client.cache_endpoints:
@@ -326,11 +336,12 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
 
     def reset_endpoints(self) -> None:
         """Clears the endpoint registry and marks the cache as unready."""
-        self._endpoints.clear()
-        self._endpoints_by_id.clear()
-        self._identifiers.clear()
-        self._endpoints_cached = False
-        self._endpoint_error = None
+        with self._lock:
+            self._endpoints.clear()
+            self._endpoints_by_id.clear()
+            self._identifiers.clear()
+            self._endpoints_cached = False
+            self._endpoint_error = None
 
     def load_documents(self, data: list[dict[str, str]]) -> None:
         """Loads endpoint metadata documents into this cache partition's registry.
@@ -340,18 +351,19 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         data : list[dict[str, str]]
             The raw list of endpoint documents containing `name` and `url`.
         """
-        self.reset_endpoints()
-        for document in data:
-            original_url = document["url"]
-            id_ = int(original_url.split("/")[-2])
+        with self._lock:
+            self.reset_endpoints()
+            for document in data:
+                original_url = document["url"]
+                id_ = int(original_url.split("/")[-2])
 
-            key = str(id_) if self._endpoint_key_is_id else document["name"]
-            url = f"{original_url.strip('/')}{self._url_suffix}" if self._url_suffix else original_url
+                key = str(id_) if self._endpoint_key_is_id else document["name"]
+                url = f"{original_url.strip('/')}{self._url_suffix}" if self._url_suffix else original_url
 
-            self._endpoints[key] = CacheEndpoint(url=url, id=id_)
-            self._endpoints_by_id[str(id_)] = key
+                self._endpoints[key] = CacheEndpoint(url=url, id=id_)
+                self._endpoints_by_id[str(id_)] = key
 
-        self._mark_endpoints_cached()
+            self._mark_endpoints_cached()
 
     def set_size(self, size: int) -> None:
         """Sets the maximum capacity of this cache partition.
@@ -367,12 +379,13 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         client.cache.pokemon.pokemon.set_size(200)
         ```
         """
-        if size <= 0:
-            raise ValueError("size must be greater than 0")
-        self._max_size = size
-        while len(self._cache) > size:
-            self._cache.popitem(last=False)
-            self._stats.evictions += 1
+        with self._lock:
+            if size <= 0:
+                raise ValueError("size must be greater than 0")
+            self._max_size = size
+            while len(self._cache) > size:
+                self._cache.popitem(last=False)
+                self._stats.evictions += 1
 
     def serialize(self) -> dict[str, t.Any]:
         """Serializes all in-memory cached models into a raw dictionary.
@@ -388,10 +401,11 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         data = client.cache.pokemon.pokemon.serialize()
         ```
         """
-        dummy: dict[str, t.Any] = {}
-        for k, v in self.items():
-            dummy[k.endpoint] = v.raw if isinstance(v, BaseModel) else [i.raw for i in v]
-        return dummy
+        with self._lock:
+            dummy: dict[str, t.Any] = {}
+            for k, v in self.items():
+                dummy[k.endpoint] = v.raw if isinstance(v, BaseModel) else [i.raw for i in v]
+            return dummy
 
     def _write(self, path: str, payload: dict[str, t.Any]) -> None:
         """Atomically write a previously serialized cache snapshot to disk."""
@@ -436,10 +450,11 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         client.cache.pokemon.pokemon.deserialize(saved_data)
         ```
         """
-        self._max_size = max(self._max_size, len(data))
-        for endpoint, info in data.items():
-            route = Route(endpoint=endpoint)
-            self.setdefault(t.cast("_KT", route), self.from_payload(info))
+        with self._lock:
+            self._max_size = max(self._max_size, len(data))
+            for endpoint, info in data.items():
+                route = Route(endpoint=endpoint)
+                self.setdefault(t.cast("_KT", route), self.from_payload(info))
 
     @property
     def endpoints(self) -> dict[str, CacheEndpoint]:

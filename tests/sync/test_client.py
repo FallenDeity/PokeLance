@@ -7,8 +7,7 @@ Coverage
 - getch_data: happy paths (int id, string name, random endpoint, cache-hit)
 - getch_data: error paths (invalid resource, category, extension)
 - from_url: happy path + error paths
-- get_image / get_audio: bytes returned, cache-hit faster, error
-- model __eq__
+- get_image / get_audio: bytes returned, cache hits, errors
 - base_url env var support
 """
 
@@ -16,7 +15,6 @@ from __future__ import annotations
 
 import random
 import threading
-import time
 from unittest.mock import Mock
 
 import niquests
@@ -45,30 +43,8 @@ def test_sync_client_ping(sync_client: pokelance.PokeLanceSyncClient) -> None:
 
 def test_sync_getch_data_by_id(sync_cached_client: pokelance.PokeLanceSyncClient) -> None:
     pokemon: Pokemon = sync_cached_client.getch_data(ExtensionEnum.Pokemon, "pokemon", 1)
-    assert pokemon.name == "bulbasaur"
-
-
-def test_sync_getch_data_by_name(sync_cached_client: pokelance.PokeLanceSyncClient) -> None:
-    pokemon: Pokemon = sync_cached_client.getch_data(ExtensionEnum.Pokemon, "pokemon", "bulbasaur")
-    assert isinstance(pokemon, Pokemon)
-    assert pokemon.name == "bulbasaur"
-
-
-def test_sync_getch_data_cache_hit(sync_cached_client: pokelance.PokeLanceSyncClient) -> None:
-    """Second call must return the exact same model instance from cache."""
-    result1: Pokemon = sync_cached_client.getch_data(ExtensionEnum.Pokemon, "pokemon", 1)
-    result2: Pokemon = sync_cached_client.getch_data(ExtensionEnum.Pokemon, "pokemon", 1)
-    assert result1 == result2
-
-
-def test_sync_getch_data_random_endpoint(sync_cached_client: pokelance.PokeLanceSyncClient) -> None:
-    """Fetch a random name from the endpoint registry; confirm it lands in cache."""
-    id_ = random.choice(list(sync_cached_client.pokemon.cache_group.pokemon.endpoints.keys()))
-    pokemon: Pokemon = sync_cached_client.getch_data(ExtensionEnum.Pokemon, "pokemon", id_)
-    assert pokemon.name == id_
-    route = Endpoint.get_pokemon(id_)
-    cached: Pokemon | None = sync_cached_client.pokemon.cache_group.pokemon.get(route)
-    assert cached is not None and cached.name == id_
+    assert isinstance(pokemon, Pokemon) and pokemon.name == "bulbasaur"
+    assert sync_cached_client.getch_data(ExtensionEnum.Pokemon, "pokemon", "bulbasaur") is pokemon
 
 
 # ---------------------------------------------------------------------------
@@ -147,19 +123,9 @@ def test_sync_get_image_returns_bytes(sync_cached_client: pokelance.PokeLanceSyn
     assert pokemon.sprites.front_default is not None
     img = sync_cached_client.get_image(pokemon.sprites.front_default)
     assert img and isinstance(img, bytes)
-
-
-def test_sync_get_image_cache_hit_is_faster(sync_cached_client: pokelance.PokeLanceSyncClient) -> None:
-    pokemon = sync_cached_client.pokemon.fetch_pokemon(1)
-    url = pokemon.sprites.front_default
-    assert url is not None
-    t0 = time.perf_counter()
-    sync_cached_client.get_image(url)
-    first = time.perf_counter() - t0
-    t1 = time.perf_counter()
-    sync_cached_client.get_image(url)
-    second = time.perf_counter() - t1
-    assert first > second, "Cached image fetch should be faster than the initial network fetch."
+    hits = sync_cached_client._cached_get_image.cache_info().hits
+    assert sync_cached_client.get_image(pokemon.sprites.front_default) is img
+    assert sync_cached_client._cached_get_image.cache_info().hits == hits + 1
 
 
 def test_sync_get_image_invalid_url(sync_cached_client: pokelance.PokeLanceSyncClient) -> None:
@@ -172,19 +138,9 @@ def test_sync_get_audio_returns_bytes(sync_cached_client: pokelance.PokeLanceSyn
     assert pokemon.cries.latest is not None
     audio = sync_cached_client.get_audio(pokemon.cries.latest)
     assert audio and isinstance(audio, bytes)
-
-
-def test_sync_get_audio_cache_hit_is_faster(sync_cached_client: pokelance.PokeLanceSyncClient) -> None:
-    pokemon = sync_cached_client.pokemon.fetch_pokemon(1)
-    url = pokemon.cries.latest
-    assert url is not None
-    t0 = time.perf_counter()
-    sync_cached_client.get_audio(url)
-    first = time.perf_counter() - t0
-    t1 = time.perf_counter()
-    sync_cached_client.get_audio(url)
-    second = time.perf_counter() - t1
-    assert first > second, "Cached audio fetch should be faster than the initial network fetch."
+    hits = sync_cached_client._cached_get_audio.cache_info().hits
+    assert sync_cached_client.get_audio(pokemon.cries.latest) is audio
+    assert sync_cached_client._cached_get_audio.cache_info().hits == hits + 1
 
 
 def test_sync_media_transport_error_is_wrapped() -> None:
@@ -205,14 +161,8 @@ def test_sync_media_transport_error_is_wrapped() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Model equality & env vars
+# Base URL configuration
 # ---------------------------------------------------------------------------
-
-
-def test_sync_model_equality(sync_cached_client: pokelance.PokeLanceSyncClient) -> None:
-    p1 = sync_cached_client.pokemon.fetch_pokemon(1)
-    p2 = sync_cached_client.pokemon.fetch_pokemon(1)
-    assert p1 == p2
 
 
 def test_sync_base_url_env_var(monkeypatch: pytest.MonkeyPatch) -> None:

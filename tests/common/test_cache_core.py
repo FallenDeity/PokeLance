@@ -21,6 +21,7 @@ Coverage
 
 import asyncio
 import math
+import threading
 import typing as t
 from unittest.mock import AsyncMock, Mock
 
@@ -92,6 +93,52 @@ def test_invalid_cache_resize_preserves_capacity(client: pokelance.PokeLanceAsyn
 # ---------------------------------------------------------------------------
 
 
+def test_cache_lru_order_eviction_and_clear() -> None:
+    cache = SyncCache(max_size=3)
+    routes = [Endpoint.get_pokemon(i) for i in range(1, 5)]
+    for route in routes[:3]:
+        cache[route] = BaseModel()
+    assert list(cache) == routes[:3]
+    assert len(cache) == 3
+
+    cache[routes[0]]
+    cache[routes[3]] = BaseModel()
+    assert list(cache) == [routes[2], routes[0], routes[3]]
+    assert cache.get(routes[1]) is None
+    assert cache.stats.evictions == 1
+
+    cache.clear()
+    assert len(cache) == 0
+
+
+@pytest.mark.parametrize("cache_type", [AsyncCache, SyncCache])
+@pytest.mark.parametrize("id_keys", [False, True])
+def test_registry_indexes_reset_and_reload(
+    cache_type: type[AsyncCache[t.Any, t.Any]] | type[SyncCache[t.Any, t.Any]], id_keys: bool
+) -> None:
+    cache = cache_type(endpoint_key_is_id=id_keys)
+    cache.load_documents([{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}])
+    key = "1" if id_keys else "bulbasaur"
+    assert set(cache.endpoints) == {key}
+    assert cache.endpoints[key].id == 1
+    assert cache.endpoints[key].url == "https://pokeapi.co/api/v2/pokemon/1/"
+    assert cache._endpoints_by_id == {"1": key}
+    assert cache.identifiers == {key, "1"}
+    assert cache.is_ready and cache._ready.is_set()
+
+    cache.reset_endpoints()
+    assert not cache.is_ready and not cache._ready.is_set()
+    assert cache.endpoints == {} and cache._endpoints_by_id == {}
+    assert cache.identifiers == set()
+
+    cache.load_documents([{"name": "ivysaur", "url": "https://pokeapi.co/api/v2/pokemon/2/"}])
+    new_key = "2" if id_keys else "ivysaur"
+    assert set(cache.endpoints) == {new_key}
+    assert cache._endpoints_by_id == {"2": new_key}
+    assert cache.identifiers == {new_key, "2"}
+    assert cache.is_ready and cache._ready.is_set()
+
+
 @pytest.mark.parametrize("cache_type", [AsyncCache, SyncCache])
 def test_cache_shrink_immediately_evicts_lru_entries(
     cache_type: type[AsyncCache[t.Any, t.Any]] | type[SyncCache[t.Any, t.Any]],
@@ -124,53 +171,50 @@ async def test_async_media_cache_shrink_evicts_lru_entries() -> None:
     await download.cache_close()
 
 
-@pytest.mark.asyncio
-async def test_lru_eviction_drops_oldest(client: pokelance.PokeLanceAsyncClient) -> None:
-    """With max_size=3, fetching a 4th entry should evict the first."""
-    client.http.cache_manager.set_size(3)
-    for i in range(1, 4):
-        await client.pokemon.fetch_pokemon(i)
-    assert len(client.http.cache_manager.pokemon.pokemon) == 3
-
-    await client.pokemon.fetch_pokemon(4)
-    assert len(client.http.cache_manager.pokemon.pokemon) == 3
-    route4 = Endpoint.get_pokemon(4)
-    assert client.http.cache_manager.pokemon.pokemon.get(route4) is not None
-
-
-@pytest.mark.asyncio
-async def test_lru_access_refreshes_order(client: pokelance.PokeLanceAsyncClient) -> None:
-    """Re-accessing entry 1 after 2 and 3 keeps it alive when 4 is inserted."""
-    client.http.cache_manager.set_size(3)
-    await client.pokemon.fetch_pokemon(1)
-    await client.pokemon.fetch_pokemon(2)
-    await client.pokemon.fetch_pokemon(3)
-
-    # Touch entry 1 → it becomes MRU; entry 2 becomes LRU
-    _ = client.http.cache_manager.pokemon.pokemon[Endpoint.get_pokemon(1)]
-
-    await client.pokemon.fetch_pokemon(4)
-    route1 = Endpoint.get_pokemon(1)
-    route2 = Endpoint.get_pokemon(2)
-    assert client.http.cache_manager.pokemon.pokemon.get(route1) is not None, "Entry 1 should survive after re-access."
-    assert client.http.cache_manager.pokemon.pokemon.get(route2) is None, "Entry 2 should be evicted as the true LRU."
-
-
-@pytest.mark.asyncio
-async def test_lru_tracks_latest_entry(client: pokelance.PokeLanceAsyncClient) -> None:
-    """The most-recently-added entry should be last in the ordered dict."""
-    client.http.cache_manager.set_size(10)
-    for i in range(1, 11):
-        await client.pokemon.fetch_pokemon(i)
-    latest = await client.pokemon.fetch_pokemon(25)
-    keys = list(client.http.cache_manager.pokemon.pokemon.cache.keys())
-    last_value = client.http.cache_manager.pokemon.pokemon.cache[keys[-1]]
-    assert latest == last_value
-
-
 # ---------------------------------------------------------------------------
 # Alias resolution in cache.get()
 # ---------------------------------------------------------------------------
+
+
+def test_sync_registry_reindex_preserves_concurrent_refresh(monkeypatch: pytest.MonkeyPatch) -> None:
+    cache = SyncCache()
+    route = Endpoint.get_pokemon("pikachu")
+    stale, fresh = BaseModel(), BaseModel()
+    cache[route] = stale
+    migrating, release, writing, finished = (threading.Event() for _ in range(4))
+    canonicalize = cache._canonicalize_key
+
+    def observed_canonicalize(key: Route) -> Route:
+        if threading.current_thread().name == "registry-loader":
+            migrating.set()
+            assert release.wait(2)
+        return canonicalize(key)
+
+    def refresh() -> None:
+        writing.set()
+        cache[route] = fresh
+        finished.set()
+
+    monkeypatch.setattr(cache, "_canonicalize_key", observed_canonicalize)
+    loader = threading.Thread(
+        target=cache.load_documents,
+        args=([{"name": "pikachu", "url": "https://pokeapi.co/api/v2/pokemon/25/"}],),
+        name="registry-loader",
+    )
+    writer = threading.Thread(target=refresh)
+    loader.start()
+    try:
+        assert migrating.wait(1)
+        writer.start()
+        assert writing.wait(1)
+        finished.wait(0.05)
+    finally:
+        release.set()
+        loader.join(2)
+        if writer.ident is not None:
+            writer.join(2)
+    assert not loader.is_alive() and not writer.is_alive()
+    assert cache.get(Endpoint.get_pokemon(25)) is fresh
 
 
 @pytest.mark.parametrize("cache_type", [AsyncCache, SyncCache])
@@ -251,38 +295,6 @@ async def test_cache_get_by_id_after_name_fetch(cached_client: pokelance.PokeLan
     result = cached_client.http.cache_manager.pokemon.pokemon.get(route_by_id)
     assert result is not None, "Should resolve bulbasaur via its numeric id alias."
     assert result.name == "bulbasaur"
-
-
-@pytest.mark.asyncio
-async def test_cache_get_by_name_after_id_fetch(cached_client: pokelance.PokeLanceAsyncClient) -> None:
-    """Fetch by id → retrieve by name via alias lookup."""
-    await cached_client.pokemon.fetch_pokemon(1)
-    route_by_name = Endpoint.get_pokemon("bulbasaur")
-    result = cached_client.http.cache_manager.pokemon.pokemon.get(route_by_name)
-    assert result is not None, "Should resolve id=1 via bulbasaur name alias."
-    assert result.name == "bulbasaur"
-
-
-# ---------------------------------------------------------------------------
-# Mapping protocol: __len__ and clear()
-# ---------------------------------------------------------------------------
-
-
-@pytest.mark.asyncio
-async def test_cache_len_increases_on_fetch(client: pokelance.PokeLanceAsyncClient) -> None:
-    assert len(client.http.cache_manager.pokemon.pokemon) == 0
-    await client.pokemon.fetch_pokemon(1)
-    assert len(client.http.cache_manager.pokemon.pokemon) == 1
-    await client.pokemon.fetch_pokemon(2)
-    assert len(client.http.cache_manager.pokemon.pokemon) == 2
-
-
-@pytest.mark.asyncio
-async def test_cache_clear(client: pokelance.PokeLanceAsyncClient) -> None:
-    await client.pokemon.fetch_pokemon(1)
-    assert len(client.http.cache_manager.pokemon.pokemon) == 1
-    client.http.cache_manager.pokemon.pokemon.clear()
-    assert len(client.http.cache_manager.pokemon.pokemon) == 0
 
 
 # ---------------------------------------------------------------------------

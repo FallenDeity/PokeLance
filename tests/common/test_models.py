@@ -45,42 +45,19 @@ class _Color(enum.Enum):
     BLUE = 42
 
 
-def test_serializer_unwraps_str_enum() -> None:
-    result = _serializer(None, t.cast("t.Any", None), _Color.RED)
-    assert result == "red"
+@pytest.mark.parametrize(("value", "expected"), [(_Color.RED, "red"), (_Color.BLUE, 42)])
+def test_serializer_unwraps_enum(value: _Color, expected: str | int) -> None:
+    assert _serializer(None, t.cast("t.Any", None), value) == expected
 
 
-def test_serializer_unwraps_int_enum() -> None:
-    result = _serializer(None, t.cast("t.Any", None), _Color.BLUE)
-    assert result == 42
-
-
-def test_serializer_passthrough_str() -> None:
-    assert _serializer(None, t.cast("t.Any", None), "hello") == "hello"
-
-
-def test_serializer_passthrough_int() -> None:
-    assert _serializer(None, t.cast("t.Any", None), 99) == 99
-
-
-def test_serializer_passthrough_none() -> None:
-    assert _serializer(None, t.cast("t.Any", None), None) is None
-
-
-def test_serializer_passthrough_list() -> None:
-    lst = [1, 2, 3]
-    assert _serializer(None, t.cast("t.Any", None), lst) is lst
+@pytest.mark.parametrize("value", ["hello", 99, None, [1, 2, 3]])
+def test_serializer_preserves_non_enum(value: object) -> None:
+    assert _serializer(None, t.cast("t.Any", None), value) is value
 
 
 # ---------------------------------------------------------------------------
 # BaseModel.from_payload() raw inclusion
 # ---------------------------------------------------------------------------
-
-
-def test_from_payload_sets_raw() -> None:
-    payload: dict[str, t.Any] = {"id": 1, "name": "bulbasaur"}
-    model = BaseModel.from_payload(payload)
-    assert model.raw == payload
 
 
 def test_from_payload_raw_is_same_object() -> None:
@@ -122,12 +99,8 @@ def test_to_dict_unwraps_enum_field() -> None:
 def test_base_model_equality_ignores_raw() -> None:
     m1 = BaseModel(raw={"a": 1})
     m2 = BaseModel(raw={"b": 2})
-    assert m1 == m2, "raw is excluded from eq; two BaseModels with no other fields are equal."
-
-
-def test_base_model_hash_is_consistent() -> None:
-    m = BaseModel(raw={})
-    assert hash(m) == hash(m)
+    assert m1 == m2
+    assert hash(m1) == hash(m2)
 
 
 # ---------------------------------------------------------------------------
@@ -142,14 +115,7 @@ async def test_pokemon_to_dict_excludes_raw(client: pokelance.PokeLanceAsyncClie
     assert "raw" not in d
     assert d["name"] == "bulbasaur"
     assert d["id"] == 1
-
-
-@pytest.mark.asyncio
-async def test_pokemon_to_dict_has_expected_keys(client: pokelance.PokeLanceAsyncClient) -> None:
-    pokemon = await client.pokemon.fetch_pokemon(1)
-    d = pokemon.to_dict()
-    for key in ("name", "id", "base_experience", "height", "weight", "abilities", "types"):
-        assert key in d, f"Expected key '{key}' missing from to_dict() output."
+    assert {"name", "id", "base_experience", "height", "weight", "abilities", "types"} <= d.keys()
 
 
 # ---------------------------------------------------------------------------

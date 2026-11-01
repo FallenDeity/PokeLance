@@ -40,7 +40,7 @@ from pokelance.exceptions import (
 )
 
 # ---------------------------------------------------------------------------
-# Minimal Route stand-in (avoids importing the real Route which needs aiohttp)
+# Minimal route stand-in for exception formatting
 # ---------------------------------------------------------------------------
 
 
@@ -58,23 +58,10 @@ ROUTE: t.Any = _FakeRoute()
 # ---------------------------------------------------------------------------
 
 
-def test_pokelance_exception_message() -> None:
-    exc = PokeLanceException("something went wrong", ROUTE)
-    assert exc.message == "something went wrong"
-
-
-def test_pokelance_exception_route() -> None:
-    exc = PokeLanceException("msg", ROUTE)
-    assert exc.route is ROUTE
-
-
 def test_pokelance_exception_str() -> None:
     exc = PokeLanceException("oops", ROUTE)
     assert str(exc) == "oops | /fake/route"
-
-
-def test_pokelance_exception_is_exception() -> None:
-    exc = PokeLanceException("msg", ROUTE)
+    assert exc.message == "oops" and exc.route is ROUTE
     assert isinstance(exc, Exception)
 
 
@@ -83,26 +70,10 @@ def test_pokelance_exception_is_exception() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_http_exception_status() -> None:
-    exc = HTTPException("bad", ROUTE, 400)
-    assert exc.status == 400
-
-
 def test_http_exception_str() -> None:
     exc = HTTPException("bad", ROUTE, 400)
     assert str(exc) == "bad | /fake/route | 400"
-
-
-def test_http_exception_create_returns_correct_subclass() -> None:
-    exc = HTTPException("not found", ROUTE, 404)
-    created = exc.create()
-    assert isinstance(created, ResourceNotFound)
-
-
-def test_http_exception_create_unknown_status() -> None:
-    exc = HTTPException("server error", ROUTE, 500)
-    created = exc.create()
-    assert isinstance(created, UnknownError)
+    assert exc.status == 400
 
 
 # ---------------------------------------------------------------------------
@@ -139,7 +110,9 @@ def test_resource_not_found_str_no_suggestions() -> None:
     assert "not found" in s
     assert "/fake/route" in s
     assert "404" in s
+    assert isinstance(exc, NotFound)
     assert "Suggestions" not in s
+    assert exc.suggestions == [] and isinstance(exc, NotFound)
 
 
 def test_resource_not_found_str_with_suggestions() -> None:
@@ -148,21 +121,7 @@ def test_resource_not_found_str_with_suggestions() -> None:
     assert "Suggestions" in s
     assert "bulbasaur" in s
     assert "ivysaur" in s
-
-
-def test_resource_not_found_suggestions_none_by_default() -> None:
-    exc = ResourceNotFound("not found", ROUTE, 404)
-    assert exc.suggestions == []
-
-
-def test_resource_not_found_suggestions_stored() -> None:
-    exc = ResourceNotFound("not found", ROUTE, 404, suggestions=["charmander"])
-    assert exc.suggestions == ["charmander"]
-
-
-def test_resource_not_found_is_not_found() -> None:
-    exc = ResourceNotFound("not found", ROUTE, 404)
-    assert isinstance(exc, NotFound)
+    assert exc.suggestions == ["bulbasaur", "ivysaur"]
 
 
 # ---------------------------------------------------------------------------
@@ -176,10 +135,6 @@ def test_image_not_found_str() -> None:
     assert "image missing" in s
     assert "/fake/route" in s
     assert "404" in s
-
-
-def test_image_not_found_is_not_found() -> None:
-    exc = ImageNotFound("image missing", ROUTE, 404)
     assert isinstance(exc, NotFound)
 
 
@@ -194,10 +149,6 @@ def test_audio_not_found_str() -> None:
     assert "audio missing" in s
     assert "/fake/route" in s
     assert "404" in s
-
-
-def test_audio_not_found_is_not_found() -> None:
-    exc = AudioNotFound("audio missing", ROUTE, 404)
     assert isinstance(exc, NotFound)
 
 
@@ -222,9 +173,7 @@ def test_audio_not_found_is_not_found() -> None:
 def test_get_exception_mapping(status: int, expected_cls: type) -> None:
     cls = get_exception(status)
     assert cls is expected_cls
-
-
-def test_get_exception_returns_callable() -> None:
-    cls = get_exception(404)
-    exc = cls("msg", ROUTE, 404)
-    assert isinstance(exc, NotFound)
+    original = HTTPException("msg", ROUTE, status)
+    created = original.create()
+    assert isinstance(created, expected_cls)
+    assert created.message == "msg" and created.route is ROUTE and created.status == status
