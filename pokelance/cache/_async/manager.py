@@ -240,7 +240,7 @@ class Utility(AsyncCacheGroup):
 
     max_size: int = 100
     language: AsyncCache[Route, models.Language] = attrs.field(
-        factory=lambda: AsyncCache(model=models.Language, name="language", endpoint_key_is_id=True)
+        factory=lambda: AsyncCache(model=models.Language, name="language")
     )
     api_metadata: AsyncCache[Route, models.APIMetadata] = attrs.field(
         factory=lambda: AsyncCache(model=models.APIMetadata, name="api_metadata", endpoint_key_is_id=True)

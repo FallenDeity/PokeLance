@@ -119,6 +119,11 @@ def test_sync_from_url_invalid_category(sync_cached_client: pokelance.PokeLanceS
         sync_cached_client.from_url("https://pokeapi.co/api/v2/garbage/something")
 
 
+def test_sync_from_url_rejects_trailing_path(sync_client: pokelance.PokeLanceSyncClient) -> None:
+    with pytest.raises(ValueError):
+        sync_client.from_url("https://pokeapi.co/api/v2/pokemon/25/encounters/extra")
+
+
 # ---------------------------------------------------------------------------
 # Media helpers
 # ---------------------------------------------------------------------------

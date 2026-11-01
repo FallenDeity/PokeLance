@@ -231,7 +231,7 @@ class Utility(SyncCacheGroup):
 
     max_size: int = 100
     language: SyncCache[Route, models.Language] = attrs.field(
-        factory=lambda: SyncCache(model=models.Language, name="language", endpoint_key_is_id=True)
+        factory=lambda: SyncCache(model=models.Language, name="language")
     )
     api_metadata: SyncCache[Route, models.APIMetadata] = attrs.field(
         factory=lambda: SyncCache(model=models.APIMetadata, name="api_metadata", endpoint_key_is_id=True)

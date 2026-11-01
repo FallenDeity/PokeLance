@@ -28,13 +28,13 @@ class Utility(SyncBaseExtension[UtilityCache]):
         self._cache_group.api_metadata.set_ready()
         self._setup_endpoints(routes)
 
-    def get_language(self, id: int) -> models.Language | None:
+    def get_language(self, name: str | int) -> models.Language | None:
         """Gets a language from the cache.
 
         Parameters
         ----------
-        id : int
-            The resource id.
+        name : str | int
+            The name or id.
 
         Returns
         -------
@@ -48,17 +48,17 @@ class Utility(SyncBaseExtension[UtilityCache]):
         if language:
             print(language)
         ```"""
-        route = Endpoint.get_language(id)
-        self._validate_resource(self._cache_group.language, id, route)
+        route = Endpoint.get_language(name)
+        self._validate_resource(self._cache_group.language, name, route)
         return self._cache_group.language.get(route, None)
 
-    def fetch_language(self, id: int) -> models.Language:
+    def fetch_language(self, name: str | int) -> models.Language:
         """Fetches a language from the API.
 
         Parameters
         ----------
-        id : int
-            The resource id.
+        name : str | int
+            The name or id.
 
         Returns
         -------
@@ -71,8 +71,8 @@ class Utility(SyncBaseExtension[UtilityCache]):
         language = client.utility.fetch_language("en")
         print(language)
         ```"""
-        route = Endpoint.get_language(id)
-        self._validate_resource(self._cache_group.language, id, route)
+        route = Endpoint.get_language(name)
+        self._validate_resource(self._cache_group.language, name, route)
         data = self._client.request(route)
         model = self._cache_group.language.from_payload(data)
         self._cache_group.language[route] = model

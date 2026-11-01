@@ -17,7 +17,7 @@ This is a hard coded limit to fetch all valid endpoints from PokeAPI's category 
 """
 
 
-@attrs.define(repr=True, slots=True, kw_only=True, hash=True)
+@attrs.define(repr=True, slots=True, kw_only=True, frozen=True, hash=True)
 class Route:
     """Represents a route for an endpoint.
 
@@ -72,7 +72,7 @@ class Route:
         if not match:
             raise ValueError(f"Invalid URL: {url}")
         category, value, subcategory = match.groups()
-        return cls(endpoint=f"/{category}/{value}" + (f"/{subcategory}" if subcategory else ""))
+        return cls(endpoint="/" + "/".join(part for part in (category, value, subcategory) if part is not None))
 
 
 class Endpoint:

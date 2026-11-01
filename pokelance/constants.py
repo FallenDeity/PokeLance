@@ -50,7 +50,7 @@ def _convert_category(value: str) -> str:
 class RequestObject:
     extension: str
     category: str = attrs.field(converter=_convert_category)
-    value: str
+    value: str | None = None
 
 
 def get_base_url() -> str:
@@ -59,9 +59,9 @@ def get_base_url() -> str:
 
 def validate_url(url: str) -> re.Match[str] | None:
     pattern = re.compile(
-        rf"{re.escape(get_base_url())}/(?P<category>[\w-]+)/(?P<value>[\w-]+)(?:/(?P<sub_category>[\w-]+))?/?"
+        rf"{re.escape(get_base_url())}/(?P<category>[\w-]+)(?:/(?P<value>[\w-]+)(?:/(?P<sub_category>[\w-]+))?)?/?"
     )
-    return pattern.match(url)
+    return pattern.fullmatch(url)
 
 
 class BaseEnum(enum.Enum):
@@ -352,6 +352,10 @@ class ExtensionEnum(BaseEnum):
         if not url.startswith(get_base_url()) or not (groups := validate_url(url)):
             raise ValueError(f"Invalid url: {url}")
         category, value, subcategory = groups.groups()
+        if category.lower() == "meta" and value is None:
+            return RequestObject(extension="Utility", category="api-metadata")
+        if value is None:
+            raise ValueError(f"Invalid url: {url}")
         for i in cls:
             if category.lower() in i.value.categories:
                 return RequestObject(extension=i.name, category=subcategory or category, value=value)

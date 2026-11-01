@@ -543,7 +543,6 @@ EXTENSIONS: list[ExtensionSpec] = [
                 endpoint_list=Endpoint.get_language_endpoints,
                 model=models.Language,
                 cache_attr="language",
-                endpoint_key_is_id=True,
                 example_value="en",
             ),
             CategorySpec(
