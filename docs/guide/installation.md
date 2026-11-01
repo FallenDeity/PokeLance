@@ -7,7 +7,6 @@ PokeLance targets Python 3.10+ and ships with full inline type hints, so your ty
 - Python `>=3.10`
 - [`niquests`](https://github.com/jawah/niquests) for modern sync and async HTTP (with HTTP/2 and HTTP/3 support)
 - [`attrs`](https://www.attrs.org/) for structured models
-- [`aiofiles`](https://github.com/Tinche/aiofiles) for non-blocking disk cache I/O
 
 PokeLance keeps its runtime footprint minimal so it drops cleanly into bots, web services, and scripts.
 
