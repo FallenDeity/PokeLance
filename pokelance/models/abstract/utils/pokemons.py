@@ -1,7 +1,7 @@
 import typing as t
 
 import attrs
-from typing_extensions import override
+from typing_extensions import Self, override
 
 from pokelance.constants import PokemonFormTriggerEnum
 from pokelance.models import BaseModel
@@ -81,6 +81,61 @@ class BaseSprite(BaseModel):
     front_female: str | None = attrs.field(default=None)
     front_shiny_female: str | None = attrs.field(default=None)
 
+    @staticmethod
+    def _sprite_fields(payload: dict[str, t.Any]) -> dict[str, str | None]:
+        return {
+            "back_default": payload.get("back_default"),
+            "back_shiny": payload.get("back_shiny"),
+            "back_female": payload.get("back_female"),
+            "back_shiny_female": payload.get("back_shiny_female"),
+            "front_default": payload.get("front_default"),
+            "front_shiny": payload.get("front_shiny"),
+            "front_female": payload.get("front_female"),
+            "front_shiny_female": payload.get("front_shiny_female"),
+        }
+
+    @classmethod
+    @override
+    def from_payload(cls, payload: dict[str, t.Any]) -> Self:
+        return cls(raw=payload, **cls._sprite_fields(payload))
+
+
+@attrs.define(kw_only=True, slots=True)
+class SpriteIcon(BaseModel):
+    """A pokemon sprite icon resource.
+
+    Attributes
+    ----------
+    front_default: t.Optional[str]
+        The default depiction of this pokemon from the front in battle.
+    front_female: t.Optional[str]
+        The default depiction of female gender of this pokemon from the front in battle.
+    front_shiny: t.Optional[str]
+        The shiny depiction of this pokemon from the front in battle.
+    front_shiny_female: t.Optional[str]
+        The shiny depiction of female gender of this pokemon from the front in battle.
+    animated: t.Optional["SpriteIcon"]
+        The animated depiction of this pokemon.
+    """
+
+    front_default: str | None = attrs.field(default=None)
+    front_female: str | None = attrs.field(default=None)
+    front_shiny: str | None = attrs.field(default=None)
+    front_shiny_female: str | None = attrs.field(default=None)
+    animated: "SpriteIcon | None" = attrs.field(default=None)
+
+    @classmethod
+    @override
+    def from_payload(cls, payload: dict[str, t.Any]) -> "SpriteIcon":
+        return cls(
+            raw=payload,
+            front_default=payload.get("front_default"),
+            front_female=payload.get("front_female"),
+            front_shiny=payload.get("front_shiny"),
+            front_shiny_female=payload.get("front_shiny_female"),
+            animated=cls.optional_from_payload(payload.get("animated")),
+        )
+
 
 @attrs.define(kw_only=True, slots=True)
 class Generation(BaseModel):
@@ -93,21 +148,6 @@ class Animated(BaseSprite):
     A pokemon animated sprite resource.
     """
 
-    @classmethod
-    @override
-    def from_payload(cls, payload: dict[str, t.Any]) -> "Animated":
-        return cls(
-            raw=payload,
-            back_default=payload.get("back_default"),
-            back_shiny=payload.get("back_shiny"),
-            back_female=payload.get("back_female"),
-            back_shiny_female=payload.get("back_shiny_female"),
-            front_default=payload.get("front_default"),
-            front_shiny=payload.get("front_shiny"),
-            front_female=payload.get("front_female"),
-            front_shiny_female=payload.get("front_shiny_female"),
-        )
-
 
 @attrs.define(kw_only=True, slots=True)
 class ShowdownSprites(BaseSprite):
@@ -118,21 +158,6 @@ class ShowdownSprites(BaseSprite):
     But they are available in their sprites repository.
     """
 
-    @classmethod
-    @override
-    def from_payload(cls, payload: dict[str, t.Any]) -> "ShowdownSprites":
-        return cls(
-            raw=payload,
-            back_default=payload.get("back_default"),
-            back_shiny=payload.get("back_shiny"),
-            back_female=payload.get("back_female"),
-            back_shiny_female=payload.get("back_shiny_female"),
-            front_default=payload.get("front_default"),
-            front_shiny=payload.get("front_shiny"),
-            front_female=payload.get("front_female"),
-            front_shiny_female=payload.get("front_shiny_female"),
-        )
-
 
 @attrs.define(kw_only=True, slots=True)
 class VersionSprite(BaseSprite):
@@ -140,6 +165,10 @@ class VersionSprite(BaseSprite):
 
     Attributes
     ----------
+    back_gbc: t.Optional[str]
+        The gbc depiction of this pokemon from the back in battle.
+    front_gbc: t.Optional[str]
+        The gbc depiction of this pokemon from the front in battle.
     back_gray: t.Optional[str]
         The gray depiction of this pokemon from the back in battle.
     front_gray: t.Optional[str]
@@ -148,42 +177,51 @@ class VersionSprite(BaseSprite):
         The transparent depiction of this pokemon from the back in battle.
     front_transparent: t.Optional[str]
         The transparent depiction of this pokemon from the front in battle.
+    back_transparent_gray: t.Optional[str]
+        The transparent gray depiction of this pokemon from the back in battle.
+    front_transparent_gray: t.Optional[str]
+        The transparent gray depiction of this pokemon from the front in battle.
     back_shiny_transparent: t.Optional[str]
         The shiny transparent depiction of this pokemon from the back in battle.
     front_shiny_transparent: t.Optional[str]
         The shiny transparent depiction of this pokemon from the front in battle.
-    animated: Animated
+    animated: t.Optional[Animated]
         The animated depiction of this pokemon.
+    icons: t.Optional[SpriteIcon]
+        The icon depictions of this pokemon.
     """
 
+    back_gbc: str | None = attrs.field(default=None)
     back_gray: str | None = attrs.field(default=None)
     back_transparent: str | None = attrs.field(default=None)
     back_shiny_transparent: str | None = attrs.field(default=None)
+    back_transparent_gray: str | None = attrs.field(default=None)
+    front_gbc: str | None = attrs.field(default=None)
     front_gray: str | None = attrs.field(default=None)
     front_transparent: str | None = attrs.field(default=None)
     front_shiny_transparent: str | None = attrs.field(default=None)
-    animated: Animated = attrs.field(factory=Animated)
+    front_transparent_gray: str | None = attrs.field(default=None)
+    animated: Animated | None = attrs.field(default=None)
+    icons: SpriteIcon | None = attrs.field(default=None)
 
     @classmethod
     @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "VersionSprite":
         return cls(
             raw=payload,
-            back_default=payload.get("back_default"),
+            **cls._sprite_fields(payload),
+            back_gbc=payload.get("back_gbc"),
             back_gray=payload.get("back_gray"),
-            back_shiny=payload.get("back_shiny"),
             back_transparent=payload.get("back_transparent"),
+            back_transparent_gray=payload.get("back_transparent_gray"),
             back_shiny_transparent=payload.get("back_shiny_transparent"),
-            back_female=payload.get("back_female"),
-            back_shiny_female=payload.get("back_shiny_female"),
-            front_default=payload.get("front_default"),
-            front_shiny=payload.get("front_shiny"),
+            front_gbc=payload.get("front_gbc"),
             front_shiny_transparent=payload.get("front_shiny_transparent"),
-            front_female=payload.get("front_female"),
-            front_shiny_female=payload.get("front_shiny_female"),
             front_gray=payload.get("front_gray"),
             front_transparent=payload.get("front_transparent"),
-            animated=Animated.from_payload(payload.get("animated", {})),
+            front_transparent_gray=payload.get("front_transparent_gray"),
+            animated=Animated.optional_from_payload(payload.get("animated")),
+            icons=SpriteIcon.optional_from_payload(payload.get("icons")),
         )
 
 
@@ -197,10 +235,13 @@ class GenerationI(Generation):
         The red-blue depiction of this pokemon.
     yellow: VersionSprite
         The yellow depiction of this pokemon.
+    red_green_japan: VersionSprite
+        The red-green-japan depiction of this pokemon.
     """
 
     red_blue: VersionSprite = attrs.field(factory=VersionSprite)
     yellow: VersionSprite = attrs.field(factory=VersionSprite)
+    red_green_japan: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
     @override
@@ -209,6 +250,7 @@ class GenerationI(Generation):
             raw=payload,
             red_blue=VersionSprite.from_payload(payload.get("red-blue", {})),
             yellow=VersionSprite.from_payload(payload.get("yellow", {})),
+            red_green_japan=VersionSprite.from_payload(payload.get("red-green-japan", {})),
         )
 
 
@@ -247,6 +289,8 @@ class GenerationIII(Generation):
 
     Attributes
     ----------
+    icons: SpriteIcon
+        The icon depictions of pokemon from the generation III games.
     emerald: VersionSprite
         The emerald depiction of this pokemon.
     firered_leafgreen: VersionSprite
@@ -255,6 +299,7 @@ class GenerationIII(Generation):
         The ruby-sapphire depiction of this pokemon.
     """
 
+    icons: SpriteIcon = attrs.field(factory=SpriteIcon)
     emerald: VersionSprite = attrs.field(factory=VersionSprite)
     firered_leafgreen: VersionSprite = attrs.field(factory=VersionSprite)
     ruby_sapphire: VersionSprite = attrs.field(factory=VersionSprite)
@@ -264,6 +309,7 @@ class GenerationIII(Generation):
     def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationIII":
         return cls(
             raw=payload,
+            icons=SpriteIcon.from_payload(payload.get("icons", {})),
             emerald=VersionSprite.from_payload(payload.get("emerald", {})),
             firered_leafgreen=VersionSprite.from_payload(payload.get("firered-leafgreen", {})),
             ruby_sapphire=VersionSprite.from_payload(payload.get("ruby-sapphire", {})),
@@ -276,6 +322,8 @@ class GenerationIV(Generation):
 
     Attributes
     ----------
+    icons: SpriteIcon
+        The icon depictions of pokemon from the generation IV games.
     diamond_pearl: VersionSprite
         The diamond-pearl depiction of this pokemon.
     heartgold_soulsilver: VersionSprite
@@ -284,6 +332,7 @@ class GenerationIV(Generation):
         The platinum depiction of this pokemon.
     """
 
+    icons: SpriteIcon = attrs.field(factory=SpriteIcon)
     diamond_pearl: VersionSprite = attrs.field(factory=VersionSprite)
     heartgold_soulsilver: VersionSprite = attrs.field(factory=VersionSprite)
     platinum: VersionSprite = attrs.field(factory=VersionSprite)
@@ -293,6 +342,7 @@ class GenerationIV(Generation):
     def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationIV":
         return cls(
             raw=payload,
+            icons=SpriteIcon.from_payload(payload.get("icons", {})),
             diamond_pearl=VersionSprite.from_payload(payload.get("diamond-pearl", {})),
             heartgold_soulsilver=VersionSprite.from_payload(payload.get("heartgold-soulsilver", {})),
             platinum=VersionSprite.from_payload(payload.get("platinum", {})),
@@ -305,13 +355,13 @@ class GenerationV(Generation):
 
     Attributes
     ----------
-    icons: VersionSprite
-        The icons depiction of this pokemon.
+    icons: SpriteIcon
+        The icons depiction of this pokemon from the generation V games.
     black_white: VersionSprite
         The black-white depiction of this pokemon.
     """
 
-    icons: VersionSprite = attrs.field(factory=VersionSprite)
+    icons: SpriteIcon = attrs.field(factory=SpriteIcon)
     black_white: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
@@ -319,7 +369,7 @@ class GenerationV(Generation):
     def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationV":
         return cls(
             raw=payload,
-            icons=VersionSprite.from_payload(payload.get("icons", {})),
+            icons=SpriteIcon.from_payload(payload.get("icons", {})),
             black_white=VersionSprite.from_payload(payload.get("black-white", {})),
         )
 
@@ -330,13 +380,16 @@ class GenerationVI(Generation):
 
     Attributes
     ----------
+    icons: SpriteIcon
+        The icon depictions of this pokemon from the generation VI games.
     omegaruby_alphasapphire: VersionSprite
         The omegaruby-alphasapphire depiction of this pokemon.
     x_y: VersionSprite
         The x-y depiction of this pokemon.
     """
 
-    omegaruby_alphasapphire: VersionSprite = attrs.field(factory=VersionSprite)
+    icons: SpriteIcon = attrs.field(factory=SpriteIcon)
+    omega_ruby_alpha_sapphire: VersionSprite = attrs.field(factory=VersionSprite)
     x_y: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
@@ -344,7 +397,8 @@ class GenerationVI(Generation):
     def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationVI":
         return cls(
             raw=payload,
-            omegaruby_alphasapphire=VersionSprite.from_payload(payload.get("omegaruby-alphasapphire", {})),
+            icons=SpriteIcon.from_payload(payload.get("icons", {})),
+            omega_ruby_alpha_sapphire=VersionSprite.from_payload(payload.get("omega-ruby-alpha-sapphire", {})),
             x_y=VersionSprite.from_payload(payload.get("x-y", {})),
         )
 
@@ -355,22 +409,26 @@ class GenerationVII(Generation):
 
     Attributes
     ----------
-    icons: VersionSprite
-        The icons depiction of this pokemon.
+    icons: SpriteIcon
+        The icon depictions of this pokemon from the generation VII games.
     ultra_sun_ultra_moon: VersionSprite
         The ultra-sun-ultra-moon depiction of this pokemon.
+    lets_go_pikachu_lets_go_eevee: VersionSprite
+        The lets-go-pikachu-lets-go-eevee depiction of this pokemon.
     """
 
-    icons: VersionSprite = attrs.field(factory=VersionSprite)
+    icons: SpriteIcon = attrs.field(factory=SpriteIcon)
     ultra_sun_ultra_moon: VersionSprite = attrs.field(factory=VersionSprite)
+    lets_go_pikachu_lets_go_eevee: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
     @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationVII":
         return cls(
             raw=payload,
-            icons=VersionSprite.from_payload(payload.get("icons", {})),
+            icons=SpriteIcon.from_payload(payload.get("icons", {})),
             ultra_sun_ultra_moon=VersionSprite.from_payload(payload.get("ultra-sun-ultra-moon", {})),
+            lets_go_pikachu_lets_go_eevee=VersionSprite.from_payload(payload.get("lets-go-pikachu-lets-go-eevee", {})),
         )
 
 
@@ -380,13 +438,16 @@ class GenerationVIII(Generation):
 
     Attributes
     ----------
-    icons: VersionSprite
-        The icons depiction of this pokemon.
+    sword_shield: VersionSprite
+        The sword-shield depiction of this pokemon.
+    legends_arceus: VersionSprite
+        The legends-arceus depiction of this pokemon.
     brilliant_diamond_shining_pearl: VersionSprite
         The brilliant-diamond-shining-pearl depiction of this pokemon.
     """
 
-    icons: VersionSprite = attrs.field(factory=VersionSprite)
+    sword_shield: VersionSprite = attrs.field(factory=VersionSprite)
+    legends_arceus: VersionSprite = attrs.field(factory=VersionSprite)
     brilliant_diamond_shining_pearl: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
@@ -394,7 +455,8 @@ class GenerationVIII(Generation):
     def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationVIII":
         return cls(
             raw=payload,
-            icons=VersionSprite.from_payload(payload.get("icons", {})),
+            sword_shield=VersionSprite.from_payload(payload.get("sword-shield", {})),
+            legends_arceus=VersionSprite.from_payload(payload.get("legends-arceus", {})),
             brilliant_diamond_shining_pearl=VersionSprite.from_payload(
                 payload.get("brilliant-diamond-shining-pearl", {})
             ),
@@ -407,16 +469,27 @@ class GenerationIX(Generation):
 
     Attributes
     ----------
+    champions: VersionSprite
+        The champions depiction of this pokemon.
     scarlet_violet: VersionSprite
         The scarlet-violet depiction of this pokemon.
+    legends_za: VersionSprite
+        The legends-za depiction of this pokemon.
     """
 
+    champions: VersionSprite = attrs.field(factory=VersionSprite)
     scarlet_violet: VersionSprite = attrs.field(factory=VersionSprite)
+    legends_za: VersionSprite = attrs.field(factory=VersionSprite)
 
     @classmethod
     @override
     def from_payload(cls, payload: dict[str, t.Any]) -> "GenerationIX":
-        return cls(raw=payload, scarlet_violet=VersionSprite.from_payload(payload.get("scarlet-violet", {})))
+        return cls(
+            raw=payload,
+            champions=VersionSprite.from_payload(payload.get("champions", {})),
+            scarlet_violet=VersionSprite.from_payload(payload.get("scarlet-violet", {})),
+            legends_za=VersionSprite.from_payload(payload.get("legends-za", {})),
+        )
 
 
 @attrs.define(kw_only=True, slots=True)
@@ -531,6 +604,98 @@ class Home(BaseModel):
 
 
 @attrs.define(kw_only=True, slots=True)
+class OfficialArtworkVersionSprite(BaseModel):
+    """A official artwork version sprite resource.
+
+    Attributes
+    ----------
+    front_default: t.Optional[str]
+        The default depiction of this pokemon.
+    """
+
+    front_default: str | None = attrs.field(default=None)
+
+    @classmethod
+    @override
+    def from_payload(cls, payload: dict[str, t.Any]) -> "OfficialArtworkVersionSprite":
+        return cls(
+            raw=payload,
+            front_default=payload.get("front_default"),
+        )
+
+
+@attrs.define(kw_only=True, slots=True)
+class OfficialArtworkGenerationI(BaseModel):
+    """Official artwork generation I resource.
+
+    Attributes
+    ----------
+    red_and_blue: OfficialArtworkVersionSprite
+        The red and blue depiction of this pokemon.
+    red_and_green: OfficialArtworkVersionSprite
+        The green depiction of this pokemon.
+    """
+
+    red_and_blue: OfficialArtworkVersionSprite = attrs.field(factory=OfficialArtworkVersionSprite)
+    red_and_green: OfficialArtworkVersionSprite = attrs.field(factory=OfficialArtworkVersionSprite)
+
+    @classmethod
+    @override
+    def from_payload(cls, payload: dict[str, t.Any]) -> "OfficialArtworkGenerationI":
+        return cls(
+            raw=payload,
+            red_and_blue=OfficialArtworkVersionSprite.from_payload(payload.get("red-and-blue", {})),
+            red_and_green=OfficialArtworkVersionSprite.from_payload(payload.get("red-and-green", {})),
+        )
+
+
+@attrs.define(kw_only=True, slots=True)
+class OfficialArtworkGenerationII(BaseModel):
+    """Official artwork generation II resource.
+
+    Attributes
+    ----------
+    gold_and_silver: OfficialArtworkVersionSprite
+        The gold and silver depiction of this pokemon.
+    """
+
+    gold_and_silver: OfficialArtworkVersionSprite = attrs.field(factory=OfficialArtworkVersionSprite)
+
+    @classmethod
+    @override
+    def from_payload(cls, payload: dict[str, t.Any]) -> "OfficialArtworkGenerationII":
+        return cls(
+            raw=payload,
+            gold_and_silver=OfficialArtworkVersionSprite.from_payload(payload.get("gold-and-silver", {})),
+        )
+
+
+@attrs.define(kw_only=True, slots=True)
+class OfficialArtworkVersion(BaseModel):
+    """Official artwork version resource.
+
+    Attributes
+    ----------
+    generation_i: OfficialArtworkGenerationI
+        The generation I depiction of this pokemon.
+    generation_ii: OfficialArtworkGenerationII
+        The generation II depiction of this pokemon.
+    """
+
+    generation_i: OfficialArtworkGenerationI = attrs.field(factory=OfficialArtworkGenerationI)
+    generation_ii: OfficialArtworkGenerationII = attrs.field(factory=OfficialArtworkGenerationII)
+
+    @classmethod
+    @override
+    def from_payload(cls, payload: dict[str, t.Any]) -> "OfficialArtworkVersion":
+        return cls(
+            raw=payload,
+            generation_i=OfficialArtworkGenerationI.from_payload(payload.get("generation-i", {})),
+            generation_ii=OfficialArtworkGenerationII.from_payload(payload.get("generation-ii", {})),
+        )
+
+
+@attrs.define(kw_only=True, slots=True)
 class OfficialArtwork(BaseModel):
     """Official artwork for this Pokémon from Nintendo.
 
@@ -544,6 +709,7 @@ class OfficialArtwork(BaseModel):
 
     front_default: str | None = attrs.field(default=None)
     front_shiny: str | None = attrs.field(default=None)
+    versions: OfficialArtworkVersion = attrs.field(factory=OfficialArtworkVersion)
 
     @classmethod
     @override
@@ -552,6 +718,7 @@ class OfficialArtwork(BaseModel):
             raw=payload,
             front_default=payload.get("front_default"),
             front_shiny=payload.get("front_shiny"),
+            versions=OfficialArtworkVersion.from_payload(payload.get("versions", {})),
         )
 
 
@@ -1175,7 +1342,7 @@ class PokemonPastAbility(BaseModel):
             raw=payload,
             is_hidden=payload.get("is_hidden", False),
             slot=payload.get("slot", 0),
-            ability=NamedResource.from_payload(payload.get("ability", {})) if payload.get("ability") else None,
+            ability=NamedResource.optional_from_payload(payload.get("ability")),
         )
 
 
@@ -1450,7 +1617,7 @@ class PokemonSprite(BaseSprite):
     Attributes
     ----------
     other: Other
-        A set of sprites used tin official artwork, home.
+        A set of sprites used in official artwork, home.
     versions: Versions
         A set of sprites used to depict this Pokémon in the game.
     """
@@ -1460,24 +1627,17 @@ class PokemonSprite(BaseSprite):
 
     @classmethod
     @override
-    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonSprite":
+    def from_payload(cls, payload: dict[str, t.Any]) -> Self:
         return cls(
             raw=payload,
-            front_default=payload.get("front_default", ""),
-            front_shiny=payload.get("front_shiny", ""),
-            front_female=payload.get("front_female", ""),
-            front_shiny_female=payload.get("front_shiny_female", ""),
-            back_default=payload.get("back_default", ""),
-            back_shiny=payload.get("back_shiny", ""),
-            back_female=payload.get("back_female", ""),
-            back_shiny_female=payload.get("back_shiny_female", ""),
+            **cls._sprite_fields(payload),
             other=Other.from_payload(payload.get("other", {})),
             versions=Versions.from_payload(payload.get("versions", {})),
         )
 
 
 @attrs.define(slots=True, kw_only=True)
-class PokemonFormSprites(BaseModel):
+class PokemonFormSprites(PokemonSprite):
     """A pokemon form sprites resource.
 
     Attributes
@@ -1498,35 +1658,11 @@ class PokemonFormSprites(BaseModel):
         The female depiction of this pokemon form from the back in battle.
     back_shiny_female: t.Optional[str]
         The shiny female depiction of this pokemon form from the back in battle.
+    other: Other
+        A set of sprites used in official artwork, home.
     versions: Versions
         A set of sprites used to depict this Pokémon form in the game.
     """
-
-    front_default: str | None = attrs.field(default=None)
-    front_shiny: str | None = attrs.field(default=None)
-    front_female: str | None = attrs.field(default=None)
-    front_shiny_female: str | None = attrs.field(default=None)
-    back_default: str | None = attrs.field(default=None)
-    back_shiny: str | None = attrs.field(default=None)
-    back_female: str | None = attrs.field(default=None)
-    back_shiny_female: str | None = attrs.field(default=None)
-    versions: Versions = attrs.field(factory=Versions)
-
-    @classmethod
-    @override
-    def from_payload(cls, payload: dict[str, t.Any]) -> "PokemonFormSprites":
-        return cls(
-            raw=payload,
-            front_default=payload.get("front_default"),
-            front_shiny=payload.get("front_shiny"),
-            front_female=payload.get("front_female"),
-            front_shiny_female=payload.get("front_shiny_female"),
-            back_default=payload.get("back_default"),
-            back_shiny=payload.get("back_shiny"),
-            back_female=payload.get("back_female"),
-            back_shiny_female=payload.get("back_shiny_female"),
-            versions=Versions.from_payload(payload.get("versions", {})),
-        )
 
 
 @attrs.define(slots=True, kw_only=True)

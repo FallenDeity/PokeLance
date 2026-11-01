@@ -141,3 +141,37 @@ async def test_pokemon_to_dict_has_expected_keys(client: pokelance.PokeLanceAsyn
     d = pokemon.to_dict()
     for key in ("name", "id", "base_experience", "height", "weight", "abilities", "types"):
         assert key in d, f"Expected key '{key}' missing from to_dict() output."
+
+
+# ---------------------------------------------------------------------------
+# parse_rpn_expression unit tests
+# ---------------------------------------------------------------------------
+
+
+def test_parse_rpn_expression_operators() -> None:
+    from pokelance.utils import parse_rpn_expression
+
+    assert parse_rpn_expression("") == ""
+    assert parse_rpn_expression("EC 100 % 0 ==") == "(EC % 100) == 0"
+    assert parse_rpn_expression("PID 16 >> 10 % 4 <=") == "((PID >> 16) % 10) <= 4"
+    assert parse_rpn_expression("SPIN_DIR 1 == SPIN_SEC 5 < &&") == "(SPIN_DIR == 1) && (SPIN_SEC < 5)"
+    assert parse_rpn_expression("SPIN_DIR 1 == SPIN_SEC 5 < and") == "(SPIN_DIR == 1) and (SPIN_SEC < 5)"
+    assert parse_rpn_expression("IS_NIGHT not") == "not IS_NIGHT"
+    assert parse_rpn_expression("SPIN_DIR 1 == !") == "!(SPIN_DIR == 1)"
+    assert parse_rpn_expression("EC 100 % 0 == PID 10 % 5 >= ||") == "((EC % 100) == 0) || ((PID % 10) >= 5)"
+
+
+@pytest.mark.parametrize(
+    ("expression", "expected"),
+    [
+        ("A 1 == B 2 == || C 3 == D 4 == || &&", "((A == 1) || (B == 2)) && ((C == 3) || (D == 4))"),
+        ("0 not 2 ==", "(not 0) == 2"),
+        ("A B == C ==", "(A == B) == C"),
+        ("A B && C ==", "(A && B) == C"),
+        ("A B or C D or and", "(A or B) and (C or D)"),
+    ],
+)
+def test_parse_rpn_expression_preserves_grouping(expression: str, expected: str) -> None:
+    from pokelance.utils import parse_rpn_expression
+
+    assert parse_rpn_expression(expression) == expected

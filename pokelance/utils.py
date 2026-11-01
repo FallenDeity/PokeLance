@@ -44,9 +44,15 @@ _BINARY_OPS: frozenset[str] = frozenset(
         ">",
         "<=",
         ">=",
+        "&&",
+        "||",
+        "and",
+        "or",
     }
 )
 _COMPARISON_OPS: frozenset[str] = frozenset({"==", "!=", "<", ">", "<=", ">="})
+_LOGICAL_OPS: frozenset[str] = frozenset({"&&", "||", "and", "or"})
+_UNARY_OPS: frozenset[str] = frozenset({"!", "not", "~"})
 
 _P = ParamSpec("_P")
 _P2 = ParamSpec("_P2")
@@ -418,27 +424,37 @@ def parse_rpn_expression(expr: str) -> str:
     Parameters
     ----------
     expr : str
-        The space-separated RPN expression (e.g. 'EC 100 % 0 ==').
+        The space-separated RPN expression (e.g. 'EC 100 % 0 ==', 'SPIN_DIR 1 == SPIN_SEC 5 < &&').
 
     Returns
     -------
     str
-        The human-readable infix expression (e.g. '(EC % 100) == 0').
+        The human-readable infix expression (e.g. '(EC % 100) == 0', '(SPIN_DIR == 1) && (SPIN_SEC < 5)').
     """
     if not expr:
         return ""
     tokens = expr.strip().split()
-    stack: list[str] = []
+    stack: list[tuple[str, bool]] = []
 
     for token in tokens:
-        if token in _BINARY_OPS and len(stack) >= 2:
-            right = stack.pop()
-            left = stack.pop()
-            if token in _COMPARISON_OPS:
-                stack.append(f"{left} {token} {right}")
+        if token in _UNARY_OPS and len(stack) >= 1:
+            operand, _ = stack.pop()
+            if token in ("not", "!"):
+                prefix = "not " if token == "not" else "!"
+                rendered = f"{prefix}({operand})" if " " in operand else f"{prefix}{operand}"
+                stack.append((rendered, token == "not"))
+            elif token == "~":
+                stack.append((f"~({operand})" if " " in operand else f"~{operand}", False))
+        elif token in _BINARY_OPS and len(stack) >= 2:
+            right, right_needs_grouping = stack.pop()
+            left, left_needs_grouping = stack.pop()
+            left = f"({left})" if left_needs_grouping else left
+            right = f"({right})" if right_needs_grouping else right
+            if token in _COMPARISON_OPS or token in _LOGICAL_OPS:
+                stack.append((f"{left} {token} {right}", True))
             else:
-                stack.append(f"({left} {token} {right})")
+                stack.append((f"({left} {token} {right})", False))
         else:
-            stack.append(token)
+            stack.append((token, False))
 
-    return stack[-1] if stack else expr
+    return stack[-1][0] if stack else expr

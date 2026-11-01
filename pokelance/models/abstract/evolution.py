@@ -94,6 +94,8 @@ class EvolutionVariable(BaseModel):
         The short mathematical symbol for this variable (e.g. 'EC', 'PID').
     data_type: str
         The data type of the variable (e.g. 'uint32').
+    source: str
+        The source of this variable (e.g. 'pokemon', 'player-input').
     version_group: NamedResource
         The version group in which this variable was introduced.
     names: list[Name]
@@ -106,6 +108,7 @@ class EvolutionVariable(BaseModel):
     name: str = attrs.field(factory=str)
     symbol: str = attrs.field(factory=str)
     data_type: str = attrs.field(factory=str)
+    source: str = attrs.field(factory=str)
     version_group: NamedResource = attrs.field(factory=NamedResource)
     names: list[Name] = attrs.field(factory=list)
     descriptions: list[Description] = attrs.field(factory=list)
@@ -119,6 +122,7 @@ class EvolutionVariable(BaseModel):
             name=payload.get("name", ""),
             symbol=payload.get("symbol", ""),
             data_type=payload.get("data_type", ""),
+            source=payload.get("source", ""),
             version_group=NamedResource.from_payload(payload.get("version_group", {})),
             names=[Name.from_payload(name) for name in payload.get("names", [])],
             descriptions=[Description.from_payload(desc) for desc in payload.get("descriptions", [])],
