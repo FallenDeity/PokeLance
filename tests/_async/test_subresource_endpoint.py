@@ -26,10 +26,9 @@ Coverage
 
 import asyncio
 import json
-import os
+import pathlib
 import tempfile
 
-import aiofiles
 import pytest
 
 import pokelance
@@ -174,10 +173,9 @@ async def test_save_produces_json_array(cached_client: pokelance.PokeLanceAsyncC
     with tempfile.TemporaryDirectory() as tmpdir:
         await cached_client.http.cache_manager.pokemon.location_area_encounter.save(tmpdir)
         filename = f"{cached_client.http.cache_manager.pokemon.location_area_encounter._name}.json"  # pyright: ignore[reportPrivateUsage]
-        save_file = os.path.join(tmpdir, filename)
-        assert os.path.exists(save_file)
-        async with aiofiles.open(save_file, encoding="utf-8") as f:
-            data = json.loads(await f.read())
+        save_file = pathlib.Path(tmpdir) / filename
+        assert save_file.exists()
+        data = json.loads(save_file.read_text(encoding="utf-8"))
         key = next(iter(data))
         assert "/encounters" in key
         assert isinstance(data[key], list)

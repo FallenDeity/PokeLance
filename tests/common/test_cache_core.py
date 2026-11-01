@@ -188,8 +188,31 @@ def test_cache_aliases_preserve_subresource_and_lru(
     cache[other] = BaseModel()
     alias = "bulbasaur" if stored == "1" else "1"
     assert cache.get(Route(endpoint=f"/pokemon/{alias}{suffix}")) is value
-    assert list(cache)[-1] == route
+    canonical_route = Route(endpoint=f"/pokemon/1{suffix}")
+    assert list(cache)[-1] == canonical_route
     assert cache.stats.hits == 1 and cache.stats.misses == 0
+
+    replacement = [LocationAreaEncounter()] if suffix else BaseModel()
+    cache[Route(endpoint=f"/pokemon/{alias}{suffix}")] = replacement
+    assert len(cache) == 2
+    assert cache.get(route) is replacement
+    assert cache.get(Route(endpoint=f"/pokemon/1{suffix}")) is replacement
+
+
+@pytest.mark.parametrize("cache_type", [AsyncCache, SyncCache])
+def test_cache_alias_entries_are_merged_when_registry_loads(
+    cache_type: type[AsyncCache[t.Any, t.Any]] | type[SyncCache[t.Any, t.Any]],
+) -> None:
+    cache = cache_type()
+    stale = BaseModel()
+    fresh = BaseModel()
+    cache[Route(endpoint="/pokemon/bulbasaur")] = stale
+    cache[Route(endpoint="/pokemon/1")] = fresh
+
+    cache.load_documents([{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}])
+
+    assert list(cache) == [Route(endpoint="/pokemon/1")]
+    assert cache.get(Route(endpoint="/pokemon/bulbasaur")) is fresh
 
 
 @pytest.mark.asyncio

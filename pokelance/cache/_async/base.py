@@ -1,12 +1,9 @@
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
-import pathlib
 import typing as t
 
-import aiofiles
 import attrs
 from typing_extensions import override
 
@@ -32,8 +29,8 @@ logger = logging.getLogger(__name__)
 class AsyncCache(BaseCacheState[_KT, _VT, "PokeLanceAsyncClient"], t.Generic[_KT, _VT]):
     """Asynchronous cache partition supporting async readiness, non-blocking I/O, and batch loading.
 
-    Extends `BaseCacheState` with an `asyncio.Event` readiness signal, async JSON serialization
-    via `aiofiles`, and asynchronous batch network pre-fetching.
+    Extends `BaseCacheState` with an `asyncio.Event` readiness signal and asynchronous batch
+    network pre-fetching. Persistence runs in a worker thread to keep file I/O off the event loop.
 
     Parameters
     ----------
@@ -134,15 +131,8 @@ class AsyncCache(BaseCacheState[_KT, _VT, "PokeLanceAsyncClient"], t.Generic[_KT
         await client.cache.pokemon.pokemon.save("./cache")
         ```
         """
-        pathlib.Path(path).mkdir(parents=True, exist_ok=True)
-        data = self.serialize()
-        async with aiofiles.open(pathlib.Path(f"{path}/{self._name}.json"), "w", encoding="utf-8") as f:
-            await f.write("{\n")
-            for n, (k, v) in enumerate(data.items()):
-                await f.write("    " + f'"{k}": {json.dumps(v, indent=4)}')
-                if n != len(data) - 1:
-                    await f.write(",\n")
-            await f.write("\n}")
+        payload = self.serialize()
+        await asyncio.to_thread(super()._write, path, payload)
 
     async def load(self, path: str = ".") -> None:
         """Loads cached data into this partition from a JSON file asynchronously.
@@ -158,8 +148,8 @@ class AsyncCache(BaseCacheState[_KT, _VT, "PokeLanceAsyncClient"], t.Generic[_KT
         await client.cache.pokemon.pokemon.load("./cache")
         ```
         """
-        async with aiofiles.open(pathlib.Path(f"{path}/{self._name}.json"), encoding="utf-8") as f:
-            self.deserialize(json.loads(await f.read()))
+        payload = await asyncio.to_thread(super()._read, path)
+        self.deserialize(payload)
 
     async def load_all(self) -> None:
         """Fetches and caches all known resources for this endpoint sequentially.

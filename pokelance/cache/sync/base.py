@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import json
 import logging
-import pathlib
 import threading
 import typing as t
 
@@ -120,45 +118,12 @@ class SyncCache(BaseCacheState[_KT, _VT, "PokeLanceSyncClient"], t.Generic[_KT, 
         self._ready.clear()
 
     def save(self, path: str = ".") -> None:
-        """Saves all cached data in this partition to a JSON file synchronously.
-
-        Parameters
-        ----------
-        path : str, default: "."
-            Directory where `{name}.json` will be saved.
-
-        Examples
-        --------
-        ```python
-        client.cache.pokemon.pokemon.save("./cache")
-        ```
-        """
-        pathlib.Path(path).mkdir(parents=True, exist_ok=True)
-        data = self.serialize()
-        with open(pathlib.Path(f"{path}/{self._name}.json"), "w", encoding="utf-8") as f:
-            f.write("{\n")
-            for n, (k, v) in enumerate(data.items()):
-                f.write("    " + f'"{k}": {json.dumps(v, indent=4)}')
-                if n != len(data) - 1:
-                    f.write(",\n")
-            f.write("\n}")
+        """Save all cached data in this partition to a JSON file."""
+        self._write(path, self.serialize())
 
     def load(self, path: str = ".") -> None:
-        """Loads cached data into this partition from a JSON file synchronously.
-
-        Parameters
-        ----------
-        path : str, default: "."
-            Directory containing `{name}.json`.
-
-        Examples
-        --------
-        ```python
-        client.cache.pokemon.pokemon.load("./cache")
-        ```
-        """
-        data = pathlib.Path(f"{path}/{self._name}.json").read_text(encoding="utf-8")
-        self.deserialize(json.loads(data))
+        """Load cached data for this partition from a JSON file."""
+        self.deserialize(self._read(path))
 
     def load_all(self) -> None:
         """Fetches and caches all known resources for this endpoint sequentially.

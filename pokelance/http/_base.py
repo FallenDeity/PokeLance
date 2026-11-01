@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import typing as t
 
+import attrs
 from typing_extensions import TypeVar, override
 from urllib3.util import Retry
 
@@ -96,6 +97,11 @@ class BaseHttpClient(t.Generic[_ClientT, _SessionT, _CacheManagerT]):
     def cache_manager(self) -> _CacheManagerT:
         """The cache manager used by this HTTP client."""
         return self._cache_manager
+
+    @staticmethod
+    def _route_for_url(url: str) -> Route:
+        """Create a route whose URL is the supplied absolute URL."""
+        return attrs.evolve(Route(endpoint=url), url="{endpoint}")
 
     @classmethod
     def _validate_response(cls, response: niquests.Response, route: Route) -> dict[str, t.Any]:

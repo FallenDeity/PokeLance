@@ -205,6 +205,10 @@ class AsyncHttpClient(BaseHttpClient["PokeLanceAsyncClient", niquests.AsyncSessi
         HTTPException
             An error occurred while making the request.
         """
+        logger.debug(f"Sending {route.method} request to {route.url}")
+        return self._validate_response(await self._request_response(route), route)
+
+    async def _request_response(self, route: Route) -> niquests.Response:
         if self._closing:
             raise RuntimeError("Cannot make a request while the HTTP client is closing.")
 
@@ -214,9 +218,7 @@ class AsyncHttpClient(BaseHttpClient["PokeLanceAsyncClient", niquests.AsyncSessi
             raise HTTPException("No session was provided.", route, -1).create()
 
         try:
-            logger.debug(f"Sending {route.method} request to {route.url}")
-            response = await self.session.request(route.method, route.url, params=route.payload)
-            return self._validate_response(response, route)
+            return await self.session.request(route.method, route.url, params=route.payload)
         except niquests.exceptions.RequestException as e:
             logger.error(f"Request failed for {route.url} ({type(e).__name__}): {e}")
             raise HTTPException(str(e), route, -1).create() from e
@@ -234,12 +236,10 @@ class AsyncHttpClient(BaseHttpClient["PokeLanceAsyncClient", niquests.AsyncSessi
         bytes
             The raw image bytes.
         """
-        await self.connect()
-        if self.session is not None:
-            logger.debug(f"Fetching image from {url}")
-            response = await self.session.get(url)
-            return self._validate_image(response, url)
-        return b""
+        logger.debug(f"Fetching image from {url}")
+        route = self._route_for_url(url)
+        response = await self._request_response(route)
+        return self._validate_image(response, url)
 
     async def load_audio(self, url: str) -> bytes:
         """Loads an audio from the url asynchronously.
@@ -254,12 +254,10 @@ class AsyncHttpClient(BaseHttpClient["PokeLanceAsyncClient", niquests.AsyncSessi
         bytes
             The raw audio bytes.
         """
-        await self.connect()
-        if self.session is not None:
-            logger.debug(f"Fetching audio from {url}")
-            response = await self.session.get(url)
-            return self._validate_audio(response, url)
-        return b""
+        logger.debug(f"Fetching audio from {url}")
+        route = self._route_for_url(url)
+        response = await self._request_response(route)
+        return self._validate_audio(response, url)
 
     async def ping(self) -> float:
         """Pings the PokeAPI and returns the latency."""

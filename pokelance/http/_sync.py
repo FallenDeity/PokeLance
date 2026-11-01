@@ -229,6 +229,11 @@ class SyncHttpClient(BaseHttpClient["PokeLanceSyncClient", niquests.Session, Syn
         HTTPException
             An error occurred while making the request.
         """
+
+        logger.debug(f"Sending {route.method} request to {route.url}")
+        return self._validate_response(self._request_response(route), route)
+
+    def _request_response(self, route: Route) -> niquests.Response:
         if self._closing:
             raise RuntimeError("Cannot make a request while the HTTP client is closing.")
 
@@ -238,9 +243,7 @@ class SyncHttpClient(BaseHttpClient["PokeLanceSyncClient", niquests.Session, Syn
             raise HTTPException("No session was provided.", route, -1).create()
 
         try:
-            logger.debug(f"Sending {route.method} request to {route.url}")
-            response = self.session.request(route.method, route.url, params=route.payload)
-            return self._validate_response(response, route)
+            return self.session.request(route.method, route.url, params=route.payload)
         except niquests.RequestException as e:
             logger.error(f"Request failed for {route.url} ({type(e).__name__}): {e}")
             raise HTTPException(str(e), route, -1).create() from e
@@ -258,12 +261,10 @@ class SyncHttpClient(BaseHttpClient["PokeLanceSyncClient", niquests.Session, Syn
         bytes
             The raw image bytes.
         """
-        self.connect()
-        if self.session is not None:
-            logger.debug(f"Fetching image from {url}")
-            response = self.session.get(url)
-            return self._validate_image(response, url)
-        return b""
+        logger.debug(f"Fetching image from {url}")
+        route = self._route_for_url(url)
+        response = self._request_response(route)
+        return self._validate_image(response, url)
 
     def load_audio(self, url: str) -> bytes:
         """Loads an audio from the url synchronously.
@@ -278,12 +279,10 @@ class SyncHttpClient(BaseHttpClient["PokeLanceSyncClient", niquests.Session, Syn
         bytes
             The raw audio bytes.
         """
-        self.connect()
-        if self.session is not None:
-            logger.debug(f"Fetching audio from {url}")
-            response = self.session.get(url)
-            return self._validate_audio(response, url)
-        return b""
+        logger.debug(f"Fetching audio from {url}")
+        route = self._route_for_url(url)
+        response = self._request_response(route)
+        return self._validate_audio(response, url)
 
     def ping(self) -> float:
         """Pings the PokeAPI and returns the latency."""

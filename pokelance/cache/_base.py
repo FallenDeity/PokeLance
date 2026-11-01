@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import json
+import os
+import pathlib
+import tempfile
 import typing as t
 from collections import OrderedDict
 
@@ -202,6 +206,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
 
     @override
     def __getitem__(self, key: _KT) -> _VT:
+        key = self._canonicalize_key(key)
         try:
             val = self._cache[key]
             self._cache.move_to_end(key)
@@ -213,6 +218,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
 
     @override
     def __setitem__(self, key: _KT, value: _VT) -> None:
+        key = self._canonicalize_key(key)
         self._stats.sets += 1
         if key in self._cache:
             self._cache[key] = value
@@ -225,7 +231,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
 
     @override
     def __delitem__(self, key: _KT) -> None:
-        del self._cache[key]
+        del self._cache[self._canonicalize_key(key)]
 
     @override
     def __len__(self) -> int:
@@ -254,12 +260,13 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
     @override
     def setdefault(self, __key: _KT, /, __default: _VT | None = None) -> _VT:
         """Returns the cached value for key if present, otherwise inserts default and returns it."""
-        if __key not in self._cache and __default is not None:
-            self[__key] = __default
-            return self._cache[__key]
+        key = self._canonicalize_key(__key)
+        if key not in self._cache and __default is not None:
+            self[key] = __default
+            return self._cache[key]
         self._stats.hits += 1
-        self._cache.move_to_end(__key)
-        return self._cache[__key]
+        self._cache.move_to_end(key)
+        return self._cache[key]
 
     @override
     def clear(self) -> None:
@@ -275,7 +282,29 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
 
     def _mark_endpoints_cached(self) -> None:
         self._identifiers = set(self._endpoints) | set(self._endpoints_by_id)
+        if self._cache:
+            entries = tuple(self._cache.items())
+            self._cache.clear()
+            for key, value in entries:
+                key = self._canonicalize_key(key)
+                if key in self._cache:
+                    del self._cache[key]
+                self._cache[key] = value
         self.set_ready()
+
+    def _canonicalize_key(self, key: _KT) -> _KT:
+        """Maps a registered name or ID route to its numeric-ID cache key."""
+        endpoint = key.endpoint.rstrip("/")
+        suffix = self._url_suffix if self._url_suffix and endpoint.endswith(self._url_suffix) else ""
+        parent, _, identifier = endpoint.removesuffix(suffix).rpartition("/")
+        endpoint_data = self._endpoints.get(self._endpoints_by_id.get(identifier, identifier))
+        if endpoint_data is None:
+            return key
+
+        canonical_endpoint = f"{parent}/{endpoint_data.id}{suffix}"
+        if canonical_endpoint == key.endpoint:
+            return key
+        return attrs.evolve(key, endpoint=canonical_endpoint)
 
     def set_ready(self) -> None:
         """Sets the cache endpoint state as ready."""
@@ -302,46 +331,6 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         self._identifiers.clear()
         self._endpoints_cached = False
         self._endpoint_error = None
-
-    @override
-    def get(self, key: _KT, default: _VT | None = None) -> _VT | None:  # ty: ignore[invalid-method-override] # pyright: ignore[reportIncompatibleMethodOverride]
-        """Gets an item from the cache. If the exact key is missing, attempts alias resolution.
-
-        Parameters
-        ----------
-        key : Route
-            The endpoint route to look up.
-        default : BaseModel | list[BaseModel] | None, optional
-            The default value returned if not found in cache.
-
-        Returns
-        -------
-        BaseModel | list[BaseModel] | None
-            The cached model instance or default if not cached.
-
-        Examples
-        --------
-        ```python
-        from pokelance.endpoints import Endpoint
-
-        route = Endpoint.get_pokemon("pikachu")
-        cached_pokemon = client.cache.pokemon.pokemon.get(route)
-        ```
-        """
-        if key in self._cache:
-            self._stats.hits += 1
-            self._cache.move_to_end(key)
-            return self._cache[key]
-        requested = key.endpoint.rstrip("/").removesuffix(self._url_suffix).rsplit("/", 1)[-1]
-        alias = self._endpoints_by_id.get(requested) or self._endpoints.get(requested)
-        if alias:
-            for k, v in self.items():
-                if k.endpoint.rstrip("/").removesuffix(self._url_suffix).rsplit("/", 1)[-1] == str(alias):
-                    self._stats.hits += 1
-                    self._cache.move_to_end(k)
-                    return v
-        self._stats.misses += 1
-        return default
 
     def load_documents(self, data: list[dict[str, str]]) -> None:
         """Loads endpoint metadata documents into this cache partition's registry.
@@ -403,6 +392,35 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         for k, v in self.items():
             dummy[k.endpoint] = v.raw if isinstance(v, BaseModel) else [i.raw for i in v]
         return dummy
+
+    def _write(self, path: str, payload: dict[str, t.Any]) -> None:
+        """Atomically write a previously serialized cache snapshot to disk."""
+        directory = pathlib.Path(path)
+        directory.mkdir(parents=True, exist_ok=True)
+        file_path = directory / f"{self._name}.json"
+        serialized = json.dumps(payload, indent=4)
+        temp_path: pathlib.Path | None = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                encoding="utf-8",
+                dir=directory,
+                prefix=f".{file_path.name}.",
+                suffix=".tmp",
+                delete=False,
+            ) as temp_file:
+                temp_path = pathlib.Path(temp_file.name)
+                temp_file.write(serialized)
+                temp_file.flush()
+            os.replace(temp_path, file_path)
+        finally:
+            if temp_path is not None:
+                temp_path.unlink(missing_ok=True)
+
+    def _read(self, path: str = ".") -> dict[str, t.Any]:
+        """Read and parse the saved data for this partition."""
+        file_path = pathlib.Path(path) / f"{self._name}.json"
+        return json.loads(file_path.read_text(encoding="utf-8"))
 
     def deserialize(self, data: dict[str, t.Any]) -> None:
         """Populates this cache partition from a serialized dictionary.

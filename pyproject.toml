@@ -16,8 +16,6 @@ classifiers = [
 ]
 dependencies = [
     "attrs>=26.1.0",
-    "aiofiles>=25.1.0",
-    "types-aiofiles>=25.1.0.20260518",
     "niquests>=3.21.0",
     "typing-extensions>=4.16.0",
 ]

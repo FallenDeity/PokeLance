@@ -16,12 +16,13 @@ import random
 import time
 from unittest.mock import AsyncMock, Mock
 
+import niquests
 import pytest
 
 import pokelance
 from pokelance.constants import DEFAULT_BASE_URL, ExtensionEnum, get_base_url
 from pokelance.endpoints import Endpoint
-from pokelance.exceptions import ImageNotFound, ResourceNotFound
+from pokelance.exceptions import HTTPException, ImageNotFound, ResourceNotFound
 from pokelance.http._async import AsyncHttpClient
 from pokelance.models import Pokemon
 
@@ -187,6 +188,24 @@ async def test_get_audio_cache_hit_is_faster(cached_client: pokelance.PokeLanceA
     await cached_client.get_audio(url)
     second = time.perf_counter() - t1
     assert first > second, "Cached audio fetch should be faster than the initial network fetch."
+
+
+@pytest.mark.asyncio
+async def test_media_transport_error_is_wrapped() -> None:
+    url = "https://media.example/asset"
+    transport_error = niquests.exceptions.RequestException("transport failed")
+    session = Mock(request=AsyncMock(side_effect=transport_error))
+    client = pokelance.PokeLanceAsyncClient(cache_endpoints=False, session=session, setup_logging=False)
+
+    try:
+        with pytest.raises(HTTPException) as exc_info:
+            await client.http.load_image(url)
+    finally:
+        await client.close()
+
+    assert exc_info.value.__cause__ is transport_error
+    assert exc_info.value.route.url == url
+    assert exc_info.value.status == -1
 
 
 # ---------------------------------------------------------------------------

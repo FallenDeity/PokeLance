@@ -24,9 +24,13 @@ from __future__ import annotations
 
 import json
 import os
+import pathlib
 import tempfile
 import typing as t
 
+import pytest
+
+from pokelance.cache.sync.base import SyncCache
 from pokelance.endpoints import Endpoint
 from pokelance.models import LocationAreaEncounter, Pokemon
 
@@ -88,6 +92,24 @@ def test_sync_save_empty_cache_writes_empty_object(sync_client: pokelance.PokeLa
         filename = f"{sync_client.http.cache_manager.pokemon.pokemon._name}.json"
         data = _read_json(os.path.join(tmpdir, filename))
     assert data == {}, "Empty cache should serialise as an empty JSON object."
+
+
+def test_sync_save_preserves_existing_file_when_replace_fails(
+    tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    cache = SyncCache(name="pokemon")
+    file_path = pathlib.Path(tmp_path) / "pokemon.json"
+    file_path.write_text('{"old": true}', encoding="utf-8")
+
+    def fail_replace(*_args: object) -> None:
+        raise OSError("replace failed")
+
+    monkeypatch.setattr("pokelance.cache._base.os.replace", fail_replace)
+    with pytest.raises(OSError, match="replace failed"):
+        cache.save(str(tmp_path))
+
+    assert _read_json(str(file_path)) == {"old": True}
+    assert os.listdir(tmp_path) == ["pokemon.json"]
 
 
 # ---------------------------------------------------------------------------
