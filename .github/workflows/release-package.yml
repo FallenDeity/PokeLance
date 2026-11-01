@@ -8,7 +8,7 @@ on:
 jobs:
   release-asset:
     name: Release on GitHub
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04-arm
     steps:
       - uses: actions/checkout@v4
 
