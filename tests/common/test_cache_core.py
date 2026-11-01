@@ -21,11 +21,15 @@ Coverage
 
 import asyncio
 import math
+import typing as t
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 
 import pokelance
-from pokelance.endpoints import Endpoint
+from pokelance.cache import AsyncCache, SyncCache
+from pokelance.endpoints import Endpoint, Route
+from pokelance.models import BaseModel, LocationAreaEncounter
 from pokelance.utils import alru_cache
 
 # ---------------------------------------------------------------------------
@@ -52,9 +56,72 @@ def test_cache_client_backref(client: pokelance.PokeLanceAsyncClient) -> None:
     assert client.http.cache_manager.client is client
 
 
+@pytest.mark.parametrize("size", [0, -1])
+def test_invalid_cache_capacities_are_rejected(size: int) -> None:
+    for client_type in (pokelance.PokeLanceAsyncClient, pokelance.PokeLanceSyncClient):
+        for option in ("cache_size", "image_cache_size", "audio_cache_size"):
+            kwargs: dict[str, t.Any] = {option: size}
+            with pytest.raises(ValueError, match="greater than 0"):
+                client_type(setup_logging=False, **kwargs)
+    for cache_type in (AsyncCache, SyncCache):
+        with pytest.raises(ValueError, match="greater than 0"):
+            cache_type(max_size=size)
+
+
+@pytest.mark.parametrize("size", [0, -1])
+def test_invalid_cache_resize_preserves_capacity(client: pokelance.PokeLanceAsyncClient, size: int) -> None:
+    manager = client.http.cache_manager
+    for resize in (manager.set_size, manager.pokemon.set_size, manager.pokemon.pokemon.set_size):
+        with pytest.raises(ValueError, match="greater than 0"):
+            resize(size)
+    assert manager.max_size == 100
+    assert manager.pokemon.max_size == 100
+    assert manager.pokemon.pokemon._max_size == 100  # pyright: ignore[reportPrivateUsage]
+    for cache in (client.get_image, client.get_audio):
+        previous = cache.cache_info().maxsize
+        with pytest.raises(ValueError, match="greater than 0"):
+            cache.set_size(size)
+        assert cache.cache_info().maxsize == previous
+    with pytest.raises(ValueError, match="greater than 0"):
+        alru_cache(maxsize=size)(client.http.load_image)
+    assert alru_cache(maxsize=None)(client.http.load_image).cache_info().maxsize is None
+
+
 # ---------------------------------------------------------------------------
 # LRU eviction
 # ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("cache_type", [AsyncCache, SyncCache])
+def test_cache_shrink_immediately_evicts_lru_entries(
+    cache_type: type[AsyncCache[t.Any, t.Any]] | type[SyncCache[t.Any, t.Any]],
+) -> None:
+    cache = cache_type(max_size=4)
+    routes = [Endpoint.get_pokemon(i) for i in range(1, 5)]
+    for route in routes:
+        cache[route] = BaseModel()
+    cache.get(routes[0])
+    cache.set_size(2)
+    assert list(cache) == [routes[3], routes[0]]
+    assert cache.stats.evictions == 2
+    cache.set_size(5)
+    assert len(cache) == 2 and cache.stats.evictions == 2
+
+
+@pytest.mark.asyncio
+async def test_async_media_cache_shrink_evicts_lru_entries() -> None:
+    @alru_cache(maxsize=4, ttl=60)
+    async def download(value: int) -> bytes:
+        return await asyncio.sleep(0, result=str(value).encode())
+
+    for i in range(4):
+        await download(i)
+    await download(0)
+    download.set_size(2)
+    assert download.cache_info().currsize == 2
+    assert download.__contains__(0) and download.__contains__(3)
+    assert not download.__contains__(1) and not download.__contains__(2)
+    await download.cache_close()
 
 
 @pytest.mark.asyncio
@@ -104,6 +171,53 @@ async def test_lru_tracks_latest_entry(client: pokelance.PokeLanceAsyncClient) -
 # ---------------------------------------------------------------------------
 # Alias resolution in cache.get()
 # ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("cache_type", [AsyncCache, SyncCache])
+@pytest.mark.parametrize("suffix", ["", "/encounters"])
+@pytest.mark.parametrize("stored", ["1", "bulbasaur"])
+def test_cache_aliases_preserve_subresource_and_lru(
+    cache_type: type[AsyncCache[t.Any, t.Any]] | type[SyncCache[t.Any, t.Any]], suffix: str, stored: str
+) -> None:
+    cache = cache_type(url_suffix=suffix)
+    cache.load_documents([{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}])
+    route = Route(endpoint=f"/pokemon/{stored}{suffix}")
+    other = Route(endpoint=f"/pokemon/2{suffix}")
+    value = [LocationAreaEncounter()] if suffix else BaseModel()
+    cache[route] = value
+    cache[other] = BaseModel()
+    alias = "bulbasaur" if stored == "1" else "1"
+    assert cache.get(Route(endpoint=f"/pokemon/{alias}{suffix}")) is value
+    assert list(cache)[-1] == route
+    assert cache.stats.hits == 1 and cache.stats.misses == 0
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("is_async", [False, True])
+async def test_empty_encounters_are_cache_hits(monkeypatch: pytest.MonkeyPatch, is_async: bool) -> None:
+    client = (
+        pokelance.PokeLanceAsyncClient(cache_endpoints=False, setup_logging=False)
+        if is_async
+        else pokelance.PokeLanceSyncClient(cache_endpoints=False, setup_logging=False)
+    )
+    request = AsyncMock(return_value=[]) if is_async else Mock(return_value=[])
+    monkeypatch.setattr(client.http, "request", request)
+    cache = client.pokemon.cache_group.location_area_encounter
+    cache.load_documents([{"name": "bulbasaur", "url": "https://pokeapi.co/api/v2/pokemon/1/"}])
+    if isinstance(client, pokelance.PokeLanceAsyncClient):
+        first: list[LocationAreaEncounter] = await client.getch_data("pokemon", "location-area-encounter", 1)
+        second: list[LocationAreaEncounter] = await client.getch_data("pokemon", "location-area-encounter", "bulbasaur")
+        await client.pokemon.cache_group.location_area_encounter.load_all()
+        await client.pokemon.cache_group.location_area_encounter.load_all_batch(batch_size=1)
+        await client.close()
+    else:
+        first = client.getch_data("pokemon", "location-area-encounter", 1)
+        second = client.getch_data("pokemon", "location-area-encounter", "bulbasaur")
+        client.pokemon.cache_group.location_area_encounter.load_all()
+        client.pokemon.cache_group.location_area_encounter.load_all_batch(batch_size=1)
+        client.close()
+    assert first == [] and second is first
+    request.assert_called_once()
 
 
 @pytest.mark.asyncio

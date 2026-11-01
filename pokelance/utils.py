@@ -92,6 +92,8 @@ class _LRUCacheWrapper(Generic[_P, _R]):
         typed: bool,
         ttl: float | None,
     ) -> None:
+        if maxsize is not None and maxsize <= 0:
+            raise ValueError("maxsize must be greater than 0 or None")
         with contextlib.suppress(AttributeError):
             self.__module__ = fn.__module__
         with contextlib.suppress(AttributeError):
@@ -126,7 +128,12 @@ class _LRUCacheWrapper(Generic[_P, _R]):
         return key in self.__cache
 
     def set_size(self, maxsize: int) -> None:
+        if maxsize <= 0:
+            raise ValueError("maxsize must be greater than 0")
         self.__maxsize = maxsize
+        while len(self.__cache) > maxsize:
+            _, item = self.__cache.popitem(last=False)
+            item.cancel()
 
     def cache_invalidate(self, /, *args: Hashable, **kwargs: Any) -> bool:  # ruff: ignore[any-type]
         key = _make_key(args, kwargs, self.__typed)

@@ -181,7 +181,7 @@ class SyncCache(BaseCacheState[_KT, _VT, "PokeLanceSyncClient"], t.Generic[_KT, 
         for endpoint in self._endpoints.values():
             route = Route.from_raw_url(endpoint.url)
             data = self.get(t.cast("_KT", route), None)
-            if not data:
+            if data is None:
                 res = self._client.http.request(route)
                 self.setdefault(t.cast("_KT", route), self.from_payload(res))
         logger.info(f"Loaded {self._name}.")
@@ -215,7 +215,7 @@ class SyncCache(BaseCacheState[_KT, _VT, "PokeLanceSyncClient"], t.Generic[_KT, 
             batch = endpoints[i : i + batch_size]
             for ep in batch:
                 route = t.cast("_KT", Route.from_raw_url(ep.url))
-                if not self.get(route):
+                if self.get(route) is None:
                     self._fetch_and_cache(route)
             current_batch = i // batch_size + 1
             total_batches = (total_endpoints + batch_size - 1) // batch_size

@@ -206,7 +206,7 @@ class PokeLanceAsyncClient(ClientBase[AsyncHttpClient]):
         get_ = getattr(ext_instance, f"get_{resolved_category}")
         fetch_ = getattr(ext_instance, f"fetch_{resolved_category}")
         params = (id_,) if id_ is not None else ()
-        return t.cast("BaseModelT", get_(*params) or await fetch_(*params))
+        return t.cast("BaseModelT", cached if (cached := get_(*params)) is not None else await fetch_(*params))
 
     async def from_url(self, url: str) -> BaseModelT:  # pyright: ignore[reportInvalidTypeVarUse]
         """Constructs a request from any valid PokeAPI resource URL.

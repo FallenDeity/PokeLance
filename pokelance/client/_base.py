@@ -113,6 +113,10 @@ class ClientBase(t.Generic[_HTTPClientT_co]):
         self._ext_tasks = []
         self._image_cache_size = kwargs.get("image_cache_size", 128)
         self._audio_cache_size = kwargs.get("audio_cache_size", 128)
+        if self._image_cache_size <= 0:
+            raise ValueError("image_cache_size must be greater than 0")
+        if self._audio_cache_size <= 0:
+            raise ValueError("audio_cache_size must be greater than 0")
 
     def setup_hook(self, ext_pkg: str) -> None:
         """Dynamically loads extensions from the specified package directory."""

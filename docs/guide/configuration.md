@@ -32,6 +32,10 @@ client = PokeLanceAsyncClient(
 
 ## Cache sizing
 
+Cache capacities must be greater than zero. Constructors and resizing methods raise `ValueError` for zero or negative capacities.
+
+Reducing a cache limit immediately evicts the least recently used entries until the new limit is met. Increasing the limit preserves existing entries.
+
 Every resource category (`pokemon`, `berry`, `move`, ...) gets its own LRU cache sized by `cache_size`:
 
 ```python

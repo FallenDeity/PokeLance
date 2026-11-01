@@ -182,7 +182,7 @@ class AsyncCache(BaseCacheState[_KT, _VT, "PokeLanceAsyncClient"], t.Generic[_KT
         for endpoint in self._endpoints.values():
             route = Route.from_raw_url(endpoint.url)
             data = self.get(t.cast("_KT", route), None)
-            if not data:
+            if data is None:
                 res = await self._client.http.request(route)
                 self.setdefault(t.cast("_KT", route), self.from_payload(res))
         logger.info(f"Loaded {self._name}.")
@@ -217,7 +217,7 @@ class AsyncCache(BaseCacheState[_KT, _VT, "PokeLanceAsyncClient"], t.Generic[_KT
             tasks = [
                 self._fetch_and_cache(t.cast("_KT", Route.from_raw_url(ep.url)))
                 for ep in batch
-                if not self.get(t.cast("_KT", Route.from_raw_url(ep.url)))
+                if self.get(t.cast("_KT", Route.from_raw_url(ep.url))) is None
             ]
             if tasks:
                 await asyncio.gather(*tasks)

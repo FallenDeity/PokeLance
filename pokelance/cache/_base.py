@@ -160,6 +160,8 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         url_suffix: str = "",
         is_list: bool = False,
     ) -> None:
+        if max_size <= 0:
+            raise ValueError("max_size must be greater than 0")
         self._max_size = max_size
         self._model = model
         self._name = name or self.__class__.__name__
@@ -330,11 +332,11 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
             self._stats.hits += 1
             self._cache.move_to_end(key)
             return self._cache[key]
-        requested = key.endpoint.split("/")[-1]
+        requested = key.endpoint.rstrip("/").removesuffix(self._url_suffix).rsplit("/", 1)[-1]
         alias = self._endpoints_by_id.get(requested) or self._endpoints.get(requested)
         if alias:
             for k, v in self.items():
-                if k.endpoint.split("/")[-1] == str(alias):
+                if k.endpoint.rstrip("/").removesuffix(self._url_suffix).rsplit("/", 1)[-1] == str(alias):
                     self._stats.hits += 1
                     self._cache.move_to_end(k)
                     return v
@@ -376,7 +378,12 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         client.cache.pokemon.pokemon.set_size(200)
         ```
         """
+        if size <= 0:
+            raise ValueError("size must be greater than 0")
         self._max_size = size
+        while len(self._cache) > size:
+            self._cache.popitem(last=False)
+            self._stats.evictions += 1
 
     def serialize(self) -> dict[str, t.Any]:
         """Serializes all in-memory cached models into a raw dictionary.
@@ -447,6 +454,10 @@ class BaseCacheGroup(t.Generic[_ClientT, _CacheT]):
 
     max_size: int
 
+    def __attrs_post_init__(self) -> None:
+        if self.max_size <= 0:
+            raise ValueError("max_size must be greater than 0")
+
     @property
     def stats(self) -> CacheStats:
         """Aggregated statistics across all sub-caches in this group.
@@ -486,6 +497,8 @@ class BaseCacheGroup(t.Generic[_ClientT, _CacheT]):
         client.cache.pokemon.set_size(250)
         ```
         """
+        if max_size <= 0:
+            raise ValueError("max_size must be greater than 0")
         self.max_size = max_size
         for cache in self._walk_caches():
             cache.set_size(max_size)
@@ -534,6 +547,8 @@ class BaseCacheManager(t.Generic[_ClientT, _GroupT]):
                 yield t.cast("_GroupT", val)
 
     def __attrs_post_init__(self) -> None:
+        if self.max_size <= 0:
+            raise ValueError("max_size must be greater than 0")
         for aggregate in self._walk_aggregates():
             aggregate.set_size(self.max_size)
             aggregate.set_client(self.client)
@@ -552,6 +567,8 @@ class BaseCacheManager(t.Generic[_ClientT, _GroupT]):
         client.cache.set_size(500)
         ```
         """
+        if max_size <= 0:
+            raise ValueError("max_size must be greater than 0")
         self.max_size = max_size
         for aggregate in self._walk_aggregates():
             aggregate.set_size(max_size)
