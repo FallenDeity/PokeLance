@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import typing as t
 
 from typing_extensions import override
@@ -31,9 +30,7 @@ class Game(AsyncBaseExtension[GameCache]):
             "version": Endpoint.get_version_endpoints(),
             "version_group": Endpoint.get_version_group_endpoints(),
         }
-        results = await asyncio.gather(*(self._client.request(r) for r in routes.values()))
-        for category, data in zip(routes.keys(), results, strict=False):
-            self._cache_manager.load_documents("Game", category, data["results"])
+        await self._setup_endpoints(routes)
 
     def get_generation(self, name: str | int) -> models.Generation | None:
         """Gets a generation from the cache.

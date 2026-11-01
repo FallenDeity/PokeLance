@@ -30,9 +30,7 @@ class Game(SyncBaseExtension[GameCache]):
             "version": Endpoint.get_version_endpoints(),
             "version_group": Endpoint.get_version_group_endpoints(),
         }
-        for category, route in routes.items():
-            data = self._client.request(route)
-            self._cache_manager.load_documents("Game", category, data["results"])
+        self._setup_endpoints(routes)
 
     def get_generation(self, name: str | int) -> models.Generation | None:
         """Gets a generation from the cache.

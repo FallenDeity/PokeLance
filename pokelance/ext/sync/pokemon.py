@@ -42,9 +42,7 @@ class Pokemon(SyncBaseExtension[PokemonCache]):
             "type": Endpoint.get_type_endpoints(),
             "location_area_encounter": Endpoint.get_location_area_encounter_endpoints(),
         }
-        for category, route in routes.items():
-            data = self._client.request(route)
-            self._cache_manager.load_documents("Pokemon", category, data["results"])
+        self._setup_endpoints(routes)
 
     def get_ability(self, name: str | int) -> models.Ability | None:
         """Gets a ability from the cache.

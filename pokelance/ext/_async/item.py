@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import typing as t
 
 from typing_extensions import override
@@ -33,9 +32,7 @@ class Item(AsyncBaseExtension[ItemCache]):
             "item_pocket": Endpoint.get_item_pocket_endpoints(),
             "currency": Endpoint.get_currency_endpoints(),
         }
-        results = await asyncio.gather(*(self._client.request(r) for r in routes.values()))
-        for category, data in zip(routes.keys(), results, strict=False):
-            self._cache_manager.load_documents("Item", category, data["results"])
+        await self._setup_endpoints(routes)
 
     def get_item(self, name: str | int) -> models.Item | None:
         """Gets a item from the cache.

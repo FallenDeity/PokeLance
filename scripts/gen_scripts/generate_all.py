@@ -184,159 +184,7 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path, w
             targets=[ast.Name(id="routes", ctx=ast.Store())],
             value=ast.Dict(keys=routes_dict_keys, values=routes_dict_values),
         )
-        if is_async:
-            # results = await asyncio.gather(*(self._client.request(r) for r in routes.values()))
-            gather_call = ast.Await(
-                value=ast.Call(
-                    func=ast.Attribute(
-                        value=ast.Name(id="asyncio", ctx=ast.Load()),
-                        attr="gather",
-                        ctx=ast.Load(),
-                    ),
-                    args=[
-                        ast.Starred(
-                            value=ast.GeneratorExp(
-                                elt=ast.Call(
-                                    func=ast.Attribute(
-                                        value=ast.Attribute(
-                                            value=ast.Name(id="self", ctx=ast.Load()),
-                                            attr="_client",
-                                            ctx=ast.Load(),
-                                        ),
-                                        attr="request",
-                                        ctx=ast.Load(),
-                                    ),
-                                    args=[ast.Name(id="r", ctx=ast.Load())],
-                                    keywords=[],
-                                ),
-                                generators=[
-                                    ast.comprehension(
-                                        target=ast.Name(id="r", ctx=ast.Store()),
-                                        iter=ast.Call(
-                                            func=ast.Attribute(
-                                                value=ast.Name(id="routes", ctx=ast.Load()),
-                                                attr="values",
-                                                ctx=ast.Load(),
-                                            ),
-                                            args=[],
-                                            keywords=[],
-                                        ),
-                                        ifs=[],
-                                        is_async=0,
-                                    )
-                                ],
-                            ),
-                            ctx=ast.Load(),
-                        )
-                    ],
-                    keywords=[],
-                )
-            )
-            results_assign = ast.Assign(
-                targets=[ast.Name(id="results", ctx=ast.Store())],
-                value=gather_call,
-            )
-            # for category, data in zip(routes.keys(), results):
-            #     self._cache_manager.load_documents(spec.name, category, data["results"])
-            loop = ast.For(
-                target=ast.Tuple(
-                    elts=[ast.Name(id="category", ctx=ast.Store()), ast.Name(id="data", ctx=ast.Store())],
-                    ctx=ast.Store(),
-                ),
-                iter=ast.Call(
-                    func=ast.Name(id="zip", ctx=ast.Load()),
-                    args=[
-                        ast.Call(
-                            func=ast.Attribute(
-                                value=ast.Name(id="routes", ctx=ast.Load()), attr="keys", ctx=ast.Load()
-                            ),
-                            args=[],
-                            keywords=[],
-                        ),
-                        ast.Name(id="results", ctx=ast.Load()),
-                    ],
-                    keywords=[],
-                ),
-                body=[
-                    ast.Expr(
-                        value=ast.Call(
-                            func=ast.Attribute(
-                                value=ast.Attribute(
-                                    value=ast.Name(id="self", ctx=ast.Load()), attr="_cache_manager", ctx=ast.Load()
-                                ),
-                                attr="load_documents",
-                                ctx=ast.Load(),
-                            ),
-                            args=[
-                                ast.Constant(value=spec.name),
-                                ast.Name(id="category", ctx=ast.Load()),
-                                ast.Subscript(
-                                    value=ast.Name(id="data", ctx=ast.Load()),
-                                    slice=ast.Constant(value="results"),
-                                    ctx=ast.Load(),
-                                ),
-                            ],
-                            keywords=[],
-                        )
-                    )
-                ],
-                orelse=[],
-            )
-            setup_stmts = [routes_assign, results_assign, loop]
-        else:
-            # for category, route in routes.items():
-            #     data = self._client.request(route)
-            #     self._cache_manager.load_documents(spec.name, category, data["results"])
-            loop = ast.For(
-                target=ast.Tuple(
-                    elts=[ast.Name(id="category", ctx=ast.Store()), ast.Name(id="route", ctx=ast.Store())],
-                    ctx=ast.Store(),
-                ),
-                iter=ast.Call(
-                    func=ast.Attribute(value=ast.Name(id="routes", ctx=ast.Load()), attr="items", ctx=ast.Load()),
-                    args=[],
-                    keywords=[],
-                ),
-                body=[
-                    ast.Assign(
-                        targets=[ast.Name(id="data", ctx=ast.Store())],
-                        value=ast.Call(
-                            func=ast.Attribute(
-                                value=ast.Attribute(
-                                    value=ast.Name(id="self", ctx=ast.Load()), attr="_client", ctx=ast.Load()
-                                ),
-                                attr="request",
-                                ctx=ast.Load(),
-                            ),
-                            args=[ast.Name(id="route", ctx=ast.Load())],
-                            keywords=[],
-                        ),
-                    ),
-                    ast.Expr(
-                        value=ast.Call(
-                            func=ast.Attribute(
-                                value=ast.Attribute(
-                                    value=ast.Name(id="self", ctx=ast.Load()), attr="_cache_manager", ctx=ast.Load()
-                                ),
-                                attr="load_documents",
-                                ctx=ast.Load(),
-                            ),
-                            args=[
-                                ast.Constant(value=spec.name),
-                                ast.Name(id="category", ctx=ast.Load()),
-                                ast.Subscript(
-                                    value=ast.Name(id="data", ctx=ast.Load()),
-                                    slice=ast.Constant(value="results"),
-                                    ctx=ast.Load(),
-                                ),
-                            ],
-                            keywords=[],
-                        )
-                    ),
-                ],
-                orelse=[],
-            )
-            setup_stmts = [routes_assign, loop]
+        setup_stmts = [routes_assign]
     else:
         setup_stmts = []
 
@@ -364,6 +212,14 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path, w
                     )
                 )
             )
+
+    if routes_dict_keys:
+        setup_call = ast.Call(
+            func=ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="_setup_endpoints", ctx=ast.Load()),
+            args=[ast.Name(id="routes", ctx=ast.Load())],
+            keywords=[],
+        )
+        setup_stmts.append(ast.Expr(value=ast.Await(value=setup_call) if is_async else setup_call))
 
     if not setup_stmts:
         setup_stmts = [ast.Pass()]

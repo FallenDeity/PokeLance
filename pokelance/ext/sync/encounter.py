@@ -29,9 +29,7 @@ class Encounter(SyncBaseExtension[EncounterCache]):
             "encounter_condition": Endpoint.get_encounter_condition_endpoints(),
             "encounter_condition_value": Endpoint.get_encounter_condition_value_endpoints(),
         }
-        for category, route in routes.items():
-            data = self._client.request(route)
-            self._cache_manager.load_documents("Encounter", category, data["results"])
+        self._setup_endpoints(routes)
 
     def get_encounter_method(self, name: str | int) -> models.EncounterMethod | None:
         """Gets a encounter method from the cache.

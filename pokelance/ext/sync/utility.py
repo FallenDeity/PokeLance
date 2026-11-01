@@ -25,10 +25,8 @@ class Utility(SyncBaseExtension[UtilityCache]):
     @override
     def setup(self) -> None:
         routes = {"language": Endpoint.get_language_endpoints()}
-        for category, route in routes.items():
-            data = self._client.request(route)
-            self._cache_manager.load_documents("Utility", category, data["results"])
         self._cache_group.api_metadata.set_ready()
+        self._setup_endpoints(routes)
 
     def get_language(self, id: int) -> models.Language | None:
         """Gets a language from the cache.

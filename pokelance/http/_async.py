@@ -10,7 +10,7 @@ import niquests
 
 from pokelance.cache._async.manager import AsyncCacheManager
 from pokelance.endpoints import Route
-from pokelance.exceptions import HTTPException
+from pokelance.exceptions import EndpointInitializationError, HTTPException
 from pokelance.http._base import BaseHttpClient
 
 if t.TYPE_CHECKING:
@@ -31,27 +31,44 @@ class AsyncEndpointLoader:
         self._ready_event: asyncio.Event = asyncio.Event()
         self._ready_event.set()
         self._scheduled: bool = False
+        self._errors: dict[str, Exception] = {}
 
     @property
     def is_ready(self) -> bool:
-        """Whether all background loading tasks have finished."""
-        return self._ready_event.is_set()
+        """Whether all background loading tasks have finished successfully."""
+        return self._ready_event.is_set() and not self._errors
 
     async def wait_until_ready(self) -> None:
         """Wait until all background endpoint tasks have completed."""
+        if not self._client.cache_endpoints:
+            raise RuntimeError("Endpoint loading is disabled (cache_endpoints=False).")
         await self._ready_event.wait()
+        if self._errors:
+            raise EndpointInitializationError(self._errors) from next(iter(self._errors.values()))
 
-    async def _load_ext(self, coroutine: t.Callable[[], t.Coroutine[t.Any, t.Any, None]], message: str) -> None:
+    async def _load_ext(
+        self, coroutine: t.Callable[[], t.Coroutine[t.Any, t.Any, None]], message: str, name: str
+    ) -> None:
         """Load an extension's resources asynchronously."""
         logger.debug(f"Loading {message}...")
         try:
             await coroutine()
-        except (asyncio.CancelledError, Exception):
+        except asyncio.CancelledError:
+            if not self._client.http.is_closing:
+                self._errors[name] = RuntimeError(f"Endpoint initialization cancelled: {name}")
+            raise
+        except Exception as error:
             if self._client.http.is_closing:
                 logger.debug(f"Extension loading aborted due to client closing: {message}")
                 return
             logger.exception(f"Failed loading {message}")
-            raise
+            self._errors[name] = error
+            extension = getattr(self._client, name, None)
+            if extension is not None:
+                for cache in extension.cache_group._walk_caches():
+                    if not cache.is_ready and cache._endpoint_error is None:
+                        cache.set_failed(error)
+            return
         finally:
             self._remaining -= 1
             if self._remaining <= 0:
@@ -63,6 +80,7 @@ class AsyncEndpointLoader:
         if self._scheduled:
             return
         self._scheduled = True
+        self._errors.clear()
         self._ready_event.clear()
         if not self._client.cache_endpoints:
             self._ready_event.set()
@@ -73,7 +91,7 @@ class AsyncEndpointLoader:
         logger.info(f"Scheduling {total} endpoint pre-population task(s)...")
         for num, (coroutine, name) in enumerate(self._client.ext_tasks):
             message = f"Extension {name} endpoints ({num + 1}/{total})"
-            task = asyncio.create_task(coro=self._load_ext(coroutine, message), name=name)
+            task = asyncio.create_task(coro=self._load_ext(coroutine, message, name), name=name)
             self._tasks.add(task)
             task.add_done_callback(self._tasks.discard)
         self._client.ext_tasks.clear()
@@ -145,6 +163,7 @@ class AsyncHttpClient(BaseHttpClient["PokeLanceAsyncClient", niquests.AsyncSessi
             return
         self._closing = True
         try:
+            await asyncio.gather(self._client.get_image.cache_close(), self._client.get_audio.cache_close())
             await self._loader.cancel_tasks()
             session_to_close = self.session if self._session_owner else None
             self.session = None

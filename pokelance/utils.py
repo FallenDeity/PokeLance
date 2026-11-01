@@ -119,6 +119,7 @@ class _LRUCacheWrapper(Generic[_P, _R]):
         self.__hits = 0
         self.__misses = 0
         self.__tasks: set[asyncio.Task[_R]] = set()
+        self.__cancelling_tasks: set[asyncio.Task[_R]] = set()
 
     def __contains__(self, /, *args: Hashable, **kwargs: Any) -> bool:  # ruff: ignore[any-type]
         key = _make_key(args, kwargs, self.__typed)
@@ -138,28 +139,34 @@ class _LRUCacheWrapper(Generic[_P, _R]):
             return True
 
     def cache_clear(self) -> None:
+        """Clear cached results and request cancellation of all pending work."""
         self.__hits = 0
         self.__misses = 0
 
         for c in self.__cache.values():
-            if c.later_call:
-                c.later_call.cancel()
+            c.cancel()
         self.__cache.clear()
-        self.__tasks.clear()
+        self._cache_cancel_tasks()
+
+    def _cache_cancel_tasks(self) -> None:
+        for task in self.__tasks:
+            if not task.done() and task not in self.__cancelling_tasks:
+                self.__cancelling_tasks.add(task)
+                task.cancel()
 
     async def cache_close(self, *, wait: bool = False) -> None:
         self.__closed = True
+        await self._cache_close(wait=wait)
 
+    async def _cache_close(self, *, wait: bool = False) -> None:
         tasks = list(self.__tasks)
-        if not tasks:
-            return
-
         if not wait:
-            for task in tasks:
-                if not task.done():
-                    task.cancel()
+            self._cache_cancel_tasks()
 
         await asyncio.gather(*tasks, return_exceptions=True)
+        for item in self.__cache.values():
+            item.cancel()
+        self.__cache.clear()
 
     def cache_info(self) -> _CacheInfo:
         return _CacheInfo(
@@ -186,22 +193,34 @@ class _LRUCacheWrapper(Generic[_P, _R]):
 
     def _task_done_callback(self, fut: asyncio.Future[_R], key: Hashable, task: asyncio.Task[_R]) -> None:
         self.__tasks.discard(task)
-
-        cache_item = self.__cache.get(key)
-        if self.__ttl is not None and cache_item is not None:
-            loop = asyncio.get_running_loop()
-            cache_item.later_call = loop.call_later(self.__ttl, self.__cache.pop, key, None)
+        self.__cancelling_tasks.discard(task)
 
         if task.cancelled():
+            self._cache_expire(key, fut)
             fut.cancel()
             return
 
         exc = task.exception()
         if exc is not None:
-            fut.set_exception(exc)
+            self._cache_expire(key, fut)
+            if not fut.done():
+                fut.set_exception(exc)
+                # The caller awaits its task directly; retrieve the cached failure too.
+                fut.exception()
             return
 
-        fut.set_result(task.result())
+        cache_item = self.__cache.get(key)
+        if self.__ttl is not None and cache_item is not None and cache_item.fut is fut:
+            loop = asyncio.get_running_loop()
+            cache_item.later_call = loop.call_later(self.__ttl, self._cache_expire, key, fut)
+        if not fut.done():
+            fut.set_result(task.result())
+
+    def _cache_expire(self, key: Hashable, fut: asyncio.Future[_R]) -> None:
+        item = self.__cache.get(key)
+        if item is not None and item.fut is fut:
+            self.__cache.pop(key)
+            item.cancel()
 
     async def __call__(self, /, *fn_args: _P.args, **fn_kwargs: _P.kwargs) -> _R:
         if self.__closed:
@@ -213,14 +232,8 @@ class _LRUCacheWrapper(Generic[_P, _R]):
 
         cache_item = self.__cache.get(key)
 
-        if cache_item is not None:
-            if not cache_item.fut.done():
-                self._cache_hit(key)
-                return await asyncio.shield(cache_item.fut)
-
-            exc = cache_item.fut._exception
-
-            if exc is None:
+        if cache_item is not None and cache_item.fut.done():
+            if not cache_item.fut.cancelled() and cache_item.fut.exception() is None:
                 self._cache_hit(key)
                 return cache_item.fut.result()
             else:
@@ -241,7 +254,7 @@ class _LRUCacheWrapper(Generic[_P, _R]):
             cache_item.cancel()
 
         self._cache_miss(key)
-        return await asyncio.shield(fut)
+        return await task
 
     @overload
     def __get__(self, instance: None, owner: type[Any]) -> Self: ...
@@ -305,8 +318,9 @@ class _LRUCacheWrapperInstanceMethod(Generic[_P, _R, _T]):
     def cache_clear(self) -> None:
         self.__wrapper.cache_clear()
 
-    async def cache_close(self, *, cancel: bool = False, return_exceptions: bool = True) -> None:
-        await self.__wrapper.cache_close()
+    async def cache_close(self, *, wait: bool = False) -> None:
+        """Drain shared method work while leaving the decorator reusable."""
+        await self.__wrapper._cache_close(wait=wait)
 
     def cache_info(self) -> _CacheInfo:
         return self.__wrapper.cache_info()

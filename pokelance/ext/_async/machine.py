@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import typing as t
 
 from typing_extensions import override
@@ -26,9 +25,7 @@ class Machine(AsyncBaseExtension[MachineCache]):
     @override
     async def setup(self) -> None:
         routes = {"machine": Endpoint.get_machine_endpoints()}
-        results = await asyncio.gather(*(self._client.request(r) for r in routes.values()))
-        for category, data in zip(routes.keys(), results, strict=False):
-            self._cache_manager.load_documents("Machine", category, data["results"])
+        await self._setup_endpoints(routes)
 
     def get_machine(self, id: int) -> models.Machine | None:
         """Gets a machine from the cache.

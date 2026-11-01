@@ -30,9 +30,7 @@ class Location(SyncBaseExtension[LocationCache]):
             "pal_park_area": Endpoint.get_pal_park_area_endpoints(),
             "region": Endpoint.get_region_endpoints(),
         }
-        for category, route in routes.items():
-            data = self._client.request(route)
-            self._cache_manager.load_documents("Location", category, data["results"])
+        self._setup_endpoints(routes)
 
     def get_location(self, name: str | int) -> models.Location | None:
         """Gets a location from the cache.

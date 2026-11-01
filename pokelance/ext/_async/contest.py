@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import typing as t
 
 from typing_extensions import override
@@ -30,9 +29,7 @@ class Contest(AsyncBaseExtension[ContestCache]):
             "contest_effect": Endpoint.get_contest_effect_endpoints(),
             "super_contest_effect": Endpoint.get_super_contest_effect_endpoints(),
         }
-        results = await asyncio.gather(*(self._client.request(r) for r in routes.values()))
-        for category, data in zip(routes.keys(), results, strict=False):
-            self._cache_manager.load_documents("Contest", category, data["results"])
+        await self._setup_endpoints(routes)
 
     def get_contest_type(self, name: str | int) -> models.ContestType | None:
         """Gets a contest type from the cache.

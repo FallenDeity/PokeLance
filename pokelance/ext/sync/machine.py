@@ -25,9 +25,7 @@ class Machine(SyncBaseExtension[MachineCache]):
     @override
     def setup(self) -> None:
         routes = {"machine": Endpoint.get_machine_endpoints()}
-        for category, route in routes.items():
-            data = self._client.request(route)
-            self._cache_manager.load_documents("Machine", category, data["results"])
+        self._setup_endpoints(routes)
 
     def get_machine(self, id: int) -> models.Machine | None:
         """Gets a machine from the cache.

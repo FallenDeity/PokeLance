@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import typing as t
 
 from typing_extensions import override
@@ -43,9 +42,7 @@ class Pokemon(AsyncBaseExtension[PokemonCache]):
             "type": Endpoint.get_type_endpoints(),
             "location_area_encounter": Endpoint.get_location_area_encounter_endpoints(),
         }
-        results = await asyncio.gather(*(self._client.request(r) for r in routes.values()))
-        for category, data in zip(routes.keys(), results, strict=False):
-            self._cache_manager.load_documents("Pokemon", category, data["results"])
+        await self._setup_endpoints(routes)
 
     def get_ability(self, name: str | int) -> models.Ability | None:
         """Gets a ability from the cache.

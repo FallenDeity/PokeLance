@@ -19,12 +19,14 @@ Coverage
 - image and audio alru_cache: contains, cache_clear, set_size
 """
 
+import asyncio
 import math
 
 import pytest
 
 import pokelance
 from pokelance.endpoints import Endpoint
+from pokelance.utils import alru_cache
 
 # ---------------------------------------------------------------------------
 # Size / attributes
@@ -197,6 +199,100 @@ async def test_audio_cache_clear(client: pokelance.PokeLanceAsyncClient) -> None
 def test_audio_cache_set_size(client: pokelance.PokeLanceAsyncClient) -> None:
     client.get_audio.set_size(10)
     assert client.get_audio.cache_info().maxsize == 10
+
+
+@pytest.mark.asyncio
+async def test_cancelled_async_cache_retries_without_coalescing_callers() -> None:
+    calls = 0
+    started, release = asyncio.Event(), asyncio.Event()
+
+    @alru_cache()
+    async def download(url: str) -> bytes:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            raise asyncio.CancelledError
+        started.set()
+        await release.wait()
+        return b"image"
+
+    with pytest.raises(asyncio.CancelledError):
+        await download("url")
+    first = asyncio.create_task(download("url"))
+    await started.wait()
+    second = asyncio.create_task(download("url"))
+    await asyncio.sleep(0)
+    first.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await first
+    release.set()
+    assert await second == b"image"
+    assert calls == 3
+    assert await download("url") == b"image"
+    assert calls == 3
+    await download.cache_close()
+
+
+@pytest.mark.asyncio
+async def test_async_cache_clear_preserves_replacement_and_tracks_cleanup() -> None:
+    calls = 0
+    started, cancelled, cleanup = asyncio.Event(), asyncio.Event(), asyncio.Event()
+
+    @alru_cache(ttl=60)
+    async def download(url: str) -> bytes:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            started.set()
+            try:
+                await asyncio.Event().wait()
+            except asyncio.CancelledError:
+                cancelled.set()
+                await cleanup.wait()
+                raise
+        return b"fresh"
+
+    first = asyncio.create_task(download("url"))
+    await started.wait()
+    download.cache_clear()
+    assert download.cache_parameters()["tasks"] == 1
+    await cancelled.wait()
+    assert await download("url") == b"fresh"
+    cleanup.set()
+    with pytest.raises(asyncio.CancelledError):
+        await first
+    assert await download("url") == b"fresh"
+    assert calls == 2
+    assert download.cache_parameters()["tasks"] == 0
+    await download.cache_close()
+
+
+@pytest.mark.asyncio
+async def test_async_cache_close_drains_work_cancelled_by_clear() -> None:
+    started, cancelled, cleanup = asyncio.Event(), asyncio.Event(), asyncio.Event()
+
+    @alru_cache()
+    async def download() -> bytes:
+        started.set()
+        try:
+            await asyncio.Event().wait()
+        finally:
+            cancelled.set()
+            await cleanup.wait()
+        return b"image"
+
+    caller = asyncio.create_task(download())
+    await started.wait()
+    download.cache_clear()
+    await cancelled.wait()
+    closer = asyncio.create_task(download.cache_close())
+    await asyncio.sleep(0)
+    assert not closer.done(), "cache_close() must wait for cancellation cleanup"
+    cleanup.set()
+    await closer
+    with pytest.raises(asyncio.CancelledError):
+        await caller
+    assert download.cache_parameters()["tasks"] == 0
 
 
 @pytest.mark.asyncio

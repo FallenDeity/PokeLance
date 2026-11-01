@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import typing as t
 
 from typing_extensions import override
@@ -34,9 +33,7 @@ class Move(AsyncBaseExtension[MoveCache]):
             "move_learn_method": Endpoint.get_move_learn_method_endpoints(),
             "move_target": Endpoint.get_move_target_endpoints(),
         }
-        results = await asyncio.gather(*(self._client.request(r) for r in routes.values()))
-        for category, data in zip(routes.keys(), results, strict=False):
-            self._cache_manager.load_documents("Move", category, data["results"])
+        await self._setup_endpoints(routes)
 
     def get_move(self, name: str | int) -> models.Move | None:
         """Gets a move from the cache.

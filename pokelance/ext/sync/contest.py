@@ -29,9 +29,7 @@ class Contest(SyncBaseExtension[ContestCache]):
             "contest_effect": Endpoint.get_contest_effect_endpoints(),
             "super_contest_effect": Endpoint.get_super_contest_effect_endpoints(),
         }
-        for category, route in routes.items():
-            data = self._client.request(route)
-            self._cache_manager.load_documents("Contest", category, data["results"])
+        self._setup_endpoints(routes)
 
     def get_contest_type(self, name: str | int) -> models.ContestType | None:
         """Gets a contest type from the cache.

@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import typing as t
 
 from typing_extensions import override
@@ -30,9 +29,7 @@ class Encounter(AsyncBaseExtension[EncounterCache]):
             "encounter_condition": Endpoint.get_encounter_condition_endpoints(),
             "encounter_condition_value": Endpoint.get_encounter_condition_value_endpoints(),
         }
-        results = await asyncio.gather(*(self._client.request(r) for r in routes.values()))
-        for category, data in zip(routes.keys(), results, strict=False):
-            self._cache_manager.load_documents("Encounter", category, data["results"])
+        await self._setup_endpoints(routes)
 
     def get_encounter_method(self, name: str | int) -> models.EncounterMethod | None:
         """Gets a encounter method from the cache.

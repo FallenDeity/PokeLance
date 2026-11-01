@@ -33,9 +33,7 @@ class Move(SyncBaseExtension[MoveCache]):
             "move_learn_method": Endpoint.get_move_learn_method_endpoints(),
             "move_target": Endpoint.get_move_target_endpoints(),
         }
-        for category, route in routes.items():
-            data = self._client.request(route)
-            self._cache_manager.load_documents("Move", category, data["results"])
+        self._setup_endpoints(routes)
 
     def get_move(self, name: str | int) -> models.Move | None:
         """Gets a move from the cache.

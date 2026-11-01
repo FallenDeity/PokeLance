@@ -11,9 +11,10 @@ Coverage
 - model __eq__
 """
 
+import asyncio
 import random
 import time
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 
@@ -21,6 +22,7 @@ import pokelance
 from pokelance.constants import DEFAULT_BASE_URL, ExtensionEnum, get_base_url
 from pokelance.endpoints import Endpoint
 from pokelance.exceptions import ImageNotFound, ResourceNotFound
+from pokelance.http._async import AsyncHttpClient
 from pokelance.models import Pokemon
 
 # ---------------------------------------------------------------------------
@@ -244,3 +246,60 @@ async def test_fetch_refreshes_cache(client: pokelance.PokeLanceAsyncClient, mon
     with pytest.raises(RuntimeError, match="request failed"):
         await client.berry.fetch_berry(1)
     assert client.berry.get_berry(1) is second
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("close_method", ["close", "context", "http"])
+async def test_shutdown_drains_shared_media(monkeypatch: pytest.MonkeyPatch, close_method: str) -> None:
+    image_started, audio_started = asyncio.Event(), asyncio.Event()
+    image_cancelled, audio_cancelled = asyncio.Event(), asyncio.Event()
+
+    async def load_image(http: AsyncHttpClient, url: str) -> bytes:
+        if url == "safe":
+            return b"image"
+        image_started.set()
+        try:
+            await asyncio.Event().wait()
+        finally:
+            image_cancelled.set()
+        return b"image"
+
+    async def load_audio(http: AsyncHttpClient, url: str) -> bytes:
+        audio_started.set()
+        try:
+            await asyncio.Event().wait()
+        finally:
+            audio_cancelled.set()
+        return b"audio"
+
+    monkeypatch.setattr(AsyncHttpClient, "load_image", load_image)
+    monkeypatch.setattr(AsyncHttpClient, "load_audio", load_audio)
+    client = pokelance.PokeLanceAsyncClient(cache_endpoints=False, setup_logging=False)
+    other = pokelance.PokeLanceAsyncClient(cache_endpoints=False, setup_logging=False)
+
+    def close_session() -> None:
+        assert image_cancelled.is_set() and audio_cancelled.is_set()
+
+    session = Mock(close=AsyncMock(side_effect=close_session))
+    monkeypatch.setattr(client.http, "session", session)
+    image = asyncio.create_task(client.get_image("url"))
+    audio = asyncio.create_task(client.get_audio("url"))
+    await image_started.wait()
+    await audio_started.wait()
+    other_image = asyncio.create_task(other.get_image("url"))
+    await asyncio.sleep(0)
+    if close_method == "context":
+        await client.__aexit__(None, None, None)
+    elif close_method == "http":
+        await client.http.close()
+    else:
+        await client.close()
+    for caller in (image, audio, other_image):
+        with pytest.raises(asyncio.CancelledError):
+            await caller
+    assert client.get_image.cache_parameters()["tasks"] == 0
+    assert client.get_audio.cache_parameters()["tasks"] == 0
+    session.close.assert_awaited_once()
+    assert not other.get_image.cache_parameters()["closed"]
+    assert await other.get_image("safe") == b"image"
+    await other.close()

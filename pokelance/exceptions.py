@@ -8,11 +8,27 @@ if t.TYPE_CHECKING:
 
 __all__: tuple[str, ...] = (
     "AudioNotFound",
+    "EndpointInitializationError",
     "HTTPException",
     "ImageNotFound",
     "PokeLanceException",
     "ResourceNotFound",
 )
+
+
+class EndpointInitializationError(RuntimeError):
+    """Endpoint metadata failed to initialize; normal resource fetching remains available.
+
+    Attributes
+    ----------
+    errors : dict[str, Exception]
+        Failed categories or extensions and their original exceptions.
+    """
+
+    def __init__(self, errors: dict[str, Exception]) -> None:
+        self.errors = dict(errors)
+        details = "; ".join(f"{name}: {error}" for name, error in errors.items())
+        super().__init__(f"Endpoint initialization incomplete ({details}). Resource fetching remains available.")
 
 
 class PokeLanceException(Exception):  # ruff: ignore[error-suffix-on-exception-name]

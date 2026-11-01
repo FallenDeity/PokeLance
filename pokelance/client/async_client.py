@@ -304,6 +304,8 @@ class PokeLanceAsyncClient(ClientBase[AsyncHttpClient]):
         # All background caches are now loaded
         ```
         """
+        if not self.cache_endpoints:
+            raise RuntimeError("Endpoint loading is disabled (cache_endpoints=False).")
         await self._http.connect()
         logger.info("Waiting until ready...")
         await self._http.loader.wait_until_ready()

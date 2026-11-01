@@ -4,7 +4,7 @@ Tests for endpoint-registry population (the list-endpoint side of caching).
 
 Coverage
 --------
-- wait_until_ready() with cache_endpoints=False completes immediately
+- wait_until_ready() with cache_endpoints=False raises immediately
 - wait_until_ready() with cache_endpoints=True waits for all tasks to finish
 - setup() on an individual extension populates its endpoint registries
 - setup() gracefully skips categories that have no list-endpoint
@@ -15,12 +15,14 @@ Coverage
 """
 
 import typing as t
+from unittest.mock import AsyncMock
 
 import pytest
 
 import pokelance
 from pokelance.constants import ExtensionEnum
-from pokelance.endpoints import Endpoint
+from pokelance.endpoints import Endpoint, Route
+from pokelance.exceptions import EndpointInitializationError
 
 if t.TYPE_CHECKING:
     from pokelance.cache import AsyncCache
@@ -31,9 +33,52 @@ if t.TYPE_CHECKING:
 
 
 @pytest.mark.asyncio
-async def test_wait_until_ready_no_cache_completes(client: pokelance.PokeLanceAsyncClient) -> None:
-    """wait_until_ready with cache_endpoints=False should return without hanging."""
-    await client.wait_until_ready()  # must not block
+async def test_wait_until_ready_no_cache_raises(client: pokelance.PokeLanceAsyncClient) -> None:
+    """Disabled initialization raises at every readiness entry point without connecting."""
+    group = client.berry.cache_group
+    for wait in (
+        client.wait_until_ready,
+        client.http.loader.wait_until_ready,
+        client.http.cache_manager.wait_until_ready,
+        group.wait_until_ready,
+        group.berry.wait_until_ready,
+    ):
+        with pytest.raises(RuntimeError, match="cache_endpoints=False"):
+            await wait()
+    assert not client.http.is_connected
+
+
+@pytest.mark.asyncio
+async def test_partial_initialization_preserves_fetching(monkeypatch: pytest.MonkeyPatch) -> None:
+    index_error = ValueError("index unavailable")
+
+    def request(route: Route) -> dict[str, t.Any]:
+        if route.endpoint == "/berry-firmness":
+            raise index_error
+        if route.payload is not None:
+            return {"results": [{"name": "cheri", "url": f"{route.url}/1/"}]}
+        return {"id": 1, "name": "cheri"}
+
+    async with pokelance.PokeLanceAsyncClient(setup_logging=False) as client:
+        monkeypatch.setattr(client.http, "request", AsyncMock(side_effect=request))
+        with pytest.raises(EndpointInitializationError, match="index unavailable") as failure:
+            await client.wait_until_ready()
+        assert "berry" in failure.value.errors
+        assert not client.http.loader.is_ready
+        group = client.berry.cache_group
+        assert group.berry.is_ready and group.berry_flavor.is_ready
+        assert not group.berry_firmness.is_ready
+        await group.berry.wait_until_ready()
+        for wait in (
+            group.berry_firmness.wait_until_ready,
+            group.wait_until_ready,
+            client.http.cache_manager.wait_until_ready,
+        ):
+            with pytest.raises(EndpointInitializationError) as cache_failure:
+                await wait()
+            assert cache_failure.value.errors["berry_firmness"] is index_error
+        fetched = await client.berry.fetch_berry_firmness(1)
+        assert client.berry.get_berry_firmness(1) is fetched
 
 
 def test_wait_until_ready_with_cache(cached_client: pokelance.PokeLanceAsyncClient) -> None:

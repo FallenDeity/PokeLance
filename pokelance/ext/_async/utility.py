@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import typing as t
 
 from typing_extensions import override
@@ -26,10 +25,8 @@ class Utility(AsyncBaseExtension[UtilityCache]):
     @override
     async def setup(self) -> None:
         routes = {"language": Endpoint.get_language_endpoints()}
-        results = await asyncio.gather(*(self._client.request(r) for r in routes.values()))
-        for category, data in zip(routes.keys(), results, strict=False):
-            self._cache_manager.load_documents("Utility", category, data["results"])
         self._cache_group.api_metadata.set_ready()
+        await self._setup_endpoints(routes)
 
     def get_language(self, id: int) -> models.Language | None:
         """Gets a language from the cache.

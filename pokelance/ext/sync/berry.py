@@ -29,9 +29,7 @@ class Berry(SyncBaseExtension[BerryCache]):
             "berry_firmness": Endpoint.get_berry_firmness_endpoints(),
             "berry_flavor": Endpoint.get_berry_flavor_endpoints(),
         }
-        for category, route in routes.items():
-            data = self._client.request(route)
-            self._cache_manager.load_documents("Berry", category, data["results"])
+        self._setup_endpoints(routes)
 
     def get_berry(self, name: str | int) -> models.Berry | None:
         """Gets a berry from the cache.

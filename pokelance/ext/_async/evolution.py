@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import typing as t
 
 from typing_extensions import override
@@ -30,9 +29,7 @@ class Evolution(AsyncBaseExtension[EvolutionCache]):
             "evolution_trigger": Endpoint.get_evolution_trigger_endpoints(),
             "evolution_variable": Endpoint.get_evolution_variable_endpoints(),
         }
-        results = await asyncio.gather(*(self._client.request(r) for r in routes.values()))
-        for category, data in zip(routes.keys(), results, strict=False):
-            self._cache_manager.load_documents("Evolution", category, data["results"])
+        await self._setup_endpoints(routes)
 
     def get_evolution_chain(self, id: int) -> models.EvolutionChain | None:
         """Gets a evolution chain from the cache.

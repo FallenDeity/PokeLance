@@ -29,9 +29,7 @@ class Evolution(SyncBaseExtension[EvolutionCache]):
             "evolution_trigger": Endpoint.get_evolution_trigger_endpoints(),
             "evolution_variable": Endpoint.get_evolution_variable_endpoints(),
         }
-        for category, route in routes.items():
-            data = self._client.request(route)
-            self._cache_manager.load_documents("Evolution", category, data["results"])
+        self._setup_endpoints(routes)
 
     def get_evolution_chain(self, id: int) -> models.EvolutionChain | None:
         """Gets a evolution chain from the cache.

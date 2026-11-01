@@ -87,7 +87,7 @@ class SyncCache(BaseCacheState[_KT, _VT, "PokeLanceSyncClient"], t.Generic[_KT, 
     @property
     def is_ready(self) -> bool:
         """Whether this cache partition has finished loading its endpoint identifiers."""
-        return self._ready.is_set()
+        return self._ready.is_set() and self._endpoint_error is None
 
     def wait_until_ready(self) -> None:
         """Blocks synchronously until this cache partition has loaded its endpoint identifiers.
@@ -98,7 +98,14 @@ class SyncCache(BaseCacheState[_KT, _VT, "PokeLanceSyncClient"], t.Generic[_KT, 
         client.cache.pokemon.pokemon.wait_until_ready()
         ```
         """
+        self._check_endpoint_wait()
         self._ready.wait()
+        self._raise_endpoint_error()
+
+    @override
+    def set_failed(self, error: Exception) -> None:
+        super().set_failed(error)
+        self._ready.set()
 
     @override
     def set_ready(self) -> None:

@@ -84,6 +84,10 @@ With `cache_endpoints=True` (the default), registries load asynchronously in the
 - **Extension-level**: `await client.berry.wait_until_ready()` (or `await client.berry.cache_group.wait_until_ready()`) waits specifically for the berry extension and its associated category registries.
 - **Category-level**: `await client.berry.cache_group.berry.wait_until_ready()` waits specifically for a single category's endpoint registry.
 
+If some registries fail, successful registries remain available. Explicit readiness waits raise `EndpointInitializationError` (from `pokelance.exceptions`), whose `errors` mapping contains the failures and original exceptions. A category wait reports that category's failure; a client wait finishes all extension tasks before reporting failures. Ordinary resource fetching and model caching remain available, including for categories whose registry failed; those categories have no local name/ID validation until their metadata loads successfully.
+
+With `cache_endpoints=False`, client, loader, cache-manager, group, and category readiness waits raise `RuntimeError` immediately. Fetching resources and caching their responses do not require these waits.
+
 ## Loading endpoint registries
 
 Similarly, you can trigger endpoint registry loading at three levels:

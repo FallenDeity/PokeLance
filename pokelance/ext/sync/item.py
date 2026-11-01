@@ -32,9 +32,7 @@ class Item(SyncBaseExtension[ItemCache]):
             "item_pocket": Endpoint.get_item_pocket_endpoints(),
             "currency": Endpoint.get_currency_endpoints(),
         }
-        for category, route in routes.items():
-            data = self._client.request(route)
-            self._cache_manager.load_documents("Item", category, data["results"])
+        self._setup_endpoints(routes)
 
     def get_item(self, name: str | int) -> models.Item | None:
         """Gets a item from the cache.

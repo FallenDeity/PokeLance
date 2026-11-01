@@ -7,6 +7,7 @@ import attrs
 from typing_extensions import override
 
 from pokelance.endpoints import Route
+from pokelance.exceptions import EndpointInitializationError
 from pokelance.models import BaseModel
 
 if t.TYPE_CHECKING:
@@ -170,6 +171,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         self._endpoints_by_id: dict[str, str] = {}
         self._identifiers: set[str] = set()
         self._endpoints_cached: bool = False
+        self._endpoint_error: Exception | None = None
         self._stats: CacheStats = CacheStats()
 
     @property
@@ -275,7 +277,21 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
 
     def set_ready(self) -> None:
         """Sets the cache endpoint state as ready."""
+        self._endpoint_error = None
         self._endpoints_cached = True
+
+    def set_failed(self, error: Exception) -> None:
+        """Records an endpoint-loading failure without disabling model caching."""
+        self._endpoint_error = error
+        self._endpoints_cached = False
+
+    def _check_endpoint_wait(self) -> None:
+        if hasattr(self, "_client") and not self._client.cache_endpoints:
+            raise RuntimeError("Endpoint loading is disabled (cache_endpoints=False).")
+
+    def _raise_endpoint_error(self) -> None:
+        if self._endpoint_error is not None:
+            raise EndpointInitializationError({self._name: self._endpoint_error}) from self._endpoint_error
 
     def reset_endpoints(self) -> None:
         """Clears the endpoint registry and marks the cache as unready."""
@@ -283,6 +299,7 @@ class BaseCacheState(t.MutableMapping[_KT, _VT], t.Generic[_KT, _VT, _ClientT]):
         self._endpoints_by_id.clear()
         self._identifiers.clear()
         self._endpoints_cached = False
+        self._endpoint_error = None
 
     @override
     def get(self, key: _KT, default: _VT | None = None) -> _VT | None:  # ty: ignore[invalid-method-override] # pyright: ignore[reportIncompatibleMethodOverride]

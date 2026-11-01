@@ -11,7 +11,7 @@ import niquests
 
 from pokelance.cache.sync.manager import SyncCacheManager
 from pokelance.endpoints import Route
-from pokelance.exceptions import HTTPException
+from pokelance.exceptions import EndpointInitializationError, HTTPException
 from pokelance.http._base import BaseHttpClient
 
 if t.TYPE_CHECKING:
@@ -34,32 +34,46 @@ class SyncEndpointLoader:
         self._ready_event = threading.Event()
         self._ready_event.set()
         self._scheduled: bool = False
+        self._errors: dict[str, Exception] = {}
 
     @property
     def is_ready(self) -> bool:
-        """Whether all background loading tasks have finished."""
-        return self._ready_event.is_set()
+        """Whether all background loading tasks have finished successfully."""
+        return self._ready_event.is_set() and not self._errors
 
     def wait_until_ready(self) -> None:
         """Wait until all background endpoint tasks have completed."""
+        if not self._client.cache_endpoints:
+            raise RuntimeError("Endpoint loading is disabled (cache_endpoints=False).")
         awaiting = not self._ready_event.is_set()
         if awaiting:
             logger.info("Waiting for endpoint loading to complete...")
         self._ready_event.wait()
+        with self._lock:
+            errors = dict(self._errors)
+        if errors:
+            raise EndpointInitializationError(errors) from next(iter(errors.values()))
         if awaiting:
             logger.info("Endpoint loading complete.")
 
-    def _load_ext(self, fn: t.Callable[[], None], message: str) -> None:
+    def _load_ext(self, fn: t.Callable[[], None], message: str, name: str) -> None:
         """Load an extension's resources synchronously in a thread."""
         logger.debug(f"Loading {message}...")
         try:
             fn()
-        except Exception:
+        except Exception as error:
             if self._client.http.is_closing:
                 logger.debug(f"Extension loading aborted due to client closing: {message}")
                 return
             logger.exception(f"Failed loading {message}")
-            raise
+            with self._lock:
+                self._errors[name] = error
+            extension = getattr(self._client, name, None)
+            if extension is not None:
+                for cache in extension.cache_group._walk_caches():
+                    if not cache.is_ready and cache._endpoint_error is None:
+                        cache.set_failed(error)
+            return
         finally:
             with self._lock:
                 self._remaining -= 1
@@ -74,6 +88,7 @@ class SyncEndpointLoader:
             if self._scheduled:
                 return
             self._scheduled = True
+            self._errors.clear()
             self._ready_event.clear()
             if not self._client.cache_endpoints:
                 self._ready_event.set()
@@ -89,7 +104,7 @@ class SyncEndpointLoader:
                 )
             for num, (fn, name) in enumerate(self._client.ext_tasks):
                 message = f"Extension {name} endpoints ({num + 1}/{total})"
-                future = self._executor.submit(self._load_ext, fn, message)
+                future = self._executor.submit(self._load_ext, fn, message, name)
                 self._futures.add(future)
                 future.add_done_callback(self._discard_future)
             self._client.ext_tasks.clear()

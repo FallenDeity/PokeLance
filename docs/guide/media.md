@@ -70,6 +70,7 @@ print(asyncio.run(main()))
     async def main() -> None:
         async with PokeLanceAsyncClient() as client:
             pokemon = await client.pokemon.fetch_pokemon("pikachu")
+            assert pokemon.cries.latest is not None
             audio = await client.get_audio(pokemon.cries.latest)
             print(f"Downloaded {len(audio)} bytes from {pokemon.cries.latest}")
 
@@ -84,6 +85,7 @@ print(asyncio.run(main()))
 
     with PokeLanceSyncClient() as client:
         pokemon = client.pokemon.fetch_pokemon("pikachu")
+        assert pokemon.cries.latest is not None
         audio = client.get_audio(pokemon.cries.latest)
         print(f"Downloaded {len(audio)} bytes from {pokemon.cries.latest}")
     ```
@@ -99,6 +101,7 @@ from pokelance import PokeLanceAsyncClient
 async def main() -> str:
     async with PokeLanceAsyncClient() as client:
         pokemon = await client.pokemon.fetch_pokemon("pikachu")
+        assert pokemon.cries.latest is not None
         audio = await client.get_audio(pokemon.cries.latest)
         encoded = base64.b64encode(audio).decode("ascii")
         return f'<audio controls preload="none"><source src="data:audio/ogg;base64,{encoded}" type="audio/ogg"></audio>'
@@ -109,13 +112,16 @@ print(asyncio.run(main()))
 
 ## Media caching
 
-Image and audio helpers in `PokeLanceAsyncClient` use an asynchronous LRU cache (`alru_cache`), which deduplicates concurrent in-flight requests for the same URL.
+Image and audio helpers in `PokeLanceAsyncClient` cache downloaded bytes using `alru_cache`.
+
+!!! note "Shared media caches"
+    Cache settings and clearing apply across async clients. Clearing a media cache cancels its pending downloads; closing any async client cancels and waits for pending downloads in both shared media caches.
 
 Cache sizes can be configured during client construction or dynamically:
 
 ```python
 client = PokeLanceAsyncClient(image_cache_size=256, audio_cache_size=64)
-client.image_cache_size = 512  # resize image cache
+client.get_image.set_size(512)  # change the shared async image cache limit
 ```
 
 ## Error handling

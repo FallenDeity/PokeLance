@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import typing as t
 
 from typing_extensions import override
@@ -31,9 +30,7 @@ class Location(AsyncBaseExtension[LocationCache]):
             "pal_park_area": Endpoint.get_pal_park_area_endpoints(),
             "region": Endpoint.get_region_endpoints(),
         }
-        results = await asyncio.gather(*(self._client.request(r) for r in routes.values()))
-        for category, data in zip(routes.keys(), results, strict=False):
-            self._cache_manager.load_documents("Location", category, data["results"])
+        await self._setup_endpoints(routes)
 
     def get_location(self, name: str | int) -> models.Location | None:
         """Gets a location from the cache.
