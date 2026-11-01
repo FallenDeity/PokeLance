@@ -120,9 +120,21 @@ def test_sync_from_url_invalid_category(sync_cached_client: pokelance.PokeLanceS
         sync_cached_client.from_url("https://pokeapi.co/api/v2/garbage/something")
 
 
-def test_sync_from_url_rejects_trailing_path(sync_client: pokelance.PokeLanceSyncClient) -> None:
-    with pytest.raises(ValueError):
-        sync_client.from_url("https://pokeapi.co/api/v2/pokemon/25/encounters/extra")
+@pytest.mark.parametrize(
+    ("path", "endpoint"),
+    [
+        ("pokemon/25/", "/pokemon/25"),
+        ("pokemon/pikachu/encounters/", "/pokemon/pikachu/encounters"),
+        ("meta/", "/meta"),
+    ],
+)
+def test_sync_from_url_preserves_valid_paths(
+    sync_client: pokelance.PokeLanceSyncClient, monkeypatch: pytest.MonkeyPatch, path: str, endpoint: str
+) -> None:
+    request = Mock(return_value=[] if endpoint.endswith("/encounters") else {})
+    monkeypatch.setattr(sync_client.http, "request", request)
+    sync_client.from_url(f"https://pokeapi.co/api/v2/{path}")
+    assert request.call_args.args[0].endpoint == endpoint
 
 
 # ---------------------------------------------------------------------------

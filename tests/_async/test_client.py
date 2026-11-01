@@ -129,12 +129,6 @@ async def test_from_url_invalid_category(cached_client: pokelance.PokeLanceAsync
         await cached_client.from_url("https://pokeapi.co/api/v2/garbage/something")
 
 
-@pytest.mark.asyncio
-async def test_from_url_rejects_trailing_path(client: pokelance.PokeLanceAsyncClient) -> None:
-    with pytest.raises(ValueError):
-        await client.from_url("https://pokeapi.co/api/v2/pokemon/25/encounters/extra")
-
-
 # ---------------------------------------------------------------------------
 # Media helpers
 # ---------------------------------------------------------------------------

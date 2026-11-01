@@ -37,9 +37,9 @@ ExtensionsL = t.Literal[
     "berry", "contest", "encounter", "evolution", "game", "item", "location", "machine", "move", "pokemon"
 ]
 
-# Special case subcategory /pokemon/{id}/encounters endpoint for getch_data and from_url methods,
-# due to inconsistent naming in the PokéAPI specification.
-_SUBCATEGORY_MAP: dict[str, str] = {"encounters": "location-area-encounter"}
+# Special case subcategory /pokemon/{id}/encounters endpoint for getch_data and from_url methods.
+_SUBCATEGORY_ROUTES: dict[tuple[str, str], str] = {("pokemon", "encounters"): "location-area-encounter"}
+_SUBCATEGORY_MAP: dict[str, str] = {suffix: category for (_, suffix), category in _SUBCATEGORY_ROUTES.items()}
 
 
 def _convert_category(value: str) -> str:
@@ -61,7 +61,13 @@ def validate_url(url: str) -> re.Match[str] | None:
     pattern = re.compile(
         rf"{re.escape(get_base_url())}/(?P<category>[\w-]+)(?:/(?P<value>[\w-]+)(?:/(?P<sub_category>[\w-]+))?)?/?"
     )
-    return pattern.fullmatch(url)
+    match = pattern.fullmatch(url)
+    if match is None:
+        return None
+    category, _, subcategory = match.groups()
+    if subcategory and (category, subcategory) not in _SUBCATEGORY_ROUTES:
+        return None
+    return match
 
 
 class BaseEnum(enum.Enum):

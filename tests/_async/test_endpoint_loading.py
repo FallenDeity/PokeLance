@@ -14,6 +14,7 @@ Coverage
 - All extensions' categories with list-endpoints are populated after wait_until_ready()
 """
 
+import asyncio
 import typing as t
 from unittest.mock import AsyncMock
 
@@ -79,6 +80,53 @@ async def test_partial_initialization_preserves_fetching(monkeypatch: pytest.Mon
             assert cache_failure.value.errors["berry_firmness"] is index_error
         fetched = await client.berry.fetch_berry_firmness(1)
         assert client.berry.get_berry_firmness(1) is fetched
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("before_start", [False, True])
+async def test_cancelled_initialization_unblocks_waits_and_retries(
+    monkeypatch: pytest.MonkeyPatch, before_start: bool
+) -> None:
+    started = asyncio.Event()
+
+    async def blocked(route: Route) -> dict[str, t.Any]:
+        started.set()
+        await asyncio.Event().wait()
+        return {"results": []}
+
+    async with pokelance.PokeLanceAsyncClient(setup_logging=False) as client:
+        client.ext_tasks[:] = [(client.berry.setup, "berry")]
+        monkeypatch.setattr(client.http, "request", AsyncMock(side_effect=blocked))
+        await client.http.connect()
+        category_wait = asyncio.create_task(client.berry.cache_group.berry.wait_until_ready())
+        if before_start:
+            await client.http.loader.cancel_tasks()
+            assert not started.is_set()
+        else:
+            await asyncio.wait_for(started.wait(), timeout=1)
+        await client.close()
+
+        with pytest.raises(EndpointInitializationError, match="cancelled"):
+            await asyncio.wait_for(category_wait, timeout=1)
+        for wait in (
+            client.berry.cache_group.wait_until_ready,
+            client.http.loader.wait_until_ready,
+        ):
+            with pytest.raises(EndpointInitializationError, match="cancelled"):
+                await asyncio.wait_for(wait(), timeout=1)
+        assert not client.http.loader.is_ready
+
+        request = AsyncMock(return_value={"results": []})
+        monkeypatch.setattr(client.http, "request", request)
+        await asyncio.wait_for(client.wait_until_ready(), timeout=1)
+        assert client.http.loader.is_ready
+        assert all(cache.is_ready for cache in client.berry.cache_group._walk_caches())
+        assert request.await_count == 3
+
+        await client.close()
+        request.reset_mock()
+        await client.wait_until_ready()
+        request.assert_not_awaited()
 
 
 def test_wait_until_ready_with_cache(cached_client: pokelance.PokeLanceAsyncClient) -> None:

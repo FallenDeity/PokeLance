@@ -5,6 +5,7 @@ import asyncio
 import logging
 import time
 import typing as t
+from functools import partial
 
 import niquests
 
@@ -53,27 +54,36 @@ class AsyncEndpointLoader:
         logger.debug(f"Loading {message}...")
         try:
             await coroutine()
-        except asyncio.CancelledError:
-            if not self._client.http.is_closing:
-                self._errors[name] = RuntimeError(f"Endpoint initialization cancelled: {name}")
-            raise
         except Exception as error:
             if self._client.http.is_closing:
                 logger.debug(f"Extension loading aborted due to client closing: {message}")
-                return
-            logger.exception(f"Failed loading {message}")
-            self._errors[name] = error
-            extension = getattr(self._client, name, None)
-            if extension is not None:
-                for cache in extension.cache_group._walk_caches():
-                    if not cache.is_ready and cache._endpoint_error is None:
-                        cache.set_failed(error)
+            else:
+                logger.exception(f"Failed loading {message}")
+            self._set_failed(name, error)
             return
-        finally:
-            self._remaining -= 1
-            if self._remaining <= 0:
-                self._ready_event.set()
-        logger.info(f"Loaded {message} ({self._remaining} remaining)")
+        logger.info(f"Loaded {message}")
+
+    def _set_failed(self, name: str, error: Exception) -> None:
+        self._errors[name] = error
+        extension = getattr(self._client, name, None)
+        if extension is not None:
+            for cache in extension.cache_group._walk_caches():
+                if not cache.is_ready and cache._endpoint_error is None:
+                    cache.set_failed(error)
+
+    def _task_done(
+        self,
+        coroutine: t.Callable[[], t.Coroutine[t.Any, t.Any, None]],
+        name: str,
+        task: asyncio.Task[None],
+    ) -> None:
+        self._tasks.discard(task)
+        if task.cancelled():
+            self._set_failed(name, RuntimeError(f"Endpoint initialization cancelled: {name}"))
+            self._client.ext_tasks.append((coroutine, name))
+        self._remaining -= 1
+        if self._remaining <= 0:
+            self._ready_event.set()
 
     async def schedule_tasks(self) -> None:
         """Schedules background endpoint-loading tasks using asyncio.create_task."""
@@ -90,10 +100,15 @@ class AsyncEndpointLoader:
         self._remaining = total
         logger.info(f"Scheduling {total} endpoint pre-population task(s)...")
         for num, (coroutine, name) in enumerate(self._client.ext_tasks):
+            extension = getattr(self._client, name, None)
+            if extension is not None:
+                for cache in extension.cache_group._walk_caches():
+                    if cache._endpoint_error is not None:
+                        cache.reset_endpoints()
             message = f"Extension {name} endpoints ({num + 1}/{total})"
             task = asyncio.create_task(coro=self._load_ext(coroutine, message, name), name=name)
             self._tasks.add(task)
-            task.add_done_callback(self._tasks.discard)
+            task.add_done_callback(partial(self._task_done, coroutine, name))
         self._client.ext_tasks.clear()
         if self._remaining == 0:
             self._ready_event.set()
@@ -111,7 +126,8 @@ class AsyncEndpointLoader:
             except asyncio.TimeoutError:
                 logger.warning("Timed out waiting for endpoint loading tasks to cancel.")
         self._tasks.clear()
-        self._scheduled = False
+        if self._client.ext_tasks:
+            self._scheduled = False
         self._remaining = 0
         self._ready_event.set()
 

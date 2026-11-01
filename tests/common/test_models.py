@@ -21,10 +21,19 @@ import attrs
 import pytest
 
 import pokelance
+from pokelance.constants import validate_url
 from pokelance.models._base import (
     BaseModel,
     _serializer,  # pyright: ignore[reportUnknownVariableType, reportPrivateUsage]
 )
+
+
+@pytest.mark.parametrize(
+    "path", ["pokemon/25/encounters/extra", "pokemon/25/ability", "berry/1/berry-firmness", "berry/1/encounters"]
+)
+def test_validate_url_rejects_invalid_subresources(path: str) -> None:
+    assert validate_url(f"https://pokeapi.co/api/v2/{path}") is None
+
 
 # ---------------------------------------------------------------------------
 # _serializer unit tests (no network)
