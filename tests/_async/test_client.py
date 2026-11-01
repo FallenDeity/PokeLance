@@ -13,6 +13,7 @@ Coverage
 
 import random
 import time
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -229,3 +230,17 @@ async def test_async_client_manual_close() -> None:
     assert berry.name == "cheri"
     await client.close()
     assert client.http.session is None
+
+
+@pytest.mark.asyncio
+async def test_fetch_refreshes_cache(client: pokelance.PokeLanceAsyncClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    request = AsyncMock(side_effect=[{"name": "old"}, {"name": "new"}, RuntimeError("request failed")])
+    monkeypatch.setattr(client.http, "request", request)
+    first = await client.berry.fetch_berry(1)
+    second = await client.berry.fetch_berry(1)
+    assert second is not first and second.name == "new"
+    assert client.berry.get_berry(1) is second
+    assert request.call_count == 2
+    with pytest.raises(RuntimeError, match="request failed"):
+        await client.berry.fetch_berry(1)
+    assert client.berry.get_berry(1) is second

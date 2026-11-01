@@ -80,7 +80,9 @@ class Game(SyncBaseExtension[GameCache]):
         route = Endpoint.get_generation(name)
         self._validate_resource(self._cache_group.generation, name, route)
         data = self._client.request(route)
-        return self._cache_group.generation.setdefault(route, self._cache_group.generation.from_payload(data))
+        model = self._cache_group.generation.from_payload(data)
+        self._cache_group.generation[route] = model
+        return model
 
     def get_pokedex(self, name: str | int) -> models.Pokedex | None:
         """Gets a pokedex from the cache.
@@ -128,7 +130,9 @@ class Game(SyncBaseExtension[GameCache]):
         route = Endpoint.get_pokedex(name)
         self._validate_resource(self._cache_group.pokedex, name, route)
         data = self._client.request(route)
-        return self._cache_group.pokedex.setdefault(route, self._cache_group.pokedex.from_payload(data))
+        model = self._cache_group.pokedex.from_payload(data)
+        self._cache_group.pokedex[route] = model
+        return model
 
     def get_version(self, name: str | int) -> models.Version | None:
         """Gets a version from the cache.
@@ -176,7 +180,9 @@ class Game(SyncBaseExtension[GameCache]):
         route = Endpoint.get_version(name)
         self._validate_resource(self._cache_group.version, name, route)
         data = self._client.request(route)
-        return self._cache_group.version.setdefault(route, self._cache_group.version.from_payload(data))
+        model = self._cache_group.version.from_payload(data)
+        self._cache_group.version[route] = model
+        return model
 
     def get_version_group(self, name: str | int) -> models.VersionGroup | None:
         """Gets a version group from the cache.
@@ -224,7 +230,9 @@ class Game(SyncBaseExtension[GameCache]):
         route = Endpoint.get_version_group(name)
         self._validate_resource(self._cache_group.version_group, name, route)
         data = self._client.request(route)
-        return self._cache_group.version_group.setdefault(route, self._cache_group.version_group.from_payload(data))
+        model = self._cache_group.version_group.from_payload(data)
+        self._cache_group.version_group[route] = model
+        return model
 
 
 def setup(lance: PokeLanceSyncClient) -> None:

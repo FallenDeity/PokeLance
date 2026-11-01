@@ -75,7 +75,9 @@ class Machine(SyncBaseExtension[MachineCache]):
         route = Endpoint.get_machine(id)
         self._validate_resource(self._cache_group.machine, id, route)
         data = self._client.request(route)
-        return self._cache_group.machine.setdefault(route, self._cache_group.machine.from_payload(data))
+        model = self._cache_group.machine.from_payload(data)
+        self._cache_group.machine[route] = model
+        return model
 
 
 def setup(lance: PokeLanceSyncClient) -> None:

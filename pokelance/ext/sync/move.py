@@ -83,7 +83,9 @@ class Move(SyncBaseExtension[MoveCache]):
         route = Endpoint.get_move(name)
         self._validate_resource(self._cache_group.move, name, route)
         data = self._client.request(route)
-        return self._cache_group.move.setdefault(route, self._cache_group.move.from_payload(data))
+        model = self._cache_group.move.from_payload(data)
+        self._cache_group.move[route] = model
+        return model
 
     def get_move_ailment(self, name: str | int) -> models.MoveAilment | None:
         """Gets a move ailment from the cache.
@@ -131,7 +133,9 @@ class Move(SyncBaseExtension[MoveCache]):
         route = Endpoint.get_move_ailment(name)
         self._validate_resource(self._cache_group.move_ailment, name, route)
         data = self._client.request(route)
-        return self._cache_group.move_ailment.setdefault(route, self._cache_group.move_ailment.from_payload(data))
+        model = self._cache_group.move_ailment.from_payload(data)
+        self._cache_group.move_ailment[route] = model
+        return model
 
     def get_move_battle_style(self, name: str | int) -> models.MoveBattleStyle | None:
         """Gets a move battle style from the cache.
@@ -179,9 +183,9 @@ class Move(SyncBaseExtension[MoveCache]):
         route = Endpoint.get_move_battle_style(name)
         self._validate_resource(self._cache_group.move_battle_style, name, route)
         data = self._client.request(route)
-        return self._cache_group.move_battle_style.setdefault(
-            route, self._cache_group.move_battle_style.from_payload(data)
-        )
+        model = self._cache_group.move_battle_style.from_payload(data)
+        self._cache_group.move_battle_style[route] = model
+        return model
 
     def get_move_category(self, name: str | int) -> models.MoveCategory | None:
         """Gets a move category from the cache.
@@ -229,7 +233,9 @@ class Move(SyncBaseExtension[MoveCache]):
         route = Endpoint.get_move_category(name)
         self._validate_resource(self._cache_group.move_category, name, route)
         data = self._client.request(route)
-        return self._cache_group.move_category.setdefault(route, self._cache_group.move_category.from_payload(data))
+        model = self._cache_group.move_category.from_payload(data)
+        self._cache_group.move_category[route] = model
+        return model
 
     def get_move_damage_class(self, name: str | int) -> models.MoveDamageClass | None:
         """Gets a move damage class from the cache.
@@ -277,9 +283,9 @@ class Move(SyncBaseExtension[MoveCache]):
         route = Endpoint.get_move_damage_class(name)
         self._validate_resource(self._cache_group.move_damage_class, name, route)
         data = self._client.request(route)
-        return self._cache_group.move_damage_class.setdefault(
-            route, self._cache_group.move_damage_class.from_payload(data)
-        )
+        model = self._cache_group.move_damage_class.from_payload(data)
+        self._cache_group.move_damage_class[route] = model
+        return model
 
     def get_move_learn_method(self, name: str | int) -> models.MoveLearnMethod | None:
         """Gets a move learn method from the cache.
@@ -327,9 +333,9 @@ class Move(SyncBaseExtension[MoveCache]):
         route = Endpoint.get_move_learn_method(name)
         self._validate_resource(self._cache_group.move_learn_method, name, route)
         data = self._client.request(route)
-        return self._cache_group.move_learn_method.setdefault(
-            route, self._cache_group.move_learn_method.from_payload(data)
-        )
+        model = self._cache_group.move_learn_method.from_payload(data)
+        self._cache_group.move_learn_method[route] = model
+        return model
 
     def get_move_target(self, name: str | int) -> models.MoveTarget | None:
         """Gets a move target from the cache.
@@ -377,7 +383,9 @@ class Move(SyncBaseExtension[MoveCache]):
         route = Endpoint.get_move_target(name)
         self._validate_resource(self._cache_group.move_target, name, route)
         data = self._client.request(route)
-        return self._cache_group.move_target.setdefault(route, self._cache_group.move_target.from_payload(data))
+        model = self._cache_group.move_target.from_payload(data)
+        self._cache_group.move_target[route] = model
+        return model
 
 
 def setup(lance: PokeLanceSyncClient) -> None:

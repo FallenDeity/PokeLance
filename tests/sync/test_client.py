@@ -15,13 +15,15 @@ Coverage
 from __future__ import annotations
 
 import random
+import threading
 import time
+from unittest.mock import Mock
 
 import pytest
 
 import pokelance
 from pokelance.constants import DEFAULT_BASE_URL, ExtensionEnum, get_base_url
-from pokelance.endpoints import Endpoint
+from pokelance.endpoints import Endpoint, Route
 from pokelance.exceptions import ImageNotFound, ResourceNotFound
 from pokelance.models import Pokemon
 
@@ -212,3 +214,66 @@ def test_sync_client_manual_close() -> None:
     assert berry.name == "cheri"
     client.close()
     assert client.http.session is None
+
+
+def test_sync_fetch_refreshes_cache(
+    sync_client: pokelance.PokeLanceSyncClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    request = Mock(side_effect=[{"name": "old"}, {"name": "new"}, RuntimeError("request failed")])
+    monkeypatch.setattr(sync_client.http, "request", request)
+    first = sync_client.berry.fetch_berry(1)
+    second = sync_client.berry.fetch_berry(1)
+    assert second is not first and second.name == "new"
+    assert sync_client.berry.get_berry(1) is second
+    assert request.call_count == 2
+    with pytest.raises(RuntimeError, match="request failed"):
+        sync_client.berry.fetch_berry(1)
+    assert sync_client.berry.get_berry(1) is second
+
+
+def test_sync_close_waits_for_endpoint_worker(monkeypatch: pytest.MonkeyPatch) -> None:
+    session = Mock()
+    factory = Mock(return_value=session)
+    monkeypatch.setattr("pokelance.http._sync.niquests.Session", factory)
+    client = pokelance.PokeLanceSyncClient(setup_logging=False)
+    started, release, shutting_down, rejected = (threading.Event() for _ in range(4))
+
+    def worker() -> None:
+        started.set()
+        assert release.wait(5)
+        try:
+            client.http.request(Route())
+        except RuntimeError:
+            rejected.set()
+
+    shutdown = client.http.loader.shutdown
+
+    def observed_shutdown() -> None:
+        shutting_down.set()
+        shutdown()
+
+    monkeypatch.setattr(client.http.loader, "shutdown", observed_shutdown)
+    client.ext_tasks.clear()
+    client.ext_tasks.append((worker, "test"))
+    client.http.connect()
+    closer = threading.Thread(target=client.close)
+    try:
+        assert started.wait(2)
+        closer.start()
+        assert shutting_down.wait(2)
+        closer.join(timeout=0.05)
+        assert closer.is_alive(), "close() must wait for the running worker"
+        session.close.assert_not_called()
+    finally:
+        release.set()
+        if closer.ident is not None:
+            closer.join(timeout=3)
+        client.close()
+
+    assert not closer.is_alive(), "Worker shutdown must not deadlock"
+    assert rejected.is_set()
+    assert not client.http.is_connected
+    assert client.http.loader.is_ready
+    assert factory.call_count == 1
+    session.request.assert_not_called()
+    session.close.assert_called_once()

@@ -79,7 +79,9 @@ class Berry(SyncBaseExtension[BerryCache]):
         route = Endpoint.get_berry(name)
         self._validate_resource(self._cache_group.berry, name, route)
         data = self._client.request(route)
-        return self._cache_group.berry.setdefault(route, self._cache_group.berry.from_payload(data))
+        model = self._cache_group.berry.from_payload(data)
+        self._cache_group.berry[route] = model
+        return model
 
     def get_berry_firmness(self, name: str | int) -> models.BerryFirmness | None:
         """Gets a berry firmness from the cache.
@@ -127,7 +129,9 @@ class Berry(SyncBaseExtension[BerryCache]):
         route = Endpoint.get_berry_firmness(name)
         self._validate_resource(self._cache_group.berry_firmness, name, route)
         data = self._client.request(route)
-        return self._cache_group.berry_firmness.setdefault(route, self._cache_group.berry_firmness.from_payload(data))
+        model = self._cache_group.berry_firmness.from_payload(data)
+        self._cache_group.berry_firmness[route] = model
+        return model
 
     def get_berry_flavor(self, name: str | int) -> models.BerryFlavor | None:
         """Gets a berry flavor from the cache.
@@ -175,7 +179,9 @@ class Berry(SyncBaseExtension[BerryCache]):
         route = Endpoint.get_berry_flavor(name)
         self._validate_resource(self._cache_group.berry_flavor, name, route)
         data = self._client.request(route)
-        return self._cache_group.berry_flavor.setdefault(route, self._cache_group.berry_flavor.from_payload(data))
+        model = self._cache_group.berry_flavor.from_payload(data)
+        self._cache_group.berry_flavor[route] = model
+        return model
 
 
 def setup(lance: PokeLanceSyncClient) -> None:

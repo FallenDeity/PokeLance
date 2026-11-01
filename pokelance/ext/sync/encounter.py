@@ -79,9 +79,9 @@ class Encounter(SyncBaseExtension[EncounterCache]):
         route = Endpoint.get_encounter_method(name)
         self._validate_resource(self._cache_group.encounter_method, name, route)
         data = self._client.request(route)
-        return self._cache_group.encounter_method.setdefault(
-            route, self._cache_group.encounter_method.from_payload(data)
-        )
+        model = self._cache_group.encounter_method.from_payload(data)
+        self._cache_group.encounter_method[route] = model
+        return model
 
     def get_encounter_condition(self, name: str | int) -> models.EncounterCondition | None:
         """Gets a encounter condition from the cache.
@@ -129,9 +129,9 @@ class Encounter(SyncBaseExtension[EncounterCache]):
         route = Endpoint.get_encounter_condition(name)
         self._validate_resource(self._cache_group.encounter_condition, name, route)
         data = self._client.request(route)
-        return self._cache_group.encounter_condition.setdefault(
-            route, self._cache_group.encounter_condition.from_payload(data)
-        )
+        model = self._cache_group.encounter_condition.from_payload(data)
+        self._cache_group.encounter_condition[route] = model
+        return model
 
     def get_encounter_condition_value(self, name: str | int) -> models.EncounterConditionValue | None:
         """Gets a encounter condition value from the cache.
@@ -179,9 +179,9 @@ class Encounter(SyncBaseExtension[EncounterCache]):
         route = Endpoint.get_encounter_condition_value(name)
         self._validate_resource(self._cache_group.encounter_condition_value, name, route)
         data = self._client.request(route)
-        return self._cache_group.encounter_condition_value.setdefault(
-            route, self._cache_group.encounter_condition_value.from_payload(data)
-        )
+        model = self._cache_group.encounter_condition_value.from_payload(data)
+        self._cache_group.encounter_condition_value[route] = model
+        return model
 
 
 def setup(lance: PokeLanceSyncClient) -> None:

@@ -30,7 +30,7 @@ class SyncEndpointLoader:
         self._executor: concurrent.futures.ThreadPoolExecutor | None = None
         self._futures: set[concurrent.futures.Future[None]] = set()
         self._remaining: int = 0
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         self._ready_event = threading.Event()
         self._ready_event.set()
         self._scheduled: bool = False
@@ -91,23 +91,34 @@ class SyncEndpointLoader:
                 message = f"Extension {name} endpoints ({num + 1}/{total})"
                 future = self._executor.submit(self._load_ext, fn, message)
                 self._futures.add(future)
-                future.add_done_callback(self._futures.discard)
+                future.add_done_callback(self._discard_future)
             self._client.ext_tasks.clear()
             if self._remaining == 0:
                 self._ready_event.set()
 
-    def shutdown(self) -> None:
-        """Cancels and shuts down the loader thread pool."""
+    def _discard_future(self, future: concurrent.futures.Future[None]) -> None:
         with self._lock:
-            count = sum(1 for f in self._futures if not f.done())
+            self._futures.discard(future)
+
+    def shutdown(self) -> None:
+        """Cancels queued work and waits for running endpoint workers to finish."""
+        with self._lock:
+            futures = list(self._futures)
+            executor = self._executor
+            self._executor = None
+            count = sum(1 for f in futures if not f.done())
             if count > 0:
                 logger.warning(f"Cancelling {count} in-flight endpoint loading tasks...")
-            for future in list(self._futures):
-                future.cancel()
-            if self._executor is not None:
-                logger.debug("Shutting down endpoint loader thread pool...")
-                self._executor.shutdown(wait=False, cancel_futures=True)
-                self._executor = None
+        # Workers and completion callbacks need the loader lock while exiting.
+        for future in futures:
+            future.cancel()
+        if executor is not None:
+            logger.debug("Shutting down endpoint loader thread pool...")
+            executor.shutdown(wait=True, cancel_futures=True)
+        with self._lock:
+            self._futures.clear()
+            self._remaining = 0
+            self._ready_event.set()
 
 
 @t.final
@@ -159,14 +170,15 @@ class SyncHttpClient(BaseHttpClient["PokeLanceSyncClient", niquests.Session, Syn
             if self._closing:
                 return
             self._closing = True
-            try:
-                session_to_close = self.session if self._session_owner else None
-                self.session = None
-                if session_to_close:
-                    logger.debug("Closing internal sync HTTP session...")
-                    session_to_close.close()
-                self._loader.shutdown()
-            finally:
+        try:
+            self._loader.shutdown()
+            session_to_close = self.session if self._session_owner else None
+            self.session = None
+            if session_to_close:
+                logger.debug("Closing internal sync HTTP session...")
+                session_to_close.close()
+        finally:
+            with self._lock:
                 self._is_ready = False
                 self._closing = False
 

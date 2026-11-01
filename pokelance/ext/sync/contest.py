@@ -79,7 +79,9 @@ class Contest(SyncBaseExtension[ContestCache]):
         route = Endpoint.get_contest_type(name)
         self._validate_resource(self._cache_group.contest_type, name, route)
         data = self._client.request(route)
-        return self._cache_group.contest_type.setdefault(route, self._cache_group.contest_type.from_payload(data))
+        model = self._cache_group.contest_type.from_payload(data)
+        self._cache_group.contest_type[route] = model
+        return model
 
     def get_contest_effect(self, id: int) -> models.ContestEffect | None:
         """Gets a contest effect from the cache.
@@ -127,7 +129,9 @@ class Contest(SyncBaseExtension[ContestCache]):
         route = Endpoint.get_contest_effect(id)
         self._validate_resource(self._cache_group.contest_effect, id, route)
         data = self._client.request(route)
-        return self._cache_group.contest_effect.setdefault(route, self._cache_group.contest_effect.from_payload(data))
+        model = self._cache_group.contest_effect.from_payload(data)
+        self._cache_group.contest_effect[route] = model
+        return model
 
     def get_super_contest_effect(self, id: int) -> models.SuperContestEffect | None:
         """Gets a super contest effect from the cache.
@@ -175,9 +179,9 @@ class Contest(SyncBaseExtension[ContestCache]):
         route = Endpoint.get_super_contest_effect(id)
         self._validate_resource(self._cache_group.super_contest_effect, id, route)
         data = self._client.request(route)
-        return self._cache_group.super_contest_effect.setdefault(
-            route, self._cache_group.super_contest_effect.from_payload(data)
-        )
+        model = self._cache_group.super_contest_effect.from_payload(data)
+        self._cache_group.super_contest_effect[route] = model
+        return model
 
 
 def setup(lance: PokeLanceSyncClient) -> None:

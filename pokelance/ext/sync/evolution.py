@@ -79,7 +79,9 @@ class Evolution(SyncBaseExtension[EvolutionCache]):
         route = Endpoint.get_evolution_chain(id)
         self._validate_resource(self._cache_group.evolution_chain, id, route)
         data = self._client.request(route)
-        return self._cache_group.evolution_chain.setdefault(route, self._cache_group.evolution_chain.from_payload(data))
+        model = self._cache_group.evolution_chain.from_payload(data)
+        self._cache_group.evolution_chain[route] = model
+        return model
 
     def get_evolution_trigger(self, name: str | int) -> models.EvolutionTrigger | None:
         """Gets a evolution trigger from the cache.
@@ -127,9 +129,9 @@ class Evolution(SyncBaseExtension[EvolutionCache]):
         route = Endpoint.get_evolution_trigger(name)
         self._validate_resource(self._cache_group.evolution_trigger, name, route)
         data = self._client.request(route)
-        return self._cache_group.evolution_trigger.setdefault(
-            route, self._cache_group.evolution_trigger.from_payload(data)
-        )
+        model = self._cache_group.evolution_trigger.from_payload(data)
+        self._cache_group.evolution_trigger[route] = model
+        return model
 
     def get_evolution_variable(self, name: str | int) -> models.EvolutionVariable | None:
         """Gets a evolution variable from the cache.
@@ -177,9 +179,9 @@ class Evolution(SyncBaseExtension[EvolutionCache]):
         route = Endpoint.get_evolution_variable(name)
         self._validate_resource(self._cache_group.evolution_variable, name, route)
         data = self._client.request(route)
-        return self._cache_group.evolution_variable.setdefault(
-            route, self._cache_group.evolution_variable.from_payload(data)
-        )
+        model = self._cache_group.evolution_variable.from_payload(data)
+        self._cache_group.evolution_variable[route] = model
+        return model
 
 
 def setup(lance: PokeLanceSyncClient) -> None:

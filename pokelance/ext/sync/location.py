@@ -80,7 +80,9 @@ class Location(SyncBaseExtension[LocationCache]):
         route = Endpoint.get_location(name)
         self._validate_resource(self._cache_group.location, name, route)
         data = self._client.request(route)
-        return self._cache_group.location.setdefault(route, self._cache_group.location.from_payload(data))
+        model = self._cache_group.location.from_payload(data)
+        self._cache_group.location[route] = model
+        return model
 
     def get_location_area(self, name: str | int) -> models.LocationArea | None:
         """Gets a location area from the cache.
@@ -128,7 +130,9 @@ class Location(SyncBaseExtension[LocationCache]):
         route = Endpoint.get_location_area(name)
         self._validate_resource(self._cache_group.location_area, name, route)
         data = self._client.request(route)
-        return self._cache_group.location_area.setdefault(route, self._cache_group.location_area.from_payload(data))
+        model = self._cache_group.location_area.from_payload(data)
+        self._cache_group.location_area[route] = model
+        return model
 
     def get_pal_park_area(self, name: str | int) -> models.PalParkArea | None:
         """Gets a pal park area from the cache.
@@ -176,7 +180,9 @@ class Location(SyncBaseExtension[LocationCache]):
         route = Endpoint.get_pal_park_area(name)
         self._validate_resource(self._cache_group.pal_park_area, name, route)
         data = self._client.request(route)
-        return self._cache_group.pal_park_area.setdefault(route, self._cache_group.pal_park_area.from_payload(data))
+        model = self._cache_group.pal_park_area.from_payload(data)
+        self._cache_group.pal_park_area[route] = model
+        return model
 
     def get_region(self, name: str | int) -> models.Region | None:
         """Gets a region from the cache.
@@ -224,7 +230,9 @@ class Location(SyncBaseExtension[LocationCache]):
         route = Endpoint.get_region(name)
         self._validate_resource(self._cache_group.region, name, route)
         data = self._client.request(route)
-        return self._cache_group.region.setdefault(route, self._cache_group.region.from_payload(data))
+        model = self._cache_group.region.from_payload(data)
+        self._cache_group.region[route] = model
+        return model
 
 
 def setup(lance: PokeLanceSyncClient) -> None:

@@ -82,7 +82,9 @@ class Item(SyncBaseExtension[ItemCache]):
         route = Endpoint.get_item(name)
         self._validate_resource(self._cache_group.item, name, route)
         data = self._client.request(route)
-        return self._cache_group.item.setdefault(route, self._cache_group.item.from_payload(data))
+        model = self._cache_group.item.from_payload(data)
+        self._cache_group.item[route] = model
+        return model
 
     def get_item_attribute(self, name: str | int) -> models.ItemAttribute | None:
         """Gets a item attribute from the cache.
@@ -130,7 +132,9 @@ class Item(SyncBaseExtension[ItemCache]):
         route = Endpoint.get_item_attribute(name)
         self._validate_resource(self._cache_group.item_attribute, name, route)
         data = self._client.request(route)
-        return self._cache_group.item_attribute.setdefault(route, self._cache_group.item_attribute.from_payload(data))
+        model = self._cache_group.item_attribute.from_payload(data)
+        self._cache_group.item_attribute[route] = model
+        return model
 
     def get_item_category(self, name: str | int) -> models.ItemCategory | None:
         """Gets a item category from the cache.
@@ -178,7 +182,9 @@ class Item(SyncBaseExtension[ItemCache]):
         route = Endpoint.get_item_category(name)
         self._validate_resource(self._cache_group.item_category, name, route)
         data = self._client.request(route)
-        return self._cache_group.item_category.setdefault(route, self._cache_group.item_category.from_payload(data))
+        model = self._cache_group.item_category.from_payload(data)
+        self._cache_group.item_category[route] = model
+        return model
 
     def get_item_fling_effect(self, name: str | int) -> models.ItemFlingEffect | None:
         """Gets a item fling effect from the cache.
@@ -226,9 +232,9 @@ class Item(SyncBaseExtension[ItemCache]):
         route = Endpoint.get_item_fling_effect(name)
         self._validate_resource(self._cache_group.item_fling_effect, name, route)
         data = self._client.request(route)
-        return self._cache_group.item_fling_effect.setdefault(
-            route, self._cache_group.item_fling_effect.from_payload(data)
-        )
+        model = self._cache_group.item_fling_effect.from_payload(data)
+        self._cache_group.item_fling_effect[route] = model
+        return model
 
     def get_item_pocket(self, name: str | int) -> models.ItemPocket | None:
         """Gets a item pocket from the cache.
@@ -276,7 +282,9 @@ class Item(SyncBaseExtension[ItemCache]):
         route = Endpoint.get_item_pocket(name)
         self._validate_resource(self._cache_group.item_pocket, name, route)
         data = self._client.request(route)
-        return self._cache_group.item_pocket.setdefault(route, self._cache_group.item_pocket.from_payload(data))
+        model = self._cache_group.item_pocket.from_payload(data)
+        self._cache_group.item_pocket[route] = model
+        return model
 
     def get_currency(self, name: str | int) -> models.Currency | None:
         """Gets a currency from the cache.
@@ -324,7 +332,9 @@ class Item(SyncBaseExtension[ItemCache]):
         route = Endpoint.get_currency(name)
         self._validate_resource(self._cache_group.currency, name, route)
         data = self._client.request(route)
-        return self._cache_group.currency.setdefault(route, self._cache_group.currency.from_payload(data))
+        model = self._cache_group.currency.from_payload(data)
+        self._cache_group.currency[route] = model
+        return model
 
 
 def setup(lance: PokeLanceSyncClient) -> None:

@@ -10,12 +10,11 @@ Every category (`berry`, `pokemon`, `move`, ...) provides two methods:
 flowchart LR
     A["client.berry.get_berry('cheri')"] -->|cache hit| B(Berry instance)
     A -->|cache miss| C[None]
-    D["client.berry.fetch_berry('cheri')"] -->|cache hit| B
-    D -->|cache miss| E[GET pokeapi.co/api/v2/berry/cheri] --> F[cache the result] --> B
+    D["client.berry.fetch_berry('cheri')"] --> E[GET pokeapi.co/api/v2/berry/cheri] --> F[replace cached result] --> B
 ```
 
 - **`get_<category>(name_or_id)`**: Synchronous, cache-only. Returns the cached model or `None` if not cached yet. Never touches the network.
-- **`fetch_<category>(name_or_id)`**: Cache-or-network. Returns the cached model if present, otherwise makes an HTTP request, caches the parsed model, and returns it. (Async in `PokeLanceAsyncClient`, Sync in `PokeLanceSyncClient`).
+- **`fetch_<category>(name_or_id)`**: Always makes a fresh HTTP request, replaces the cached entry for that route, and returns the new model. Failed requests or parsing leave the previous cached entry intact. (Async in `PokeLanceAsyncClient`, Sync in `PokeLanceSyncClient`).
 
 === "Async"
 
@@ -134,6 +133,6 @@ Internally, this is powered by [`ExtensionEnum.validate_url`][pokelance.constant
 | Need                                             | Async Method                                  | Sync Method                                 |
 | ------------------------------------------------ | --------------------------------------------- | ------------------------------------------- |
 | Cache-only lookup, no network                    | `client.<ext>.get_<category>(...)`            | `client.<ext>.get_<category>(...)`          |
-| Network fallback, single known extension         | `await client.<ext>.fetch_<category>(...)`    | `client.<ext>.fetch_<category>(...)`        |
+| Fresh network request, single known extension    | `await client.<ext>.fetch_<category>(...)`    | `client.<ext>.fetch_<category>(...)`        |
 | Extension/category chosen dynamically at runtime | `await client.getch_data(ext, category, id_)` | `client.getch_data(ext, category, id_)`     |
 | Fetch model directly from PokéAPI resource URL   | `await client.from_url(url)`                  | `client.from_url(url)`                      |

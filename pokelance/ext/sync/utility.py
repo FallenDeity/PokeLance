@@ -76,7 +76,9 @@ class Utility(SyncBaseExtension[UtilityCache]):
         route = Endpoint.get_language(id)
         self._validate_resource(self._cache_group.language, id, route)
         data = self._client.request(route)
-        return self._cache_group.language.setdefault(route, self._cache_group.language.from_payload(data))
+        model = self._cache_group.language.from_payload(data)
+        self._cache_group.language[route] = model
+        return model
 
     def get_api_metadata(self) -> models.APIMetadata | None:
         """Gets a api metadata from the cache.
@@ -112,7 +114,9 @@ class Utility(SyncBaseExtension[UtilityCache]):
         ```"""
         route = Endpoint.get_api_metadata()
         data = self._client.request(route)
-        return self._cache_group.api_metadata.setdefault(route, self._cache_group.api_metadata.from_payload(data))
+        model = self._cache_group.api_metadata.from_payload(data)
+        self._cache_group.api_metadata[route] = model
+        return model
 
 
 def setup(lance: PokeLanceSyncClient) -> None:

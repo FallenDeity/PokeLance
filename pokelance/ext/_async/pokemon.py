@@ -93,7 +93,9 @@ class Pokemon(AsyncBaseExtension[PokemonCache]):
         route = Endpoint.get_ability(name)
         self._validate_resource(self._cache_group.ability, name, route)
         data = await self._client.request(route)
-        return self._cache_group.ability.setdefault(route, self._cache_group.ability.from_payload(data))
+        model = self._cache_group.ability.from_payload(data)
+        self._cache_group.ability[route] = model
+        return model
 
     def get_characteristic(self, id: int) -> models.Characteristic | None:
         """Gets a characteristic from the cache.
@@ -141,7 +143,9 @@ class Pokemon(AsyncBaseExtension[PokemonCache]):
         route = Endpoint.get_characteristic(id)
         self._validate_resource(self._cache_group.characteristic, id, route)
         data = await self._client.request(route)
-        return self._cache_group.characteristic.setdefault(route, self._cache_group.characteristic.from_payload(data))
+        model = self._cache_group.characteristic.from_payload(data)
+        self._cache_group.characteristic[route] = model
+        return model
 
     def get_egg_group(self, name: str | int) -> models.EggGroup | None:
         """Gets a egg group from the cache.
@@ -189,7 +193,9 @@ class Pokemon(AsyncBaseExtension[PokemonCache]):
         route = Endpoint.get_egg_group(name)
         self._validate_resource(self._cache_group.egg_group, name, route)
         data = await self._client.request(route)
-        return self._cache_group.egg_group.setdefault(route, self._cache_group.egg_group.from_payload(data))
+        model = self._cache_group.egg_group.from_payload(data)
+        self._cache_group.egg_group[route] = model
+        return model
 
     def get_gender(self, name: str | int) -> models.Gender | None:
         """Gets a gender from the cache.
@@ -237,7 +243,9 @@ class Pokemon(AsyncBaseExtension[PokemonCache]):
         route = Endpoint.get_gender(name)
         self._validate_resource(self._cache_group.gender, name, route)
         data = await self._client.request(route)
-        return self._cache_group.gender.setdefault(route, self._cache_group.gender.from_payload(data))
+        model = self._cache_group.gender.from_payload(data)
+        self._cache_group.gender[route] = model
+        return model
 
     def get_growth_rate(self, name: str | int) -> models.GrowthRate | None:
         """Gets a growth rate from the cache.
@@ -285,7 +293,9 @@ class Pokemon(AsyncBaseExtension[PokemonCache]):
         route = Endpoint.get_growth_rate(name)
         self._validate_resource(self._cache_group.growth_rate, name, route)
         data = await self._client.request(route)
-        return self._cache_group.growth_rate.setdefault(route, self._cache_group.growth_rate.from_payload(data))
+        model = self._cache_group.growth_rate.from_payload(data)
+        self._cache_group.growth_rate[route] = model
+        return model
 
     def get_nature(self, name: str | int) -> models.Nature | None:
         """Gets a nature from the cache.
@@ -333,7 +343,9 @@ class Pokemon(AsyncBaseExtension[PokemonCache]):
         route = Endpoint.get_nature(name)
         self._validate_resource(self._cache_group.nature, name, route)
         data = await self._client.request(route)
-        return self._cache_group.nature.setdefault(route, self._cache_group.nature.from_payload(data))
+        model = self._cache_group.nature.from_payload(data)
+        self._cache_group.nature[route] = model
+        return model
 
     def get_pokeathlon_stat(self, name: str | int) -> models.PokeathlonStat | None:
         """Gets a pokeathlon stat from the cache.
@@ -381,7 +393,9 @@ class Pokemon(AsyncBaseExtension[PokemonCache]):
         route = Endpoint.get_pokeathlon_stat(name)
         self._validate_resource(self._cache_group.pokeathlon_stat, name, route)
         data = await self._client.request(route)
-        return self._cache_group.pokeathlon_stat.setdefault(route, self._cache_group.pokeathlon_stat.from_payload(data))
+        model = self._cache_group.pokeathlon_stat.from_payload(data)
+        self._cache_group.pokeathlon_stat[route] = model
+        return model
 
     def get_pokemon(self, name: str | int) -> models.Pokemon | None:
         """Gets a pokemon from the cache.
@@ -429,7 +443,9 @@ class Pokemon(AsyncBaseExtension[PokemonCache]):
         route = Endpoint.get_pokemon(name)
         self._validate_resource(self._cache_group.pokemon, name, route)
         data = await self._client.request(route)
-        return self._cache_group.pokemon.setdefault(route, self._cache_group.pokemon.from_payload(data))
+        model = self._cache_group.pokemon.from_payload(data)
+        self._cache_group.pokemon[route] = model
+        return model
 
     def get_pokemon_color(self, name: str | int) -> models.PokemonColor | None:
         """Gets a pokemon color from the cache.
@@ -477,7 +493,9 @@ class Pokemon(AsyncBaseExtension[PokemonCache]):
         route = Endpoint.get_pokemon_color(name)
         self._validate_resource(self._cache_group.pokemon_color, name, route)
         data = await self._client.request(route)
-        return self._cache_group.pokemon_color.setdefault(route, self._cache_group.pokemon_color.from_payload(data))
+        model = self._cache_group.pokemon_color.from_payload(data)
+        self._cache_group.pokemon_color[route] = model
+        return model
 
     def get_pokemon_form(self, name: str | int) -> models.PokemonForm | None:
         """Gets a pokemon form from the cache.
@@ -525,7 +543,9 @@ class Pokemon(AsyncBaseExtension[PokemonCache]):
         route = Endpoint.get_pokemon_form(name)
         self._validate_resource(self._cache_group.pokemon_form, name, route)
         data = await self._client.request(route)
-        return self._cache_group.pokemon_form.setdefault(route, self._cache_group.pokemon_form.from_payload(data))
+        model = self._cache_group.pokemon_form.from_payload(data)
+        self._cache_group.pokemon_form[route] = model
+        return model
 
     def get_pokemon_habitat(self, name: str | int) -> models.PokemonHabitats | None:
         """Gets a pokemon habitat from the cache.
@@ -573,7 +593,9 @@ class Pokemon(AsyncBaseExtension[PokemonCache]):
         route = Endpoint.get_pokemon_habitat(name)
         self._validate_resource(self._cache_group.pokemon_habitat, name, route)
         data = await self._client.request(route)
-        return self._cache_group.pokemon_habitat.setdefault(route, self._cache_group.pokemon_habitat.from_payload(data))
+        model = self._cache_group.pokemon_habitat.from_payload(data)
+        self._cache_group.pokemon_habitat[route] = model
+        return model
 
     def get_pokemon_shape(self, name: str | int) -> models.PokemonShape | None:
         """Gets a pokemon shape from the cache.
@@ -621,7 +643,9 @@ class Pokemon(AsyncBaseExtension[PokemonCache]):
         route = Endpoint.get_pokemon_shape(name)
         self._validate_resource(self._cache_group.pokemon_shape, name, route)
         data = await self._client.request(route)
-        return self._cache_group.pokemon_shape.setdefault(route, self._cache_group.pokemon_shape.from_payload(data))
+        model = self._cache_group.pokemon_shape.from_payload(data)
+        self._cache_group.pokemon_shape[route] = model
+        return model
 
     def get_pokemon_species(self, name: str | int) -> models.PokemonSpecies | None:
         """Gets a pokemon species from the cache.
@@ -669,7 +693,9 @@ class Pokemon(AsyncBaseExtension[PokemonCache]):
         route = Endpoint.get_pokemon_species(name)
         self._validate_resource(self._cache_group.pokemon_species, name, route)
         data = await self._client.request(route)
-        return self._cache_group.pokemon_species.setdefault(route, self._cache_group.pokemon_species.from_payload(data))
+        model = self._cache_group.pokemon_species.from_payload(data)
+        self._cache_group.pokemon_species[route] = model
+        return model
 
     def get_stat(self, name: str | int) -> models.Stat | None:
         """Gets a stat from the cache.
@@ -717,7 +743,9 @@ class Pokemon(AsyncBaseExtension[PokemonCache]):
         route = Endpoint.get_stat(name)
         self._validate_resource(self._cache_group.stat, name, route)
         data = await self._client.request(route)
-        return self._cache_group.stat.setdefault(route, self._cache_group.stat.from_payload(data))
+        model = self._cache_group.stat.from_payload(data)
+        self._cache_group.stat[route] = model
+        return model
 
     def get_type(self, name: str | int) -> models.Type | None:
         """Gets a type from the cache.
@@ -765,7 +793,9 @@ class Pokemon(AsyncBaseExtension[PokemonCache]):
         route = Endpoint.get_type(name)
         self._validate_resource(self._cache_group.type, name, route)
         data = await self._client.request(route)
-        return self._cache_group.type.setdefault(route, self._cache_group.type.from_payload(data))
+        model = self._cache_group.type.from_payload(data)
+        self._cache_group.type[route] = model
+        return model
 
     def get_location_area_encounter(self, name: str | int) -> list[models.LocationAreaEncounter] | None:
         """Gets a location area encounter from the cache.
@@ -813,9 +843,9 @@ class Pokemon(AsyncBaseExtension[PokemonCache]):
         route = Endpoint.get_location_area_encounter(name)
         self._validate_resource(self._cache_group.location_area_encounter, name, route)
         data = await self._client.request(route)
-        return self._cache_group.location_area_encounter.setdefault(
-            route, self._cache_group.location_area_encounter.from_payload(data)
-        )
+        model = self._cache_group.location_area_encounter.from_payload(data)
+        self._cache_group.location_area_encounter[route] = model
+        return model
 
 
 def setup(lance: PokeLanceAsyncClient) -> None:

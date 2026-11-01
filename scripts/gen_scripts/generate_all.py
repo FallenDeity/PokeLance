@@ -587,19 +587,15 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path, w
             keywords=[],
         )
 
-        # self._cache_group.<attr>.setdefault(route, self._cache_group.<attr>.from_payload(data))
-        setdefault_call = ast.Call(
-            func=ast.Attribute(
-                value=ast.Attribute(
-                    value=ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="_cache_group", ctx=ast.Load()),
-                    attr=cat.cache_attr,
-                    ctx=ast.Load(),
-                ),
-                attr="setdefault",
+        # self._cache_group.<attr>[route] = model
+        cache_target = ast.Subscript(
+            value=ast.Attribute(
+                value=ast.Attribute(value=ast.Name(id="self", ctx=ast.Load()), attr="_cache_group", ctx=ast.Load()),
+                attr=cat.cache_attr,
                 ctx=ast.Load(),
             ),
-            args=[ast.Name(id="route", ctx=ast.Load()), from_payload_call],
-            keywords=[],
+            slice=ast.Name(id="route", ctx=ast.Load()),
+            ctx=ast.Store(),
         )
 
         fetch_call_prefix = "await " if is_async else ""
@@ -667,8 +663,12 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path, w
                 value=fetch_data_expr,
             )
         )
-        # return self._cache_group.<attr>.setdefault(route, self._cache_group.<attr>.from_payload(data))
-        fetch_body.append(ast.Return(value=setdefault_call))
+        # Parse before replacing the cached value so failed fetches preserve old data.
+        fetch_body.append(
+            ast.Assign(targets=[ast.Name(id="model", ctx=ast.Store())], value=from_payload_call)
+        )
+        fetch_body.append(ast.Assign(targets=[cache_target], value=ast.Name(id="model", ctx=ast.Load())))
+        fetch_body.append(ast.Return(value=ast.Name(id="model", ctx=ast.Load())))
 
         if is_async:
             class_body.append(
