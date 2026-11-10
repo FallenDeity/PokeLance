@@ -142,7 +142,7 @@ class SyncCache(BaseCacheState[_KT, _VT, "PokeLanceSyncClient"], t.Generic[_KT, 
         if not self._endpoints_cached or self._model is None:
             raise RuntimeError("Endpoints not loaded or model not set")
         logger.info(f"Loading {self._name}...")
-        self._max_size = len(self._endpoints)
+        self._max_size = max(self._max_size, len(self._endpoints))
         for endpoint in self._endpoints.values():
             route = Route.from_raw_url(endpoint.url)
             data = self.get(t.cast("_KT", route), None)
@@ -170,10 +170,12 @@ class SyncCache(BaseCacheState[_KT, _VT, "PokeLanceSyncClient"], t.Generic[_KT, 
         client.cache.berry.berry.load_all_batch(batch_size=15)
         ```
         """
+        if batch_size <= 0:
+            raise ValueError("batch_size must be greater than 0")
         if not self._endpoints_cached or self._model is None:
             raise RuntimeError("Endpoints not loaded or model not set")
         logger.info(f"Loading {self._name}...")
-        self._max_size = len(self._endpoints)
+        self._max_size = max(self._max_size, len(self._endpoints))
         endpoints = list(self._endpoints.values())
         total_endpoints = len(endpoints)
         for i in range(0, total_endpoints, batch_size):

@@ -21,7 +21,6 @@ import ast
 import inspect
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 # Add current script directory and project root to sys.path
@@ -44,18 +43,38 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 # ---------------------------------------------------------------------------
 
 
-def format_tree(root: Path) -> None:
-    """Run ruff check --fix and ruff format on the target tree."""
-    subprocess.run(
-        [sys.executable, "-m", "ruff", "check", str(root), "--fix", "--unsafe-fixes"],
-        capture_output=True,
-        text=True,
-    )
-    subprocess.run(
-        [sys.executable, "-m", "ruff", "format", str(root)],
-        capture_output=True,
-        text=True,
-    )
+def format_source(source: str, path: Path) -> str:
+    """Normalize generated source and report failures against its repository path."""
+    filename = path.relative_to(PROJECT_ROOT).as_posix()
+    for command in (
+        ["check", "--fix-only", "--unsafe-fixes"],
+        ["format"],
+        ["check", "--output-format=concise"],
+    ):
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "ruff",
+                *command,
+                "--config",
+                str(PROJECT_ROOT / "ruff.toml"),
+                "--stdin-filename",
+                filename,
+                "-",
+            ],
+            input=source,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            cwd=PROJECT_ROOT,
+        )
+        if result.returncode:
+            details = "\n".join(output.strip() for output in (result.stdout, result.stderr) if output.strip())
+            raise RuntimeError(f"Ruff failed for {filename}:\n{details}")
+        if command[0] == "format" or "--fix-only" in command:
+            source = result.stdout
+    return source
 
 
 def format_docstring(doc: str, indent_spaces: int = 4) -> str:
@@ -629,8 +648,11 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path, w
         "# DO NOT EDIT MANUALLY\n"
         "# Edit scripts/gen_scripts/_registry.py instead.\n\n"
     )
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(header + unparsed + "\n", encoding="utf-8")
+    source = format_source(header + unparsed + "\n", output_path)
+    if write:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(source, encoding="utf-8")
+    return source
 
 
 # ---------------------------------------------------------------------------
@@ -638,7 +660,7 @@ def generate_extension(spec: ExtensionSpec, is_async: bool, output_path: Path, w
 # ---------------------------------------------------------------------------
 
 
-def generate_cache_manager(is_async: bool, output_path: Path) -> None:
+def generate_cache_manager(is_async: bool, output_path: Path, write: bool = True) -> str:
     """Generate the full cache manager file using Python AST and ast.unparse()."""
     base_cache_cls = "AsyncCache" if is_async else "SyncCache"
     base_agg_cls = "AsyncCacheGroup" if is_async else "SyncCacheGroup"
@@ -1018,8 +1040,11 @@ Examples
         "# DO NOT EDIT MANUALLY\n"
         "# Edit scripts/gen_scripts/_registry.py instead.\n\n"
     )
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(header + unparsed + "\n", encoding="utf-8")
+    source = format_source(header + unparsed + "\n", output_path)
+    if write:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(source, encoding="utf-8")
+    return source
 
 
 # ---------------------------------------------------------------------------
@@ -1033,9 +1058,10 @@ def generate_all_to_root(
     generate_ext: bool,
     do_async: bool,
     do_sync: bool,
-) -> list[tuple[Path, Path]]:
-    """Generate targets into a root directory. Returns list of (generated_path, repo_path)."""
-    pairs: list[tuple[Path, Path]] = []
+    write: bool = True,
+) -> list[tuple[str, Path]]:
+    """Generate targets into a root directory. Returns list of (generated_source, repo_path)."""
+    pairs: list[tuple[str, Path]] = []
 
     async_cache_dir = root / "pokelance" / "cache" / "_async"
     sync_cache_dir = root / "pokelance" / "cache" / "sync"
@@ -1050,25 +1076,25 @@ def generate_all_to_root(
     if generate_cache:
         if do_async:
             p = async_cache_dir / "manager.py"
-            generate_cache_manager(is_async=True, output_path=p)
-            pairs.append((p, repo_async_cache / "manager.py"))
+            source = generate_cache_manager(is_async=True, output_path=p, write=write)
+            pairs.append((source, repo_async_cache / "manager.py"))
 
         if do_sync:
             p = sync_cache_dir / "manager.py"
-            generate_cache_manager(is_async=False, output_path=p)
-            pairs.append((p, repo_sync_cache / "manager.py"))
+            source = generate_cache_manager(is_async=False, output_path=p, write=write)
+            pairs.append((source, repo_sync_cache / "manager.py"))
 
     if generate_ext:
         for spec in EXTENSIONS:
             if do_async:
                 p = async_ext_dir / f"{spec.module_name}.py"
-                generate_extension(spec, is_async=True, output_path=p)
-                pairs.append((p, repo_async_ext / f"{spec.module_name}.py"))
+                source = generate_extension(spec, is_async=True, output_path=p, write=write)
+                pairs.append((source, repo_async_ext / f"{spec.module_name}.py"))
 
             if do_sync:
                 p = sync_ext_dir / f"{spec.module_name}.py"
-                generate_extension(spec, is_async=False, output_path=p)
-                pairs.append((p, repo_sync_ext / f"{spec.module_name}.py"))
+                source = generate_extension(spec, is_async=False, output_path=p, write=write)
+                pairs.append((source, repo_sync_ext / f"{spec.module_name}.py"))
 
     return pairs
 
@@ -1092,29 +1118,28 @@ def main() -> int:
     do_async = not args.sync_only
     do_sync = not args.async_only
 
+    try:
+        pairs = generate_all_to_root(
+            PROJECT_ROOT, generate_cache, generate_ext, do_async, do_sync, write=not args.check
+        )
+    except RuntimeError as error:
+        print(error, file=sys.stderr)
+        return 1
+
     if args.check:
-        with tempfile.TemporaryDirectory() as tmpdir:
-            tmp_root = Path(tmpdir)
-            pairs = generate_all_to_root(tmp_root, generate_cache, generate_ext, do_async, do_sync)
-            format_tree(tmp_root)
+        all_ok = True
+        for source, repo_path in pairs:
+            if not repo_path.exists() or repo_path.read_text(encoding="utf-8") != source:
+                print(f"STALE: {repo_path.relative_to(PROJECT_ROOT).as_posix()}", file=sys.stderr)
+                all_ok = False
 
-            all_ok = True
-            for tmp_path, repo_path in pairs:
-                if not repo_path.exists() or repo_path.read_text(encoding="utf-8") != tmp_path.read_text(
-                    encoding="utf-8"
-                ):
-                    print(f"STALE: {repo_path}", file=sys.stderr)
-                    all_ok = False
-
-            if all_ok:
-                print("All generated files are up-to-date.")
-                return 0
-            else:
-                print("Some generated files are stale. Run without --check to regenerate.", file=sys.stderr)
-                return 1
+        if all_ok:
+            print("All generated files are up-to-date.")
+            return 0
+        else:
+            print("Some generated files are stale. Run without --check to regenerate.", file=sys.stderr)
+            return 1
     else:
-        pairs = generate_all_to_root(PROJECT_ROOT, generate_cache, generate_ext, do_async, do_sync)
-        format_tree(PROJECT_ROOT / "pokelance")
         for _, repo_path in pairs:
             print(f"Generated (AST): {repo_path}")
         return 0

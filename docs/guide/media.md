@@ -90,7 +90,7 @@ print(asyncio.run(main()))
         print(f"Downloaded {len(audio)} bytes from {pokemon.cries.latest}")
     ```
 
-Accepted content types are `ogg`, `wav`, and `mp3`; anything else raises [`AudioNotFound`][pokelance.exceptions.AudioNotFound].
+Only OGG audio is accepted (`audio/ogg` or `application/ogg`); anything else raises [`AudioNotFound`][pokelance.exceptions.AudioNotFound].
 
 ```python exec="true" source="above" html="true" session="media_cry_async"
 import asyncio
@@ -121,7 +121,7 @@ Cache sizes can be configured during client construction or dynamically:
 
 ```python
 client = PokeLanceAsyncClient(image_cache_size=256, audio_cache_size=64)
-client.get_image.set_size(512)  # change the shared async image cache limit
+client.get_image.set_size(512)  # change this client's async image cache limit
 ```
 
 ## Error handling

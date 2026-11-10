@@ -99,10 +99,10 @@ class PokemonFormTriggerEnum(BaseEnum):
     UNDEFINED = "undefined"
 
     @classmethod
-    def from_str(cls, value: str | None) -> PokemonFormTriggerEnum:
-        if value is None:
-            return PokemonFormTriggerEnum.UNDEFINED
-        return cls(value) if value in cls._value2member_map_ else cls.UNDEFINED
+    def from_str(cls, value: str | PokemonFormTriggerEnum | None) -> PokemonFormTriggerEnum:
+        if isinstance(value, cls):
+            return value
+        return cls(value) if value in cls._value2member_map_ else cls("undefined")
 
 
 class GenderEnum(BaseEnum):

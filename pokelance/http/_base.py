@@ -109,7 +109,8 @@ class BaseHttpClient(t.Generic[_ClientT, _SessionT, _CacheManagerT]):
     """Base class containing shared HTTP logic, validation, and media checks."""
 
     IMAGE_FORMATS: t.ClassVar[tuple[str, ...]] = ("png", "jpg", "jpeg", "gif", "webp", "svg")
-    AUDIO_FORMATS: t.ClassVar[tuple[str, ...]] = ("ogg", "wav", "mp3")
+    AUDIO_FORMATS: t.ClassVar[tuple[str, ...]] = ("ogg",)
+    AUDIO_MIME_TYPES: t.ClassVar[tuple[str, ...]] = ("audio/ogg", "application/ogg")
 
     _client: _ClientT
     session: _SessionT | None
@@ -178,7 +179,7 @@ class BaseHttpClient(t.Generic[_ClientT, _SessionT, _CacheManagerT]):
         """Validate that the response is an audio file and return raw bytes."""
         status = response.status_code or -1
         content_type = response.headers.get("content-type", "")
-        is_cry = any(f_ in content_type for f_ in cls.AUDIO_FORMATS)
+        is_cry = content_type.partition(";")[0].strip().lower() in cls.AUDIO_MIME_TYPES
         if 200 <= status < 300 and response.content and is_cry:
             logger.debug(f"Request to {url} was successful.")
             return response.content

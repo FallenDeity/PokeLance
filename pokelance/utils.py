@@ -122,6 +122,7 @@ class _LRUCacheWrapper(Generic[_P, _R]):
         self.__misses = 0
         self.__tasks: set[asyncio.Task[_R]] = set()
         self.__cancelling_tasks: set[asyncio.Task[_R]] = set()
+        self.__instance_cache_key = f"__alru_cache_{id(self)}"
 
     def __contains__(self, /, *args: Hashable, **kwargs: Any) -> bool:  # ruff: ignore[any-type]
         key = _make_key(args, kwargs, self.__typed)
@@ -281,7 +282,11 @@ class _LRUCacheWrapper(Generic[_P, _R]):
         if instance is None:
             return self
         else:
-            return _LRUCacheWrapperInstanceMethod(self, instance)
+            namespace = vars(instance)
+            if self.__instance_cache_key not in namespace:
+                wrapper = _LRUCacheWrapper(self.__wrapped__, self.__maxsize, self.__typed, self.__ttl)
+                namespace.setdefault(self.__instance_cache_key, _LRUCacheWrapperInstanceMethod(wrapper, instance))
+            return cast("_LRUCacheWrapperInstanceMethod[_P2, _R, _T]", namespace[self.__instance_cache_key])
 
 
 @final
@@ -326,7 +331,7 @@ class _LRUCacheWrapperInstanceMethod(Generic[_P, _R, _T]):
         self.__wrapper.cache_clear()
 
     async def cache_close(self, *, wait: bool = False) -> None:
-        """Drain shared method work while leaving the decorator reusable."""
+        """Drain this instance's method work while leaving its cache reusable."""
         await self.__wrapper._cache_close(wait=wait)
 
     def cache_info(self) -> _CacheInfo:

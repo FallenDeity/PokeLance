@@ -213,7 +213,7 @@ async def test_fetch_refreshes_cache(client: pokelance.PokeLanceAsyncClient, mon
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("close_method", ["close", "context", "http"])
-async def test_shutdown_drains_shared_media(monkeypatch: pytest.MonkeyPatch, close_method: str) -> None:
+async def test_shutdown_drains_client_media(monkeypatch: pytest.MonkeyPatch, close_method: str) -> None:
     image_started, audio_started = asyncio.Event(), asyncio.Event()
     image_cancelled, audio_cancelled = asyncio.Event(), asyncio.Event()
 
@@ -257,12 +257,16 @@ async def test_shutdown_drains_shared_media(monkeypatch: pytest.MonkeyPatch, clo
         await client.http.close()
     else:
         await client.close()
-    for caller in (image, audio, other_image):
+    for caller in (image, audio):
         with pytest.raises(asyncio.CancelledError):
             await caller
     assert client.get_image.cache_parameters()["tasks"] == 0
     assert client.get_audio.cache_parameters()["tasks"] == 0
     session.close.assert_awaited_once()
+    assert not other_image.done()
+    other_image.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await other_image
     assert not other.get_image.cache_parameters()["closed"]
     assert await other.get_image("safe") == b"image"
     await other.close()
